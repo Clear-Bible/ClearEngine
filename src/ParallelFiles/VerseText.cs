@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
-using System.Data.SqlClient;
-using System.Data.OleDb;
 using System.IO;
 
 namespace ParallelFiles
