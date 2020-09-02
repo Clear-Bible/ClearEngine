@@ -5,4 +5,12 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Tokenizer\Tokenizer.csproj" />
+    <ProjectReference Include="..\..\src\ParallelFiles\ParallelFiles.csproj" />
+    <ProjectReference Include="..\..\src\GBI_Aligner\GBI_Aligner.csproj" />
+    <ProjectReference Include="..\..\src\AlignmentTool\AlignmentTool.csproj" />
+    <ProjectReference Include="..\..\src\TransModels\TransModels.csproj" />
+    <ProjectReference Include="..\..\src\Utilities\Utilities.csproj" />
+  </ItemGroup>
 </Project>
