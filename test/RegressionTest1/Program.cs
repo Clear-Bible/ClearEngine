@@ -4,6 +4,7 @@ using GBI_Aligner;
 using ParallelFiles;
 using System;
 using System.Collections;
+using System.IO;
 using Tokenizer;
 using TransModels;
 using Utilities;
@@ -16,28 +17,54 @@ namespace RegressionTest1
         {
             Console.WriteLine("Regression Test 1");
 
-            string rawPath = "T/Verse.txt";
-            string tokPath = "T/target.punc.txt";
+            Console.WriteLine("Option: 1 Brief, 2 Long");
+            Console.Write("? ");
+            if (!int.TryParse(Console.ReadLine(), out int option))
+            {
+                Console.WriteLine("Unrecognized Option");
+                return;
+            }
+
+            string[] inputFolders = { "InputBrief", "InputLong" };
+            string[] outputFolders = { "OutputBrief", "OutputLong" };
+            string[] referenceFolders = { "RefBrief", "RefLong" };
+
+            string inputFolder = inputFolders[option];            
+            string outputFolder = outputFolders[option];
+            string referenceFolder = referenceFolders[option];
+            string commonFolder = "InputCommon";
+            string treeFolder = "Trees";
+
+            Func<string,Func<string, string>> prefix =
+                pre => s => Path.Combine(pre, s);
+            Func<string, string>
+                input = prefix(inputFolder),
+                output = prefix(outputFolder),
+                common = prefix(commonFolder),
+                reference = prefix(referenceFolder);
+
+            string versePath = input("Verse.txt");
+            string tokPath = output("target.punc.txt");
             string lang = "Eggon";
-            ArrayList puncs = Data.GetWordList("puncs.txt");
+            ArrayList puncs = Data.GetWordList(common("puncs.txt"));
 
             Console.WriteLine("Tokenizing");
-            Tokens.Tokenize(rawPath, tokPath, puncs, lang);
+            Tokens.Tokenize(versePath, tokPath, puncs, lang);
 
-            string versificationPath = "T/Versification.xml";
+            string versificationPath = common("Versification.xml");
             ArrayList versificationList =
                 Versification.LoadVersificationList(versificationPath,
                 "S1", "id");
 
-            string sourcePath = "S/source.txt";
-            string sourceIdPath = "S/source.id.txt";
-            string sourceIdLemmaPath = "S/source.id.lemma.txt";
-            string targetPath = "T/target.punc.txt";
-            string parallelSourcePath = "T/source.txt";
-            string parallelSourceIdPath = "T/source.id.txt";
-            string parallelSourceIdLemmaPath = "T/source.id.lemma.txt";
-            string parallelTargetPath = "T/target.txt";
-            string parallelTargetIdPath = "T/target.id.txt";
+            string sourcePath = common("source.txt");
+            string sourceIdPath = common("source.id.txt");
+            string sourceIdLemmaPath = common("source.id.lemma.txt");
+            string targetPath = output("target.punc.txt");
+            string parallelSourcePath = output("source.txt");
+            string parallelSourceIdPath = output("source.id.txt");
+            string parallelSourceIdLemmaPath = output("source.id.lemma.txt");
+            string parallelTargetPath = output("target.txt");
+            string parallelTargetIdPath = output("target.id.txt");
 
             Console.WriteLine("Creating Parallel Files");
             GroupVerses.CreateParallelFiles(
@@ -48,62 +75,56 @@ namespace RegressionTest1
                 parallelTargetPath, parallelTargetIdPath,
                 versificationList);
 
-            ArrayList sourceFuncWords = Data.GetWordList("sourceFuncWords.txt");
-            ArrayList targetFuncWords = Data.GetWordList("T/targetFuncWords.txt");
+            ArrayList sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
+            ArrayList targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
 
-            // source.txt target.txt source.id.txt target.id.txt 1:10;H:5 0.1 transModel.txt alignModel.txt
+            string parallelCwSourcePath = output("sourceFile.cw.txt");
+            string parallelCwSourceIdPath = output("sourceFile.id.cw.txt");
+            string parallelCwTargetPath = output("targetFile.cw.txt");
+            string parallelCwTargetIdPath = output("targetFile.id.cw.txt");
 
-            string sourcePathA = "T/source.txt";
-            string sourcePath2 = "T/sourceFile.cw.txt";
-            string sourceIdPathA = "T/source.id.txt";
-            string sourceIdPath2 = "T/sourceFile.id.cw.txt";
-            string targetPathA = "T/target.txt";
-            string targetPath2 = "T/targetFile.cw.txt";
-            string targetIdPathA = "T/target.id.txt";
-            string targetIdPath2 = "T/targetFile.id.cw.txt";
+            Data.FilterOutFunctionWords(parallelSourcePath, parallelCwSourcePath, sourceFuncWords);
+            Data.FilterOutFunctionWords(parallelSourceIdPath, parallelCwSourceIdPath, sourceFuncWords);
+            Data.FilterOutFunctionWords(parallelTargetPath, parallelCwTargetPath, targetFuncWords);
+            Data.FilterOutFunctionWords(parallelTargetIdPath, parallelCwTargetIdPath, targetFuncWords);
 
-            Data.FilterOutFunctionWords(sourcePathA, sourcePath2, sourceFuncWords);
-            Data.FilterOutFunctionWords(sourceIdPathA, sourceIdPath2, sourceFuncWords);
-            Data.FilterOutFunctionWords(targetPathA, targetPath2, targetFuncWords);
-            Data.FilterOutFunctionWords(targetIdPathA, targetIdPath2, targetFuncWords);
-
-            string transModelPath = "T/transModel.txt";
-            string alignModelPath = "T/alignModel.txt";
+            string transModelPath = output("transModel.txt");
+            string alignModelPath = output("alignModel.txt");
 
             Console.WriteLine("Building Models");
             BuildTransModels.BuildModels(
-                sourcePath2, targetPath2, sourceIdPath2, targetIdPath2,
+                parallelCwSourcePath, parallelCwTargetPath, parallelCwSourceIdPath, parallelCwTargetIdPath,
                 "T/1:10;H:5", 0.1,
                 transModelPath, alignModelPath);
 
             Hashtable bookNames = BookTables.LoadBookNames3();
 
-            string jsonOutput = "T/alignment.json";
+            string jsonOutput = output("alignment.json");
 
-            Hashtable transModel = Data.GetTranslationModel("T/transModel.txt");
-            Hashtable manTransModel = Data.GetTranslationModel2("T/manTransModel.txt");
-            Hashtable alignProbs = Data.GetAlignmentModel("alignModel.txt");
+            Hashtable transModel = Data.GetTranslationModel(transModelPath);
+            Hashtable manTransModel = Data.GetTranslationModel2(common("manTransModel.txt"));
+            Hashtable alignProbs = Data.GetAlignmentModel(alignModelPath);
             Hashtable preAlignment = Data.BuildPreAlignmentTable(alignProbs);
             bool useAlignModel = true;
             int maxPaths = 1000000;
-            Hashtable groups = Data.LoadGroups("T/groups.txt");
-            ArrayList stopWords = Data.GetStopWords("T/stopWords.txt");
-            Hashtable goodLinks = Data.GetXLinks("T/goodLinks.txt");
+            Hashtable groups = Data.LoadGroups(common("groups.txt"));
+            ArrayList stopWords = Data.GetStopWords(common("stopWords.txt"));
+            Hashtable goodLinks = Data.GetXLinks(common("goodLinks.txt"));
             int goodLinkMinCount = 3;
-            Hashtable badLinks = Data.GetXLinks("T/badLinks.txt");
+            Hashtable badLinks = Data.GetXLinks(common("badLinks.txt"));
             int badLinkMinCount = 3;
-            Hashtable glossTable = Data.BuildGlossTableFromFile("Gloss.txt");
-            Hashtable oldLinks = Data.GetOldLinks("T/oldAlignment.json", ref groups);
+            Hashtable glossTable = Data.BuildGlossTableFromFile(common("Gloss.txt"));
+            Hashtable oldLinks = Data.GetOldLinks(common("oldAlignment.json"), ref groups);
             bool contentWordsOnly = true;
-            Hashtable strongs = Data.BuildStrongTable("T/strongs.txt");
+            Hashtable strongs = Data.BuildStrongTable(common("strongs.txt"));
 
             Console.WriteLine("Auto Alignment");
             AutoAligner.AutoAlign(
-                "T/source.id.txt", "T/source.id.lemma.txt",
-                "T/target.id.txt",
+                parallelSourceIdPath, parallelSourceIdLemmaPath,
+                parallelTargetIdPath,
                 jsonOutput,
                 transModel, manTransModel,
-                "Trees",
+                treeFolder,
                 bookNames,
                 alignProbs, preAlignment, useAlignModel,
                 maxPaths,
@@ -113,7 +134,7 @@ namespace RegressionTest1
                 oldLinks,
                 sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
 
-            string jsonOutputRef = "Compare/alignment.json";
+            string jsonOutputRef = reference("alignment.json");
 
             Console.WriteLine("Comparing JSON Output Files");
             if (FilesMatch(jsonOutput, jsonOutputRef))
