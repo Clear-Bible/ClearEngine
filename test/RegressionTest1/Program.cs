@@ -29,7 +29,7 @@ namespace RegressionTest1
 
             string[] inputFolders = { "InputBrief", "InputLong" };
             string[] outputFolders = { "OutputBrief", "OutputLong" };
-            string[] referenceFolders = { "RefBrief", "RefLong" };
+            string[] referenceFolders = { "ReferenceBrief", "ReferenceLong" };
 
             string inputFolder = inputFolders[option];            
             string outputFolder = outputFolders[option];
