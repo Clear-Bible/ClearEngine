@@ -19,11 +19,13 @@ namespace RegressionTest1
 
             Console.WriteLine("Option: 1 Brief, 2 Long");
             Console.Write("? ");
-            if (!int.TryParse(Console.ReadLine(), out int option))
+            if (!int.TryParse(Console.ReadLine(), out int option) ||
+                option != 1 && option != 2)
             {
                 Console.WriteLine("Unrecognized Option");
                 return;
             }
+            option -= 1;
 
             string[] inputFolders = { "InputBrief", "InputLong" };
             string[] outputFolders = { "OutputBrief", "OutputLong" };
@@ -34,6 +36,8 @@ namespace RegressionTest1
             string referenceFolder = referenceFolders[option];
             string commonFolder = "InputCommon";
             string treeFolder = "Trees";
+
+            return;
 
             Func<string,Func<string, string>> prefix =
                 pre => s => Path.Combine(pre, s);
