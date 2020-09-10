@@ -60,8 +60,7 @@ namespace GBI_Aligner
             Alignment2 align = new Alignment2();  // The output goes here.
             align.Lines = new Line[sourceVerses.Count];
 
-            // for (int i = 0; i < sourceVerses.Count; i++)
-            for (int i = 0; i < 1; i++)  // (TIM study)
+            for (int i = 0; i < sourceVerses.Count; i++)
             {
                 if (i == 8)
                 {
@@ -146,24 +145,24 @@ namespace GBI_Aligner
             XmlNode treeNode = GetTreeNode(sStartVerseID, sEndVerseID, trees);
 
             // TIM Study
-            {
-                using (StringWriter sw = new StringWriter())
-                {
-                    XmlWriterSettings xws = new XmlWriterSettings();
-                    xws.Indent = true;
-                    using (XmlWriter xw = XmlWriter.Create(sw, xws))
-                    {
-                        treeNode.WriteContentTo(xw);
-                    }
-                    Console.WriteLine(sw.ToString());
-                }
-            }
+            //{
+            //    using (StringWriter sw = new StringWriter())
+            //    {
+            //        XmlWriterSettings xws = new XmlWriterSettings();
+            //        xws.Indent = true;
+            //        using (XmlWriter xw = XmlWriter.Create(sw, xws))
+            //        {
+            //            treeNode.WriteContentTo(xw);
+            //        }
+            //        Console.WriteLine(sw.ToString());
+            //    }
+            //}
 
             Hashtable wordInfoTable = Data.BuildWordInfoTable(treeNode);
                 // Hashtable(sourceId => WordInfo) for the terminal nodes
 
             // TIM study
-            TimUtil.PrintHashTable("wordInfoTable", wordInfoTable);
+            // TimUtil.PrintHashTable("wordInfoTable", wordInfoTable);
            
 
             ArrayList sWords = GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
@@ -171,14 +170,14 @@ namespace GBI_Aligner
             // sourceWords2 not actually used
 
             // TIM Study
-            TimUtil.PrintArrayList("sWords", sWords);
+            // TimUtil.PrintArrayList("sWords", sWords);
            
             ArrayList tWords = GetTargetWords(targetWords, targetWords2);
             // ArrayList(TargetWord)
             // targetWords not actually used
 
             // TIM Study
-            TimUtil.PrintArrayList("tWords", tWords);
+            // TimUtil.PrintArrayList("tWords", tWords);
 
             Hashtable idMap = OldLinks.CreateIdMap(sWords);  // HashTable(SourceWord.ID => SourceWord.AltID)
 
@@ -203,7 +202,7 @@ namespace GBI_Aligner
                 //     ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
 
             // TIM Study
-            TimUtil.PrintHashTable("terminalCandidates", terminalCandidates);
+            // TimUtil.PrintHashTable("terminalCandidates", terminalCandidates);
             
             Hashtable alignments = new Hashtable();
             AlignNodes(treeNode, tWords, ref alignments, n, sourceWords.Length, maxPaths, terminalCandidates);
@@ -212,13 +211,13 @@ namespace GBI_Aligner
             //   or Candidate)
 
             // TIM Study
-            TimUtil.PrintHashTable("alignments", alignments);
+            // TimUtil.PrintHashTable("alignments", alignments);
 
             ArrayList verseAlignment = (ArrayList) alignments[verseNodeID];
             Candidate topCandidate = (Candidate)verseAlignment[0];
 
             // TIM Study
-            TimUtil.PrintAsJson("verseAlignment", verseAlignment);
+            // TimUtil.PrintAsJson("verseAlignment", verseAlignment);
 
 
             string linkedWords = GetWords(topCandidate);

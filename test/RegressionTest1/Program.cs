@@ -13,9 +13,33 @@ namespace RegressionTest1
 {
     class Program
     {
+        /// <summary>
+        /// Regression Test 1.  Checks for expected Clear3 behavior in
+        /// a simple representative complete auto-alignment example.
+        /// </summary>
+        /// <remarks>
+        /// 2020-sep-08 tims  Current form of this test is to support
+        /// initial development;  expecting some rework of file locations
+        /// before first production release.
+        /// </remarks>
+        /// 
         static void Main(string[] args)
         {
             Console.WriteLine("Regression Test 1");
+
+            // Check that current directory is reasonable.
+            DirectoryInfo dir = new DirectoryInfo(".");
+            if (!dir.Name.Equals("TestSandbox1"))
+            {
+                Console.WriteLine("Expected current directory to be named TestSandbox1.");
+                Console.WriteLine("You may need to set debug options, or perhaps modify this program.");
+                return;
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Using sandbox directory:");
+            Console.WriteLine(Directory.GetCurrentDirectory());
+            Console.WriteLine();
 
             Console.WriteLine("Option: 1 Brief, 2 Long");
             Console.Write("? ");
@@ -35,9 +59,7 @@ namespace RegressionTest1
             string outputFolder = outputFolders[option];
             string referenceFolder = referenceFolders[option];
             string commonFolder = "InputCommon";
-            string treeFolder = "Trees";
-
-            return;
+            string treeFolder = "SyntaxTrees";
 
             Func<string,Func<string, string>> prefix =
                 pre => s => Path.Combine(pre, s);
@@ -49,7 +71,7 @@ namespace RegressionTest1
 
             string versePath = input("Verse.txt");
             string tokPath = output("target.punc.txt");
-            string lang = "Eggon";
+            string lang = "English";
             ArrayList puncs = Data.GetWordList(common("puncs.txt"));
 
             Console.WriteLine("Tokenizing");
@@ -98,7 +120,7 @@ namespace RegressionTest1
             Console.WriteLine("Building Models");
             BuildTransModels.BuildModels(
                 parallelCwSourcePath, parallelCwTargetPath, parallelCwSourceIdPath, parallelCwTargetIdPath,
-                "T/1:10;H:5", 0.1,
+                "1:10;H:5", 0.1,
                 transModelPath, alignModelPath);
 
             Hashtable bookNames = BookTables.LoadBookNames3();
