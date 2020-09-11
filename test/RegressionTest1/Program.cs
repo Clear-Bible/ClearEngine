@@ -1,9 +1,11 @@
 ﻿
 using AlignmentTool;
 using GBI_Aligner;
+using Newtonsoft.Json;
 using ParallelFiles;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using Tokenizer;
 using TransModels;
@@ -162,16 +164,43 @@ namespace RegressionTest1
 
             string jsonOutputRef = reference("alignment.json");
 
-            Console.WriteLine("Comparing JSON Output Files");
-            if (FilesMatch(jsonOutput, jsonOutputRef))
+            string jsonText = File.ReadAllText(output("alignment.json"));
+            Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
+            string jsonTextR = File.ReadAllText(reference("alignment.json"));
+            Line[] linesR = JsonConvert.DeserializeObject<Line[]>(jsonTextR);
+            int n = lines.Length;
+            int nR = linesR.Length;
+            if (n != nR)
             {
-                Console.WriteLine("*** OK ***");
+                Console.WriteLine("Unequal numbers of lines.");
+                return;
             }
-            else
+            int differentLines = 0;
+            for (int i = 0; i < n; i++)
             {
-                Console.WriteLine("*** JSON output differs from reference. ***");
+                Line line = lines[i];
+                Line lineR = linesR[i];
+                if (line.links.Count != lineR.links.Count)
+                {
+                    Console.WriteLine($"Line {i} links {line.links.Count} ref {lineR.links.Count}");
+                    differentLines++;
+                }
             }
-            Console.WriteLine("End of Regression Test 1");
+            Console.WriteLine($"Different lines: {differentLines}");
+            ;
+            
+
+
+            //Console.WriteLine("Comparing JSON Output Files");
+            //if (FilesMatch(jsonOutput, jsonOutputRef))
+            //{
+            //    Console.WriteLine("*** OK ***");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("*** JSON output differs from reference. ***");
+            //}
+            //Console.WriteLine("End of Regression Test 1");
         }
 
         static bool FilesMatch(string path1, string path2)
