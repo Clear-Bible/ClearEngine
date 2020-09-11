@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GBI_Aligner", "src\GBI_Alig
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlignmentTool", "src\AlignmentTool\AlignmentTool.csproj", "{DA369651-0364-4F2D-AF57-FB69E3A3EAE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clear3", "src\Clear3\Clear3.csproj", "{13DF258A-0FA2-453E-926B-FD0959D73405}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,5 +139,17 @@ Global
 		{DA369651-0364-4F2D-AF57-FB69E3A3EAE5}.Debug|x64.Build.0 = Debug|x64
 		{DA369651-0364-4F2D-AF57-FB69E3A3EAE5}.Release|x64.ActiveCfg = Release|x64
 		{DA369651-0364-4F2D-AF57-FB69E3A3EAE5}.Release|x64.Build.0 = Release|x64
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Debug|x86.Build.0 = Debug|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Release|x86.ActiveCfg = Release|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Release|x86.Build.0 = Release|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Debug|x64.Build.0 = Debug|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Release|x64.ActiveCfg = Release|Any CPU
+		{13DF258A-0FA2-453E-926B-FD0959D73405}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
