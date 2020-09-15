@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
-namespace ClearBible.Clear3
+namespace ClearBible.Clear3.API
 {
     public struct ZoneId
     {
