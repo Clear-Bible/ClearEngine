@@ -16,50 +16,63 @@ namespace ClearBible.Clear3.API
         IEnumerable<ManuscriptSegment> Verse(
             int book, int chapter, int verse);
 
-        ManuscriptSegment Get(
-            int book, int chapter, int verse, int word, int segment);
+        bool Segment(
+            int book, int chapter, int verse, int word, int segNum,
+            out ManuscriptSegment segment);
 
-        ManuscriptSegment Get(string key);
-    }
-
-    public interface ManuscriptSegmentId
-    {
-        string Key { get; }
-
-        int Book { get; }
-
-        int Chapter { get; }
-
-        int Verse { get; }
-
-        int Word { get; }
-
-        int Segment { get; }
+        bool Find(string key, out ManuscriptSegment segment);
     }
 
     public interface ManuscriptSegment
     {
-        Manuscript Context { get; }
+        Status QueryId(out string key, out Manuscript context);
 
-        ManuscriptSegmentId Id { get; }
+        Status QueryPosition(
+            out int chapter,
+            out int book,
+            out int word,
+            out int segNum);
 
-        string SurfaceText { get; }
-
-        string Morphology { get; }
-
-        Lemma Lemma { get; }
+        Status Query(
+            out string surfaceText,
+            out string optionalMorphology,
+            out Lemma optionalLemma);
     }
 
-    public interface Lemma
+    
+
+    public interface ManuscriptFactory
     {
-        Uri Context { get; }
+        Status CreateManuscript(
+            Uri id,
+            out Manuscript manuscript);
 
-        string Key { get; }
+        Status CreateSegment(
+            Manuscript manuscript,
+            int book,
+            int chapter,
+            int verse,
+            int word,
+            int segNum,
+            string surfaceText,
+            out ManuscriptSegment segment);
 
-        string LemmaText { get; }
+        Status DeleteSegment(
+            Manuscript manuscript,
+            string manuscriptSegmentKey);
 
-        Uri Language { get; }
+        Status SetMorphology(
+            ManuscriptSegment segment,
+            string morphology);
 
-        int Submeaning { get; }
+        Status SetLemma(
+            ManuscriptSegment segment,
+            Uri lemmaContext,
+            string lemmaKey,
+            string lemmaText,
+            Uri language,
+            int submeaning);
+
+        Status ClearLemma(ManuscriptSegment segment);
     }
 }
