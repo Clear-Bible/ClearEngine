@@ -1,44 +1,92 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace ClearBible.Clear3.API
 {
     public interface ClearStudy
     {
-        string Key { get; }
+        Guid Id { get; }
 
         string ClientMetadata { get; set; }
 
-        bool SetTrees(Uri trees, out string status);
+        void AddTargetZone(Zone targetZone);
+        // throws ArgumentException if zone already present
 
-        bool SetManuscript(Uri manuscript, out string status);
+        void RemoveTargetZone(Zone targetZone);
+        // throws ArgumentException if zone is not present
 
-        bool GetManuscript(out Manuscript manuscript, out string status);
+        IEnumerable<Zone> TargetZones(ZoneQuery zoneQuery);
 
-        TargetLanguageInfo TargetLanguageInfo { get; }
+        void SetAlignment(
+            Zone targetZone,
+            SourceKind kind,
+            Guid AlignmentId);
+        // throws ArgumentException if zone is not present
 
-        TargetZones TargetZones { get; }
+        void ClearAlignment(
+            Zone targetZone,
+            SourceKind kind);
+        // throws ArgumentException if zone is not present
+
+        Alignment GetAlignment(Zone targetZone, SourceKind kind);
+        // throws ArgumentException if zone is not present
+        // returns null if no alignment for the kind
+
+        IEnumerable<Guid> AllLexiconIds(SourceKind kind);
+
+        IEnumerable<Guid> LexiconIdsForTargetText(
+            SourceKind kind,
+            string[] targetText);
+
+        IEnumerable<Guid> QueryLexiconByTargetPatterns(
+            SourceKind kind,
+            Regex[] regularExpressions);
+
+        IEnumerable<Guid> LexiconIdsForAlignment(SourceKind kind, Guid alignmentId);
+
+        LexiconEntry LexiconEntry(SourceKind kind, Guid lexiconId);
     }
+
+    public enum SourceKind
+    {
+        Original,
+        Gateway
+    }
+
+    public struct LexiconEntry
+    {
+        public readonly Guid Id;
+        public readonly string[] sourceDictForms;
+        public readonly bool IsPhrase;
+        public readonly TargetForm[] targetForms;
+    }
+
+    public struct TargetForm
+    {
+        public readonly string targetText;
+        public readonly int count;
+        public readonly double rate;
+        public readonly Guid[] alignmentIds;
+    }
+
+
+
+
+    
 
     public interface TargetLanguageInfo
     {
         string Name { get; set; }
 
-        void SetPunctuations(Uri punctuationSetUri);
+        Status SetPunctuations(Uri punctuationSetUri);
 
         void ClearPunctuations();
 
         void AddPunctuation(string punctuation);
+
+        IEnumerable<string> Punctuations { get; }
     }
 
-    public interface TargetZones
-    {
-        TargetZone FindOrCreateStd(int book, int chapter, int verse);
-
-        TargetZone FindOrCreateNonStd(string name);
-
-        void Delete(TargetZone zone);
-
-        IEnumerable<TargetZone> All { get; }
-    }
+    
 }

@@ -3,25 +3,42 @@ using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
+    public interface Status
+    {
+        bool Error { get; }
+
+        int StatusCode { get; }
+
+        string Message { get; }
+    }
+
+    public interface KeyedAbstractDatum
+    {
+        string Uuid { get; }
+    }
+
     public interface ClearService
     {
         ClearStudy FindOrCreateStudy(string key);
 
-        bool SerializeStudy(string key, string path, out string status);
+        Status SerializeStudy(string key, string path);
 
-        bool DeserializeStudy(string path, out string key, out string status);
+        Status DeserializeStudy(string path, out string key);
 
         TargetZoneId StdTargetZoneId(int book, int chapter, int verse);
 
         TargetZoneId VariantTargetZoneId(string name);
 
-        bool SetLocalResourceFolder(string path, out string status);
+        Status SetLocalResourceFolder(string path);
 
-        bool DownloadResource(Uri uri, out string status);
+        Status DownloadResource(Uri uri);
 
-        bool QueryLocalResources(
-            out IEnumerable<LocalResource> resources,
-            out string status);
+        Status QueryLocalResources(
+            out IEnumerable<LocalResource> resources);
+
+        ManuscriptFactory ManuscriptFactory { get; }
+
+        LemmaService LemmaService { get; }
     }
 
     public interface LocalResource
