@@ -17,16 +17,18 @@ namespace ClearBible.Clear3.API
 
     public interface LemmaService
     {
-        Status LoadLemmaResource(Uri context);
+        void LoadLemmaResource(Uri context);
+        // can throw ClearException
 
         bool Find(Uri context, string key, out Lemma lemma);
 
-        Status Create(
+        void Create(
             Uri context,
             string key,
             string lemmaText,
             Uri language,
             int submeaning,
             out Lemma lemma);
+        // can throw ClearException
     }    
 }
