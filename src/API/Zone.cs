@@ -5,10 +5,9 @@ namespace ClearBible.Clear3.API
 {
     public interface ZoneService
     {
-        Zone FindOrCreate(string key);
-        // throws ArgumentException if key is malformed
+        Zone Find(string key);
 
-        Zone FindOrCreateStd(int book, int chapter, int verse);
+        Zone FindOrCreateStandard(int book, int chapter, int verse);
 
         Zone FindOrCreateNonStandard(string nonStandardName);
 

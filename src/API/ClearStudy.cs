@@ -4,6 +4,20 @@ using System.Text.RegularExpressions;
 
 namespace ClearBible.Clear3.API
 {
+    public interface ClearStudyManager
+    {
+        ClearStudy FindOrCreateStudy(string key);
+
+        void SerializeStudy(string key, string path);
+        // can throw ClearException
+
+        void DeserializeStudy(string path, out string key);
+        // can throw ClearException
+
+        void DeleteStudy(string key);
+        // can throw ClearException
+    }
+
     public interface ClearStudy
     {
         Guid Id { get; }
@@ -79,7 +93,7 @@ namespace ClearBible.Clear3.API
     {
         string Name { get; set; }
 
-        Status SetPunctuations(Uri punctuationSetUri);
+        // Status SetPunctuations(Uri punctuationSetUri);
 
         void ClearPunctuations();
 

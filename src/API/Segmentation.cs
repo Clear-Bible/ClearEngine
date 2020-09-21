@@ -3,22 +3,17 @@ using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
-    //public interface Segmentation
-    //{
-    //    TargetZone TargetZone { get; }
+    public interface Segmenter
+    {
+        public void SetPunctuationFromResource(Uri punctuationResource);
+        // can throw ClearException
 
-    //    bool Segmented { get; }
+        string[] GetAllPunctuation();
 
-    //    IEnumerable<string> Segments { get; }
+        void AddPunctuation(string punctuation);
 
-    //    bool Manual { get; }
+        void RemovePunctuation(string punctuation);
 
-    //    Uri AutoAlgorithm { get; }
-
-    //    void Clear();
-
-    //    void SetManual(string[] segments);
-
-    //    void PerformAuto(Uri autoAlgorithm);
-    //}
+        string[] Segment(string toBeSegmented);
+    }
 }

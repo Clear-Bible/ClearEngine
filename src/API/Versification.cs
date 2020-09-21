@@ -16,7 +16,7 @@ namespace ClearBible.Clear3.API
             int numberVerses);
 
         void AddWordsMapping(
-            TargetZoneId targetZoneId,
+            Zone targetZone,
             int manuscriptStartBook,
             int manuscriptStartChapter,
             int manuscriptStartVerse,
