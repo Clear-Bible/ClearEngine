@@ -17,6 +17,8 @@ namespace RegressionTest2
 
         static Uri punctuationUri =
             new Uri("http://clear.bible/clear3BuiltIn/punctuation1");
+        static Uri stopwordsUri =
+            new Uri("http://clear.bible/clear3BuiltIn/stopwords1");
         static Uri segmenterAlgorithmUri =
             new Uri("http://clear.bible/clear3BuiltIn/segmentation1");
         static Uri versificationUri =
@@ -51,6 +53,7 @@ namespace RegressionTest2
                 out HashSet<string> origFunctionWords,
                 out HashSet<string> englishFunctionWords,
                 out HashSet<string> builtInPunctuation,
+                out HashSet<string> builtInStopWords,
                 out Versification s1Versification);
 
             Corpus targetCorpus = GetTargetCorpus(
@@ -79,7 +82,7 @@ namespace RegressionTest2
             Task<SMTResult> smtTask = PerformSMT(service, smtTable);
             SMTResult smtResult = smtTask.Result;
 
-            PhraseTranslationModel emptyManualTextTranslationModel =
+            PhraseTranslationModel emptyManualPhraseAlignmentModel =
                 service.EmptyPhraseTranslationModel;
 
             PlaceAlignmentModel emptyManualPlaceAlignmentModel =
@@ -94,9 +97,13 @@ namespace RegressionTest2
                     translationPairTable,
                     smtResult.TransModel,
                     smtResult.AlignModel,
-                    emptyManualTextTranslationModel,
+                    emptyManualPhraseAlignmentModel,
                     emptyManualPlaceAlignmentModel,
-                    emptyManualTargetCorpus
+                    emptyManualTargetCorpus,
+                    origFunctionWords,
+                    englishFunctionWords,
+                    builtInPunctuation,
+                    builtInStopWords
                     );
             AutoAlignmentResult autoAlignmentResult =
                 autoAlignmentTask.Result;
@@ -144,12 +151,14 @@ namespace RegressionTest2
             out HashSet<string> origFunctionWords,
             out HashSet<string> englishFunctionWords,
             out HashSet<string> builtInPunctuation,
+            out HashSet<string> builtInStopWords,
             out Versification s1Versification)
         {
             treeService = null;
             origFunctionWords = null;
             englishFunctionWords = null;
             builtInPunctuation = null;
+            builtInStopWords = null;
             s1Versification = null;
             try
             {
@@ -161,6 +170,8 @@ namespace RegressionTest2
                     service.ResourceManager.GetStringSet(englishFunctionWordsUri);
                 builtInPunctuation =
                     service.ResourceManager.GetStringSet(punctuationUri);
+                builtInStopWords =
+                    service.ResourceManager.GetStringSet(stopwordsUri);
                 s1Versification =
                     service.ResourceManager.GetVersification(versificationUri);
             }
