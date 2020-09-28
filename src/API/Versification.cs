@@ -1,27 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
     public interface Versification
     {
-        Uri DefaultVersification { get; set; }
+        PlaceSet Apply(Zone targetZone);
 
-        void AddVersesRangeMapping(
-            int targetBook,
-            int targetChapter,
-            int targetStartVerse,
-            int manuscriptBook,
-            int manuscriptChapter,
-            int manuscriptStartVerse,
-            int numberVerses);
-
-        void AddWordsMapping(
+        Versification Override(
             Zone targetZone,
-            int manuscriptStartBook,
-            int manuscriptStartChapter,
-            int manuscriptStartVerse,
-            int manuscriptStartWord,
-            int manuscriptStartSegment);
+            PlaceSet placeSet);
+
+        Versification OverrideWithFunction(
+            Func<Zone, PlaceSet> maybeOverride);
+
+        Versification OverrideWithVerseOffset(
+            int book, int chapter, int verseOffset);
     }
 }
 
@@ -31,6 +25,7 @@ namespace ClearBible.Clear3.API
 // org.vrs
 // Reinier de Blois
 //
+// Example: Psalm 60
 // PSA 60:0 = PSA 60:1
 // PSA 60:0 = PSA 60:2
 // PSA 60:1 - 12 = PSA 60:3 - 14

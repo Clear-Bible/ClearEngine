@@ -26,10 +26,7 @@ namespace ClearBible.Clear3.API
     //    NotAligned
     //}
 
-    public interface Alignment
-    {
-
-    }
+    
 
     //public interface Alignment
     //{

@@ -3,27 +3,10 @@ using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
-    public class ClearException : Exception
-    {
-        public ClearException(
-            string message,
-            StatusCode statusCode,
-            Exception innerException)
-            : base(message, innerException)
-        {
-            StatusCode = statusCode;
-        }
-
-        public StatusCode StatusCode { get; private set; }
-    }
-
-    public enum StatusCode
-    {
-        OK,
-        SetLocalResourceFolderFailed,
-        QueryLocalResourcesFailed
-    }
-
+    /// <summary>
+    /// Clear 3.0 Top Level Interface
+    /// </summary>
+    /// 
     public interface Clear30ServiceAPI
     {
         ResourceManager ResourceManager { get; }
@@ -33,37 +16,22 @@ namespace ClearBible.Clear3.API
 
         Corpus CreateEmptyCorpus();
 
-        ClearStudyManager ClearStudyManager { get; }
+        CorpusService CorpusService { get; }
 
-        ZoneService ZoneService { get; }       
+        ZoneService ZoneService { get; }
 
-        // ManuscriptFactory ManuscriptFactory { get; }
+        TranslationPairTable MakeEmptyTranslationPairTable();
 
-        LemmaService LemmaService { get; }
-    }
+        SMTService SMTService { get; }
 
-    public interface ResourceManager
-    {
-        void SetLocalResourceFolder(string path);
-        // can throw ClearException
+        TextTranslationModelBuilder CreateNewTextTranslationModelBuilder();
 
-        void DownloadResource(Uri uri);
-        // can throw ClearException
+        TokenAlignmentModelBuilder CreateNewTokenAlignmentModelBuilder();
 
-        IEnumerable<LocalResource> QueryLocalResources();
-        // can throw ClearException
-    }
+        AutoAlignmentService AutoAlignmentService { get; }
 
-    public interface LocalResource
-    {
-        Uri Id { get; }
+        // ClearStudyManager ClearStudyManager { get; }      
 
-        DateTime DownloadMoment { get; }
-
-        bool Ok { get; }
-
-        string Status { get; }
-
-        string Description { get; }
-    }
+        // LemmaService LemmaService { get; }
+    }   
 }

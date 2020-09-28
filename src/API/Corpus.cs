@@ -5,30 +5,124 @@ namespace ClearBible.Clear3.API
 {
     public interface Corpus
     {
-        Guid Id { get; }
+        string Key { get; }
+
+        IEnumerable<SegmentInstance> SegmentsForZone(Zone zone);
+
+        SegmentInstance SegmentsForPlace(Place place);
+
+        IEnumerable<SegmentInstance> SegmentsForPlaceSet(PlaceSet placeSet);
+
+        RelativePlace RelativePlace(Place place);
 
         IEnumerable<Zone> AllZones();
 
-        void AddOrReplaceZone(Zone zone);
+        Corpus AddZone(Zone zone, IEnumerable<string> segments);
 
-        void RemoveZone(Zone zone);
 
-        IEnumerable<Token> Tokens(Zone zone);
 
-        void AppendToken(Zone zone, Token token);
+        //void AddZone(Zone zone);
 
-        void AppendText(Zone zone, string text);
+        //void PutText(Zone zone, int index, string text);
+
+
+
+
+        //Corpus Map(Func<Token, string> mappingFunction);
+
+        //Corpus Filter(Func<Token, bool> filterFunction);
+
+
+
+
+
+        //Token Token(Zone zone, int index);
+
+        
+        //IEnumerable<Token> TokensForZoneRange(ZoneRange zoneRange);
+
+        //IEnumerable<Token> TokensForZone(Zone zone);
+
+        //IEnumerable<Token> Find(string tokenText);
+
+
+
+
+        
     }
+
+
+    /// <summary>
+    /// An example of a RelativePlace is a datum that means
+    /// "the second occurrence of 'word' in John 1:1".
+    /// </summary>
+    /// 
+    public interface RelativePlace
+    {
+        string Key { get; }
+
+        Zone Zone { get; }
+
+        string Text { get; }
+
+        int Occurrence { get; }
+    }
+
+
+    public interface SegmentInstance
+    {
+        string Key { get; }
+
+        string Text { get; }
+
+        Place Place { get; }
+    }
+
+
+    public interface CorpusService
+    {
+        Corpus CreateEmptyCorpus();
+
+        SegmentInstance SegmentInstance(string Text, Place place);
+    }
+
 
 
     public interface Token
     {
-        Guid HomeCorpos { get; }
+        Guid Id { get; }
 
-        Zone HomeZone { get; }
+        Guid Corpus { get; }
 
-        int HomeZoneIndex { get; }
+        Zone Zone { get; }
+
+        int IndexInZone { get; }
 
         string Text { get; }
+
+        int TextIndexInZone { get; }
+    }
+
+
+    public interface Alignment
+    {
+        IEnumerable<Matching> Matchings { get; }
+    }
+
+
+    public interface Matching
+    {
+        IEnumerable<Token> SourceTokens { get; }
+
+        IEnumerable<Token> TargetTokens { get; }
+
+        MatchingKind Kind { get; }
+    }
+
+
+    public enum MatchingKind
+    {
+        Auto,
+        Manual
     }
 }

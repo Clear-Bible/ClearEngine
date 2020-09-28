@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Service;
@@ -18,26 +20,95 @@ namespace RegressionTest2
         static Uri segmenterAlgorithmUri =
             new Uri("http://clear.bible/clear3BuiltIn/segmentation1");
         static Uri versificationUri =
-            new Uri("http://clear.bible/versification/S1");
+            new Uri("http://clear.bible/clear3BuiltIn/versification/S1");
         static Uri treesUri =
             new Uri("http://clear.bible/trees/WLCGroves");
+        static Uri origFunctionWordsUri =
+            new Uri("http://clear.bible/functionWords/biblicalLanguages");
+        static Uri englishFunctionWordsUri =
+            new Uri("http://clear.bible/functionWords/english");
         static Uri gloss1Uri =
             new Uri("http://clear.bible/glossary/WLCGroves/english");
         static Uri gloss2Uri =
             new Uri("http://clear.bible/glossary/WLCGroves/chinese");
 
 
+        const int Psalms = 19;
+        const int Sixty = 60;
+        static readonly string Psalm60Superscription =
+            $"{Psalms}-{Sixty}-Superscription";
+
+
         static void Main(string[] args)
         {
-            Console.WriteLine("Begin Regression Test 2");
-
             Clear30ServiceAPI service = Clear30Service.FindOrCreate();
 
-            PrepareResources(service);
+            PrepareResources(service);            
 
-            Corpus targetCorpus = GetTargetCorpus(service);
+            GetResources(
+                service,
+                out TreeService treeService,
+                out HashSet<string> origFunctionWords,
+                out HashSet<string> englishFunctionWords,
+                out HashSet<string> builtInPunctuation,
+                out Versification s1Versification);
+
+            Corpus targetCorpus = GetTargetCorpus(
+                service,
+                builtInPunctuation);
+
+            Versification versification = AdjustVersification(
+                service,
+                s1Versification);
+
+            Corpus sourceCorpus = treeService.CreateCorpus(
+                targetCorpus.AllZones());
+
+            TranslationPairTable translationPairTable =
+                CreateTranslationPairTable(
+                    service,
+                    treeService,
+                    targetCorpus,
+                    versification);
+
+            //Corpus smtTargetCorpus =
+            //    targetCorpus.Filter(
+            //        token => !englishFunctionWords.Contains(token.Text));
+
+            //Corpus smtSourceCorpus =
+            //    sourceCorpus
+            //        .Map(token => treeService.LemmaForToken(token))
+            //        .Filter(
+            //            token => !origFunctionWords.Contains(token.Text));
+
+            //Task<SMTResult> smtTask = PerformSMT(
+            //    service,
+            //    smtSourceCorpus,
+            //    smtTargetCorpus);
+            //SMTResult smtResult = smtTask.Result;
+
+            SMTResult smtResult = null;
+
+            TextTranslationModel emptyManualTextTranslationModel =
+                service.CreateNewTextTranslationModelBuilder().Result;
+
+            TokenAlignmentModel emptyManualTokenAlignmentModel =
+                service.CreateNewTokenAlignmentModelBuilder().Result;
+
+            Task<AutoAlignmentResult> autoAlignmentTask =
+                service.AutoAlignmentService.LaunchAutoAlignmentAsync(
+                    treeService,
+                    translationPairTable,
+                    smtResult.TransModel,
+                    smtResult.AlignModel,
+                    emptyManualTextTranslationModel,
+                    emptyManualTokenAlignmentModel
+                    );
+            AutoAlignmentResult autoAlignmentResult =
+                autoAlignmentTask.Result;
         }
 
+        
 
         static void PrepareResources(Clear30ServiceAPI service)
         {
@@ -53,8 +124,8 @@ namespace RegressionTest2
 
                 foreach (Uri uri in
                     new Uri[] {
-                        versificationUri,
                         treesUri,
+                        origFunctionWordsUri,
                         gloss1Uri,
                         gloss2Uri
                     })
@@ -72,7 +143,44 @@ namespace RegressionTest2
             }
         }
 
-        static Corpus GetTargetCorpus(Clear30ServiceAPI service)
+
+        static void GetResources(
+            Clear30ServiceAPI service,
+            out TreeService treeService,
+            out HashSet<string> origFunctionWords,
+            out HashSet<string> englishFunctionWords,
+            out HashSet<string> builtInPunctuation,
+            out Versification s1Versification)
+        {
+            treeService = null;
+            origFunctionWords = null;
+            englishFunctionWords = null;
+            builtInPunctuation = null;
+            s1Versification = null;
+            try
+            {
+                treeService =
+                    service.ResourceManager.GetTreeService(treesUri);
+                origFunctionWords =
+                    service.ResourceManager.GetStringSet(origFunctionWordsUri);
+                englishFunctionWords =
+                    service.ResourceManager.GetStringSet(englishFunctionWordsUri);
+                builtInPunctuation =
+                    service.ResourceManager.GetStringSet(punctuationUri);
+                s1Versification =
+                    service.ResourceManager.GetVersification(versificationUri);
+            }
+            catch (ClearException e)
+            {
+                Console.WriteLine($"Could not get resources: {e.Message}");
+                Environment.Exit(-(int)e.StatusCode);
+            }
+        }
+
+
+        static Corpus GetTargetCorpus(
+            Clear30ServiceAPI service,
+            HashSet<string> punctuation)
         {
             Segmenter segmenter = null;
 
@@ -80,7 +188,6 @@ namespace RegressionTest2
             {
                 segmenter = service.CreateSegmenter(
                     segmenterAlgorithmUri);
-                segmenter.SetPunctuationFromResource(punctuationUri);
             }
             catch (ClearException e)
             {
@@ -88,29 +195,26 @@ namespace RegressionTest2
                 Environment.Exit(-(int)e.StatusCode);
             }
 
-            Corpus targetCorpus = service.CreateEmptyCorpus();
+            segmenter.Punctuation = punctuation;
 
-            const int Psalms = 19;
-            const int Sixty = 60;
+            Corpus targetCorpus = service.CreateEmptyCorpus();
 
             ZoneService zoneService = service.ZoneService;
 
-            Zone superscription = zoneService.FindOrCreateNonStandard(
-                $"{Psalms}-{Sixty}-superscription");
+            Zone superscription = zoneService.ZoneX(
+                Psalm60Superscription);
 
             Zone verse(int verseNumber)
             {
-                return zoneService.FindOrCreateStandard(
+                return zoneService.Zone(
                     Psalms, Sixty, verseNumber);
             }
 
             void addZone(Zone zone, string text)
             {
-                targetCorpus.AddOrReplaceZone(zone);
-                foreach (string segment in segmenter.Segment(text))
-                {
-                    targetCorpus.AppendText(zone, segment);
-                }
+                targetCorpus = targetCorpus.AddZone(
+                    zone,
+                    segmenter.Segment(text));
             }
 
             addZone(
@@ -184,6 +288,57 @@ namespace RegressionTest2
                   he himself will tread down our foes.");
 
             return targetCorpus;
+        }
+
+
+        static Versification AdjustVersification(
+            Clear30ServiceAPI service,
+            Versification versification)
+        {
+            ZoneService zoneService = service.ZoneService;
+
+            return versification
+                .OverrideWithVerseOffset(Psalms, Sixty, verseOffset: 2)
+                .Override(
+                    zoneService.ZoneX(Psalm60Superscription),
+                    zoneService.PlaceSetBuilder()
+                        .Zone(Psalms, Sixty, 1)
+                        .Zone(Psalms, Sixty, 2)
+                        .End());
+        }
+
+
+        private static TranslationPairTable CreateTranslationPairTable(
+            Clear30ServiceAPI service,
+            TreeService treeService,
+            Corpus targetCorpus,
+            Versification versification)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        async static Task<SMTResult> PerformSMT(
+            Clear30ServiceAPI service,
+            Corpus smtSourceCorpus,
+            Corpus smtTargetCorpus)
+        {
+            CancellationTokenSource ctSource = new CancellationTokenSource();
+
+            IProgress<ProgressReport> progress = new Progress<ProgressReport>(
+                smtProgress => ShowProgress(
+                    smtProgress.PercentComplete,
+                    smtProgress.Message));
+
+            return await service.SMTService.LaunchAsync(
+                smtSourceCorpus,
+                smtTargetCorpus,
+                progress,
+                ctSource.Token);
+        }
+
+        static void ShowProgress(float percentComplete, string message)
+        {
         }
     }
 }
