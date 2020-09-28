@@ -30,7 +30,7 @@ namespace ClearBible.Clear3.API
         void RemoveTargetZone(Zone targetZone);
         // throws ArgumentException if zone is not present
 
-        IEnumerable<Zone> TargetZones(ZoneQuery zoneQuery);
+        IEnumerable<Zone> TargetZones();
 
         void SetAlignment(
             Zone targetZone,

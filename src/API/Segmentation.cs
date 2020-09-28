@@ -5,14 +5,7 @@ namespace ClearBible.Clear3.API
 {
     public interface Segmenter
     {
-        public void SetPunctuationFromResource(Uri punctuationResource);
-        // can throw ClearException
-
-        string[] GetAllPunctuation();
-
-        void AddPunctuation(string punctuation);
-
-        void RemovePunctuation(string punctuation);
+        HashSet<string> Punctuation { get; set; }
 
         string[] Segment(string toBeSegmented);
     }

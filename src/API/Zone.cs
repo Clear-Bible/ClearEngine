@@ -1,29 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace ClearBible.Clear3.API
 {
-    public interface ZoneService
-    {
-        Zone Find(string key);
-
-        Zone FindOrCreateStandard(int book, int chapter, int verse);
-
-        Zone FindOrCreateNonStandard(string nonStandardName);
-
-        ZoneQuery ZoneQuery();
-    }
-
+    /// <summary>
+    /// A standard Zone has a book, chapter, and verse which are all
+    /// numbers.  A non-standard Zone is uniquely identified by a name
+    /// that is chosen by the client.
+    /// </summary>
+    /// 
     public interface Zone
     {
         string Key { get; }
-        // Standard zone has a key of the form "BB-CCC-VVV"
-        // Nonstandard zone has a key of the form "#nonStandardName"
 
         bool IsStandard { get; }
-
-        // Interpretation of book, chapter, and verse is
-        // determined by the resource with which the zone is used.
 
         int Book { get; }  // 0 for nonstandard zone
 
@@ -34,22 +25,73 @@ namespace ClearBible.Clear3.API
         string NonStandardName { get; }
     }
 
-    public interface ZoneQuery
+    /// <summary>
+    /// A Place represents a position within a Corpus where a
+    /// string can occur.  (It is "can occur" because some corpora have
+    /// holes between places.)  A Place consists of a Zone plus an index.
+    /// </summary>
+    /// 
+    public interface Place
     {
-        ZoneQuery Book(int book);
+        string Key { get; }
 
-        ZoneQuery Books(int start, int end);
+        Zone Zone { get; }
 
-        ZoneQuery Chapter(int chapter);
-
-        ZoneQuery Chapters(int start, int end);
-
-        ZoneQuery Verse(int verse);
-
-        ZoneQuery Verses(int start, int end);
-
-        ZoneQuery MatchNonStandardName(Regex regularExpression);
+        int Index { get; }
     }
 
 
+    public interface PlaceSet
+    {
+        string Key { get; }
+
+        IEnumerable<Place> Members { get; }
+    }
+
+
+
+    public interface ZoneRange
+    {
+        Zone Zone { get; }
+
+        int Start { get; } // inclusive, 0 = beginning
+
+        int End { get; } // exclusive, -1 = to the end
+
+        string Key { get; }
+    }
+
+
+    public interface ZoneService
+    {
+        Zone Zone(int book, int chapter, int verse);
+
+        Zone ZoneX(string nonStandardName);
+
+        Zone ZoneByKey(string key);
+
+        Place Place(Zone zone, int index);
+
+        PlaceSetBuilder PlaceSetBuilder();
+    }
+
+
+    public interface PlaceSetBuilder
+    {
+        PlaceSetBuilder Zone(int book, int chapter, int verse);
+
+        PlaceSetBuilder ZoneX(string nonStandardName);
+
+        PlaceSetBuilder ZoneByKey(string key);
+
+        PlaceSetBuilder Index(int index);
+
+        PlaceSetBuilder SubrangeInclusive(int start, int end);
+
+        PlaceSetBuilder Place(Place place);
+
+        PlaceSetBuilder PlaceRangeInclusive(Place start, Place end);
+
+        PlaceSet End();
+    }
 }
