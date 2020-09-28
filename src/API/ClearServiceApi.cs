@@ -14,24 +14,24 @@ namespace ClearBible.Clear3.API
         Segmenter CreateSegmenter(Uri segmenterAlgorithmUri);
         // can throw ClearException
 
-        Corpus CreateEmptyCorpus();
+        Corpus EmptyCorpus { get; }
 
-        CorpusService CorpusService { get; }
+        PhraseService PhraseService { get; }
+
+        SegmentInstance SegmentInstance(string Text, Place place);
 
         ZoneService ZoneService { get; }
 
-        TranslationPairTable MakeEmptyTranslationPairTable();
+        TranslationPairTable EmptyTranslationPairTable { get; }
 
         SMTService SMTService { get; }
 
-        TextTranslationModelBuilder CreateNewTextTranslationModelBuilder();
+        PhraseTranslationModel EmptyPhraseTranslationModel { get; }
 
-        TokenAlignmentModelBuilder CreateNewTokenAlignmentModelBuilder();
+        PlaceAlignmentModel EmptyPlaceAlignmentModel { get; }
 
         AutoAlignmentService AutoAlignmentService { get; }
 
         // ClearStudyManager ClearStudyManager { get; }      
-
-        // LemmaService LemmaService { get; }
     }   
 }

@@ -79,45 +79,37 @@ namespace ClearBible.Clear3.API
     }
 
 
-    public interface CorpusService
-    {
-        Corpus CreateEmptyCorpus();
 
-        SegmentInstance SegmentInstance(string Text, Place place);
-    }
+    //public interface Token
+    //{
+    //    Guid Id { get; }
 
+    //    Guid Corpus { get; }
 
+    //    Zone Zone { get; }
 
-    public interface Token
-    {
-        Guid Id { get; }
+    //    int IndexInZone { get; }
 
-        Guid Corpus { get; }
+    //    string Text { get; }
 
-        Zone Zone { get; }
-
-        int IndexInZone { get; }
-
-        string Text { get; }
-
-        int TextIndexInZone { get; }
-    }
+    //    int TextIndexInZone { get; }
+    //}
 
 
-    public interface Alignment
-    {
-        IEnumerable<Matching> Matchings { get; }
-    }
+    //public interface Alignment
+    //{
+    //    IEnumerable<Matching> Matchings { get; }
+    //}
 
 
-    public interface Matching
-    {
-        IEnumerable<Token> SourceTokens { get; }
+    //public interface Matching
+    //{
+    //    IEnumerable<Token> SourceTokens { get; }
 
-        IEnumerable<Token> TargetTokens { get; }
+    //    IEnumerable<Token> TargetTokens { get; }
 
-        MatchingKind Kind { get; }
-    }
+    //    MatchingKind Kind { get; }
+    //}
 
 
     public enum MatchingKind
