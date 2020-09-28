@@ -49,19 +49,6 @@ namespace ClearBible.Clear3.API
     }
 
 
-
-    public interface ZoneRange
-    {
-        Zone Zone { get; }
-
-        int Start { get; } // inclusive, 0 = beginning
-
-        int End { get; } // exclusive, -1 = to the end
-
-        string Key { get; }
-    }
-
-
     public interface ZoneService
     {
         Zone Zone(int book, int chapter, int verse);

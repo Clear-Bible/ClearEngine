@@ -9,17 +9,18 @@ namespace ClearBible.Clear3.API
         Task<AutoAlignmentResult> LaunchAutoAlignmentAsync(
             TreeService treeService,
             TranslationPairTable translationPairTable,
-            TextTranslationModel smtTransModel,
-            TokenAlignmentModel smtAlignModel,
-            TextTranslationModel manualTransModel,
-            TokenAlignmentModel manualAlignModel
+            PhraseTranslationModel smtTransModel,
+            PlaceAlignmentModel smtAlignModel,
+            PhraseTranslationModel manualTransModel,
+            PlaceAlignmentModel manualAlignModel,
+            Corpus manualCorpus
             );
     }
 
     public interface AutoAlignmentResult
     {
-        TokenAlignmentModel AutoAlignmentModel { get; }
+        PlaceAlignmentModel AutoAlignmentModel { get; }
 
-        TokenAlignmentModel ManualAlignmentModel { get; }
+        PlaceAlignmentModel ManualAlignmentModel { get; }
     }
 }

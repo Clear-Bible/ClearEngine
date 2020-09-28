@@ -9,10 +9,6 @@ namespace ClearBible.Clear3.API
 
         Corpus Corpus { get; }
 
-        Corpus CreateCorpus(IEnumerable<Zone> zones);
-
-        string LemmaForToken(Token token);
-
-        IEnumerable<Token> GetTokens(Zone zone, bool lemmas);
+        string GetLemma(Place place);
     }
 }

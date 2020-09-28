@@ -61,9 +61,6 @@ namespace RegressionTest2
                 service,
                 s1Versification);
 
-            Corpus sourceCorpus = treeService.CreateCorpus(
-                targetCorpus.AllZones());
-
             TranslationPairTable translationPairTable =
                 CreateTranslationPairTable(
                     service,
@@ -71,29 +68,25 @@ namespace RegressionTest2
                     targetCorpus,
                     versification);
 
-            //Corpus smtTargetCorpus =
-            //    targetCorpus.Filter(
-            //        token => !englishFunctionWords.Contains(token.Text));
+            TranslationPairTable smtTable =
+                WithSourceLemmasAndContentWords(
+                    service,
+                    translationPairTable,
+                    treeService,
+                    englishFunctionWords,
+                    origFunctionWords);
 
-            //Corpus smtSourceCorpus =
-            //    sourceCorpus
-            //        .Map(token => treeService.LemmaForToken(token))
-            //        .Filter(
-            //            token => !origFunctionWords.Contains(token.Text));
+            Task<SMTResult> smtTask = PerformSMT(service, smtTable);
+            SMTResult smtResult = smtTask.Result;
 
-            //Task<SMTResult> smtTask = PerformSMT(
-            //    service,
-            //    smtSourceCorpus,
-            //    smtTargetCorpus);
-            //SMTResult smtResult = smtTask.Result;
+            PhraseTranslationModel emptyManualTextTranslationModel =
+                service.EmptyPhraseTranslationModel;
 
-            SMTResult smtResult = null;
+            PlaceAlignmentModel emptyManualPlaceAlignmentModel =
+                service.EmptyPlaceAlignmentModel;
 
-            TextTranslationModel emptyManualTextTranslationModel =
-                service.CreateNewTextTranslationModelBuilder().Result;
-
-            TokenAlignmentModel emptyManualTokenAlignmentModel =
-                service.CreateNewTokenAlignmentModelBuilder().Result;
+            Corpus emptyManualTargetCorpus =
+                service.EmptyCorpus;
 
             Task<AutoAlignmentResult> autoAlignmentTask =
                 service.AutoAlignmentService.LaunchAutoAlignmentAsync(
@@ -102,7 +95,8 @@ namespace RegressionTest2
                     smtResult.TransModel,
                     smtResult.AlignModel,
                     emptyManualTextTranslationModel,
-                    emptyManualTokenAlignmentModel
+                    emptyManualPlaceAlignmentModel,
+                    emptyManualTargetCorpus
                     );
             AutoAlignmentResult autoAlignmentResult =
                 autoAlignmentTask.Result;
@@ -197,7 +191,7 @@ namespace RegressionTest2
 
             segmenter.Punctuation = punctuation;
 
-            Corpus targetCorpus = service.CreateEmptyCorpus();
+            Corpus targetCorpus = service.EmptyCorpus;
 
             ZoneService zoneService = service.ZoneService;
 
@@ -308,20 +302,66 @@ namespace RegressionTest2
         }
 
 
-        private static TranslationPairTable CreateTranslationPairTable(
+        static TranslationPairTable CreateTranslationPairTable(
             Clear30ServiceAPI service,
             TreeService treeService,
             Corpus targetCorpus,
             Versification versification)
         {
-            throw new NotImplementedException();
+            TranslationPairTable table =
+                service.EmptyTranslationPairTable;
+
+            foreach (Zone zone in targetCorpus.AllZones())
+            {
+                IEnumerable<SegmentInstance> targetSegments =
+                    targetCorpus.SegmentsForZone(zone);
+                PlaceSet placeSet = versification.Apply(zone);
+                IEnumerable<SegmentInstance> sourceSegments =
+                    treeService.Corpus.SegmentsForPlaceSet(placeSet);
+                table = table.Add(targetSegments, sourceSegments);
+            }
+
+            return table;
+        }
+
+
+        static TranslationPairTable WithSourceLemmasAndContentWords(
+            Clear30ServiceAPI service,
+            TranslationPairTable inputTable,
+            TreeService treeService,
+            HashSet<string> targetFunctionWords,
+            HashSet<string> sourceFunctionWords)
+        {
+            TranslationPairTable outputTable =
+                service.EmptyTranslationPairTable;
+
+            bool targetContentWord(SegmentInstance si) =>
+                !targetFunctionWords.Contains(si.Text);
+            bool sourceContentWord(SegmentInstance si) =>
+                !sourceFunctionWords.Contains(si.Text);
+
+            SegmentInstance useLemma(SegmentInstance si) =>
+                service.SegmentInstance(
+                    treeService.GetLemma(si.Place),
+                    si.Place);
+
+            foreach (TranslationPair pair in inputTable.TranslationPairs)
+            {
+                outputTable = outputTable.Add(
+                    pair.TargetSegments
+                        .Where(targetContentWord),
+                    pair.SourceSegments
+                        .Select(useLemma)
+                        .Where(sourceContentWord));
+            }
+
+            return outputTable;
         }
 
 
         async static Task<SMTResult> PerformSMT(
             Clear30ServiceAPI service,
-            Corpus smtSourceCorpus,
-            Corpus smtTargetCorpus)
+            TranslationPairTable translationPairTable)
         {
             CancellationTokenSource ctSource = new CancellationTokenSource();
 
@@ -331,8 +371,7 @@ namespace RegressionTest2
                     smtProgress.Message));
 
             return await service.SMTService.LaunchAsync(
-                smtSourceCorpus,
-                smtTargetCorpus,
+                translationPairTable,
                 progress,
                 ctSource.Token);
         }

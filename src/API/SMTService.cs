@@ -7,8 +7,7 @@ namespace ClearBible.Clear3.API
     public interface SMTService
     {
          Task<SMTResult> LaunchAsync(
-            Corpus sourceCorpus,
-            Corpus targetCorpus,
+            TranslationPairTable translationPairTable,
             IProgress<ProgressReport> progress,
             CancellationToken cancellationToken);
     }
@@ -20,8 +19,8 @@ namespace ClearBible.Clear3.API
 
         DateTime CreationDate { get; }
 
-        TextTranslationModel TransModel { get; }
+        PhraseTranslationModel TransModel { get; }
 
-        TokenAlignmentModel AlignModel { get; }
+        PlaceAlignmentModel AlignModel { get; }
     }
 }

@@ -10,7 +10,7 @@ namespace ClearBible.Clear3.API
 
         IEnumerable<TranslationPair> TranslationPairs { get; }
 
-        void Add(
+        TranslationPairTable Add(
             IEnumerable<SegmentInstance> targetSegments,
             IEnumerable<SegmentInstance> sourceSegments);
     }

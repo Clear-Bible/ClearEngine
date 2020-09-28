@@ -43,7 +43,7 @@ namespace ClearBible.Clear3.API
             SourceKind kind);
         // throws ArgumentException if zone is not present
 
-        Alignment GetAlignment(Zone targetZone, SourceKind kind);
+        //Alignment GetAlignment(Zone targetZone, SourceKind kind);
         // throws ArgumentException if zone is not present
         // returns null if no alignment for the kind
 
