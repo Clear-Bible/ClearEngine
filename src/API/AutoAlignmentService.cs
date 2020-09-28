@@ -13,8 +13,11 @@ namespace ClearBible.Clear3.API
             PlaceAlignmentModel smtAlignModel,
             PhraseTranslationModel manualTransModel,
             PlaceAlignmentModel manualAlignModel,
-            Corpus manualCorpus
-            );
+            Corpus manualCorpus,
+            HashSet<string> sourceFunctionWords,
+            HashSet<string> targetFunctionWords,
+            HashSet<string> punctuation,
+            HashSet<string> stopWords);
     }
 
     public interface AutoAlignmentResult
