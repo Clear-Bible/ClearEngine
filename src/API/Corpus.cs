@@ -15,6 +15,8 @@ namespace ClearBible.Clear3.API
 
         RelativePlace RelativePlace(Place place);
 
+        long LegacyTargetId(Place place);
+
         IEnumerable<Zone> AllZones();
 
         Corpus AddZone(Zone zone, IEnumerable<string> segments);

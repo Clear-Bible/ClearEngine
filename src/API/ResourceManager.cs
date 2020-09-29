@@ -20,6 +20,10 @@ namespace ClearBible.Clear3.API
         HashSet<string> GetStringSet(Uri stringSetUri);
         // can throw ClearException
 
+        Dictionary<string, string> GetStringsDictionary(
+            Uri stringsDictionaryUri);
+        // can throw ClearException
+
         Versification GetVersification(Uri versificationUri);
         // can throw ClearException
     }

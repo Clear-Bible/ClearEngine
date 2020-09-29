@@ -25,20 +25,20 @@ namespace ClearBible.Clear3.API
 
         IEnumerable<Phrase> TargetPhrases { get; }
 
-        IEnumerable<Phrase> TargetsForSource(Phrase sourcePhrase);
+        IEnumerable<Phrase> TargetsForSource(string sourceKey);
 
-        IEnumerable<Phrase> SourcesForTarget(Phrase targetPhrase);
+        IEnumerable<Phrase> SourcesForTarget(string targetKey);
 
-        double Rate(Phrase sourcePhrase, Phrase targetPhrase);
+        double Rate(string sourceKey, string targetKey);
 
-        double Count(Phrase sourcePhrase, Phrase targetPhrase);
+        double Count(string sourceKey, string targetKey);
 
         PhraseTranslationModel Add(
             Phrase sourcePhrase,
             Phrase targetPhrase);
 
         PhraseTranslationModel Remove(
-            Phrase sourcePhrase,
-            Phrase targetPhrase);
+            string sourceKey,
+            string targetKey);
     }
 }
