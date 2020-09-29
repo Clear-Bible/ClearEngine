@@ -6,7 +6,7 @@ namespace ClearBible.Clear3.API
 {
     public interface TranslationPairTable
     {
-        Guid Id { get; }
+        string Key { get; }
 
         IEnumerable<TranslationPair> TranslationPairs { get; }
 

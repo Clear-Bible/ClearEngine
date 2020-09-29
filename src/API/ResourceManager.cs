@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
-    public interface ResourceManager
+    public interface ResourceService
     {
         void SetLocalResourceFolder(string path);
         // can throw ClearException
@@ -12,6 +12,9 @@ namespace ClearBible.Clear3.API
         // can throw ClearException
 
         IEnumerable<LocalResource> QueryLocalResources();
+        // can throw ClearException
+
+        Segmenter CreateSegmenter(Uri segmenterAlgorithmUri);
         // can throw ClearException
 
         TreeService GetTreeService(Uri treeResourceUri);

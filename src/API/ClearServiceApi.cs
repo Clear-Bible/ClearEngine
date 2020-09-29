@@ -9,29 +9,33 @@ namespace ClearBible.Clear3.API
     /// 
     public interface Clear30ServiceAPI
     {
-        ResourceManager ResourceManager { get; }
+        #region Sub-Services
 
-        Segmenter CreateSegmenter(Uri segmenterAlgorithmUri);
-        // can throw ClearException
+        ResourceService ResourceService { get; }
 
-        Corpus EmptyCorpus { get; }
+        SMTService SMTService { get; }
+
+        AutoAlignmentService AutoAlignmentService { get; }
 
         PhraseService PhraseService { get; }
 
-        SegmentInstance SegmentInstance(string Text, Place place);
-
         ZoneService ZoneService { get; }
 
-        TranslationPairTable EmptyTranslationPairTable { get; }
+        #endregion
 
-        SMTService SMTService { get; }
+
+        #region Construction of Certain Abstract Data
+
+        Corpus EmptyCorpus { get; }       
+
+        TranslationPairTable EmptyTranslationPairTable { get; }       
 
         PhraseTranslationModel EmptyPhraseTranslationModel { get; }
 
         PlaceAlignmentModel EmptyPlaceAlignmentModel { get; }
+        
+        SegmentInstance SegmentInstance(string Text, Place place);
 
-        AutoAlignmentService AutoAlignmentService { get; }
-
-        // ClearStudyManager ClearStudyManager { get; }      
-    }   
+        #endregion
+    }
 }

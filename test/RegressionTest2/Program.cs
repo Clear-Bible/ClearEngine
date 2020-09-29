@@ -135,7 +135,7 @@ namespace RegressionTest2
 
         static void PrepareResources(Clear30ServiceAPI service)
         {
-            ResourceManager mgr = service.ResourceManager;
+            ResourceService mgr = service.ResourceService;
 
             try
             {
@@ -189,21 +189,21 @@ namespace RegressionTest2
             try
             {
                 treeService =
-                    service.ResourceManager.GetTreeService(treesUri);
+                    service.ResourceService.GetTreeService(treesUri);
                 origFunctionWords =
-                    service.ResourceManager.GetStringSet(origFunctionWordsUri);
+                    service.ResourceService.GetStringSet(origFunctionWordsUri);
                 englishFunctionWords =
-                    service.ResourceManager.GetStringSet(englishFunctionWordsUri);
+                    service.ResourceService.GetStringSet(englishFunctionWordsUri);
                 builtInPunctuation =
-                    service.ResourceManager.GetStringSet(punctuationUri);
+                    service.ResourceService.GetStringSet(punctuationUri);
                 builtInStopWords =
-                    service.ResourceManager.GetStringSet(stopwordsUri);
+                    service.ResourceService.GetStringSet(stopwordsUri);
                 glossEnglish =
-                    service.ResourceManager.GetStringsDictionary(glossEnglishUri);
+                    service.ResourceService.GetStringsDictionary(glossEnglishUri);
                 glossChinese =
-                    service.ResourceManager.GetStringsDictionary(glossChineseUri);
+                    service.ResourceService.GetStringsDictionary(glossChineseUri);
                 s1Versification =
-                    service.ResourceManager.GetVersification(versificationUri);
+                    service.ResourceService.GetVersification(versificationUri);
             }
             catch (ClearException e)
             {
@@ -221,7 +221,7 @@ namespace RegressionTest2
 
             try
             {
-                segmenter = service.CreateSegmenter(
+                segmenter = service.ResourceService.CreateSegmenter(
                     segmenterAlgorithmUri);
             }
             catch (ClearException e)

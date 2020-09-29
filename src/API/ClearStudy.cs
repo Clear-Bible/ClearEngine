@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace ClearBible.Clear3.API
 {
+    // Some ideas.
+    // Not currently part of the API.
+
     public interface ClearStudyManager
     {
         ClearStudy FindOrCreateStudy(string key);

@@ -9,6 +9,8 @@ namespace ClearBible.Clear3.API
         string Key { get; }
 
         IEnumerable<PhraseUnit> PhraseUnits { get; }
+
+        int PrimaryPhraseUnitIndex { get; }
     }
 
     /// <summary>
@@ -33,9 +35,11 @@ namespace ClearBible.Clear3.API
 
         PhraseUnit PhraseUnitByKey(string key);
 
-        Phrase Phrase(IEnumerable<PhraseUnit> phraseUnits);
+        Phrase Phrase(
+            IEnumerable<PhraseUnit> phraseUnits,
+            int primaryPhraseUnitIndex);
 
-        Phrase PhraseText(string text);
+        Phrase PhraseFromText(string text);
 
         Phrase PhraseByKey(string key);
     }

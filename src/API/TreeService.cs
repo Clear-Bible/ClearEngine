@@ -5,7 +5,7 @@ namespace ClearBible.Clear3.API
 {
     public interface TreeService
     {
-        Uri Id { get; }
+        Uri IdUri { get; }
 
         Corpus Corpus { get; }
 
