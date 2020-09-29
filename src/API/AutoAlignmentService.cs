@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ClearBible.Clear3.API
@@ -17,7 +18,9 @@ namespace ClearBible.Clear3.API
             HashSet<string> sourceFunctionWords,
             HashSet<string> targetFunctionWords,
             HashSet<string> punctuation,
-            HashSet<string> stopWords);
+            HashSet<string> stopWords,
+            IProgress<ProgressReport> progress,
+            CancellationToken cancellationToken);
     }
 
     public interface AutoAlignmentResult

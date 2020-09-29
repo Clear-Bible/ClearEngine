@@ -8,10 +8,20 @@ using System.Threading.Tasks;
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Service;
 
+using GBI_Aligner;
+
+using Newtonsoft.Json;
+
+
+
+
+
 namespace RegressionTest2
 {
     class Program
-    {       
+    {
+        static string jsonAlignmentFile = Path.Combine(".", "alignment.json");
+
         static string resourceFolder = Path.Combine(".", "MyLocalResources");
 
 
@@ -29,9 +39,9 @@ namespace RegressionTest2
             new Uri("http://clear.bible/functionWords/biblicalLanguages");
         static Uri englishFunctionWordsUri =
             new Uri("http://clear.bible/functionWords/english");
-        static Uri gloss1Uri =
+        static Uri glossEnglishUri =
             new Uri("http://clear.bible/glossary/WLCGroves/english");
-        static Uri gloss2Uri =
+        static Uri glossChineseUri =
             new Uri("http://clear.bible/glossary/WLCGroves/chinese");
 
 
@@ -54,6 +64,8 @@ namespace RegressionTest2
                 out HashSet<string> englishFunctionWords,
                 out HashSet<string> builtInPunctuation,
                 out HashSet<string> builtInStopWords,
+                out Dictionary<string, string> glossEnglish,
+                out Dictionary<string, string> glossChinese,
                 out Versification s1Versification);
 
             Corpus targetCorpus = GetTargetCorpus(
@@ -92,7 +104,8 @@ namespace RegressionTest2
                 service.EmptyCorpus;
 
             Task<AutoAlignmentResult> autoAlignmentTask =
-                service.AutoAlignmentService.LaunchAutoAlignmentAsync(
+                PerformAutoAlignment(
+                    service,
                     treeService,
                     translationPairTable,
                     smtResult.TransModel,
@@ -107,6 +120,15 @@ namespace RegressionTest2
                     );
             AutoAlignmentResult autoAlignmentResult =
                 autoAlignmentTask.Result;
+
+            WriteJsonAlignmentFormat(
+                jsonAlignmentFile,
+                translationPairTable,
+                targetCorpus,
+                autoAlignmentResult.AutoAlignmentModel,
+                treeService,
+                glossEnglish,
+                glossChinese);
         }
 
         
@@ -127,8 +149,8 @@ namespace RegressionTest2
                     new Uri[] {
                         treesUri,
                         origFunctionWordsUri,
-                        gloss1Uri,
-                        gloss2Uri
+                        glossEnglishUri,
+                        glossChineseUri
                     })
                 {
                     if (!localResources.Contains(uri))
@@ -152,6 +174,8 @@ namespace RegressionTest2
             out HashSet<string> englishFunctionWords,
             out HashSet<string> builtInPunctuation,
             out HashSet<string> builtInStopWords,
+            out Dictionary<string, string> glossEnglish,
+            out Dictionary<string, string> glossChinese,
             out Versification s1Versification)
         {
             treeService = null;
@@ -160,6 +184,8 @@ namespace RegressionTest2
             builtInPunctuation = null;
             builtInStopWords = null;
             s1Versification = null;
+            glossEnglish = null;
+            glossChinese = null;
             try
             {
                 treeService =
@@ -172,6 +198,10 @@ namespace RegressionTest2
                     service.ResourceManager.GetStringSet(punctuationUri);
                 builtInStopWords =
                     service.ResourceManager.GetStringSet(stopwordsUri);
+                glossEnglish =
+                    service.ResourceManager.GetStringsDictionary(glossEnglishUri);
+                glossChinese =
+                    service.ResourceManager.GetStringsDictionary(glossChineseUri);
                 s1Versification =
                     service.ResourceManager.GetVersification(versificationUri);
             }
@@ -387,8 +417,201 @@ namespace RegressionTest2
                 ctSource.Token);
         }
 
+
+        async static Task<AutoAlignmentResult> PerformAutoAlignment(
+            Clear30ServiceAPI service,
+            TreeService treeService,
+            TranslationPairTable translationPairTable,
+            PhraseTranslationModel smtTransModel,
+            PlaceAlignmentModel smtAlignModel,
+            PhraseTranslationModel manualTransModel,
+            PlaceAlignmentModel manualAlignModel,
+            Corpus manualCorpus,
+            HashSet<string> sourceFunctionWords,
+            HashSet<string> targetFunctionWords,
+            HashSet<string> punctuation,
+            HashSet<string> stopWords)
+        {
+            CancellationTokenSource ctSource = new CancellationTokenSource();
+
+            IProgress<ProgressReport> progress = new Progress<ProgressReport>(
+                smtProgress => ShowProgress(
+                    smtProgress.PercentComplete,
+                    smtProgress.Message));
+
+            return await service.AutoAlignmentService.LaunchAutoAlignmentAsync(
+                treeService,
+                translationPairTable,
+                smtTransModel,
+                smtAlignModel,
+                manualTransModel,
+                manualAlignModel,
+                manualCorpus,
+                sourceFunctionWords,
+                targetFunctionWords,
+                punctuation,
+                stopWords,
+                progress,
+                ctSource.Token);
+        }
+
+
+        private static void WriteJsonAlignmentFormat(
+            string jsonAlignmentFile,
+            TranslationPairTable translationPairTable,
+            Corpus targetCorpus,
+            PlaceAlignmentModel autoAlignmentModel,
+            TreeService treeService,
+            Dictionary<string, string> gloss1,
+            Dictionary<string, string> gloss2)
+        {
+            string lookupOrNull(Dictionary<string, string> dict, string key)
+            {
+                dict.TryGetValue(key, out string result);
+                return result;
+            }
+
+            string renderAltId(Place place, Corpus corpus)
+            {
+                RelativePlace relativePlace = corpus.RelativePlace(place);
+                return $"{relativePlace.Text}-{relativePlace.Occurrence}";
+            }
+
+            ManuscriptWord makeManuscriptWord(SegmentInstance si)
+            {
+                ManuscriptWord mw = new ManuscriptWord();
+                mw.id = treeService.GetLegacyID(si.Place);
+                mw.altId = renderAltId(si.Place, treeService.Corpus);
+                mw.text = si.Text;
+                mw.strong = treeService.GetStrong(si.Place);
+                mw.lemma = treeService.GetLemma(si.Place);
+                mw.morph = treeService.GetMorphology(si.Place);
+                mw.pos = treeService.GetPartOfSpeech(si.Place);
+                mw.gloss = lookupOrNull(gloss1, mw.lemma);
+                mw.gloss2 = lookupOrNull(gloss2, mw.lemma);
+                return mw;
+            }
+
+            TranslationWord makeTranslationWord(SegmentInstance si)
+            {
+                TranslationWord tw = new TranslationWord();
+                tw.id = targetCorpus.LegacyTargetId(si.Place);
+                tw.altId = renderAltId(si.Place, targetCorpus);
+                tw.text = si.Text;
+                return tw;
+            }
+
+            void analyzePlaceSets(
+                IEnumerable<SegmentInstance> segmentInstances,
+                out Dictionary<string, List<int>> placeSetIndicesForKey,
+                out List<string> placeSetKeysInOrder)
+            {
+                placeSetIndicesForKey = new Dictionary<string, List<int>>();
+                placeSetKeysInOrder = new List<string>();
+
+                int i = 1;
+                foreach (SegmentInstance si in segmentInstances)
+                {
+                    PlaceSet candidate = autoAlignmentModel.FindTargetPlaceSet(
+                        new Place[] { si.Place });
+                    if (candidate != null)
+                    {
+                        if (placeSetIndicesForKey.TryGetValue(
+                            candidate.Key,
+                            out List<int> indexList))
+                        {
+                            indexList.Add(i);
+                        }
+                        else
+                        {
+                            List<int> indices = new List<int>();
+                            indices.Add(i);
+                            placeSetIndicesForKey[candidate.Key] = indices;
+                            placeSetKeysInOrder.Add(candidate.Key);
+                        }
+                    }
+                    i += 1;
+                }
+            }
+
+            Link makeLink(
+                string targetKey,
+                Dictionary<string, List<int>> sourcePlaceSetIndicesForKey,
+                Dictionary<string, List<int>> targetPlaceSetIndicesForKey)
+            {
+                PlaceSet source =
+                        autoAlignmentModel.SourceForTarget(targetKey);
+
+                if (source != null)
+                {
+                    string sourceKey = source.Key;
+                    if (sourcePlaceSetIndicesForKey.ContainsKey(sourceKey))
+                    {
+                        return new Link()
+                        {
+                            source = sourcePlaceSetIndicesForKey
+                                [source.Key].ToArray(),
+                            target = targetPlaceSetIndicesForKey
+                                [targetKey].ToArray(),
+                            cscore = autoAlignmentModel.Score(source.Key, targetKey)
+                        };
+                    }
+                }
+                return null;
+            }
+
+            Line makeLine(TranslationPair pair)
+            {
+                ManuscriptWord[] manuscriptWords =
+                    pair.SourceSegments.Select(makeManuscriptWord).ToArray();
+                TranslationWord[] translationWords =
+                    pair.TargetSegments.Select(makeTranslationWord).ToArray();
+
+                analyzePlaceSets(
+                    pair.SourceSegments,
+                    out Dictionary<string, List<int>> sourcePlaceSetIndicesForKey,
+                    out List<string> sourcePlaceSetKeysInOrderIgnored);
+                analyzePlaceSets(
+                    pair.TargetSegments,
+                    out Dictionary<string, List<int>> targetPlaceSetIndicesForKey,
+                    out List<string> targetPlaceSetKeysInOrder);
+
+                List<Link> linksList = targetPlaceSetKeysInOrder
+                    .Select(targetKey => makeLink(
+                        targetKey,
+                        sourcePlaceSetIndicesForKey,
+                        targetPlaceSetIndicesForKey))
+                    .Where(link => link != null)
+                    .ToList();
+
+                return new Line()
+                {
+                    manuscript = new Manuscript()
+                    {
+                        words = manuscriptWords
+                    },
+                    translation = new Translation()
+                    {
+                        words = translationWords
+                    },
+                    links = linksList
+                };
+            }
+
+            Line[] lines = translationPairTable
+                .TranslationPairs
+                .Select(makeLine).ToArray();
+
+            string json = JsonConvert.SerializeObject(
+                lines, Newtonsoft.Json.Formatting.Indented);
+
+            File.WriteAllText(jsonAlignmentFile, json);
+        }
+
+
         static void ShowProgress(float percentComplete, string message)
         {
+            // (Just a stub.)
         }
     }
 }

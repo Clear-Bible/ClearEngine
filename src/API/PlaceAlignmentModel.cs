@@ -20,17 +20,17 @@ namespace ClearBible.Clear3.API
 
         IEnumerable<PlaceSet> TargetPlaceSets { get; }
 
-        PlaceSet TargetForSource(PlaceSet source);
+        PlaceSet TargetForSource(string sourceKey);
 
-        PlaceSet SourceForTarget(PlaceSet target);
+        PlaceSet SourceForTarget(string targetKey);
 
-        double Score(PlaceSet source, PlaceSet target);
+        double Score(string sourceKey, string targetKey);
 
         PlaceAlignmentModel Add(
             PlaceSet source,
             PlaceSet target,
             double score);
 
-        PlaceAlignmentModel RemoveMatching(PlaceSet placeSet);
+        PlaceAlignmentModel RemoveMatching(string placeSetKey);
     }
 }
