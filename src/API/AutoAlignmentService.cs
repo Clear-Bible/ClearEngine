@@ -25,6 +25,8 @@ namespace ClearBible.Clear3.API
 
     public interface AutoAlignmentResult
     {
+        string Key { get; }
+
         PlaceAlignmentModel AutoAlignmentModel { get; }
 
         PlaceAlignmentModel ManualAlignmentModel { get; }

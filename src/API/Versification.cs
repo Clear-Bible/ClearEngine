@@ -5,6 +5,8 @@ namespace ClearBible.Clear3.API
 {
     public interface Versification
     {
+        string Key { get; }
+
         PlaceSet Apply(Zone targetZone);
 
         Versification Override(

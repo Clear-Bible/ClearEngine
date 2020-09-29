@@ -15,7 +15,7 @@ namespace ClearBible.Clear3.API
 
     public interface SMTResult
     {
-        Guid Id { get; }
+        string Key { get; }
 
         DateTime CreationDate { get; }
 
