@@ -94,7 +94,7 @@ namespace RegressionTest2
             Task<SMTResult> smtTask = PerformSMT(service, smtTable);
             SMTResult smtResult = smtTask.Result;
 
-            PhraseTranslationModel emptyManualPhraseAlignmentModel =
+            PhraseTranslationModel emptyManualPhraseTranslationModel =
                 service.EmptyPhraseTranslationModel;
 
             PlaceAlignmentModel emptyManualPlaceAlignmentModel =
@@ -110,7 +110,7 @@ namespace RegressionTest2
                     translationPairTable,
                     smtResult.TransModel,
                     smtResult.AlignModel,
-                    emptyManualPhraseAlignmentModel,
+                    emptyManualPhraseTranslationModel,
                     emptyManualPlaceAlignmentModel,
                     emptyManualTargetCorpus,
                     origFunctionWords,
