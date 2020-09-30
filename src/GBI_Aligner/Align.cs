@@ -136,34 +136,15 @@ namespace GBI_Aligner
             int n = targetWords.Length;  // n = number of target tokens
 
             string sStartVerseID = GetVerseID(sourceWords[0]);  // bbcccvvv
-            if (sStartVerseID.StartsWith("1102204"))
-            {
-                ;
-            }
             string sEndVerseID = GetVerseID(sourceWords[sourceWords.Length - 1]); // bbcccvvv
+
             XmlNode treeNode = GetTreeNode(sStartVerseID, sEndVerseID, trees);
 
-            // TIM Study
-            //{
-            //    using (StringWriter sw = new StringWriter())
-            //    {
-            //        XmlWriterSettings xws = new XmlWriterSettings();
-            //        xws.Indent = true;
-            //        using (XmlWriter xw = XmlWriter.Create(sw, xws))
-            //        {
-            //            treeNode.WriteContentTo(xw);
-            //        }
-            //        Console.WriteLine(sw.ToString());
-            //    }
-            //}
+            // TimUtil.PrintXmlNode(treeNode);
 
-            Hashtable wordInfoTable = Data.BuildWordInfoTable(treeNode);
-                // Hashtable(sourceId => WordInfo) for the terminal nodes
-
-            // TIM study
-            // TimUtil.PrintHashTable("wordInfoTable", wordInfoTable);
+            Dictionary<string, WordInfo> wordInfoTable =
+                Data.BuildWordInfoTable(treeNode);
            
-
             ArrayList sWords = GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
             // ArrayList(SourceWord)
             // sourceWords2 not actually used
@@ -1047,7 +1028,10 @@ namespace GBI_Aligner
             return topCandidates;
         }
 
-        static ArrayList GetSourceWords(string[] words, string[] words2, Hashtable wordInfoTable)
+        static ArrayList GetSourceWords(
+            string[] words,
+            string[] words2,
+            Dictionary<string, WordInfo> wordInfoTable)
         {
             ArrayList wordList = new ArrayList();
 
