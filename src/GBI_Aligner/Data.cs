@@ -188,9 +188,9 @@ namespace GBI_Aligner
             return transModel;
         }
 
-        public static Hashtable BuildWordInfoTable(XmlNode tree)
+        public static Dictionary<string, WordInfo> BuildWordInfoTable(XmlNode tree)
         {
-            Hashtable morphTable = new Hashtable();
+            Dictionary<string, WordInfo> morphTable = new Dictionary<string, WordInfo>();
 
             ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(tree);
 
