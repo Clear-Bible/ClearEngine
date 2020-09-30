@@ -13,22 +13,22 @@ namespace GBI_Aligner
 {
     class VerseTrees
     {
-        public static Hashtable GetVerseTrees(string treeFolder)
+        public static Dictionary<string, XmlNode> GetVerseTrees(string treeFolder)
         {
-            Hashtable verseTrees = new Hashtable();
+            Dictionary<string, XmlNode> verseTrees = new Dictionary<string, XmlNode>();
 
             string[] files = Directory.GetFiles(treeFolder, "*.trees.xml");
 
             for (int i = 0; i < files.Length; i++)
             {
                 string file = files[i];
-                GetVerseTrees(file, ref verseTrees);
+                GetVerseTrees(file, verseTrees);
             }
 
             return verseTrees;
         }
 
-        public static void GetChapterTree(string chapterID, string treeFolder, ref Hashtable trees, Hashtable bookNames)
+        public static void GetChapterTree(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Hashtable bookNames)
         {
             string bookNumber = chapterID.Substring(0, 2);
             string bookName = (string)bookNames[bookNumber];
@@ -36,11 +36,11 @@ namespace GBI_Aligner
             string treeFile = Path.Combine(treeFolder , bookName + chapterNumber + ".trees.xml");      
             if (File.Exists(treeFile))
             {
-                GetVerseTrees(treeFile, ref trees);
+                GetVerseTrees(treeFile, trees);
             }
         }
 
-        public static void GetChapterTree2(string chapterID, string treeFolder, ref Hashtable trees, Hashtable bookNames)
+        public static void GetChapterTree2(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Hashtable bookNames)
         {
             string bookNumber = chapterID.Substring(0, 2);
             string bookName = (string)bookNames[bookNumber];
@@ -48,11 +48,11 @@ namespace GBI_Aligner
             string treeFile = Path.Combine(treeFolder, bookName + chapterNumber + ".trees.xml");
             if (File.Exists(treeFile))
             {
-                GetVerseTrees2(treeFile, ref trees);
+                GetVerseTrees2(treeFile, trees);
             }
         }
 
-        static void GetVerseTrees(string file, ref Hashtable verseTrees)
+        static void GetVerseTrees(string file, Dictionary<string, XmlNode> verseTrees)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(file);
@@ -67,7 +67,7 @@ namespace GBI_Aligner
             }
         }
 
-        static void GetVerseTrees2(string file, ref Hashtable verseTrees)
+        static void GetVerseTrees2(string file, Dictionary<string, XmlNode> verseTrees)
         {
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(file);

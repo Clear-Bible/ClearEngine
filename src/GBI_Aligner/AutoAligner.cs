@@ -921,8 +921,8 @@ namespace GBI_Aligner
             ArrayList treeNodes = new ArrayList();
             Hashtable bookNames = BookTables.LoadBookNames3();
             string chapter = mWords[0].id.ToString().PadLeft(12, '0').Substring(0, 5);
-            Hashtable trees = new Hashtable();
-            VerseTrees.GetChapterTree2(chapter, treeFolder, ref trees, bookNames);
+            Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();
+            VerseTrees.GetChapterTree2(chapter, treeFolder, trees, bookNames);
             ArrayList verses = GetVerses(mWords);
             string sStartVerseID = (string)verses[0];
             if (sStartVerseID.StartsWith("11022043"))
