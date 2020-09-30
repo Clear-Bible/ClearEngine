@@ -20,6 +20,9 @@ namespace RegressionTest2
 {
     class Program
     {
+        // Example code to demonstrate the API.
+        // Work in progress; does not actually execute yet.
+
         static string jsonAlignmentFile = Path.Combine(".", "alignment.json");
 
         static string resourceFolder = Path.Combine(".", "MyLocalResources");

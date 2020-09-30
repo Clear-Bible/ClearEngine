@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AlignmentTool\AlignmentTool.csproj" />
+    <ProjectReference Include="..\..\src\Utilities\Utilities.csproj" />
+    <ProjectReference Include="..\..\src\GBI_Aligner\GBI_Aligner.csproj" />
+  </ItemGroup>
+</Project>
