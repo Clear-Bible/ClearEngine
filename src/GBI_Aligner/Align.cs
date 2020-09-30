@@ -47,15 +47,14 @@ namespace GBI_Aligner
             Hashtable strongs
             )
         {
-            ArrayList sourceVerses = Data.GetVerses(sourceLemma, false); // ArrayList(string)
-            ArrayList sourceVerses2 = Data.GetVerses(source, false);  // ArrayList(string)
-            //            ArrayList targetVerses = Data.GetVerses(targetLower);
-            ArrayList targetVerses = Data.GetVerses(target, true);  // ArrayList(string)
-            ArrayList targetVerses2 = Data.GetVerses(target, false); // ArrayList(string)
+            List<string> sourceVerses = Data.GetVerses(sourceLemma, false);
+            List<string> sourceVerses2 = Data.GetVerses(source, false);
+            List<string> targetVerses = Data.GetVerses(target, true);
+            List<string> targetVerses2 = Data.GetVerses(target, false);
 
             string prevChapter = string.Empty;
 
-            Hashtable trees = new Hashtable();  // Hashtable(verseID => XmlNode)
+            Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();  // Hashtable(verseID => XmlNode)
 
             Alignment2 align = new Alignment2();  // The output goes here.
             align.Lines = new Line[sourceVerses.Count];
@@ -72,22 +71,22 @@ namespace GBI_Aligner
                 string targetVerse2 = (string)targetVerses2[i]; // tokens, not lowercase
                 string chapterID = GetChapterID(sourceVerse);  // string with chapter number
 
-                Console.WriteLine($"sourceVerse: {sourceVerse}\n");
-                Console.WriteLine($"sourceVerse2: {sourceVerse2}\n");
-                Console.WriteLine($"targetVerse: {targetVerse}\n");
-                Console.WriteLine($"targetVerse2: {targetVerse2}\n");
+                //Console.WriteLine($"sourceVerse: {sourceVerse}\n");
+                //Console.WriteLine($"sourceVerse2: {sourceVerse2}\n");
+                //Console.WriteLine($"targetVerse: {targetVerse}\n");
+                //Console.WriteLine($"targetVerse2: {targetVerse2}\n");
 
                 if (chapterID != prevChapter)
                 {
                     trees.Clear();
                     // Get the trees for the current chapter; a verse can cross chapter boundaries
-                    VerseTrees.GetChapterTree(chapterID, treeFolder, ref trees, bookNames);
+                    VerseTrees.GetChapterTree(chapterID, treeFolder, trees, bookNames);
                     string book = chapterID.Substring(0, 2);
                     string chapter = chapterID.Substring(2, 3);
                     string prevChapterID = book + Utils.Pad3((Int32.Parse(chapter) - 1).ToString());
-                    VerseTrees.GetChapterTree(prevChapterID, treeFolder, ref trees, bookNames);
+                    VerseTrees.GetChapterTree(prevChapterID, treeFolder, trees, bookNames);
                     string nextChapterID = book + Utils.Pad3((Int32.Parse(chapter) + 1).ToString());
-                    VerseTrees.GetChapterTree(nextChapterID, treeFolder, ref trees, bookNames);
+                    VerseTrees.GetChapterTree(nextChapterID, treeFolder, trees, bookNames);
                     prevChapter = chapterID;
                 }
 
@@ -111,7 +110,7 @@ namespace GBI_Aligner
             bool useAlignModel,
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
-            Hashtable trees, // Hashtable(verseID => XmlNode)
+            Dictionary<string, XmlNode> trees, // verseID => XmlNode
             ref Alignment2 align,  // Output goes here.
             int i,
             int maxPaths,
@@ -221,7 +220,7 @@ namespace GBI_Aligner
 
 
             string linkedWords = GetWords(topCandidate);
-            Console.WriteLine($"\nGetWords(topCandidate) = {linkedWords}\n");
+            //Console.WriteLine($"\nGetWords(topCandidate) = {linkedWords}\n");
 
 
             ArrayList terminals = Terminals.GetTerminalXmlNodes(treeNode);
@@ -1238,7 +1237,7 @@ namespace GBI_Aligner
             return tWord;
         }
 
-        public static XmlNode GetTreeNode(string sStartVerseID, string sEndVerseID, Hashtable trees)
+        public static XmlNode GetTreeNode(string sStartVerseID, string sEndVerseID, Dictionary<string, XmlNode> trees)
         {
             XmlNode treeNode = null;
 
@@ -1255,7 +1254,7 @@ namespace GBI_Aligner
             return treeNode;
         }
 
-        static ArrayList GetSubTrees(string sStartVerseID, string sEndVerseID, Hashtable trees)
+        static ArrayList GetSubTrees(string sStartVerseID, string sEndVerseID, Dictionary<string, XmlNode> trees)
         {
             ArrayList subTrees = new ArrayList();
 
@@ -1275,7 +1274,7 @@ namespace GBI_Aligner
             return subTrees;
         }
 
-        static void GetSubTreesInSameChapter(string sStartVerseID, string sEndVerseID, string book, string chapter, ref ArrayList subTrees, Hashtable trees)
+        static void GetSubTreesInSameChapter(string sStartVerseID, string sEndVerseID, string book, string chapter, ref ArrayList subTrees, Dictionary<string, XmlNode> trees)
         {
             int startVerse = Int32.Parse(sStartVerseID.Substring(5, 3));
             int endVerse = Int32.Parse(sEndVerseID.Substring(5, 3));
@@ -1310,7 +1309,7 @@ namespace GBI_Aligner
             return matchingTwords;
         }
 
-        static void GetSubTreesInDiffChapter(string sStartVerseID, string sEndVerseID, string book, string chapter1, string chapter2, ref ArrayList subTrees, Hashtable trees)
+        static void GetSubTreesInDiffChapter(string sStartVerseID, string sEndVerseID, string book, string chapter1, string chapter2, ref ArrayList subTrees, Dictionary<string, XmlNode> trees)
         {
             string hypotheticalLastVerse = book + chapter1 + "100";
             GetSubTreesInSameChapter(sStartVerseID, hypotheticalLastVerse, book, chapter1, ref subTrees, trees);

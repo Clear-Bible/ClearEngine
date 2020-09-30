@@ -14,9 +14,9 @@ namespace GBI_Aligner
 {
     class Data
     {
-        public static ArrayList GetVerses(string file, bool lowercase)
+        public static List<string> GetVerses(string file, bool lowercase)
         {
-            ArrayList verses = new ArrayList();
+            List<string> verses = new List<string>();
 
             string[] lines = File.ReadAllLines(file);
             foreach(string line in lines)
