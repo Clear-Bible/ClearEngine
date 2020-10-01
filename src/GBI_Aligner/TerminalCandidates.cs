@@ -17,7 +17,7 @@ namespace GBI_Aligner
             ref Hashtable candidateTable,  // the output goes here
                                            // HashTable(SourceWord.Id => ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
             XmlNode treeNode, // syntax tree for current verse
-            ArrayList tWords, // ArrayList(TargetWord)
+            List<TargetWord> tWords,
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
             Hashtable manModel, // manually checked alignments
                                 // Hashtable(source => Hashtable(target => Stats{ count, probability})

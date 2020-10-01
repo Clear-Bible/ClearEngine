@@ -145,19 +145,11 @@ namespace GBI_Aligner
             Dictionary<string, WordInfo> wordInfoTable =
                 Data.BuildWordInfoTable(treeNode);
            
-            ArrayList sWords = GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
-            // ArrayList(SourceWord)
-            // sourceWords2 not actually used
-
-            // TIM Study
-            // TimUtil.PrintArrayList("sWords", sWords);
+            List<SourceWord> sWords = GetSourceWords(
+                sourceWords,
+                wordInfoTable);
            
-            ArrayList tWords = GetTargetWords(targetWords, targetWords2);
-            // ArrayList(TargetWord)
-            // targetWords not actually used
-
-            // TIM Study
-            // TimUtil.PrintArrayList("tWords", tWords);
+            List<TargetWord> tWords = GetTargetWords(targetWords, targetWords2);
 
             Hashtable idMap = OldLinks.CreateIdMap(sWords);  // HashTable(SourceWord.ID => SourceWord.AltID)
 
@@ -219,7 +211,7 @@ namespace GBI_Aligner
 
         static void AlignNodes(
             XmlNode treeNode,
-            ArrayList tWords, // ArrayList(TargetWord)
+            List<TargetWord> tWords,
 
             ref Hashtable alignments, // Hashtable(nodeId =>
                                       //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
@@ -354,7 +346,7 @@ namespace GBI_Aligner
         //
         public static ArrayList GetTopCandidates(
             SourceWord sWord,
-            ArrayList tWords, // ArrayList(TargetWord)
+            List<TargetWord> tWords,
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
             Hashtable manModel, // manually checked alignments
                                 // Hashtable(source => Hashtable(target => Stats{ count, probability})
@@ -1028,19 +1020,17 @@ namespace GBI_Aligner
             return topCandidates;
         }
 
-        static ArrayList GetSourceWords(
+        static List<SourceWord> GetSourceWords(
             string[] words,
-            string[] words2,
             Dictionary<string, WordInfo> wordInfoTable)
         {
-            ArrayList wordList = new ArrayList();
+            List<SourceWord> wordList = new List<SourceWord>();
 
             Hashtable wordCount = new Hashtable();
 
             for (int i = 0; i < words.Length; i++)
             {
                 string word = words[i];
-                string word2 = words2[i];
                 SourceWord w = new SourceWord();
                 w.ID = word.Substring(word.LastIndexOf("_") + 1);
                 WordInfo wi = (WordInfo)wordInfoTable[w.ID];
@@ -1069,9 +1059,9 @@ namespace GBI_Aligner
             return wordList;
         }
 
-        static ArrayList GetTargetWords(string[] words, string[] words2)
+        static List<TargetWord> GetTargetWords(string[] words, string[] words2)
         {
-            ArrayList wordList = new ArrayList();
+            List<TargetWord> wordList = new List<TargetWord>();
 
             Hashtable wordCount = new Hashtable();
 
@@ -1278,7 +1268,7 @@ namespace GBI_Aligner
             }
         }
 
-        static ArrayList GetMatchingTwords(Hashtable wordIds, ArrayList tWords)
+        static ArrayList GetMatchingTwords(Hashtable wordIds, List<TargetWord> tWords)
         {
             ArrayList matchingTwords = new ArrayList();
 

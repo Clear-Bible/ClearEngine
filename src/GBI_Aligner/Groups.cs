@@ -14,8 +14,8 @@ namespace GBI_Aligner
     {
         public static void AlignGroups(
             ref ArrayList links, // ArrayList(MappedGroup)
-            ArrayList sourceWords, // ArrayList(SourceWord)
-            ArrayList targetWords, // ArrayList(TargetWord)
+            List<SourceWord> sourceWords, 
+            List<TargetWord> targetWords,
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
             ArrayList terminals // ArrayList(XmlNode)
@@ -263,7 +263,7 @@ namespace GBI_Aligner
             return inGroup;
         }
 
-        static void AddGroup(string[][]group, ref ArrayList links, ArrayList terminals, ArrayList targets)
+        static void AddGroup(string[][]group, ref ArrayList links, ArrayList terminals, List<TargetWord> targets)
         {
             string[] sourceWords = group[0];
             string[] targetWords = group[1];
@@ -313,7 +313,7 @@ namespace GBI_Aligner
             return treeNode;
         }
 
-        static void AddTargetNodes(string[] targetWords, ref ArrayList targetNodes, ArrayList targets)
+        static void AddTargetNodes(string[] targetWords, ref ArrayList targetNodes, List<TargetWord> targets)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {
@@ -322,7 +322,7 @@ namespace GBI_Aligner
             }
         }
 
-        static LinkedWord GetTargetNode(string id, ArrayList targets)
+        static LinkedWord GetTargetNode(string id, List<TargetWord> targets)
         {
             LinkedWord lw = new LinkedWord();
             TargetWord tWord = LocateTargetword(id, targets);
@@ -333,7 +333,7 @@ namespace GBI_Aligner
             return lw;
         }
 
-        static TargetWord LocateTargetword(string id, ArrayList targets)
+        static TargetWord LocateTargetword(string id, List<TargetWord> targets)
         {
             TargetWord tw = null;
 
@@ -349,7 +349,7 @@ namespace GBI_Aligner
             return tw;
         }
 
-        static SourceWord[] BuildSourceArray(ArrayList sourceWords)
+        static SourceWord[] BuildSourceArray(List<SourceWord> sourceWords)
         {
             SourceWord[] sourceArray = new SourceWord[sourceWords.Count];
 
@@ -364,7 +364,7 @@ namespace GBI_Aligner
             return sourceArray;
         }
 
-        static TargetWord[] BuildTargetArray(ArrayList targetWords)
+        static TargetWord[] BuildTargetArray(List<TargetWord> targetWords)
         {
             TargetWord[] targetArray = new TargetWord[targetWords.Count];
 

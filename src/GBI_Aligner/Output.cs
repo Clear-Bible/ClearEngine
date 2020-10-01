@@ -16,8 +16,8 @@ namespace GBI_Aligner
     {
         public static void WriteAlignment(
             ArrayList links, // ArrayList(MappedGroup)
-            ArrayList sourceWords, 
-            ArrayList targetWords, 
+            List<SourceWord> sourceWords, 
+            List<TargetWord> targetWords, 
             ref Alignment2 align, 
             int k, 
             Hashtable glossTable, 
@@ -110,7 +110,7 @@ namespace GBI_Aligner
             align.Lines[k] = line;
         }
 
-        static Hashtable BuildTargetPositionMap(ArrayList targetWords)
+        static Hashtable BuildTargetPositionMap(List<TargetWord> targetWords)
         {
             Hashtable positionMap = new Hashtable();
 
@@ -159,7 +159,7 @@ namespace GBI_Aligner
             return isTrue;
         }
 
-        static void RestoreOriginalPositions(ref ArrayList links, ArrayList sourceWords)
+        static void RestoreOriginalPositions(ref ArrayList links, List<SourceWord> sourceWords)
         {
             Hashtable positionTable = new Hashtable();
 
