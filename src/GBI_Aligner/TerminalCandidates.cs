@@ -14,8 +14,7 @@ namespace GBI_Aligner
     class TerminalCandidates
     {
         public static void GetTerminalCandidates(
-            ref Hashtable candidateTable,  // the output goes here
-                                           // HashTable(SourceWord.Id => ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
+            ref Dictionary<string, List<Candidate>> candidateTable,
             XmlNode treeNode, // syntax tree for current verse
             List<TargetWord> tWords,
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))

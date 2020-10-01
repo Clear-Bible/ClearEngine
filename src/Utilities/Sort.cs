@@ -265,44 +265,31 @@ namespace Utilities
             return sortedTable;
         }
 
-        public static ArrayList SortTableDoubleDesc(Hashtable table)
+        public static List<T> SortTableDoubleDesc<T>(
+            Dictionary<T, double> table)
         {
             double[] scores;
             scores = new double[table.Count];
-            object[] items;
-            items = new object[table.Count];
+            T[] items;
+            items = new T[table.Count];
 
             int i = 0;
 
-            IDictionaryEnumerator pathEnum = table.GetEnumerator();
-
-            while (pathEnum.MoveNext())
+            foreach (var keyValuePair in table)
             {
-                items[i] = (object)pathEnum.Key;
-                scores[i] = (double)pathEnum.Value;
+                items[i] = keyValuePair.Key;
+                scores[i] = keyValuePair.Value;
                 i++;
             }
 
-            ArrayList sortedTable = new ArrayList();
+            List<T> sortedTable = new List<T>();
 
             Array.Sort(scores, items, 0, scores.Length);
 
             for (int j = scores.Length - 1; j >= 0; j--)
             {
-                object obj = (object)items[j];
-                sortedTable.Add(obj);
+                sortedTable.Add(items[j]);
             }
-
-/*            IComparer myComparer = new myReverserClass();
-
-            Array.Sort(scores, items, myComparer);
-
-            ArrayList sortedTable = new ArrayList();
-
-            foreach (object item in items)
-            {
-                sortedTable.Add(item);
-            } */
 
             return sortedTable;
         }

@@ -13,12 +13,12 @@ namespace GBI_Aligner
     class Groups
     {
         public static void AlignGroups(
-            ref ArrayList links, // ArrayList(MappedGroup)
+            ref List<MappedGroup> links,
             List<SourceWord> sourceWords, 
             List<TargetWord> targetWords,
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
-            ArrayList terminals // ArrayList(XmlNode)
+            List<XmlNode> terminals
             )
         {
             SourceWord[] sWords = BuildSourceArray(sourceWords);
@@ -379,24 +379,20 @@ namespace GBI_Aligner
             return targetArray;
         }
 
-//        static XmlNode GetNode(string id, ArrayList terminals)
 
-        // wordLinks :: ArrayList(MappedWords)
-        // returns ArrayList(MappedGroup)
-        //
-        public static ArrayList WordsToGroups(ArrayList wordLinks)
+        public static List<MappedGroup> WordsToGroups(List<MappedWords> wordLinks)
         {
-            ArrayList gourpLinks = new ArrayList();
+            List<MappedGroup> groupLinks = new List<MappedGroup>();
 
             foreach(MappedWords wordLink in wordLinks)
             {
                 MappedGroup groupLink = new MappedGroup();
                 groupLink.SourceNodes.Add(wordLink.SourceNode);
                 groupLink.TargetNodes.Add(wordLink.TargetNode);
-                gourpLinks.Add(groupLink);
+                groupLinks.Add(groupLink);
             }
 
-            return gourpLinks;
+            return groupLinks;
         }
     }
 

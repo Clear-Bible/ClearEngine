@@ -18,9 +18,9 @@ namespace GBI_Aligner
     {
         // returns ArrayList(MappedWords)
         //
-        public static ArrayList AlignTheRest(
+        public static List<MappedWords> AlignTheRest(
             Candidate topCandidate,
-            ArrayList terminals, // :: ArrayList(XmlNode)
+            List<XmlNode> terminals,
             string[] sourceWords, // lemmas
             string[] targetWords,  // lowercased tokens        
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
@@ -710,14 +710,14 @@ namespace GBI_Aligner
             return null;
         }
 
-        public static void FixCrossingLinks(ref ArrayList links)
+        public static void FixCrossingLinks(ref List<MappedGroup> links)
         {
             Hashtable uniqueLemmaLinks = GetUniqueLemmaLinks(links);
             ArrayList crossingLinks = IdentifyCrossingLinks(uniqueLemmaLinks);
             SwapTargets(crossingLinks, ref links);
         }
 
-        static Hashtable GetUniqueLemmaLinks(ArrayList links)
+        static Hashtable GetUniqueLemmaLinks(List<MappedGroup> links)
         {
             Hashtable uniqueLemmaLinks = new Hashtable();
 
@@ -785,7 +785,7 @@ namespace GBI_Aligner
             return false;
         }
 
-        static void SwapTargets(ArrayList crossingLinks, ref ArrayList links)
+        static void SwapTargets(ArrayList crossingLinks, ref List<MappedGroup> links)
         {
             for (int i = 0; i < crossingLinks.Count; i++)
             {

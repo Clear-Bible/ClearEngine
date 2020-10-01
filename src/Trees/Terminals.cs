@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Utilities;
@@ -53,7 +54,7 @@ namespace Trees
 			   || ( rule == "CompoundVP" && length == 4 )
 			   || ( rule == "CompoundVP2" && length == 4 )
 			   || ( rule == "CompoundADVP" && length == 4 )
-			   || ( rule == "AdvP-A" && treeNode.Attributes.GetNamedItem("adLemma") != null && treeNode.Attributes.GetNamedItem("adLemma").Value == "×î" )
+			   || ( rule == "AdvP-A" && treeNode.Attributes.GetNamedItem("adLemma") != null && treeNode.Attributes.GetNamedItem("adLemma").Value == "??" )
 			   || ( rule == "AdvP-V" && length == 2 )
 			   ) // terminal ndoe
 			{
@@ -118,15 +119,15 @@ namespace Trees
 			}
 		}
 
-		public static ArrayList GetTerminalXmlNodes ( XmlNode treeNode )
+		public static List<XmlNode> GetTerminalXmlNodes ( XmlNode treeNode )
 		{
-			ArrayList terminalNodes = new ArrayList();
+			List<XmlNode> terminalNodes = new List<XmlNode>();
             GetTerminalXmlNodes(treeNode, ref terminalNodes);
 
 			return terminalNodes;
 		}
 
-		public static void GetTerminalXmlNodes ( XmlNode treeNode, ref ArrayList terminalNodes )
+		public static void GetTerminalXmlNodes ( XmlNode treeNode, ref List<XmlNode> terminalNodes )
 		{
 			if ( treeNode.NodeType.ToString().Equals("Text") ) // Terminal node
 			{

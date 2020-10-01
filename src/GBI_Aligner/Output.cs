@@ -15,7 +15,7 @@ namespace GBI_Aligner
     class Output
     {
         public static void WriteAlignment(
-            ArrayList links, // ArrayList(MappedGroup)
+            List<MappedGroup> links,
             List<SourceWord> sourceWords, 
             List<TargetWord> targetWords, 
             ref Alignment2 align, 
@@ -128,9 +128,9 @@ namespace GBI_Aligner
             return positionMap;
         }
 
-        static ArrayList RemoveEmptyLinks(ArrayList links)
+        static List<MappedGroup> RemoveEmptyLinks(List<MappedGroup> links)
         {
-            ArrayList trueLinks = new ArrayList();
+            List<MappedGroup> trueLinks = new List<MappedGroup>();
 
             foreach(MappedGroup mg in links)
             {
@@ -159,7 +159,7 @@ namespace GBI_Aligner
             return isTrue;
         }
 
-        static void RestoreOriginalPositions(ref ArrayList links, List<SourceWord> sourceWords)
+        static void RestoreOriginalPositions(ref List<MappedGroup> links, List<SourceWord> sourceWords)
         {
             Hashtable positionTable = new Hashtable();
 

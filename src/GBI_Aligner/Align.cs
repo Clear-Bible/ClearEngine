@@ -169,59 +169,39 @@ namespace GBI_Aligner
                 // mWord.altId => tWord.altId)
             }
 
-            Hashtable terminalCandidates = new Hashtable();
+            Dictionary<string, List<Candidate>> terminalCandidates =
+                new Dictionary<string, List<Candidate>>();
             TerminalCandidates.GetTerminalCandidates(ref terminalCandidates, treeNode, tWords, model, manModel, alignProbs, useAlignModel, n, verseID, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, existingLinks, idMap, sourceFuncWords, contentWordsOnly, strongs);
-                // terminalCandidates :: HashTable(SourceWord.Id =>
-                //     ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
 
-            // TIM Study
-            // TimUtil.PrintHashTable("terminalCandidates", terminalCandidates);
             
-            Hashtable alignments = new Hashtable();
+            Dictionary<string, List<Candidate>> alignments =
+                new Dictionary<string, List<Candidate>>();
             AlignNodes(treeNode, tWords, ref alignments, n, sourceWords.Length, maxPaths, terminalCandidates);
-            // alignments :: Hashtable(nodeId =>
-            //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
-            //   or Candidate)
 
-            // TIM Study
-            // TimUtil.PrintHashTable("alignments", alignments);
-
-            ArrayList verseAlignment = (ArrayList) alignments[verseNodeID];
+            List<Candidate> verseAlignment = alignments[verseNodeID];
             Candidate topCandidate = (Candidate)verseAlignment[0];
 
-            // TIM Study
-            // TimUtil.PrintAsJson("verseAlignment", verseAlignment);
-
-
             string linkedWords = GetWords(topCandidate);
-            //Console.WriteLine($"\nGetWords(topCandidate) = {linkedWords}\n");
 
+            List<XmlNode> terminals = Terminals.GetTerminalXmlNodes(treeNode);
+            List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sourceWords, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
 
-            ArrayList terminals = Terminals.GetTerminalXmlNodes(treeNode);
-            ArrayList links = Align2.AlignTheRest(topCandidate, terminals, sourceWords, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
-            // links :: ArrayList(MappedWords)
+            List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
-            links = Groups.WordsToGroups(links);
-            // links :: ArrayList(MappedGroup)
-
-            Groups.AlignGroups(ref links, sWords, tWords, groups, terminals);
-            Align2.FixCrossingLinks(ref links);
+            Groups.AlignGroups(ref links2, sWords, tWords, groups, terminals);
+            Align2.FixCrossingLinks(ref links2);
             //            Output.WriteAlignment(links, sourceWords, targetWords2, ref align, i, wordInfoTable, groups);
-            Output.WriteAlignment(links, sWords, tWords, ref align, i, glossTable, groups);
+            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups);
         }
 
         static void AlignNodes(
             XmlNode treeNode,
             List<TargetWord> tWords,
-
-            ref Hashtable alignments, // Hashtable(nodeId =>
-                                      //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
-                                      //   or Candidate)
-
+            ref Dictionary<string, List<Candidate>> alignments, 
             int n, // number of target tokens
             int sLength, // number of source words
             int maxPaths,
-            Hashtable terminalCandidates
+            Dictionary<string, List<Candidate>> terminalCandidates
                 // terminalCandidates :: HashTable(SourceWord.Id =>
                 //     ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
             )
@@ -260,10 +240,9 @@ namespace GBI_Aligner
                 sWord.Position = Int32.Parse(Utils.GetAttribValue(treeNode, "Start"));
                 sWord.RelativePos = (double)sWord.Position / (double)sLength;
 
-                ArrayList topCandidates = null;
-                topCandidates = (ArrayList)terminalCandidates[sWord.ID];
+                List<Candidate> topCandidates =
+                    terminalCandidates[sWord.ID];
                     // candidates that were found for this terminal:
-                    // ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
 
                 // (Doesn't do anything.)
                 foreach (Candidate c in topCandidates)
@@ -275,12 +254,11 @@ namespace GBI_Aligner
             }   
             else if (treeNode.ChildNodes.Count > 1)  // non-terminal with multiple children
             {
-                ArrayList sNodes = GetSourceNodes(treeNode);
-                    // ::= ArrayList(morphId, ...) for terminal nodes under this node
+                List<string> sNodes = GetSourceNodes(treeNode);
+                    // ::= List of morphId for terminal nodes under this node
 
-                ArrayList candidates = new ArrayList();
+                List<List<Candidate>> candidates = new List<List<Candidate>>();
                 // list of candidate lists, one for each child, some might be empty
-                // ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
 
                 foreach (XmlNode childNode in treeNode.ChildNodes)
                 {
@@ -295,8 +273,7 @@ namespace GBI_Aligner
                         childNodeID = childNodeID.Substring(0, childNodeID.Length - 2);
                     }
 
-                    ArrayList childCandidates = (ArrayList)alignments[childNodeID];
-                    // ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
+                    List<Candidate> childCandidates = alignments[childNodeID];
 
                     if (childCandidates.Count == 0)
                     {
@@ -314,7 +291,7 @@ namespace GBI_Aligner
                     
                 }
 
-                ArrayList topCandidates = ComputeTopCandidates(candidates, n, maxPaths, sNodes, treeNode);
+                List<Candidate> topCandidates = ComputeTopCandidates(candidates, n, maxPaths, sNodes, treeNode);
 
                 // doesn't actually do anything
                 foreach (Candidate c in topCandidates)
@@ -345,7 +322,7 @@ namespace GBI_Aligner
         //
         // returns ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
         //
-        public static ArrayList GetTopCandidates(
+        public static List<Candidate> GetTopCandidates(
             SourceWord sWord,
             List<TargetWord> tWords,
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
@@ -366,9 +343,7 @@ namespace GBI_Aligner
             Hashtable strongs
             )
         {
-            ArrayList topCandidates = new ArrayList();
-              // ArrayList(Candidate)
-              // Candidate { Sequence ArrayList(TargetWord), Prob double }
+            List<Candidate> topCandidates = new List<Candidate>();
 
             if (existingLinks.Count > 0 && sWord.AltID != null && existingLinks.ContainsKey(sWord.AltID))
             {
@@ -507,9 +482,9 @@ namespace GBI_Aligner
             return bestProb;
         }
 
-        static ArrayList GetTopCandidate(double bestProb, Hashtable probs)
+        static List<Candidate> GetTopCandidate(double bestProb, Hashtable probs)
         {
-            ArrayList bestCandidates = new ArrayList();
+            List<Candidate> bestCandidates = new List<Candidate>();
 
             IDictionaryEnumerator probEnum = probs.GetEnumerator();
 
@@ -533,25 +508,29 @@ namespace GBI_Aligner
         // childCandidateList = ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
         // returns ArrayList(Candidate)
         //
-        static ArrayList ComputeTopCandidates(ArrayList childCandidateList, int n, int maxPaths, ArrayList sNodes, XmlNode treeNode)
+        static List<Candidate> ComputeTopCandidates(
+            List<List<Candidate>> childCandidateList,
+            int n,
+            int maxPaths,
+            List<string> sNodes,
+            XmlNode treeNode)
         {
-            Hashtable pathProbs = new Hashtable();
-            ArrayList allPaths = CreatePaths(childCandidateList, maxPaths);
-            // allPaths :: ArrayList(ArrayList(Candidate))
-            ArrayList paths = FilterPaths(allPaths);
-            // paths :: ArrayList(ArrayList(Candidate))
+            Dictionary<List<Candidate>, double> pathProbs =
+                new Dictionary<List<Candidate>, double>();
+            List<List<Candidate>> allPaths = CreatePaths(childCandidateList, maxPaths);
+            List<List<Candidate>> paths = FilterPaths(allPaths);
             // paths = those where the candidates use different words
             if (paths.Count == 0)
             {
-                ArrayList topPath = (ArrayList)allPaths[0];
+                List<Candidate> topPath = allPaths[0];
                 paths.Add(topPath);
             }
 
-            ArrayList topCandidates = new ArrayList();
+            List<Candidate> topCandidates =
+                new List<Candidate>();
 
-            foreach (ArrayList path in paths)
+            foreach (List<Candidate> path in paths)
             {
-                // path :: ArrayList(Candidate)
                 double jointProb = ComputeJointProb(path); // sum of candidate probabilities in a path
                 try
                 {
@@ -560,16 +539,13 @@ namespace GBI_Aligner
                 catch
                 {
                     Console.WriteLine("Hashtable out of memory.");
-                    ArrayList sortedCandidates2 = Sort.SortTableDoubleDesc(pathProbs);
+                    List<List<Candidate>> sortedCandidates2 = Sort.SortTableDoubleDesc(pathProbs);
                     int topN2 = sortedCandidates2.Count / 10;
                     if (topN2 < n) topN2 = n;
-                    //                    topCandidates = GetTopPaths(sortedCandidates2, pathProbs, topN2);
                     topCandidates = GetTopPaths2(sortedCandidates2, pathProbs);
                     return topCandidates;
                 }
             }
-
-            // pathProbs :: Hashtable(ArrayList(Candidate), jointProb)
 
             Hashtable pathProbs2 = AdjustProbsByDistanceAndOrder(pathProbs);
 
@@ -583,7 +559,7 @@ namespace GBI_Aligner
             if (topN < n) topN = n;
 
             topCandidates = GetTopPaths2(sortedCandidates, pathProbs);
-            // topCandidates :: ArrayList(Candidate)
+            // topCandidates :: List<Candidate>
             // one for each path of maximal probability
 
             // (doesn't actually do anything)
@@ -1099,9 +1075,9 @@ namespace GBI_Aligner
             return word.Substring(word.LastIndexOf("_") + 1, 8);
         }
 
-        public static ArrayList CreateEmptyCandidate()
+        public static List<Candidate> CreateEmptyCandidate()
         {
-            ArrayList candidates = new ArrayList();
+            List<Candidate> candidates = new List<Candidate>();
             Candidate c = new Candidate();
             c.Prob = 0.0;
             candidates.Add(c);
@@ -1123,11 +1099,11 @@ namespace GBI_Aligner
             return firstWord.Substring(firstWord.LastIndexOf("_") + 1, 5);
         }
 
-        static ArrayList GetSourceNodes(XmlNode treeNode)
+        static List<string> GetSourceNodes(XmlNode treeNode)
         {
-            ArrayList sourceNodes = new ArrayList();
+            List<string> sourceNodes = new List<string>();
 
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
             foreach(XmlNode terminalNode in terminalNodes)
             {
                 string cat = Utils.GetAttribValue(terminalNode, "Cat");
