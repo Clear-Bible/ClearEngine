@@ -142,7 +142,8 @@ namespace RegressionTest1
             Hashtable badLinks = Data.GetXLinks(common("badLinks.txt"));
             int badLinkMinCount = 3;
             Hashtable glossTable = Data.BuildGlossTableFromFile(common("Gloss.txt"));
-            Hashtable oldLinks = Data.GetOldLinks(common("oldAlignment.json"), ref groups);
+            Dictionary<string, Dictionary<string, string>> oldLinks =
+                Data.GetOldLinks(common("oldAlignment.json"), ref groups);
             bool contentWordsOnly = true;
             Hashtable strongs = Data.BuildStrongTable(common("strongs.txt"));
 

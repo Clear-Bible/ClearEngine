@@ -58,7 +58,7 @@ namespace GBI_Aligner
             Hashtable badLinks, // list of word pairs that should not be linked, also Hashtable(link => count)
             int badLinkMinCount, // the mininmal counts required for a bad link to be considered
             Hashtable glossTable, // gloss information of the source text 
-            Hashtable oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            Dictionary<string, Dictionary<string, string>> oldLinks, // verseID => (mWord.altId => tWord.altId)
             ArrayList sourceFuncWords, // function words in Hebrew and Greek
             ArrayList targetFuncWords,
             bool contentWordsOnly,

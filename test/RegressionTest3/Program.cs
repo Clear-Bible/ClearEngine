@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 using AlignmentTool;
@@ -58,7 +59,7 @@ namespace RegressionTest3
 
             Hashtable glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
 
-            Hashtable oldLinks = Data.GetOldLinks(InPath("oldAlignment.json"), ref groups);
+            Dictionary<string, Dictionary<string, string>> oldLinks = Data.GetOldLinks(InPath("oldAlignment.json"), ref groups);
 
             ArrayList sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
             ArrayList targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));

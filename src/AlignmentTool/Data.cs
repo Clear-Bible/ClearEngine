@@ -543,16 +543,18 @@ namespace AlignmentTool
         // Deserializes the JSON in the input file into a Line[] with
         // types as above.
         // Returns a datum of the form:
-        //   Hashtable(verseId => Hashtable(manuscriptWord.AltId => translationWord.AltId))
+        //   Dictionary<string, Dictionary<string, string>>
+        //   verseId => (manuscriptWord.AltId => translationWord.AltId)
         //   where the verseId is the first 8 characters of the manuscriptWord.Id
         //   and the entries come from the one-to-one links
         //
         // In addition, this routine calls UpdateGroups() whenever it encounters
         // a link that is not one-to-one.
         //
-        public static Hashtable GetOldLinks(string jsonFile, ref Hashtable groups)
+        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, ref Hashtable groups)
         {
-            Hashtable oldLinks = new Hashtable();
+            Dictionary<string, Dictionary<string, string>> oldLinks =
+                new Dictionary<string, Dictionary<string, string>>();
 
             string jsonText = File.ReadAllText(jsonFile);
             Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
@@ -583,12 +585,14 @@ namespace AlignmentTool
 
                         if (oldLinks.ContainsKey(verseID))
                         {
-                            Hashtable verseLinks = (Hashtable)oldLinks[verseID];
+                            Dictionary<string, string> verseLinks =
+                                oldLinks[verseID];
                             verseLinks.Add(mWord.altId, tWord.altId);
                         }
                         else
                         {
-                            Hashtable verseLinks = new Hashtable();
+                            Dictionary<string, string> verseLinks =
+                                new Dictionary<string, string>();
                             verseLinks.Add(mWord.altId, tWord.altId);
                             oldLinks.Add(verseID, verseLinks);
                         }
@@ -596,7 +600,7 @@ namespace AlignmentTool
                 }
             }
 
-            return oldLinks;  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            return oldLinks;  // verseID => (mWord.altId => tWord.altId)
         }
 
         public static void FilterOutFunctionWords(string file, string cwFile, ArrayList funcWords)

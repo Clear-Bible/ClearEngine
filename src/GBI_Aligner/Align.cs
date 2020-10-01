@@ -40,7 +40,7 @@ namespace GBI_Aligner
             Hashtable badLinks,
             int badLinkMinCount,
             Hashtable glossTable,
-            Hashtable oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            Dictionary<string, Dictionary<string, string>> oldLinks, // verseID => (mWord.altId => tWord.altId)
             ArrayList sourceFuncWords, 
             ArrayList targetFuncWords,
             bool contentWordsOnly,
@@ -121,7 +121,7 @@ namespace GBI_Aligner
             Hashtable badLinks,
             int badLinkMinCount,
             Hashtable glossTable,
-            Hashtable oldLinks,  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            Dictionary<string, Dictionary<string, string>> oldLinks,  // verseID => (mWord.altId => tWord.altId)
             ArrayList sourceFuncWords,
             ArrayList targetFuncWords,
             bool contentWordsOnly,
@@ -149,23 +149,24 @@ namespace GBI_Aligner
                 sourceWords,
                 wordInfoTable);
            
-            List<TargetWord> tWords = GetTargetWords(targetWords, targetWords2);
+            List<TargetWord> tWords = GetTargetWords(
+                targetWords,
+                targetWords2);
 
-            Hashtable idMap = OldLinks.CreateIdMap(sWords);  // HashTable(SourceWord.ID => SourceWord.AltID)
+            Dictionary<string, string> idMap =
+                OldLinks.CreateIdMap(sWords);
 
             string verseNodeID = Utils.GetAttribValue(treeNode, "nodeId");
             verseNodeID = verseNodeID.Substring(0, verseNodeID.Length - 1);
             string verseID = verseNodeID.Substring(0, 8);
-            if (verseID == "41002004")
-            {
-                ;
-            }
+            
 
-            Hashtable existingLinks = new Hashtable();
+            Dictionary<string, string> existingLinks =
+                new Dictionary<string, string>();
             if (oldLinks.ContainsKey(verseID))  // verseID as obtained from tree
             {
-                existingLinks = (Hashtable)oldLinks[verseID];
-                // Hashtable(mWord.altId => tWord.altId)
+                existingLinks = oldLinks[verseID];
+                // mWord.altId => tWord.altId)
             }
 
             Hashtable terminalCandidates = new Hashtable();
@@ -359,8 +360,7 @@ namespace GBI_Aligner
             int goodLinkMinCount, // (not actually used)
             Hashtable badLinks,
             int badLinkMinCount,
-            Hashtable existingLinks, // Hashtable(mWord.altId => tWord.altId)
-                                     // it gets used here
+            Dictionary<string, string> existingLinks, // mWord.altId => tWord.altId
             ArrayList sourceFuncWords,
             bool contentWordsOnly, // (not actually used)
             Hashtable strongs

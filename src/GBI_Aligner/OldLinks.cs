@@ -12,9 +12,11 @@ namespace GBI_Aligner
 {
     class OldLinks
     {
-        public static Hashtable CreateIdMap(List<SourceWord> sWords)
+        public static Dictionary<string, string> CreateIdMap(
+            List<SourceWord> sWords)
         {
-            Hashtable idMap = new Hashtable();
+            Dictionary<string, string> idMap =
+                new Dictionary<string, string>();
 
             foreach(SourceWord sWord in sWords)
             {

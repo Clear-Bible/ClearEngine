@@ -31,8 +31,8 @@ namespace GBI_Aligner
             int goodLinkMinCount,
             Hashtable badLinks,  // Hashtable(link => count)
             int badLinkMinCount,
-            Hashtable existingLinks, // Hashtable(mWord.altId => tWord.altId)
-            Hashtable idMap, // HashTable(SourceWord.ID => SourceWord.AltID)
+            Dictionary<string, string> existingLinks, // mWord.altId => tWord.altId
+            Dictionary<string, string> idMap, // (SourceWord.ID => SourceWord.AltID)
             ArrayList sourceFuncWords,
             bool contentWordsOnly,  // not actually used
             Hashtable strongs
