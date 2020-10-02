@@ -1309,11 +1309,21 @@ namespace GBI_Aligner
     }
 
 
-    public class Candidate
+    public class CandidateSequence
     {
-        public double Prob { get; set; }
-
+        // Either List<Candidate>, List<TargetWord>, or null.
+        //
         private object sequence;
+
+        public CandidateSequence(List<Candidate> subcandidates)
+        {
+            sequence = subcandidates;
+        }
+
+        public CandidateSequence(List<TargetWord> targetWords)
+        {
+            sequence = targetWords;
+        }
 
         public int Count
         {
@@ -1399,124 +1409,9 @@ namespace GBI_Aligner
     }
 
 
-
-
-    public class CandidateX
+    public class Candidate
     {
-        private object sequence;
-
         public double Prob { get; set; }
-
-        public object SequenceUntyped => sequence;
-
-        public int Count
-        {
-            get
-            {
-                switch (sequence)
-                {
-                    case null:
-                        return 0;
-
-                    case List<CandidateX> sequence2:
-                        return sequence2.Count;
-
-                    case List<TargetWord> sequence2:
-                        return sequence2.Count;
-
-                    default:
-                        throw new InvalidOperationException("DEFECT");
-                }
-            }
-        }
-
-        public void SetSequenceUntyped(object newSequence)
-        {
-            switch (newSequence)
-            {
-                case List<CandidateX> sequence2:
-                case List<TargetWord> sequence3:
-                case null:
-                    sequence = newSequence;
-                    break;
-
-                default:
-                    throw new InvalidOperationException("DEFECT");
-            }
-        }
-
-        public IEnumerable<CandidateX> SubCandidates
-        {
-            get
-            {
-                switch (sequence)
-                {
-                    case List<CandidateX> sequence2:
-                        return sequence2;
-
-                    case null:
-                        return Enumerable.Empty<CandidateX>();
-
-                    default:
-                        throw new InvalidOperationException("DEFECT");
-                }
-            }
-        }
-
-        public IEnumerable<TargetWord> SubTargetWords
-        {
-            get
-            {
-                switch (sequence)
-                {
-                    case List<TargetWord> sequence2:
-                        return sequence2;
-
-                    case null:
-                        return Enumerable.Empty<TargetWord>();
-
-                    default:
-                        throw new InvalidOperationException("DEFECT");
-                }
-            }
-        }
-
-        public void AddSubTargetWord(TargetWord targetWord)
-        {
-            switch (sequence)
-            {
-                case null:
-                    List<TargetWord> targetWords = new List<TargetWord>();
-                    targetWords.Add(targetWord);
-                    sequence = targetWords;
-                    break;
-
-                case List<TargetWord> sequence2:
-                    sequence2.Add(targetWord);
-                    break;
-
-                default:
-                    throw new InvalidOperationException("DEFECT");
-            }
-        }
-
-        public void AddSubCandidate(CandidateX candidate)
-        {
-            switch (sequence)
-            {
-                case null:
-                    List<CandidateX> subCandidates = new List<CandidateX>();
-                    subCandidates.Add(candidate);
-                    sequence = subCandidates;
-                    break;
-
-                case List<CandidateX> sequence2:
-                    sequence2.Add(candidate);
-                    break;
-
-                default:
-                    throw new InvalidOperationException("DEFECT");
-            }
-        }
+        public CandidateSequence Sequence { get; set; }
     }
 }
