@@ -43,22 +43,24 @@ namespace GBI_Aligner
         // pathProbs :: Hashtable(Candidate, probability)
         // returns ArrayList(Candidate)
         //
-        public static ArrayList SortPaths(Hashtable pathProbs)
+        public static List<List<Candidate2>> SortPaths(Dictionary<List<Candidate2>, double> pathProbs)
         {
-            ArrayList sortedPaths = Sort.SortTableDoubleDesc(pathProbs);
+            List<List<Candidate2>> sortedPaths = Sort.SortTableDoubleDesc(pathProbs);
             return SecondarySort(sortedPaths, pathProbs);
         }
 
-        static public ArrayList SecondarySort(ArrayList paths, Hashtable pathProbs)
+        static public List<List<Candidate2>> SecondarySort(
+            List<List<Candidate2>> paths,
+            Dictionary<List<Candidate2>, double> pathProbs)
         {
-            ArrayList probGroups = new ArrayList();
+            List<Hashtable> probGroups = new List<Hashtable>();
 
             double currentProb = 10.0;
             Hashtable group = new Hashtable();
 
             for (int i = 0; i < paths.Count; i++)
             {
-                ArrayList path = (ArrayList)paths[i];
+                List<Candidate2> path = paths[i];
                 double prob = (double)pathProbs[path];
                 ArrayList wordsInPath = new ArrayList();
                 Align.GetWordsInPath(path, ref wordsInPath);

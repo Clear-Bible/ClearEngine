@@ -19,7 +19,7 @@ namespace GBI_Aligner
         // returns ArrayList(MappedWords)
         //
         public static List<MappedWords> AlignTheRest(
-            Candidate topCandidate,
+            Candidate2 topCandidate,
             List<XmlNode> terminals,
             string[] sourceWords, // lemmas
             string[] targetWords,  // lowercased tokens        
@@ -495,7 +495,7 @@ namespace GBI_Aligner
                 string type = obj.GetType().ToString();
                 if (type == "GBI_Aligner.Candidate")
                 {
-                    foreach (Candidate c in path)
+                    foreach (Candidate2 c in path)
                     {
                         GetLinkedWords(c.Sequence, ref links, c.Prob);
                     }

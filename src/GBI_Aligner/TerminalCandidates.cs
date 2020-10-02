@@ -14,7 +14,7 @@ namespace GBI_Aligner
     class TerminalCandidates
     {
         public static void GetTerminalCandidates(
-            ref Dictionary<string, List<Candidate>> candidateTable,
+            ref Dictionary<string, List<Candidate2>> candidateTable,
             XmlNode treeNode, // syntax tree for current verse
             List<TargetWord> tWords,
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
@@ -122,7 +122,7 @@ namespace GBI_Aligner
                     string target = (string)conflictEnum.Key;
                     ArrayList positions = (ArrayList)conflictEnum.Value;                    
                     ArrayList conflictingCandidates = GetConflictingCandidates(target, positions, candidateTable);
-                    Candidate winningCandidate = Align.GetWinningCandidate(conflictingCandidates);
+                    Candidate2 winningCandidate = Align.GetWinningCandidate(conflictingCandidates);
                     if (winningCandidate != null)
                     {
                         RemoveLosingCandidates(target, positions, winningCandidate, ref candidateTable);
@@ -131,14 +131,14 @@ namespace GBI_Aligner
             }
         }
 
-        static void RemoveLosingCandidates(string target, ArrayList positions, Candidate winningCandidate, ref Hashtable candidateTable)
+        static void RemoveLosingCandidates(string target, ArrayList positions, Candidate2 winningCandidate, ref Hashtable candidateTable)
         {
             foreach(string morphID in positions)
             {
                 ArrayList candidates = (ArrayList)candidateTable[morphID];
                 for (int i = 0; i < candidates.Count; i++)
                 {
-                    Candidate c = (Candidate)candidates[i];
+                    Candidate2 c = (Candidate2)candidates[i];
                     string targetID = GetTargetID(c);
                     if (targetID == string.Empty) continue;
                     string linkedWords = Align.GetWords(c);
@@ -150,7 +150,7 @@ namespace GBI_Aligner
             }
         }
 
-        static string GetTargetID(Candidate c)
+        static string GetTargetID(Candidate2 c)
         {
             if (c.Sequence.Count == 0)
             {
@@ -169,19 +169,19 @@ namespace GBI_Aligner
 
             foreach(string morphID in positions)
             {
-                Candidate c = GetConflictingCandidate(morphID, target, candidateTable);
+                Candidate2 c = GetConflictingCandidate(morphID, target, candidateTable);
                 conflictingCandidates.Add(c);
             }
 
             return conflictingCandidates;
         }
 
-        static Candidate GetConflictingCandidate(string morphID, string target, Hashtable candidateTable)
+        static Candidate2 GetConflictingCandidate(string morphID, string target, Hashtable candidateTable)
         {
-            Candidate conflictingCandidate = null;
+            Candidate2 conflictingCandidate = null;
 
             ArrayList candidates = (ArrayList)candidateTable[morphID];
-            foreach(Candidate candidate in candidates)
+            foreach(Candidate2 candidate in candidates)
             {
                 string linkedWords = Align.GetWords(candidate);
                 if (linkedWords == target)
@@ -213,7 +213,7 @@ namespace GBI_Aligner
 
                 for (int i = 1; i < candidates.Count; i++) // excluding the top candidate
                 {
-                    Candidate c = (Candidate)candidates[i];
+                    Candidate2 c = (Candidate2)candidates[i];
                     // c :: Candidate{ Sequence ArrayList(TargetWord), Prob double }
 
                     string linkedWords = Align.GetWords(c);
