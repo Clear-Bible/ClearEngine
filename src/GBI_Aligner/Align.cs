@@ -1311,6 +1311,98 @@ namespace GBI_Aligner
 
     public class Candidate
     {
+        public double Prob { get; set; }
+
+        private object sequence;
+
+        public int Count
+        {
+            get
+            {
+                switch (sequence)
+                {
+                    case null:
+                        return 0;
+
+                    case List<Candidate> sequenceC:
+                        return sequenceC.Count;
+
+                    case List<TargetWord> sequenceTW:
+                        return sequenceTW.Count;
+
+                    default:
+                        throw new InvalidOperationException("DEFECT");
+                }
+            }
+        }
+
+        public void Match(
+            Action<List<TargetWord>> actionTargetWords,
+            Action<List<Candidate>> actionCandidates)
+        {
+            switch (sequence)
+            {
+                case List<TargetWord> sequenceTW:
+                    actionTargetWords(sequenceTW);
+                    break;
+
+                case List<Candidate> sequenceC:
+                    actionCandidates(sequenceC);
+                    break;
+
+                case null:
+                    actionCandidates(new List<Candidate>());
+                    break;
+
+                default:
+                    throw new InvalidOperationException("DEFECT");
+            }
+        }
+
+        public void Add(TargetWord targetWord)
+        {
+            switch (sequence)
+            {
+                case null:
+                    List<TargetWord> targetWords = new List<TargetWord>();
+                    targetWords.Add(targetWord);
+                    sequence = targetWords;
+                    break;
+
+                case List<TargetWord> sequenceTW:
+                    sequenceTW.Add(targetWord);
+                    break;
+
+                default:
+                    throw new InvalidOperationException("DEFECT");
+            }
+        }
+
+        public void Add(Candidate candidate)
+        {
+            switch (sequence)
+            {
+                case null:
+                    List<Candidate> subCandidates = new List<Candidate>();
+                    subCandidates.Add(candidate);
+                    sequence = subCandidates;
+                    break;
+
+                case List<Candidate> sequenceC:
+                    sequenceC.Add(candidate);
+                    break;
+
+                default:
+                    throw new InvalidOperationException("DEFECT");
+            }
+        }
+    }
+
+
+
+
+    public class CandidateX
+    {
         private object sequence;
 
         public double Prob { get; set; }
@@ -1326,7 +1418,7 @@ namespace GBI_Aligner
                     case null:
                         return 0;
 
-                    case List<Candidate> sequence2:
+                    case List<CandidateX> sequence2:
                         return sequence2.Count;
 
                     case List<TargetWord> sequence2:
@@ -1342,7 +1434,7 @@ namespace GBI_Aligner
         {
             switch (newSequence)
             {
-                case List<Candidate> sequence2:
+                case List<CandidateX> sequence2:
                 case List<TargetWord> sequence3:
                 case null:
                     sequence = newSequence;
@@ -1353,17 +1445,17 @@ namespace GBI_Aligner
             }
         }
 
-        public IEnumerable<Candidate> SubCandidates
+        public IEnumerable<CandidateX> SubCandidates
         {
             get
             {
                 switch (sequence)
                 {
-                    case List<Candidate> sequence2:
+                    case List<CandidateX> sequence2:
                         return sequence2;
 
                     case null:
-                        return Enumerable.Empty<Candidate>();
+                        return Enumerable.Empty<CandidateX>();
 
                     default:
                         throw new InvalidOperationException("DEFECT");
@@ -1408,17 +1500,17 @@ namespace GBI_Aligner
             }
         }
 
-        public void AddSubCandidate(Candidate candidate)
+        public void AddSubCandidate(CandidateX candidate)
         {
             switch (sequence)
             {
                 case null:
-                    List<Candidate> subCandidates = new List<Candidate>();
+                    List<CandidateX> subCandidates = new List<CandidateX>();
                     subCandidates.Add(candidate);
                     sequence = subCandidates;
                     break;
 
-                case List<Candidate> sequence2:
+                case List<CandidateX> sequence2:
                     sequence2.Add(candidate);
                     break;
 
