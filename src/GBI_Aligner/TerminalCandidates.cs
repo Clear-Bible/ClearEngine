@@ -14,7 +14,7 @@ namespace GBI_Aligner
     class TerminalCandidates
     {
         public static void GetTerminalCandidates(
-            ref Dictionary<string, List<Candidate2>> candidateTable,
+            Dictionary<string, List<Candidate>> candidateTable,
             XmlNode treeNode, // syntax tree for current verse
             List<TargetWord> tWords,
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
@@ -37,8 +37,7 @@ namespace GBI_Aligner
             Hashtable strongs
             )
         {
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
-                // ArrayList(XmlNode)
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
 
             foreach(XmlNode terminalNode in terminalNodes)
             {
@@ -62,44 +61,40 @@ namespace GBI_Aligner
                 if (sWord.Lemma == null) continue;
  //               if (contentWordsOnly && sourceFuncWords.Contains(sWord.Lemma)) continue;
 
-                ArrayList topCandidates = null;
-                topCandidates = Align.GetTopCandidates(sWord, tWords, model, manModel, alignProbs, useAlignModel, n, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, existingLinks, sourceFuncWords, contentWordsOnly, strongs);
-                    // ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
-
-          /*      foreach (Candidate c in topCandidates)
-                {
-                    string linkedWords = Align.GetWords(c);
-                } */
+                List<Candidate> topCandidates =
+                    Align.GetTopCandidates(sWord, tWords, model, manModel, alignProbs, useAlignModel, n, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, existingLinks, sourceFuncWords, contentWordsOnly, strongs);
 
                 candidateTable.Add(sWord.ID, topCandidates);
 
-                ResolveConflicts(ref candidateTable);
+                ResolveConflicts(candidateTable);
             }
 
-            FillGaps(ref candidateTable);
+            FillGaps(candidateTable);
         }
 
-        static void FillGaps(ref Hashtable candidateTable)
+        static void FillGaps(Dictionary<string, List<Candidate>> candidateTable)
         {
-            ArrayList gaps = FindGaps(candidateTable);
+            List<string> gaps = FindGaps(candidateTable);
 
             foreach(string morphID in gaps)
             {
-                ArrayList emptyCandidate = Align.CreateEmptyCandidate();
+                List<Candidate> emptyCandidate = Align.CreateEmptyCandidate();
                 candidateTable[morphID] = emptyCandidate;
             }
         }
 
-        static ArrayList FindGaps(Hashtable candidateTable)
+        static List<string> FindGaps(Dictionary<string, List<Candidate>> candidateTable)
         {
-            ArrayList gaps = new ArrayList();
+            List<string> gaps = new List<string>();
 
             IDictionaryEnumerator tableEnum = candidateTable.GetEnumerator();
 
             while (tableEnum.MoveNext())
+
+            foreach (var keyValuePair in candidateTable)
             {
-                string morphID = (string)tableEnum.Key;
-                ArrayList candidates = (ArrayList)tableEnum.Value;
+                string morphID = keyValuePair.Key;
+                List<Candidate> candidates = keyValuePair.Value;
 
                 if (candidates.Count == 0)
                 {
@@ -110,35 +105,41 @@ namespace GBI_Aligner
             return gaps;
         }
 
-        static void ResolveConflicts(ref Hashtable candidateTable)
+        static void ResolveConflicts(Dictionary<string, List<Candidate>> candidateTable)
         {
-            Hashtable conflicts = FindConflicts(candidateTable);
+            Dictionary<string, List<string>> conflicts = FindConflicts(candidateTable);
 
             if (conflicts.Count > 0)
             {
                 IDictionaryEnumerator conflictEnum = conflicts.GetEnumerator();
                 while (conflictEnum.MoveNext())
+
+                foreach (var keyValuePair in conflicts)
                 {
-                    string target = (string)conflictEnum.Key;
-                    ArrayList positions = (ArrayList)conflictEnum.Value;                    
-                    ArrayList conflictingCandidates = GetConflictingCandidates(target, positions, candidateTable);
-                    Candidate2 winningCandidate = Align.GetWinningCandidate(conflictingCandidates);
+                    string target = keyValuePair.Key;
+                    List<string> positions = keyValuePair.Value;                    
+                    List<Candidate> conflictingCandidates = GetConflictingCandidates(target, positions, candidateTable);
+                    Candidate winningCandidate = Align.GetWinningCandidate(conflictingCandidates);
                     if (winningCandidate != null)
                     {
-                        RemoveLosingCandidates(target, positions, winningCandidate, ref candidateTable);
+                        RemoveLosingCandidates(target, positions, winningCandidate, candidateTable);
                     }
                 }
             }
         }
 
-        static void RemoveLosingCandidates(string target, ArrayList positions, Candidate2 winningCandidate, ref Hashtable candidateTable)
+        static void RemoveLosingCandidates(
+            string target,
+            List<string> positions,
+            Candidate winningCandidate,
+            Dictionary<string, List<Candidate>> candidateTable)
         {
             foreach(string morphID in positions)
             {
-                ArrayList candidates = (ArrayList)candidateTable[morphID];
+                List<Candidate> candidates = candidateTable[morphID];
                 for (int i = 0; i < candidates.Count; i++)
                 {
-                    Candidate2 c = (Candidate2)candidates[i];
+                    Candidate c = (Candidate)candidates[i];
                     string targetID = GetTargetID(c);
                     if (targetID == string.Empty) continue;
                     string linkedWords = Align.GetWords(c);
@@ -150,38 +151,52 @@ namespace GBI_Aligner
             }
         }
 
-        static string GetTargetID(Candidate2 c)
+        static string GetTargetID(Candidate c)
         {
-            if (c.Sequence.Count == 0)
-            {
-                return string.Empty;
-            }
-            else
-            {
-                TargetWord tWord = (TargetWord)c.Sequence[0];
-                return tWord.ID;
-            }
+            string result = string.Empty;
+
+            c.Sequence.Match(
+                targetWords =>
+                {
+                    if (targetWords.Count > 0)
+                    { 
+                        TargetWord tWord = targetWords[0];
+                        result = tWord.ID;
+                    }
+                },
+                candidates =>
+                {
+                    throw new InvalidOperationException("DEFECT");
+                });
+
+            return result;            
         }
 
-        static ArrayList GetConflictingCandidates(string target, ArrayList positions, Hashtable candidateTable)
+        static List<Candidate> GetConflictingCandidates(
+            string target,
+            List<string> positions,
+            Dictionary<string, List<Candidate>> candidateTable)
         {
-            ArrayList conflictingCandidates = new ArrayList();
+            List<Candidate> conflictingCandidates = new List<Candidate>();
 
             foreach(string morphID in positions)
             {
-                Candidate2 c = GetConflictingCandidate(morphID, target, candidateTable);
+                Candidate c = GetConflictingCandidate(morphID, target, candidateTable);
                 conflictingCandidates.Add(c);
             }
 
             return conflictingCandidates;
         }
 
-        static Candidate2 GetConflictingCandidate(string morphID, string target, Hashtable candidateTable)
+        static Candidate GetConflictingCandidate(
+            string morphID,
+            string target,
+            Dictionary<string, List<Candidate>> candidateTable)
         {
-            Candidate2 conflictingCandidate = null;
+            Candidate conflictingCandidate = null;
 
-            ArrayList candidates = (ArrayList)candidateTable[morphID];
-            foreach(Candidate2 candidate in candidates)
+            List<Candidate> candidates = candidateTable[morphID];
+            foreach(Candidate candidate in candidates)
             {
                 string linkedWords = Align.GetWords(candidate);
                 if (linkedWords == target)
@@ -199,46 +214,42 @@ namespace GBI_Aligner
         // returns Hashtable(linkedWords => ArrayList(wordId))
         // where the ArrayLists all have more than one member
         //
-        static Hashtable FindConflicts(Hashtable candidateTable)
+        static Dictionary<string, List<string>> FindConflicts(Dictionary<string, List<Candidate>> candidateTable)
         {
-            Hashtable targets = new Hashtable(); // Hashtable(linkedWords => ArrayList(wordId))
+            Dictionary<string, List<string>> targets =
+                new Dictionary<string, List<string>>();
 
-            IDictionaryEnumerator tableEnum = candidateTable.GetEnumerator();
-
-            while (tableEnum.MoveNext())
+            foreach (var keyValuePair in candidateTable)
             {
-                string morphID = (string)tableEnum.Key;  // source word ID
-                ArrayList candidates = (ArrayList)tableEnum.Value;
-                    // candidates :: ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
+                string morphID = keyValuePair.Key;
+                List<Candidate> candidates = keyValuePair.Value;
 
                 for (int i = 1; i < candidates.Count; i++) // excluding the top candidate
                 {
-                    Candidate2 c = (Candidate2)candidates[i];
-                    // c :: Candidate{ Sequence ArrayList(TargetWord), Prob double }
+                    Candidate c = candidates[i];
 
                     string linkedWords = Align.GetWords(c);
                     if (targets.ContainsKey(linkedWords))
                     {
-                        ArrayList positions = (ArrayList)targets[linkedWords];
+                        List<string> positions = targets[linkedWords];
                         positions.Add(morphID);
                     }
                     else
                     {
-                        ArrayList positions = new ArrayList();
+                        List<string> positions = new List<string>();
                         positions.Add(morphID);
                         targets.Add(linkedWords, positions);
                     }
                 }
             }
 
-            Hashtable conflicts = new Hashtable();
+            Dictionary<string, List<string>> conflicts =
+                new Dictionary<string, List<string>>();
 
-            IDictionaryEnumerator targetEnum = targets.GetEnumerator();
-
-            while (targetEnum.MoveNext())
+            foreach (var keyValuePair in targets)
             {
-                string target = (string)targetEnum.Key;
-                ArrayList positions = (ArrayList)targetEnum.Value;
+                string target = keyValuePair.Key;
+                List<string> positions = keyValuePair.Value;
                 if (positions.Count > 1)
                 {
                     conflicts.Add(target, positions);

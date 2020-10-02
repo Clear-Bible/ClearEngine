@@ -43,15 +43,15 @@ namespace GBI_Aligner
         // pathProbs :: Hashtable(Candidate, probability)
         // returns ArrayList(Candidate)
         //
-        public static List<List<Candidate2>> SortPaths(Dictionary<List<Candidate2>, double> pathProbs)
+        public static List<List<Candidate>> SortPaths(Dictionary<CandidateSequence, double> pathProbs)
         {
-            List<List<Candidate2>> sortedPaths = Sort.SortTableDoubleDesc(pathProbs);
+            List<CandidateSequence> sortedPaths = Sort.SortTableDoubleDesc(pathProbs);
             return SecondarySort(sortedPaths, pathProbs);
         }
 
-        static public List<List<Candidate2>> SecondarySort(
-            List<List<Candidate2>> paths,
-            Dictionary<List<Candidate2>, double> pathProbs)
+        static public List<List<Candidate>> SecondarySort(
+            List<CandidateSequence> paths,
+            Dictionary<CandidateSequence, double> pathProbs)
         {
             List<Hashtable> probGroups = new List<Hashtable>();
 
@@ -60,15 +60,15 @@ namespace GBI_Aligner
 
             for (int i = 0; i < paths.Count; i++)
             {
-                List<Candidate2> path = paths[i];
-                double prob = (double)pathProbs[path];
-                ArrayList wordsInPath = new ArrayList();
-                Align.GetWordsInPath(path, ref wordsInPath);
+                CandidateSequence path = paths[i];
+                double prob = pathProbs[path];
+                List<TargetWord> wordsInPath = new List<TargetWord>();
+                Align.GetWordsInPath(path, wordsInPath);
                 string words = GetWords(wordsInPath);
                 int hashCode = words.GetHashCode();
                 if (prob != currentProb && group.Count > 0)
                 {
-                    probGroups.Add(group.Clone());
+                    probGroups.Add((Hashtable)group.Clone());
                     group.Clear();
                     group.Add(path, hashCode);
                 }
@@ -146,7 +146,7 @@ namespace GBI_Aligner
             return paths2;
         }
 
-        static string GetWords(ArrayList wordsInPath)
+        static string GetWords(List<TargetWord> wordsInPath)
         {
             string words = string.Empty;
 
