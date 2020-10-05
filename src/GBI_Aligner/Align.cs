@@ -684,8 +684,7 @@ namespace GBI_Aligner
         //
         public static string GetWords(Candidate c)
         {
-            ArrayList wordsInPath = new ArrayList();
-            GetWordsInPath(c.Sequence, ref wordsInPath);
+            ArrayList wordsInPath = GetTargetWordsInPath(c.Sequence);
 
             string words = string.Empty;
 
@@ -699,8 +698,7 @@ namespace GBI_Aligner
 
         public static string GetWordsInPath(ArrayList path)
         {
-            ArrayList wordsInPath = new ArrayList();
-            GetWordsInPath(path, ref wordsInPath);
+            ArrayList wordsInPath = GetTargetWordsInPath(path);
 
             string words = string.Empty;
 
@@ -768,8 +766,9 @@ namespace GBI_Aligner
 
         static int ComputeDistance(ArrayList path)
         {
-            ArrayList wordsInPath = new ArrayList();
-            GetWordsInPath(path, ref wordsInPath);
+
+            ArrayList wordsInPath = GetTargetWordsInPath(path);
+
             int distance = 0;
 
             int position = GetInitialPosition(wordsInPath);
@@ -788,8 +787,11 @@ namespace GBI_Aligner
 
         static double ComputeOrderProb(ArrayList path)
         {
-            ArrayList wordsInPath = new ArrayList();
-            GetWordsInPath(path, ref wordsInPath);
+            //ArrayList wordsInPath = new ArrayList();
+            //GetWordsInPath(path, ref wordsInPath);
+
+            ArrayList wordsInPath = GetTargetWordsInPath(path);
+
             int violations = 0;
             int countedWords = 1;
 
@@ -828,34 +830,56 @@ namespace GBI_Aligner
             return initialPosition;
         }
 
-        public static void GetWordsInPath(ArrayList path, ref ArrayList wordsInPath)
-        {
-            ArrayList words = new ArrayList();
+        //public static void GetWordsInPath(ArrayList path, ref ArrayList wordsInPath)
+        //{
+        //    ArrayList words = new ArrayList();
 
-            if (path.Count == 0)
+        //    if (path.Count == 0)
+        //    {
+        //        TargetWord tWord = CreateFakeTargetWord();
+        //    }
+        //    else if (path[0] is Candidate)
+        //    {
+        //        foreach (Candidate c in path)
+        //        {
+        //            GetWordsInPath(c.Sequence, ref wordsInPath);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        foreach (TargetWord tWord in path)
+        //        {
+        //            wordsInPath.Add(tWord);
+        //        }
+        //    }
+        //}
+
+
+        // returns an ArrayList of TargetWord objects.
+        public static ArrayList GetTargetWordsInPath(ArrayList path)
+        {
+            IEnumerable<TargetWord> helper(ArrayList path)
             {
-                TargetWord tWord = CreateFakeTargetWord();
-            }
-            else
-            {
-                Object obj = path[0];
-                string type = obj.GetType().ToString();
-                if (type == "GBI_Aligner.Candidate")
+                if (path.Count == 0)
                 {
-                    foreach (Candidate c in path)
-                    {
-                        GetWordsInPath(c.Sequence, ref wordsInPath);
-                    }
+                    return new TargetWord[] { CreateFakeTargetWord() };
+                }
+                else if (path[0] is Candidate)
+                {
+                    return path
+                        .Cast<Candidate>()
+                        .SelectMany(c => helper(c.Sequence));
                 }
                 else
                 {
-                    foreach (TargetWord tWord in path)
-                    {
-                        wordsInPath.Add(tWord);
-                    }
+                    return path.Cast<TargetWord>();
                 }
             }
+
+
+            return new ArrayList(helper(path).ToList());
         }
+
 
         // childCandidateList = ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
         //
@@ -1223,13 +1247,21 @@ namespace GBI_Aligner
 
         public static TargetWord CreateFakeTargetWord()
         {
-            TargetWord tWord = new TargetWord();
-            tWord.Text = string.Empty;
-            tWord.Position = -1;
-            tWord.IsFake = true;
-            tWord.ID = "0";
+            //TargetWord tWord = new TargetWord();
+            //tWord.Text = string.Empty;
+            //tWord.Position = -1;
+            //tWord.IsFake = true;
+            //tWord.ID = "0";
 
-            return tWord;
+            //return tWord;
+
+            return new TargetWord()
+            {
+                Text = string.Empty,
+                Position = -1,
+                IsFake = true,
+                ID = "0"
+            };
         }
 
         public static XmlNode GetTreeNode(string sStartVerseID, string sEndVerseID, Dictionary<string, XmlNode> trees)

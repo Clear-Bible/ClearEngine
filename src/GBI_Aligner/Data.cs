@@ -42,18 +42,15 @@ namespace GBI_Aligner
         // pathProbs :: path => score
         public static ArrayList SortPaths(Hashtable pathProbs)
         {
-            int hashCodeOfWordsInPath(object path)
-            {
-                ArrayList wordsInPath = new ArrayList();
-                Align.GetWordsInPath((ArrayList)path, ref wordsInPath);
-                return GetWords(wordsInPath).GetHashCode();
-            }
+            int hashCodeOfWordsInPath(ArrayList path) =>
+                Align.GetTargetWordsInPath(path).GetHashCode();
 
             return new ArrayList(
                 pathProbs
                     .Cast<DictionaryEntry>()
                     .OrderByDescending(kvp => (double)kvp.Value)
-                    .ThenByDescending(kvp => hashCodeOfWordsInPath(kvp.Key))
+                    .ThenByDescending(kvp =>
+                        hashCodeOfWordsInPath((ArrayList)kvp.Key))
                     .Select(kvp => kvp.Key)
                     .ToList());
         }
