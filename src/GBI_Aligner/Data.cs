@@ -39,60 +39,79 @@ namespace GBI_Aligner
             return w;
         }
 
- 
-        // pathProbs :: Hashtable(Candidate, probability)
-        // returns ArrayList(Candidate)
-        //
+        // pathProbs :: path => score
         public static ArrayList SortPaths(Hashtable pathProbs)
         {
-            ArrayList sortedPaths = Sort.SortTableDoubleDesc(pathProbs);
-            return SecondarySort(sortedPaths, pathProbs);
-        }
-
-        static public ArrayList SecondarySort(ArrayList paths, Hashtable pathProbs)
-        {
-            ArrayList probGroups = new ArrayList();
-
-            double currentProb = 10.0;
-            Hashtable group = new Hashtable();
-
-            for (int i = 0; i < paths.Count; i++)
+            int hashCodeOfWordsInPath(object path)
             {
-                ArrayList path = (ArrayList)paths[i];
-                double prob = (double)pathProbs[path];
                 ArrayList wordsInPath = new ArrayList();
-                Align.GetWordsInPath(path, ref wordsInPath);
-                string words = GetWords(wordsInPath);
-                int hashCode = words.GetHashCode();
-                if (prob != currentProb && group.Count > 0)
-                {
-                    probGroups.Add(group.Clone());
-                    group.Clear();
-                    group.Add(path, hashCode);
-                }
-                else
-                {
-                    group.Add(path, hashCode);
-                }
-
-                currentProb = prob;
+                Align.GetWordsInPath((ArrayList)path, ref wordsInPath);
+                return GetWords(wordsInPath).GetHashCode();
             }
 
-            probGroups.Add(group);
-
-            ArrayList paths2 = new ArrayList();
-
-            foreach(Hashtable probGroup in probGroups)
-            {
-                ArrayList sortedPaths = Sort.SortTableIntDesc(probGroup);
-                foreach(ArrayList sortedPath in sortedPaths)
-                {
-                    paths2.Add(sortedPath);
-                }
-            }
-
-            return paths2;
+            return new ArrayList(
+                pathProbs
+                    .Cast<DictionaryEntry>()
+                    .OrderByDescending(kvp => kvp.Value)
+                    .ThenByDescending(kvp => hashCodeOfWordsInPath(kvp.Key))
+                    .Select(kvp => kvp.Key)
+                    .ToList());
         }
+ 
+        //// pathProbs :: Hashtable(Candidate, probability)
+        //// returns ArrayList(Candidate)
+        ////
+        //public static ArrayList SortPaths(Hashtable pathProbs)
+        //{
+        //    ArrayList sortedPaths = Sort.SortTableDoubleDesc(pathProbs);
+        //    return SecondarySort(sortedPaths, pathProbs);
+        //}
+
+        //// 
+        //static public ArrayList SecondarySort(ArrayList paths, Hashtable pathProbs)
+        //{
+        //    ArrayList probGroups = new ArrayList();
+
+        //    double currentProb = 10.0;
+        //    Hashtable group = new Hashtable();
+
+        //    for (int i = 0; i < paths.Count; i++)
+        //    {
+        //        ArrayList path = (ArrayList)paths[i];
+        //        double prob = (double)pathProbs[path];
+        //        ArrayList wordsInPath = new ArrayList();
+        //        Align.GetWordsInPath(path, ref wordsInPath);
+        //        string words = GetWords(wordsInPath);
+        //        int hashCode = words.GetHashCode();
+        //        if (prob != currentProb && group.Count > 0)
+        //        {
+        //            probGroups.Add(group.Clone());
+        //            group.Clear();
+        //            group.Add(path, hashCode);
+        //        }
+        //        else
+        //        {
+        //            group.Add(path, hashCode);
+        //        }
+
+        //        currentProb = prob;
+        //    }
+
+        //    probGroups.Add(group);
+
+        //    ArrayList paths2 = new ArrayList();
+
+        //    foreach(Hashtable probGroup in probGroups)
+        //    {
+        //        ArrayList sortedPaths = Sort.SortTableIntDesc(probGroup);
+        //        foreach(ArrayList sortedPath in sortedPaths)
+        //        {
+        //            paths2.Add(sortedPath);
+        //        }
+        //    }
+
+        //    return paths2;
+        //}
 
         public static ArrayList SortWordCandidates(Hashtable pathProbs)
         {
