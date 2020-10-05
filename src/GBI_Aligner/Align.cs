@@ -487,54 +487,35 @@ namespace GBI_Aligner
             return topCandidates;
         }
 
-/*        public static bool IsContentWord(string cat)
-        {
-            if (cat == "noun" || cat == "verb" || cat == "adj" || cat == "Name") return true;
-            else return false;
-        } */
 
-        public static bool IsContentWord(string lemma, ArrayList sourceFuncWords)
-        {
-            if (sourceFuncWords.Contains(lemma)) return false;
 
-            return true;
-        }
+        public static bool IsContentWord(
+            string lemma,
+            ArrayList sourceFuncWords)
+            => !sourceFuncWords.Contains(lemma);
+ 
 
+        // the values of the Hashtable are probabilities that are doubles
         static double FindBestProb(Hashtable probs)
         {
-            double bestProb = -10.0;
-
-            IDictionaryEnumerator probEnum = probs.GetEnumerator();
-
-            while (probEnum.MoveNext())
-            {
-                double prob = (double)probEnum.Value;
-                if (prob > bestProb) bestProb = prob;
-            }
-
-            return bestProb;
+            return probs
+                .Cast<DictionaryEntry>()
+                .Select(kvp => (double)kvp.Value)
+                .Concat(Enumerable.Repeat(-10.0, 1))
+                .Max();
         }
+
+
 
         static ArrayList GetTopCandidate(double bestProb, Hashtable probs)
         {
-            ArrayList bestCandidates = new ArrayList();
-
-            IDictionaryEnumerator probEnum = probs.GetEnumerator();
-
-            while (probEnum.MoveNext())
-            {
-                TargetWord tWord = (TargetWord)probEnum.Key;
-                double prob = (double)probEnum.Value;
-                if (prob == bestProb)
-                {
-                    Candidate c = new Candidate();
-                    c.Prob = prob;
-                    c.Sequence.Add(tWord);
-                    bestCandidates.Add(c);
-                }
-            }
-
-            return bestCandidates;
+            return new ArrayList(probs
+                .Cast<DictionaryEntry>()
+                .Where(kvp => (double)kvp.Value == bestProb)
+                .Select(kvp => new Candidate(
+                    (TargetWord)kvp.Key,
+                    (double)kvp.Value))
+                .ToList());
         }
 
 
@@ -922,10 +903,10 @@ namespace GBI_Aligner
 
             if (childCandidatesList.Count > 1)
             {
-                if (paths.Count > 16000000)  // seems like this can never happen ...
-                {
-                    return paths;
-                }
+                //if (paths.Count > 16000000)  // seems like this can never happen ...
+                //{
+                //    return paths;
+                //}
                 ArrayList headCandidates = (ArrayList)childCandidatesList[0];
                 // ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
 
@@ -968,10 +949,10 @@ namespace GBI_Aligner
             }
             else
             {
-                if (paths.Count > 16000000)  // seems like this can never happen
-                {
-                    return paths;
-                }
+                //if (paths.Count > 16000000)  // seems like this can never happen
+                //{
+                //    return paths;
+                //}
                 ArrayList candidates = (ArrayList)childCandidatesList[0];
                 for (int i = 0; i < candidates.Count && i <= depth; i++)
                 {
@@ -1309,8 +1290,7 @@ namespace GBI_Aligner
             for (int i = startVerse; i <= endVerse; i++)
             {
                 string verseID = book + chapter + Utils.Pad3(i.ToString());
-                XmlNode subTree = (XmlNode)trees[verseID];
-                if (subTree != null)
+                if (trees.TryGetValue(verseID, out XmlNode subTree))
                 {
                     subTrees.Add(subTree);
                 }
@@ -1377,5 +1357,17 @@ namespace GBI_Aligner
     {
         public ArrayList Sequence = new ArrayList();
         public double Prob;
+
+        public Candidate()
+        {
+            Sequence = new ArrayList();
+        }
+
+        public Candidate(TargetWord tw, double probability)
+        {
+            Sequence = new ArrayList();
+            Sequence.Add(tw);
+            Prob = probability;
+        }
     }
 }
