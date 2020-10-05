@@ -568,7 +568,18 @@ namespace GBI_Aligner
                 catch
                 {
                     Console.WriteLine("Hashtable out of memory.");
-                    ArrayList sortedCandidates2 = Sort.SortTableDoubleDesc(pathProbs);
+
+                    // ArrayList sortedCandidates2 = Sort.SortTableDoubleDesc(pathProbs);
+
+                    ArrayList sortedCandidates2 =
+                        new ArrayList(
+                            pathProbs
+                                .Cast<DictionaryEntry>()
+                                .OrderByDescending(kvp => (double)kvp.Value)
+                                .Select(kvp => kvp.Key)
+                                .ToList()
+                            );
+
                     int topN2 = sortedCandidates2.Count / 10;
                     if (topN2 < n) topN2 = n;
                     //                    topCandidates = GetTopPaths(sortedCandidates2, pathProbs, topN2);
