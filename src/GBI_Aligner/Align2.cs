@@ -42,10 +42,11 @@ namespace GBI_Aligner
             List<LinkedWord> linkedWords = new List<LinkedWord>();
             GetLinkedWords(topCandidate.Sequence, linkedWords, topCandidate.Prob);
 
-            // TIM Study
-            //TimUtil.PrintArrayList("linkedWords", linkedWords);
+            // linkedWords has a LinkedWord for each target word found in
+            // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
+            // TargetWord for zero-length sub-paths in topCandidate.sequence.
 
-            ArrayList links = new ArrayList();
+            List<MappedWords> links = new List<MappedWords>();
             for (int i = 0; i < terminals.Count; i++)
             {
                 XmlNode terminal = (XmlNode)terminals[i];
@@ -59,19 +60,17 @@ namespace GBI_Aligner
                 if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
                 sourceLink.TreeNode = terminal;
                 LinkedWord targetLink = linkedWords[i];
+                // (looks like linkedWords and terminals are expected to be
+                // in 1-to-1 correspondence.)
                 MappedWords link = new MappedWords();
                 link.SourceNode = sourceLink;
                 link.TargetNode = targetLink;
                 links.Add(link);
             }
-
-            // links :: ArrayList(MappedWords)
-
-            // TIM Study
-            //TimUtil.PrintArrayList("links", links);
             
 
             ArrayList conflicts = FindConflictingLinks(links);
+
             // conflicts :: ArrayList(ArrayList(MappedWords))
 
             // TIM Study
@@ -79,7 +78,7 @@ namespace GBI_Aligner
 
             if (conflicts.Count > 0)
             {
-                ResolveConflicts(conflicts, ref links, 1);
+                ResolveConflicts(conflicts, links, 1);
             }
 
             ArrayList linkedTargets = GetLinkedTargets(links);
@@ -117,10 +116,10 @@ namespace GBI_Aligner
 
             if (conflicts.Count > 0)
             {
-                ResolveConflicts(conflicts, ref links, 2);
+                ResolveConflicts(conflicts, links, 2);
             }
 
-            return links;
+            return new ArrayList(links);
         }
 
 
@@ -417,7 +416,7 @@ namespace GBI_Aligner
         // links :: ArrayList(MappedWords)
         // replaces some members of links with a special non-link MappedWords datum
         //
-        public static void ResolveConflicts(ArrayList conflicts, ref ArrayList links, int pass)
+        public static void ResolveConflicts(ArrayList conflicts, List<MappedWords> links, int pass)
         {
             ArrayList linksToRemove = new ArrayList();
 
@@ -456,7 +455,7 @@ namespace GBI_Aligner
             }
         }
 
-        static ArrayList GetLinkedTargets(ArrayList links)
+        static ArrayList GetLinkedTargets(List<MappedWords> links)
         {
             ArrayList linkedTargets = new ArrayList();
 
@@ -516,7 +515,7 @@ namespace GBI_Aligner
         // links :: ArrayList(MappedWords)
         // returns ArrayList(ArrayList(MappedWords)) where each member has length > 1
         //
-        public static ArrayList FindConflictingLinks(ArrayList links)
+        public static ArrayList FindConflictingLinks(List<MappedWords> links)
         {
             ArrayList conflicts = new ArrayList();
 
@@ -625,7 +624,7 @@ namespace GBI_Aligner
         }
 
 
-        static Hashtable CreateLinksTable(ArrayList links)
+        static Hashtable CreateLinksTable(List<MappedWords> links)
         {
             Hashtable linksTable = new Hashtable();
 
