@@ -519,8 +519,8 @@ namespace GBI_Aligner
         {
             ArrayList conflicts = new ArrayList();
 
-            Hashtable targetLinks = new Hashtable();
-            // Hashtable("tWord-tPosition" => ArrayList(MappedWords))
+            Dictionary<string, List<MappedWords>> targetLinks =
+                new Dictionary<string, List<MappedWords>>();
 
             foreach(MappedWords link in links)
             {
@@ -528,27 +528,24 @@ namespace GBI_Aligner
                 string tPosition = link.TargetNode.Word.ID;
                 if (tWord == string.Empty) continue;
                 string key = tWord + "-" + tPosition;
-                if (targetLinks.ContainsKey(key))
+                if (targetLinks.TryGetValue(key, out List<MappedWords> targets))
                 {
-                    ArrayList targets = (ArrayList)targetLinks[key];
                     targets.Add(link);
                 }
                 else
                 {
-                    ArrayList targets = new ArrayList();
+                    targets = new List<MappedWords>();
                     targets.Add(link);
                     targetLinks.Add(key, targets);
-                }    
+                }
             }
 
-            IDictionaryEnumerator targetEnum = targetLinks.GetEnumerator();
-
-            while (targetEnum.MoveNext())
+            foreach (var kvp in targetLinks)
             {
-                ArrayList targets = (ArrayList)targetEnum.Value;
+                List<MappedWords> targets = kvp.Value;
                 if (targets.Count > 1)
                 {
-                    conflicts.Add(targets);
+                    conflicts.Add(new ArrayList(targets));
                 }
             }
 
