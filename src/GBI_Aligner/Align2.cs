@@ -493,45 +493,16 @@ namespace GBI_Aligner
             }
         }
 
-        // links :: ArrayList(MappedWords)
-        // returns ArrayList(ArrayList(MappedWords)) where each member has length > 1
-        //
+        
         public static List<List<MappedWords>> FindConflictingLinks(List<MappedWords> links)
         {
-            List<List<MappedWords>> conflicts =
-                new List<List<MappedWords>>();
-
-            Dictionary<string, List<MappedWords>> targetLinks =
-                new Dictionary<string, List<MappedWords>>();
-
-            foreach(MappedWords link in links)
-            {
-                string tWord = link.TargetNode.Word.Text;
-                string tPosition = link.TargetNode.Word.ID;
-                if (tWord == string.Empty) continue;
-                string key = tWord + "-" + tPosition;
-                if (targetLinks.TryGetValue(key, out List<MappedWords> targets))
-                {
-                    targets.Add(link);
-                }
-                else
-                {
-                    targets = new List<MappedWords>();
-                    targets.Add(link);
-                    targetLinks.Add(key, targets);
-                }
-            }
-
-            foreach (var kvp in targetLinks)
-            {
-                List<MappedWords> targets = kvp.Value;
-                if (targets.Count > 1)
-                {
-                    conflicts.Add(targets);
-                }
-            }
-
-            return conflicts;
+            return links
+                .Where(link => link.TargetNode.Word.Text != string.Empty)
+                .GroupBy(link =>
+                    $"{link.TargetNode.Word.Text}-{link.TargetNode.Word.ID}")
+                .Where(group => group.Count() > 1)
+                .Select(group => group.ToList())
+                .ToList();
         }
 
  
