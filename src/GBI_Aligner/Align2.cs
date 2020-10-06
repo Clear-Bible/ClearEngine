@@ -81,11 +81,6 @@ namespace GBI_Aligner
 
             Dictionary<string, MappedWords> linksTable = CreateLinksTable(links);
 
-            // linksTable :: Hashtable(sourceId => MappedWords)
-
-            // TIM Study
-            //TimUtil.PrintHashTable("linksTable", linksTable);
-
             for (int i = 0; i < links.Count; i++)
             {
                 MappedWords link = (MappedWords)links[i];
@@ -97,9 +92,6 @@ namespace GBI_Aligner
             }
 
             conflicts = FindConflictingLinks(links);
-
-            // TIM Study
-            //TimUtil.PrintArrayList("conflicts", conflicts);
 
             if (conflicts.Count > 0)
             {
@@ -464,22 +456,22 @@ namespace GBI_Aligner
 
             if (path.Count == 0)
             {
-                LinkedWord linkedWord = new LinkedWord();
-                TargetWord tWord = new TargetWord();
-                tWord.Text = string.Empty;
-                tWord.Position = -1;
-                tWord.IsFake = true;
-                tWord.ID = "0";
-                linkedWord.Word = tWord;
-                linkedWord.Prob = -1000;
-                linkedWord.Text = string.Empty;
-                links.Add(linkedWord);
+                links.Add(new LinkedWord()
+                {
+                    Word = new TargetWord
+                    {
+                        Text = string.Empty,
+                        Position = -1,
+                        IsFake = true,
+                        ID = "0"
+                    },
+                    Prob = -1000,
+                    Text = string.Empty
+                });
             }
             else
             {
-                Object obj = path[0];
-                string type = obj.GetType().ToString();
-                if (type == "GBI_Aligner.Candidate")
+                if (path[0] is Candidate)
                 {
                     foreach (Candidate c in path)
                     {
@@ -490,11 +482,12 @@ namespace GBI_Aligner
                 {
                     foreach (TargetWord tWord in path)
                     {
-                        LinkedWord linkedWord = new LinkedWord();
-                        linkedWord.Word = tWord;
-                        linkedWord.Prob = prob;
-                        linkedWord.Text = tWord.Text;
-                        links.Add(linkedWord);
+                        links.Add(new LinkedWord()
+                        {
+                            Word = tWord,
+                            Prob = prob,
+                            Text = tWord.Text
+                        });
                     }
                 }
             }
