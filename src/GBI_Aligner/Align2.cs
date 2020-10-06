@@ -39,9 +39,8 @@ namespace GBI_Aligner
         {
             //Console.WriteLine("\nAlignTheRest\n\n");
 
-            ArrayList linkedWords = new ArrayList();
-            GetLinkedWords(topCandidate.Sequence, ref linkedWords, topCandidate.Prob);
-            // linkedWords :: ArrayList(LinkedWord)
+            List<LinkedWord> linkedWords = new List<LinkedWord>();
+            GetLinkedWords(topCandidate.Sequence, linkedWords, topCandidate.Prob);
 
             // TIM Study
             //TimUtil.PrintArrayList("linkedWords", linkedWords);
@@ -59,7 +58,7 @@ namespace GBI_Aligner
                 sourceLink.RelativePos = (double)sourceLink.Position / (double)sourceWords.Length;
                 if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
                 sourceLink.TreeNode = terminal;
-                LinkedWord targetLink = (LinkedWord)linkedWords[i];
+                LinkedWord targetLink = linkedWords[i];
                 MappedWords link = new MappedWords();
                 link.SourceNode = sourceLink;
                 link.TargetNode = targetLink;
@@ -472,7 +471,7 @@ namespace GBI_Aligner
             return linkedTargets;
         }
 
-        static void GetLinkedWords(ArrayList path, ref ArrayList links, double prob)
+        static void GetLinkedWords(ArrayList path, List<LinkedWord> links, double prob)
         {
             ArrayList words = new ArrayList();
 
@@ -497,7 +496,7 @@ namespace GBI_Aligner
                 {
                     foreach (Candidate c in path)
                     {
-                        GetLinkedWords(c.Sequence, ref links, c.Prob);
+                        GetLinkedWords(c.Sequence, links, c.Prob);
                     }
                 }
                 else
