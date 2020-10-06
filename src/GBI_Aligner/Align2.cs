@@ -79,7 +79,7 @@ namespace GBI_Aligner
             List<string> linkedTargets = GetLinkedTargets(links);
 
 
-            Hashtable linksTable = CreateLinksTable(links);
+            Dictionary<string, MappedWords> linksTable = CreateLinksTable(links);
 
             // linksTable :: Hashtable(sourceId => MappedWords)
 
@@ -113,7 +113,7 @@ namespace GBI_Aligner
         static void AlignWord(
             ref MappedWords link, // output goes here
             string[] targetWords,
-            Hashtable linksTable, // Hashtable(sourceId => MappedWords)
+            Dictionary<string, MappedWords> linksTable,
             List<string> linkedTargets, 
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
             Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
@@ -311,7 +311,7 @@ namespace GBI_Aligner
         // linksTable :: Hashtable(sourceId => MappedWords)
         // returns ArrayList(MappedWords)
         //
-        static ArrayList GetLinkedSiblings(XmlNode treeNode, Hashtable linksTable, ref bool stopped)
+        static ArrayList GetLinkedSiblings(XmlNode treeNode, Dictionary<string, MappedWords> linksTable, ref bool stopped)
         {
             ArrayList linkedSiblings = new ArrayList();
 
@@ -336,7 +336,7 @@ namespace GBI_Aligner
                             if (morphID.Length == 11) morphID += "1";
                             if (linksTable.ContainsKey(morphID))
                             {
-                                MappedWords map = (MappedWords)linksTable[morphID];
+                                MappedWords map = linksTable[morphID];
                                 linkedSiblings.Add(map);
                             }
                         }
@@ -610,9 +610,10 @@ namespace GBI_Aligner
         }
 
 
-        static Hashtable CreateLinksTable(List<MappedWords> links)
+        static Dictionary<string, MappedWords> CreateLinksTable(List<MappedWords> links)
         {
-            Hashtable linksTable = new Hashtable();
+            Dictionary<string, MappedWords> linksTable =
+                new Dictionary<string, MappedWords>();
 
             foreach(MappedWords link in links)
             {
