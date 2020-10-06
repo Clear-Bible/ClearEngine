@@ -69,7 +69,7 @@ namespace GBI_Aligner
             }
             
 
-            ArrayList conflicts = FindConflictingLinks(links);
+            List<List<MappedWords>> conflicts = FindConflictingLinks(links);
 
             // conflicts :: ArrayList(ArrayList(MappedWords))
 
@@ -416,11 +416,11 @@ namespace GBI_Aligner
         // links :: ArrayList(MappedWords)
         // replaces some members of links with a special non-link MappedWords datum
         //
-        public static void ResolveConflicts(ArrayList conflicts, List<MappedWords> links, int pass)
+        public static void ResolveConflicts(List<List<MappedWords>> conflicts, List<MappedWords> links, int pass)
         {
             ArrayList linksToRemove = new ArrayList();
 
-            foreach (ArrayList conflict in conflicts)
+            foreach (List<MappedWords> conflict in conflicts)
             {
                 ArrayList winners = FindWinners(conflict, pass);
                 // winners :: ArrayList(MappedWord)
@@ -515,9 +515,10 @@ namespace GBI_Aligner
         // links :: ArrayList(MappedWords)
         // returns ArrayList(ArrayList(MappedWords)) where each member has length > 1
         //
-        public static ArrayList FindConflictingLinks(List<MappedWords> links)
+        public static List<List<MappedWords>> FindConflictingLinks(List<MappedWords> links)
         {
-            ArrayList conflicts = new ArrayList();
+            List<List<MappedWords>> conflicts =
+                new List<List<MappedWords>>();
 
             Dictionary<string, List<MappedWords>> targetLinks =
                 new Dictionary<string, List<MappedWords>>();
@@ -545,7 +546,7 @@ namespace GBI_Aligner
                 List<MappedWords> targets = kvp.Value;
                 if (targets.Count > 1)
                 {
-                    conflicts.Add(new ArrayList(targets));
+                    conflicts.Add(targets);
                 }
             }
 
@@ -556,7 +557,7 @@ namespace GBI_Aligner
         // conflict :: ArrayList(MappedWord)
         // returns ArrayList(MappedWord)
         //
-        static ArrayList FindWinners(ArrayList conflict, int pass)
+        static ArrayList FindWinners(List<MappedWords> conflict, int pass)
         {
             double bestProb = GetBestProb(conflict);
             double minDistance = GetMinDistance(conflict);
@@ -589,7 +590,7 @@ namespace GBI_Aligner
 
 
 
-        static double GetBestProb(ArrayList conflict)
+        static double GetBestProb(List<MappedWords> conflict)
         {
             double bestProb = -1000;
 
@@ -604,7 +605,7 @@ namespace GBI_Aligner
 
  
 
-        static double GetMinDistance(ArrayList conflict)
+        static double GetMinDistance(List<MappedWords> conflict)
         {
             double minDistance = 100;
 
