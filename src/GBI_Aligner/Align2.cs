@@ -71,25 +71,16 @@ namespace GBI_Aligner
 
             List<List<MappedWords>> conflicts = FindConflictingLinks(links);
 
-            // conflicts :: ArrayList(ArrayList(MappedWords))
-
-            // TIM Study
-            //TimUtil.PrintArrayList("conflicts", conflicts);
-
             if (conflicts.Count > 0)
             {
                 ResolveConflicts(conflicts, links, 1);
             }
 
-            ArrayList linkedTargets = GetLinkedTargets(links);
-            // linkedTargets :: ArrayList(MappedWords)
-            // a copy of links with the fakes removed
-
-            // TIM Study
-            //TimUtil.PrintArrayList("linkedTargets", linkedTargets);
+            List<string> linkedTargets = GetLinkedTargets(links);
 
 
             Hashtable linksTable = CreateLinksTable(links);
+
             // linksTable :: Hashtable(sourceId => MappedWords)
 
             // TIM Study
@@ -127,7 +118,7 @@ namespace GBI_Aligner
             ref MappedWords link, // output goes here
             string[] targetWords,
             Hashtable linksTable, // Hashtable(sourceId => MappedWords)
-            ArrayList linkedTargets, // ArrayList(MappedWords)
+            List<string> linkedTargets, 
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
             Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
@@ -256,7 +247,7 @@ namespace GBI_Aligner
             return position;
         }
 
-        static ArrayList GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, ArrayList linkedTargets, ArrayList puncs, ArrayList targetFuncWords, bool contentWordsOnly)
+        static ArrayList GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, ArrayList puncs, ArrayList targetFuncWords, bool contentWordsOnly)
         {
             ArrayList candidates = new ArrayList();
 
@@ -294,7 +285,7 @@ namespace GBI_Aligner
             return candidates;
         }
 
-        static ArrayList GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, string[] targetWords, ArrayList linkedTargets, ArrayList puncBounds, ArrayList targetFuncWords, bool contentWordsOnly)
+        static ArrayList GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, ArrayList puncBounds, ArrayList targetFuncWords, bool contentWordsOnly)
         {
             ArrayList candidates = new ArrayList();
 
@@ -455,9 +446,10 @@ namespace GBI_Aligner
             }
         }
 
-        static ArrayList GetLinkedTargets(List<MappedWords> links)
+        static List<string> GetLinkedTargets(List<MappedWords> links)
         {
-            ArrayList linkedTargets = new ArrayList();
+            List<string> linkedTargets =
+                new List<string>();
 
             foreach(MappedWords link in links)
             {
@@ -645,7 +637,7 @@ namespace GBI_Aligner
             SourceNode sWord, 
             ArrayList tWords, 
             Hashtable model, 
-            ArrayList linkedTargets, 
+            List<string> linkedTargets, 
             ArrayList puncs, 
             ArrayList stopWords, 
             Hashtable goodLinks,
