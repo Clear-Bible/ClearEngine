@@ -238,6 +238,8 @@ namespace GBI_Aligner
                 return;
             }
 
+            string nodeString = TimUtil.DebugTreeToString(treeNode);
+
             foreach(XmlNode subTree in treeNode)
             {
                 AlignNodes(subTree, tWords, ref alignments, n, sLength, maxPaths, terminalCandidates);
@@ -340,6 +342,9 @@ namespace GBI_Aligner
                     alignments.Add(nodeID, topCandidates);
                 }
             }
+
+            // string alignmentsString = TimUtil.DebugAlignmentsToString(alignments);
+            // Console.WriteLine(alignmentsString);
         }
 
 
@@ -901,6 +906,8 @@ namespace GBI_Aligner
         {
             ArrayList paths = new ArrayList();
 
+            // string[] sChildCandidates = childCandidatesList.Cast<ArrayList>().Select(p => GetWordsInPath(p)).ToArray();
+
             if (childCandidatesList.Count > 1)
             {
                 //if (paths.Count > 16000000)  // seems like this can never happen ...
@@ -964,6 +971,8 @@ namespace GBI_Aligner
 
                 // Puts each candidate into its own path.
             }
+
+            //  string[] sPaths = paths.Cast<ArrayList>().Select(p => GetWordsInPath(p)).ToArray();
 
             return paths;
         }
