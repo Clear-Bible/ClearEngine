@@ -14,66 +14,6 @@ using System.IO;
 
 namespace GBI_Aligner
 {
-    class TimUtil
-    {
-        public static void PrintArrayList(string name, ArrayList arrayList)
-        {
-            using (StringWriter sw = new StringWriter())
-            {
-                using (JsonWriter w = new JsonTextWriter(sw))
-                {
-                    JsonSerializer s = JsonSerializer.CreateDefault();
-                    foreach (object obj in arrayList)
-                    {
-                        s.Serialize(w, obj);
-                        sw.WriteLine();
-                    }
-                    sw.WriteLine();
-                }
-                Console.WriteLine($"\n{name}\n{sw}\n\n");
-            }
-        }
-
-        public static void PrintHashTable(string name, Hashtable hashtable)
-        {
-            {
-                using (StringWriter sw = new StringWriter())
-                {
-                    using (JsonWriter w = new JsonTextWriter(sw))
-                    {
-                        JsonSerializer s = JsonSerializer.CreateDefault();
-                        foreach (DictionaryEntry e in hashtable)
-                        {
-                            s.Serialize(w, e.Key);
-                            sw.Write(" => ");
-                            s.Serialize(w, e.Value);
-                            sw.WriteLine();
-                        }
-                    }
-                    Console.WriteLine($"\n{name}\n{sw}\n\n");
-                }
-            }
-        }
-
-
-        public static void PrintAsJson(string name, object obj)
-        {
-            {
-                using (StringWriter sw = new StringWriter())
-                {
-                    using (JsonWriter w = new JsonTextWriter(sw))
-                    {
-                        JsonSerializer s = JsonSerializer.CreateDefault();
-                        s.Serialize(w, obj);
-                        sw.WriteLine();
-                    }
-                    Console.WriteLine($"\nname\n{sw}\n\n");
-                }
-            }
-        }
-    }
-
-
     class Align2
     {
         // returns ArrayList(MappedWords)
@@ -97,14 +37,14 @@ namespace GBI_Aligner
             bool contentWordsOnly
             )
         {
-            Console.WriteLine("\nAlignTheRest\n\n");
+            //Console.WriteLine("\nAlignTheRest\n\n");
 
             ArrayList linkedWords = new ArrayList();
             GetLinkedWords(topCandidate.Sequence, ref linkedWords, topCandidate.Prob);
             // linkedWords :: ArrayList(LinkedWord)
 
             // TIM Study
-            TimUtil.PrintArrayList("linkedWords", linkedWords);
+            //TimUtil.PrintArrayList("linkedWords", linkedWords);
 
             ArrayList links = new ArrayList();
             for (int i = 0; i < terminals.Count; i++)
@@ -129,14 +69,14 @@ namespace GBI_Aligner
             // links :: ArrayList(MappedWords)
 
             // TIM Study
-            TimUtil.PrintArrayList("links", links);
+            //TimUtil.PrintArrayList("links", links);
             
 
             ArrayList conflicts = FindConflictingLinks(links);
             // conflicts :: ArrayList(ArrayList(MappedWords))
 
             // TIM Study
-            TimUtil.PrintArrayList("conflicts", conflicts);
+            //TimUtil.PrintArrayList("conflicts", conflicts);
 
             if (conflicts.Count > 0)
             {
@@ -148,14 +88,14 @@ namespace GBI_Aligner
             // a copy of links with the fakes removed
 
             // TIM Study
-            TimUtil.PrintArrayList("linkedTargets", linkedTargets);
+            //TimUtil.PrintArrayList("linkedTargets", linkedTargets);
 
 
             Hashtable linksTable = CreateLinksTable(links);
             // linksTable :: Hashtable(sourceId => MappedWords)
 
             // TIM Study
-            TimUtil.PrintHashTable("linksTable", linksTable);
+            //TimUtil.PrintHashTable("linksTable", linksTable);
 
             for (int i = 0; i < links.Count; i++)
             {
@@ -174,7 +114,7 @@ namespace GBI_Aligner
             conflicts = FindConflictingLinks(links);
 
             // TIM Study
-            TimUtil.PrintArrayList("conflicts", conflicts);
+            //TimUtil.PrintArrayList("conflicts", conflicts);
 
             if (conflicts.Count > 0)
             {
@@ -204,9 +144,9 @@ namespace GBI_Aligner
             bool contentWordsOnly
             )
         {
-            Console.WriteLine("AlignWord");
-            TimUtil.PrintAsJson("link", link);
-            Console.WriteLine("\n");
+            // Console.WriteLine("AlignWord");
+            // TimUtil.PrintAsJson("link", link);
+            // Console.WriteLine("\n");
 
             if (stopWords.Contains(link.SourceNode.Lemma)) return;
             if (contentWordsOnly && sourceFuncWords.Contains(link.SourceNode.Lemma)) return;
