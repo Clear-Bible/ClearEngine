@@ -47,15 +47,14 @@ namespace GBI_Aligner
             Hashtable strongs
             )
         {
-            ArrayList sourceVerses = Data.GetVerses(sourceLemma, false); // ArrayList(string)
-            ArrayList sourceVerses2 = Data.GetVerses(source, false);  // ArrayList(string)
-            //            ArrayList targetVerses = Data.GetVerses(targetLower);
-            ArrayList targetVerses = Data.GetVerses(target, true);  // ArrayList(string)
-            ArrayList targetVerses2 = Data.GetVerses(target, false); // ArrayList(string)
+            List<string> sourceVerses = Data.GetVerses(sourceLemma, false);
+            List<string> sourceVerses2 = Data.GetVerses(source, false);
+            List<string> targetVerses = Data.GetVerses(target, true);
+            List<string> targetVerses2 = Data.GetVerses(target, false);
 
             string prevChapter = string.Empty;
 
-            Hashtable trees = new Hashtable();  // Hashtable(verseID => XmlNode)
+            Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();  // Hashtable(verseID => XmlNode)
 
             Alignment2 align = new Alignment2();  // The output goes here.
             align.Lines = new Line[sourceVerses.Count];
@@ -72,22 +71,22 @@ namespace GBI_Aligner
                 string targetVerse2 = (string)targetVerses2[i]; // tokens, not lowercase
                 string chapterID = GetChapterID(sourceVerse);  // string with chapter number
 
-                Console.WriteLine($"sourceVerse: {sourceVerse}\n");
-                Console.WriteLine($"sourceVerse2: {sourceVerse2}\n");
-                Console.WriteLine($"targetVerse: {targetVerse}\n");
-                Console.WriteLine($"targetVerse2: {targetVerse2}\n");
+                //Console.WriteLine($"sourceVerse: {sourceVerse}\n");
+                //Console.WriteLine($"sourceVerse2: {sourceVerse2}\n");
+                //Console.WriteLine($"targetVerse: {targetVerse}\n");
+                //Console.WriteLine($"targetVerse2: {targetVerse2}\n");
 
                 if (chapterID != prevChapter)
                 {
                     trees.Clear();
                     // Get the trees for the current chapter; a verse can cross chapter boundaries
-                    VerseTrees.GetChapterTree(chapterID, treeFolder, ref trees, bookNames);
+                    VerseTrees.GetChapterTree(chapterID, treeFolder, trees, bookNames);
                     string book = chapterID.Substring(0, 2);
                     string chapter = chapterID.Substring(2, 3);
                     string prevChapterID = book + Utils.Pad3((Int32.Parse(chapter) - 1).ToString());
-                    VerseTrees.GetChapterTree(prevChapterID, treeFolder, ref trees, bookNames);
+                    VerseTrees.GetChapterTree(prevChapterID, treeFolder, trees, bookNames);
                     string nextChapterID = book + Utils.Pad3((Int32.Parse(chapter) + 1).ToString());
-                    VerseTrees.GetChapterTree(nextChapterID, treeFolder, ref trees, bookNames);
+                    VerseTrees.GetChapterTree(nextChapterID, treeFolder, trees, bookNames);
                     prevChapter = chapterID;
                 }
 
@@ -111,7 +110,7 @@ namespace GBI_Aligner
             bool useAlignModel,
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
-            Hashtable trees, // Hashtable(verseID => XmlNode)
+            Dictionary<string, XmlNode> trees, // verseID => XmlNode
             ref Alignment2 align,  // Output goes here.
             int i,
             int maxPaths,
@@ -137,34 +136,15 @@ namespace GBI_Aligner
             int n = targetWords.Length;  // n = number of target tokens
 
             string sStartVerseID = GetVerseID(sourceWords[0]);  // bbcccvvv
-            if (sStartVerseID.StartsWith("1102204"))
-            {
-                ;
-            }
             string sEndVerseID = GetVerseID(sourceWords[sourceWords.Length - 1]); // bbcccvvv
+
             XmlNode treeNode = GetTreeNode(sStartVerseID, sEndVerseID, trees);
 
-            // TIM Study
-            //{
-            //    using (StringWriter sw = new StringWriter())
-            //    {
-            //        XmlWriterSettings xws = new XmlWriterSettings();
-            //        xws.Indent = true;
-            //        using (XmlWriter xw = XmlWriter.Create(sw, xws))
-            //        {
-            //            treeNode.WriteContentTo(xw);
-            //        }
-            //        Console.WriteLine(sw.ToString());
-            //    }
-            //}
+            // TimUtil.PrintXmlNode(treeNode);
 
-            Hashtable wordInfoTable = Data.BuildWordInfoTable(treeNode);
-                // Hashtable(sourceId => WordInfo) for the terminal nodes
-
-            // TIM study
-            // TimUtil.PrintHashTable("wordInfoTable", wordInfoTable);
+            Dictionary<string, WordInfo> wordInfoTable =
+                Data.BuildWordInfoTable(treeNode);
            
-
             ArrayList sWords = GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
             // ArrayList(SourceWord)
             // sourceWords2 not actually used
@@ -221,7 +201,7 @@ namespace GBI_Aligner
 
 
             string linkedWords = GetWords(topCandidate);
-            Console.WriteLine($"\nGetWords(topCandidate) = {linkedWords}\n");
+            //Console.WriteLine($"\nGetWords(topCandidate) = {linkedWords}\n");
 
 
             ArrayList terminals = Terminals.GetTerminalXmlNodes(treeNode);
@@ -257,6 +237,8 @@ namespace GBI_Aligner
             {
                 return;
             }
+
+            string nodeString = TimUtil.DebugTreeToString(treeNode);
 
             foreach(XmlNode subTree in treeNode)
             {
@@ -360,6 +342,9 @@ namespace GBI_Aligner
                     alignments.Add(nodeID, topCandidates);
                 }
             }
+
+            // string alignmentsString = TimUtil.DebugAlignmentsToString(alignments);
+            // Console.WriteLine(alignmentsString);
         }
 
 
@@ -507,54 +492,35 @@ namespace GBI_Aligner
             return topCandidates;
         }
 
-/*        public static bool IsContentWord(string cat)
-        {
-            if (cat == "noun" || cat == "verb" || cat == "adj" || cat == "Name") return true;
-            else return false;
-        } */
 
-        public static bool IsContentWord(string lemma, ArrayList sourceFuncWords)
-        {
-            if (sourceFuncWords.Contains(lemma)) return false;
 
-            return true;
-        }
+        public static bool IsContentWord(
+            string lemma,
+            ArrayList sourceFuncWords)
+            => !sourceFuncWords.Contains(lemma);
+ 
 
+        // the values of the Hashtable are probabilities that are doubles
         static double FindBestProb(Hashtable probs)
         {
-            double bestProb = -10.0;
-
-            IDictionaryEnumerator probEnum = probs.GetEnumerator();
-
-            while (probEnum.MoveNext())
-            {
-                double prob = (double)probEnum.Value;
-                if (prob > bestProb) bestProb = prob;
-            }
-
-            return bestProb;
+            return probs
+                .Cast<DictionaryEntry>()
+                .Select(kvp => (double)kvp.Value)
+                .Concat(Enumerable.Repeat(-10.0, 1))
+                .Max();
         }
+
+
 
         static ArrayList GetTopCandidate(double bestProb, Hashtable probs)
         {
-            ArrayList bestCandidates = new ArrayList();
-
-            IDictionaryEnumerator probEnum = probs.GetEnumerator();
-
-            while (probEnum.MoveNext())
-            {
-                TargetWord tWord = (TargetWord)probEnum.Key;
-                double prob = (double)probEnum.Value;
-                if (prob == bestProb)
-                {
-                    Candidate c = new Candidate();
-                    c.Prob = prob;
-                    c.Sequence.Add(tWord);
-                    bestCandidates.Add(c);
-                }
-            }
-
-            return bestCandidates;
+            return new ArrayList(probs
+                .Cast<DictionaryEntry>()
+                .Where(kvp => (double)kvp.Value == bestProb)
+                .Select(kvp => new Candidate(
+                    (TargetWord)kvp.Key,
+                    (double)kvp.Value))
+                .ToList());
         }
 
 
@@ -588,7 +554,18 @@ namespace GBI_Aligner
                 catch
                 {
                     Console.WriteLine("Hashtable out of memory.");
-                    ArrayList sortedCandidates2 = Sort.SortTableDoubleDesc(pathProbs);
+
+                    // ArrayList sortedCandidates2 = Sort.SortTableDoubleDesc(pathProbs);
+
+                    ArrayList sortedCandidates2 =
+                        new ArrayList(
+                            pathProbs
+                                .Cast<DictionaryEntry>()
+                                .OrderByDescending(kvp => (double)kvp.Value)
+                                .Select(kvp => kvp.Key)
+                                .ToList()
+                            );
+
                     int topN2 = sortedCandidates2.Count / 10;
                     if (topN2 < n) topN2 = n;
                     //                    topCandidates = GetTopPaths(sortedCandidates2, pathProbs, topN2);
@@ -693,8 +670,7 @@ namespace GBI_Aligner
         //
         public static string GetWords(Candidate c)
         {
-            ArrayList wordsInPath = new ArrayList();
-            GetWordsInPath(c.Sequence, ref wordsInPath);
+            ArrayList wordsInPath = GetTargetWordsInPath(c.Sequence);
 
             string words = string.Empty;
 
@@ -708,8 +684,7 @@ namespace GBI_Aligner
 
         public static string GetWordsInPath(ArrayList path)
         {
-            ArrayList wordsInPath = new ArrayList();
-            GetWordsInPath(path, ref wordsInPath);
+            ArrayList wordsInPath = GetTargetWordsInPath(path);
 
             string words = string.Empty;
 
@@ -777,8 +752,9 @@ namespace GBI_Aligner
 
         static int ComputeDistance(ArrayList path)
         {
-            ArrayList wordsInPath = new ArrayList();
-            GetWordsInPath(path, ref wordsInPath);
+
+            ArrayList wordsInPath = GetTargetWordsInPath(path);
+
             int distance = 0;
 
             int position = GetInitialPosition(wordsInPath);
@@ -797,8 +773,11 @@ namespace GBI_Aligner
 
         static double ComputeOrderProb(ArrayList path)
         {
-            ArrayList wordsInPath = new ArrayList();
-            GetWordsInPath(path, ref wordsInPath);
+            //ArrayList wordsInPath = new ArrayList();
+            //GetWordsInPath(path, ref wordsInPath);
+
+            ArrayList wordsInPath = GetTargetWordsInPath(path);
+
             int violations = 0;
             int countedWords = 1;
 
@@ -837,34 +816,56 @@ namespace GBI_Aligner
             return initialPosition;
         }
 
-        public static void GetWordsInPath(ArrayList path, ref ArrayList wordsInPath)
-        {
-            ArrayList words = new ArrayList();
+        //public static void GetWordsInPath(ArrayList path, ref ArrayList wordsInPath)
+        //{
+        //    ArrayList words = new ArrayList();
 
-            if (path.Count == 0)
+        //    if (path.Count == 0)
+        //    {
+        //        TargetWord tWord = CreateFakeTargetWord();
+        //    }
+        //    else if (path[0] is Candidate)
+        //    {
+        //        foreach (Candidate c in path)
+        //        {
+        //            GetWordsInPath(c.Sequence, ref wordsInPath);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        foreach (TargetWord tWord in path)
+        //        {
+        //            wordsInPath.Add(tWord);
+        //        }
+        //    }
+        //}
+
+
+        // returns an ArrayList of TargetWord objects.
+        public static ArrayList GetTargetWordsInPath(ArrayList path)
+        {
+            IEnumerable<TargetWord> helper(ArrayList path)
             {
-                TargetWord tWord = CreateFakeTargetWord();
-            }
-            else
-            {
-                Object obj = path[0];
-                string type = obj.GetType().ToString();
-                if (type == "GBI_Aligner.Candidate")
+                if (path.Count == 0)
                 {
-                    foreach (Candidate c in path)
-                    {
-                        GetWordsInPath(c.Sequence, ref wordsInPath);
-                    }
+                    return new TargetWord[] { CreateFakeTargetWord() };
+                }
+                else if (path[0] is Candidate)
+                {
+                    return path
+                        .Cast<Candidate>()
+                        .SelectMany(c => helper(c.Sequence));
                 }
                 else
                 {
-                    foreach (TargetWord tWord in path)
-                    {
-                        wordsInPath.Add(tWord);
-                    }
+                    return path.Cast<TargetWord>();
                 }
             }
+
+
+            return new ArrayList(helper(path).ToList());
         }
+
 
         // childCandidateList = ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
         //
@@ -905,12 +906,14 @@ namespace GBI_Aligner
         {
             ArrayList paths = new ArrayList();
 
+            // string[] sChildCandidates = childCandidatesList.Cast<ArrayList>().Select(p => GetWordsInPath(p)).ToArray();
+
             if (childCandidatesList.Count > 1)
             {
-                if (paths.Count > 16000000)  // seems like this can never happen ...
-                {
-                    return paths;
-                }
+                //if (paths.Count > 16000000)  // seems like this can never happen ...
+                //{
+                //    return paths;
+                //}
                 ArrayList headCandidates = (ArrayList)childCandidatesList[0];
                 // ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
 
@@ -953,10 +956,10 @@ namespace GBI_Aligner
             }
             else
             {
-                if (paths.Count > 16000000)  // seems like this can never happen
-                {
-                    return paths;
-                }
+                //if (paths.Count > 16000000)  // seems like this can never happen
+                //{
+                //    return paths;
+                //}
                 ArrayList candidates = (ArrayList)childCandidatesList[0];
                 for (int i = 0; i < candidates.Count && i <= depth; i++)
                 {
@@ -968,6 +971,8 @@ namespace GBI_Aligner
 
                 // Puts each candidate into its own path.
             }
+
+            //  string[] sPaths = paths.Cast<ArrayList>().Select(p => GetWordsInPath(p)).ToArray();
 
             return paths;
         }
@@ -1048,7 +1053,10 @@ namespace GBI_Aligner
             return topCandidates;
         }
 
-        static ArrayList GetSourceWords(string[] words, string[] words2, Hashtable wordInfoTable)
+        static ArrayList GetSourceWords(
+            string[] words,
+            string[] words2,
+            Dictionary<string, WordInfo> wordInfoTable)
         {
             ArrayList wordList = new ArrayList();
 
@@ -1229,16 +1237,24 @@ namespace GBI_Aligner
 
         public static TargetWord CreateFakeTargetWord()
         {
-            TargetWord tWord = new TargetWord();
-            tWord.Text = string.Empty;
-            tWord.Position = -1;
-            tWord.IsFake = true;
-            tWord.ID = "0";
+            //TargetWord tWord = new TargetWord();
+            //tWord.Text = string.Empty;
+            //tWord.Position = -1;
+            //tWord.IsFake = true;
+            //tWord.ID = "0";
 
-            return tWord;
+            //return tWord;
+
+            return new TargetWord()
+            {
+                Text = string.Empty,
+                Position = -1,
+                IsFake = true,
+                ID = "0"
+            };
         }
 
-        public static XmlNode GetTreeNode(string sStartVerseID, string sEndVerseID, Hashtable trees)
+        public static XmlNode GetTreeNode(string sStartVerseID, string sEndVerseID, Dictionary<string, XmlNode> trees)
         {
             XmlNode treeNode = null;
 
@@ -1255,7 +1271,7 @@ namespace GBI_Aligner
             return treeNode;
         }
 
-        static ArrayList GetSubTrees(string sStartVerseID, string sEndVerseID, Hashtable trees)
+        static ArrayList GetSubTrees(string sStartVerseID, string sEndVerseID, Dictionary<string, XmlNode> trees)
         {
             ArrayList subTrees = new ArrayList();
 
@@ -1275,7 +1291,7 @@ namespace GBI_Aligner
             return subTrees;
         }
 
-        static void GetSubTreesInSameChapter(string sStartVerseID, string sEndVerseID, string book, string chapter, ref ArrayList subTrees, Hashtable trees)
+        static void GetSubTreesInSameChapter(string sStartVerseID, string sEndVerseID, string book, string chapter, ref ArrayList subTrees, Dictionary<string, XmlNode> trees)
         {
             int startVerse = Int32.Parse(sStartVerseID.Substring(5, 3));
             int endVerse = Int32.Parse(sEndVerseID.Substring(5, 3));
@@ -1283,8 +1299,7 @@ namespace GBI_Aligner
             for (int i = startVerse; i <= endVerse; i++)
             {
                 string verseID = book + chapter + Utils.Pad3(i.ToString());
-                XmlNode subTree = (XmlNode)trees[verseID];
-                if (subTree != null)
+                if (trees.TryGetValue(verseID, out XmlNode subTree))
                 {
                     subTrees.Add(subTree);
                 }
@@ -1310,7 +1325,7 @@ namespace GBI_Aligner
             return matchingTwords;
         }
 
-        static void GetSubTreesInDiffChapter(string sStartVerseID, string sEndVerseID, string book, string chapter1, string chapter2, ref ArrayList subTrees, Hashtable trees)
+        static void GetSubTreesInDiffChapter(string sStartVerseID, string sEndVerseID, string book, string chapter1, string chapter2, ref ArrayList subTrees, Dictionary<string, XmlNode> trees)
         {
             string hypotheticalLastVerse = book + chapter1 + "100";
             GetSubTreesInSameChapter(sStartVerseID, hypotheticalLastVerse, book, chapter1, ref subTrees, trees);
@@ -1351,5 +1366,17 @@ namespace GBI_Aligner
     {
         public ArrayList Sequence = new ArrayList();
         public double Prob;
+
+        public Candidate()
+        {
+            Sequence = new ArrayList();
+        }
+
+        public Candidate(TargetWord tw, double probability)
+        {
+            Sequence = new ArrayList();
+            Sequence.Add(tw);
+            Prob = probability;
+        }
     }
 }
