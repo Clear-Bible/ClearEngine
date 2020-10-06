@@ -92,11 +92,7 @@ namespace GBI_Aligner
 
                 if (link.TargetNode.Word.IsFake)
                 {
-                    bool linked = false;
-                    if (!linked)  // (always true)
-                    { 
-                        AlignWord(ref link, targetWords, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
-                    }
+                    AlignWord(ref link, targetWords, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
                 }
             }
 
