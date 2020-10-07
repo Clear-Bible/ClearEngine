@@ -943,7 +943,7 @@ namespace GBI_Aligner
                     for (int j = 0; j < tailPaths.Count; j++)  // for each tail path
                     { 
                         ArrayList tailPath = (ArrayList)tailPaths[j];
-                        ArrayList path = CombinePath(nHeadCandidate, tailPath);
+                        ArrayList path = ConsChain(nHeadCandidate, tailPath);
                         // path is copy of tailPath with nHeadCandidate prepended.
 
                         if (paths.Count > 16000000)
@@ -1004,32 +1004,17 @@ namespace GBI_Aligner
         // headCandidates :: ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
         // result is copy of initial segment of the list, of length depth
         //
-        static ArrayList Get_Nth_Candidate(ArrayList headCandidates, int depth)
+        static CandidateChain Get_Nth_Candidate(ArrayList headCandidates, int depth)
         {
-            ArrayList nCandidates = new ArrayList();
-
-            for (int i = 0; i <= depth; i++)
-            {
-                Candidate c = (Candidate)headCandidates[i];
-                nCandidates.Add(c);
-            }
-
-            return nCandidates;
+            return new CandidateChain(
+                headCandidates.Cast<Candidate>().Take(depth + 1));
         }
 
-        // prepends headCandidate to a copy of tailPath to obtain result
-        static ArrayList CombinePath(Candidate headCandidate, ArrayList tailPath)
+        // prepends head to a copy of tail to obtain result
+        static CandidateChain ConsChain(Candidate head, ArrayList tail)
         {
-            ArrayList path = new ArrayList();
-
-            path.Add(headCandidate);
-
-            foreach (Candidate tailCandidate in tailPath)
-            {
-                path.Add(tailCandidate);
-            }
-
-            return path;
+            return new CandidateChain(
+                tail.Cast<Candidate>().Prepend(head));
         }
 
 
@@ -1392,13 +1377,13 @@ namespace GBI_Aligner
         {
         }
 
-        public CandidateChain(List<Candidate> candidates)
-            : base(candidates)
+        public CandidateChain(IEnumerable<Candidate> candidates)
+            : base(candidates.ToList())
         {
         }
 
-        public CandidateChain(List<TargetWord> targetWords)
-            : base(targetWords)
+        public CandidateChain(IEnumerable<TargetWord> targetWords)
+            : base(targetWords.ToList())
         {
         }
     }
