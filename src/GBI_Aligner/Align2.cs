@@ -427,19 +427,12 @@ namespace GBI_Aligner
 
         static List<string> GetLinkedTargets(List<MappedWords> links)
         {
-            List<string> linkedTargets =
-                new List<string>();
-
-            foreach(MappedWords link in links)
-            {
-                if (!link.TargetNode.Word.IsFake)
-                {
-                    linkedTargets.Add(link.TargetNode.Word.ID);
-                }
-            }
-
-            return linkedTargets;
+            return links
+                .Where(mw => !mw.TargetNode.Word.IsFake)
+                .Select(mw => mw.TargetNode.Word.ID)
+                .ToList();
         }
+
 
         static void GetLinkedWords(ArrayList path, List<LinkedWord> links, double prob)
         {
