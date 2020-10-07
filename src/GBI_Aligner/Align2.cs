@@ -395,44 +395,35 @@ namespace GBI_Aligner
         // links :: ArrayList(MappedWords)
         // replaces some members of links with a special non-link MappedWords datum
         //
-        public static void ResolveConflicts(List<List<MappedWords>> conflicts, List<MappedWords> links, int pass)
+        public static void ResolveConflicts(
+            List<List<MappedWords>> conflicts,
+            List<MappedWords> links,
+            int pass)
         {
-            ArrayList linksToRemove = new ArrayList();
-
-            foreach (List<MappedWords> conflict in conflicts)
-            {
-                List<MappedWords> winners = FindWinners(conflict, pass);
-
-                if (winners.Count > 1)
-                {
-                    MappedWords winner = winners[0];
-                    winners.Clear();
-                    winners.Add(winner);
-                }
-                foreach (MappedWords map in conflict)
-                {
-                    if (!winners.Contains(map))
-                    {
-                        linksToRemove.Add(map);
-                    }
-                }
-            }
+            List<MappedWords> linksToRemove = conflicts.
+                SelectMany(conflict =>
+                    conflict.Except(
+                        FindWinners(conflict, pass).Where((_, n) => n == 0)))
+                .ToList();
 
             for (int i = 0; i < links.Count; i++)
             {
-                MappedWords link = (MappedWords)links[i];
+                MappedWords link = links[i];
                 if (linksToRemove.Contains(link))
                 {
-                    MappedWords nonLink = new MappedWords();
-                    nonLink.SourceNode = link.SourceNode;
-                    LinkedWord nonTarget = new LinkedWord();
-                    nonTarget.Prob = -1000;
-                    nonTarget.Word = Align.CreateFakeTargetWord();
-                    nonLink.TargetNode = nonTarget;
-                    links[i] = nonLink;
+                    links[i] = new MappedWords
+                    {
+                        SourceNode = link.SourceNode,
+                        TargetNode = new LinkedWord()
+                        {
+                            Prob = -1000,
+                            Word = Align.CreateFakeTargetWord()
+                        }
+                    };
                 }
             }
         }
+
 
         static List<string> GetLinkedTargets(List<MappedWords> links)
         {
