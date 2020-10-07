@@ -379,7 +379,7 @@ namespace GBI_Aligner
             Hashtable strongs
             )
         {
-            ArrayList topCandidates = new ArrayList();
+            List<Candidate> topCandidates = new List<Candidate>();
               // ArrayList(Candidate)
               // Candidate { Sequence ArrayList(TargetWord), Prob double }
 
@@ -393,7 +393,7 @@ namespace GBI_Aligner
                     c.Prob = 0.0;
                     c.Chain.Add(target);
                     topCandidates.Add(c);
-                    return topCandidates;
+                    return new ArrayList(topCandidates);
                 }
             }
 
@@ -401,7 +401,7 @@ namespace GBI_Aligner
             // TargetWord => log of probability
 
             bool isContentWord = IsContentWord(sWord.Lemma, sourceFuncWords);
-            if (!isContentWord) return topCandidates;
+            if (!isContentWord) return new ArrayList(topCandidates);
 
             if (strongs.ContainsKey(sWord.Strong))
             {
@@ -414,7 +414,7 @@ namespace GBI_Aligner
                     c.Chain.Add(target);
                     topCandidates.Add(c);
                 }
-                return topCandidates;
+                return new ArrayList(topCandidates);
             }
 
             if (manModel.ContainsKey(sWord.Lemma))
@@ -489,7 +489,7 @@ namespace GBI_Aligner
                 string linkedWords = GetWords(c);
             }
 
-            return topCandidates;
+            return new ArrayList(topCandidates);
         }
 
 
@@ -512,15 +512,15 @@ namespace GBI_Aligner
 
 
 
-        static ArrayList GetTopCandidate(double bestProb, Hashtable probs)
+        static List<Candidate> GetTopCandidate(double bestProb, Hashtable probs)
         {
-            return new ArrayList(probs
+            return probs
                 .Cast<DictionaryEntry>()
                 .Where(kvp => (double)kvp.Value == bestProb)
                 .Select(kvp => new Candidate(
                     (TargetWord)kvp.Key,
                     (double)kvp.Value))
-                .ToList());
+                .ToList();
         }
 
 
