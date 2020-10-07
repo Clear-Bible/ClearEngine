@@ -177,7 +177,7 @@ namespace GBI_Aligner
             }
 
             Hashtable terminalCandidates = new Hashtable();
-            TerminalCandidates.GetTerminalCandidates(ref terminalCandidates, treeNode, tWords, model, manModel, alignProbs, useAlignModel, n, verseID, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, existingLinks, idMap, sourceFuncWords, contentWordsOnly, strongs);
+            TerminalCandidates.GetTerminalCandidates(terminalCandidates, treeNode, tWords, model, manModel, alignProbs, useAlignModel, n, verseID, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, existingLinks, idMap, sourceFuncWords, contentWordsOnly, strongs);
                 // terminalCandidates :: HashTable(SourceWord.Id =>
                 //     ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
 
