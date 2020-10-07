@@ -506,71 +506,40 @@ namespace GBI_Aligner
         }
 
  
-        // conflict :: ArrayList(MappedWord)
         // returns ArrayList(MappedWord)
         //
         static ArrayList FindWinners(List<MappedWords> conflict, int pass)
         {
-            double bestProb = GetBestProb(conflict);
-            double minDistance = GetMinDistance(conflict);
-            ArrayList winners = new ArrayList();
-            foreach (MappedWords mappedWord in conflict)
-            {
-                double prob = mappedWord.TargetNode.Prob;
-                if (prob == bestProb)
-                {
-                    winners.Add(mappedWord);
-                }
-            }
+            double prob(MappedWords mw) => mw.TargetNode.Prob;
+
+            double distance(MappedWords mw) =>
+                Math.Abs(mw.SourceNode.RelativePos -
+                         mw.TargetNode.Word.RelativePos);
+
+            // We know that conflict is not the empty list.
+
+            double bestProb = conflict.Max(mw => prob(mw));           
+
+            List<MappedWords> winners = conflict
+                .Where(mw => mw.TargetNode.Prob == bestProb)
+                .ToList();
 
             if (pass == 2 && winners.Count > 1)
             {
-                foreach (MappedWords winner in winners)
+                double minDistance = conflict.Min(mw => distance(mw));
+
+                MappedWords winner2 = winners
+                    .Where(mw => distance(mw) == minDistance)
+                    .FirstOrDefault();
+
+                if (winner2 != null)
                 {
-                    double distance = Math.Abs(winner.SourceNode.RelativePos - winner.TargetNode.Word.RelativePos);
-                    if (distance == minDistance)
-                    {
-                        winners.Clear();
-                        winners.Add(winner);
-                        break;
-                    }
+                    winners = new List<MappedWords>();
+                    winners.Add(winner2);
                 }
             }
 
-            return winners;
-        }
-
-
-
-        static double GetBestProb(List<MappedWords> conflict)
-        {
-            double bestProb = -1000;
-
-            foreach(MappedWords mappedWord in conflict)
-            {
-                double prob = mappedWord.TargetNode.Prob;
-                if (prob > bestProb) bestProb = prob;
-            }
-
-            return bestProb;
-        }
-
- 
-
-        static double GetMinDistance(List<MappedWords> conflict)
-        {
-            double minDistance = 100;
-
-            foreach (MappedWords mappedWord in conflict)
-            {
-                double distance = Math.Abs(mappedWord.SourceNode.RelativePos - mappedWord.TargetNode.Word.RelativePos);
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                }
-            }
-
-            return minDistance;
+            return new ArrayList(winners);
         }
 
 
