@@ -357,7 +357,7 @@ namespace GBI_Aligner
         //
         // returns ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
         //
-        public static ArrayList GetTopCandidates(
+        public static AlternativeCandidates GetTopCandidates(
             SourceWord sWord,
             ArrayList tWords, // ArrayList(TargetWord)
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
@@ -379,9 +379,7 @@ namespace GBI_Aligner
             Hashtable strongs
             )
         {
-            List<Candidate> topCandidates = new List<Candidate>();
-              // ArrayList(Candidate)
-              // Candidate { Sequence ArrayList(TargetWord), Prob double }
+            AlternativeCandidates topCandidates = new AlternativeCandidates();
 
             if (existingLinks.Count > 0 && sWord.AltID != null && existingLinks.ContainsKey(sWord.AltID))
             {
@@ -393,7 +391,7 @@ namespace GBI_Aligner
                     c.Prob = 0.0;
                     c.Chain.Add(target);
                     topCandidates.Add(c);
-                    return new ArrayList(topCandidates);
+                    return topCandidates;
                 }
             }
 
@@ -401,7 +399,7 @@ namespace GBI_Aligner
             // TargetWord => log of probability
 
             bool isContentWord = IsContentWord(sWord.Lemma, sourceFuncWords);
-            if (!isContentWord) return new ArrayList(topCandidates);
+            if (!isContentWord) return topCandidates;
 
             if (strongs.ContainsKey(sWord.Strong))
             {
@@ -414,7 +412,7 @@ namespace GBI_Aligner
                     c.Chain.Add(target);
                     topCandidates.Add(c);
                 }
-                return new ArrayList(topCandidates);
+                return topCandidates;
             }
 
             if (manModel.ContainsKey(sWord.Lemma))
@@ -479,17 +477,15 @@ namespace GBI_Aligner
             }
 
             double bestProb = FindBestProb(probs);
-            topCandidates = GetTopCandidate(bestProb, probs);
-              // get candidates of maximal probability
+            topCandidates = new AlternativeCandidates(
+                GetCandidatesWithSpecifiedProbability(bestProb, probs));
 
- //           ArrayList candidates = Data.SortWordCandidates(probs);
- //           topCandidates = GetTopCandidates2(candidates, probs);
             foreach (Candidate c in topCandidates)
             {
                 string linkedWords = GetWords(c);
             }
 
-            return new ArrayList(topCandidates);
+            return topCandidates;
         }
 
 
@@ -512,7 +508,7 @@ namespace GBI_Aligner
 
 
 
-        static List<Candidate> GetTopCandidate(double bestProb, Hashtable probs)
+        static List<Candidate> GetCandidatesWithSpecifiedProbability(double bestProb, Hashtable probs)
         {
             return probs
                 .Cast<DictionaryEntry>()
@@ -1385,6 +1381,25 @@ namespace GBI_Aligner
         public CandidateChain(IEnumerable<TargetWord> targetWords)
             : base(targetWords.ToList())
         {
+        }
+    }
+
+
+    /// <summary>
+    /// An AlternativeCandidates object is a list of Candidate
+    /// objects that are alternatives to one another.
+    /// </summary>
+    /// 
+    public class AlternativeCandidates : ArrayList
+    {
+        public AlternativeCandidates()
+            : base()
+        {
+        }
+
+        public AlternativeCandidates(IEnumerable<Candidate> candidates)
+            : base(candidates.ToList())
+        { 
         }
     }
 }
