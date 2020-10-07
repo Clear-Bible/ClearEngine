@@ -529,18 +529,11 @@ namespace GBI_Aligner
 
         static Dictionary<string, MappedWords> CreateLinksTable(List<MappedWords> links)
         {
-            Dictionary<string, MappedWords> linksTable =
-                new Dictionary<string, MappedWords>();
-
-            foreach(MappedWords link in links)
-            {
-                if (link.TargetNode.Word.IsFake) continue;
-                string sourceID = link.SourceNode.MorphID;
-                linksTable.Add(sourceID, link);
-            }
-
-            return linksTable;
+            return links
+                .Where(mw => !mw.TargetNode.Word.IsFake)
+                .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
         }
+
 
         public static string GetTargetID (string target)
         {
