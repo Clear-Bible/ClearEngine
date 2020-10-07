@@ -325,28 +325,8 @@ namespace GBI_Aligner
                     
                 }
 
-                ArrayList topCandidates = ComputeTopCandidates(candidates, n, maxPaths, sNodes, treeNode);
-
-                // doesn't actually do anything
-                foreach (Candidate c in topCandidates)
-                {
-                    string linkedWords = GetWords(c);
-//                    sw.WriteLine(linkedWords);
-                }
-
-                if (alignments.ContainsKey(nodeID))
-                {
-                    alignments.Remove(nodeID);
-                    alignments.Add(nodeID, topCandidates);
-                }
-                else
-                {
-                    alignments.Add(nodeID, topCandidates);
-                }
+                alignments[nodeID] = ComputeTopCandidates(candidates, n, maxPaths, sNodes, treeNode);
             }
-
-            // string alignmentsString = TimUtil.DebugAlignmentsToString(alignments);
-            // Console.WriteLine(alignmentsString);
         }
 
 
