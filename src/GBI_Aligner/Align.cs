@@ -286,46 +286,40 @@ namespace GBI_Aligner
             }   
             else if (treeNode.ChildNodes.Count > 1)  // non-terminal with multiple children
             {
-                ArrayList sNodes = GetSourceNodes(treeNode);
-                    // ::= ArrayList(morphId, ...) for terminal nodes under this node
-
-                ArrayList candidates = new ArrayList();
-                // list of candidate lists, one for each child, some might be empty
-                // ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
-
-                foreach (XmlNode childNode in treeNode.ChildNodes)
+                // (John 1:1 first node: nodeId="430010010010171")
+                //
+                string getNodeId(XmlNode node)
                 {
-                    string childNodeID = Utils.GetAttribValue(childNode, "nodeId");
-                    // John 1:1 first node: nodeId="430010010010171"
+                    string childNodeID = Utils.GetAttribValue(node, "nodeId");
                     if (childNodeID.Length == 15)
                     {
-                        childNodeID = childNodeID.Substring(0, childNodeID.Length - 1);
+                        return childNodeID.Substring(0, childNodeID.Length - 1);
                     }
                     else
                     {
-                        childNodeID = childNodeID.Substring(0, childNodeID.Length - 2);
+                        return childNodeID.Substring(0, childNodeID.Length - 2);
                     }
-
-                    ArrayList childCandidates = (ArrayList)alignments[childNodeID];
-                    // ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
-
-                    if (childCandidates.Count == 0)
-                    {
-                        childCandidates = CreateEmptyCandidate();
-                    }
-
-                    // (doesn't do anything)
-                    foreach (Candidate childCandidate in childCandidates)
-                    {
-                        string linkedWords = GetWords(childCandidate);
-                        //                    sw.WriteLine(linkedWords);
-                    }
-
-                    candidates.Add(childCandidates);
-                    
                 }
 
-                alignments[nodeID] = ComputeTopCandidates(candidates, n, maxPaths, sNodes, treeNode);
+                ArrayList makeNonEmpty(ArrayList list) =>
+                    list.Count == 0
+                    ? CreateEmptyCandidate()
+                    : list;
+
+                ArrayList candidatesForNode(XmlNode node) =>
+                    makeNonEmpty((ArrayList)alignments[getNodeId(node)]);
+
+                ArrayList candidates = new ArrayList(
+                    treeNode
+                    .ChildNodes
+                    .Cast<XmlNode>()
+                    .Select(childNode => candidatesForNode(childNode))
+                    .ToList());
+
+                ArrayList sNodes = GetSourceNodes(treeNode);
+
+                alignments[nodeID] = ComputeTopCandidates(
+                    candidates, n, maxPaths, sNodes, treeNode);
             }
         }
 
