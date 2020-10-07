@@ -14,8 +14,7 @@ namespace GBI_Aligner
     class TerminalCandidates
     {
         public static void GetTerminalCandidates(
-            Hashtable candidateTable,  // the output goes here
-                                           // HashTable(SourceWord.Id => ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
+            AlternativesForTerminals candidateTable,  // the output goes here
             XmlNode treeNode, // syntax tree for current verse
             ArrayList tWords, // ArrayList(TargetWord)
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
@@ -69,12 +68,6 @@ namespace GBI_Aligner
                         goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                         existingLinks, sourceFuncWords, contentWordsOnly,
                         strongs);
-
-
-          /*      foreach (Candidate c in topCandidates)
-                {
-                    string linkedWords = Align.GetWords(c);
-                } */
 
                 candidateTable.Add(sWord.ID, topCandidates);
 

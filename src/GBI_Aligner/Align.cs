@@ -176,16 +176,20 @@ namespace GBI_Aligner
                 // Hashtable(mWord.altId => tWord.altId)
             }
 
-            Hashtable terminalCandidates = new Hashtable();
-            TerminalCandidates.GetTerminalCandidates(terminalCandidates, treeNode, tWords, model, manModel, alignProbs, useAlignModel, n, verseID, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, existingLinks, idMap, sourceFuncWords, contentWordsOnly, strongs);
-                // terminalCandidates :: HashTable(SourceWord.Id =>
-                //     ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
-
-            // TIM Study
-            // TimUtil.PrintHashTable("terminalCandidates", terminalCandidates);
+            AlternativesForTerminals terminalCandidates =
+                new AlternativesForTerminals();
+            TerminalCandidates.GetTerminalCandidates(
+                terminalCandidates, treeNode, tWords, model, manModel,
+                alignProbs, useAlignModel, n, verseID, puncs, stopWords,
+                goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
+                existingLinks, idMap, sourceFuncWords, contentWordsOnly,
+                strongs);
             
             Hashtable alignments = new Hashtable();
-            AlignNodes(treeNode, tWords, alignments, n, sourceWords.Length, maxPaths, terminalCandidates);
+            AlignNodes(
+                treeNode, tWords, alignments, n, sourceWords.Length,
+                maxPaths, terminalCandidates);
+
             // alignments :: Hashtable(nodeId =>
             //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
             //   or Candidate)
@@ -228,9 +232,7 @@ namespace GBI_Aligner
             int n, // number of target tokens
             int sLength, // number of source words
             int maxPaths,
-            Hashtable terminalCandidates
-                // terminalCandidates :: HashTable(SourceWord.Id =>
-                //     ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
+            AlternativesForTerminals terminalCandidates
             )
         {
             if (treeNode.NodeType.ToString() == "Text") // child of a terminal node
@@ -1400,6 +1402,20 @@ namespace GBI_Aligner
         public AlternativeCandidates(IEnumerable<Candidate> candidates)
             : base(candidates.ToList())
         { 
+        }
+    }
+
+
+    /// <summary>
+    /// An AlternativesForTerminals object is a mapping:
+    /// SourceWord.ID => AlternativeCandidates.
+    /// </summary>
+    /// 
+    public class AlternativesForTerminals : Hashtable
+    {
+        public AlternativesForTerminals()
+            : base()
+        {
         }
     }
 }
