@@ -401,11 +401,11 @@ namespace GBI_Aligner
 
             foreach (List<MappedWords> conflict in conflicts)
             {
-                ArrayList winners = FindWinners(conflict, pass);
-                // winners :: ArrayList(MappedWord)
+                List<MappedWords> winners = FindWinners(conflict, pass);
+
                 if (winners.Count > 1)
                 {
-                    MappedWords winner = (MappedWords)winners[0];
+                    MappedWords winner = winners[0];
                     winners.Clear();
                     winners.Add(winner);
                 }
@@ -508,7 +508,7 @@ namespace GBI_Aligner
  
         // returns ArrayList(MappedWord)
         //
-        static ArrayList FindWinners(List<MappedWords> conflict, int pass)
+        static List<MappedWords> FindWinners(List<MappedWords> conflict, int pass)
         {
             double prob(MappedWords mw) => mw.TargetNode.Prob;
 
@@ -539,7 +539,7 @@ namespace GBI_Aligner
                 }
             }
 
-            return new ArrayList(winners);
+            return winners;
         }
 
 
