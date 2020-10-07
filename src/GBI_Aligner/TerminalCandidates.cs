@@ -14,7 +14,7 @@ namespace GBI_Aligner
     class TerminalCandidates
     {
         public static void GetTerminalCandidates(
-            ref Hashtable candidateTable,  // the output goes here
+            Hashtable candidateTable,  // the output goes here
                                            // HashTable(SourceWord.Id => ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
             XmlNode treeNode, // syntax tree for current verse
             ArrayList tWords, // ArrayList(TargetWord)
@@ -74,13 +74,13 @@ namespace GBI_Aligner
 
                 candidateTable.Add(sWord.ID, topCandidates);
 
-                ResolveConflicts(ref candidateTable);
+                ResolveConflicts(candidateTable);
             }
 
-            FillGaps(ref candidateTable);
+            FillGaps(candidateTable);
         }
 
-        static void FillGaps(ref Hashtable candidateTable)
+        static void FillGaps(Hashtable candidateTable)
         {
             ArrayList gaps = FindGaps(candidateTable);
 
@@ -111,7 +111,7 @@ namespace GBI_Aligner
             return gaps;
         }
 
-        static void ResolveConflicts(ref Hashtable candidateTable)
+        static void ResolveConflicts(Hashtable candidateTable)
         {
             Hashtable conflicts = FindConflicts(candidateTable);
 
@@ -126,13 +126,13 @@ namespace GBI_Aligner
                     Candidate winningCandidate = Align.GetWinningCandidate(conflictingCandidates);
                     if (winningCandidate != null)
                     {
-                        RemoveLosingCandidates(target, positions, winningCandidate, ref candidateTable);
+                        RemoveLosingCandidates(target, positions, winningCandidate, candidateTable);
                     }
                 }
             }
         }
 
-        static void RemoveLosingCandidates(string target, ArrayList positions, Candidate winningCandidate, ref Hashtable candidateTable)
+        static void RemoveLosingCandidates(string target, ArrayList positions, Candidate winningCandidate, Hashtable candidateTable)
         {
             foreach(string morphID in positions)
             {
