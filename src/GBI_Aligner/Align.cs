@@ -240,49 +240,29 @@ namespace GBI_Aligner
                 return;
             }
 
-            string nodeString = TimUtil.DebugTreeToString(treeNode);
+            // string nodeString = TimUtil.DebugTreeToString(treeNode);
 
+            // Recursive calls.
+            //
             foreach(XmlNode subTree in treeNode)
             {
-                AlignNodes(subTree, tWords, alignments, n, sLength, maxPaths, terminalCandidates);
-                // recursive call
+                AlignNodes(
+                    subTree, tWords, alignments, n, sLength,
+                    maxPaths, terminalCandidates);
             }
 
             string nodeID = Utils.GetAttribValue(treeNode, "nodeId");
             nodeID = nodeID.Substring(0, nodeID.Length - 1);
-            if (nodeID == "40001003012004")
-            {
-                ;
-            }
 
             if (treeNode.FirstChild.NodeType.ToString() == "Text") // terminal node
             {
-                // Make a new SourceWord for this terminal node.
-                // But all we end up using is the ID member.
-                SourceWord sWord = new SourceWord();
-                sWord.ID = Utils.GetAttribValue(treeNode, "morphId");
-                if (sWord.ID.Length == 11)
+                string morphId = Utils.GetAttribValue(treeNode, "morphId");
+                if (morphId.Length == 11)
                 {
-                    sWord.ID += "1";
-                }
-                sWord.Lemma = Utils.GetAttribValue(treeNode, "UnicodeLemma");
-                sWord.Gloss = Utils.GetAttribValue(treeNode, "English");
-                sWord.Category = Utils.GetAttribValue(treeNode, "Cat");
-                sWord.Position = Int32.Parse(Utils.GetAttribValue(treeNode, "Start"));
-                sWord.RelativePos = (double)sWord.Position / (double)sLength;
-
-                ArrayList topCandidates = null;
-                topCandidates = (ArrayList)terminalCandidates[sWord.ID];
-                    // candidates that were found for this terminal:
-                    // ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
-
-                // (Doesn't do anything.)
-                foreach (Candidate c in topCandidates)
-                {
-                    string linkedWords = GetWords(c);
+                    morphId += "1";
                 }
 
-                alignments.Add(nodeID, topCandidates);
+                alignments.Add(nodeID, terminalCandidates[morphId]);
             }   
             else if (treeNode.ChildNodes.Count > 1)  // non-terminal with multiple children
             {
