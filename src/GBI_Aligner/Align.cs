@@ -185,7 +185,7 @@ namespace GBI_Aligner
             // TimUtil.PrintHashTable("terminalCandidates", terminalCandidates);
             
             Hashtable alignments = new Hashtable();
-            AlignNodes(treeNode, tWords, ref alignments, n, sourceWords.Length, maxPaths, terminalCandidates);
+            AlignNodes(treeNode, tWords, alignments, n, sourceWords.Length, maxPaths, terminalCandidates);
             // alignments :: Hashtable(nodeId =>
             //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
             //   or Candidate)
@@ -221,7 +221,7 @@ namespace GBI_Aligner
             XmlNode treeNode,
             ArrayList tWords, // ArrayList(TargetWord)
 
-            ref Hashtable alignments, // Hashtable(nodeId =>
+            Hashtable alignments, // Hashtable(nodeId =>
                                       //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
                                       //   or Candidate)
 
@@ -242,7 +242,7 @@ namespace GBI_Aligner
 
             foreach(XmlNode subTree in treeNode)
             {
-                AlignNodes(subTree, tWords, ref alignments, n, sLength, maxPaths, terminalCandidates);
+                AlignNodes(subTree, tWords, alignments, n, sLength, maxPaths, terminalCandidates);
                 // recursive call
             }
 
