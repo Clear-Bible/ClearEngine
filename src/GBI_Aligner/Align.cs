@@ -391,7 +391,7 @@ namespace GBI_Aligner
                 {
                     Candidate c = new Candidate();
                     c.Prob = 0.0;
-                    c.Sequence.Add(target);
+                    c.Chain.Add(target);
                     topCandidates.Add(c);
                     return topCandidates;
                 }
@@ -411,7 +411,7 @@ namespace GBI_Aligner
                 {
                     Candidate c = new Candidate();
                     c.Prob = 0.0;
-                    c.Sequence.Add(target);
+                    c.Chain.Add(target);
                     topCandidates.Add(c);
                 }
                 return topCandidates;
@@ -625,8 +625,8 @@ namespace GBI_Aligner
                 // Make a new candidate that has the path inside of it,
                 // and put that new candidate on candidates.
                 Candidate candidate = new Candidate();
-                candidate.Sequence = (ArrayList)pathEnum.Key; // :: ArrayList(Candidate)
-                string wordsInPath = GetWordsInPath(candidate.Sequence);
+                candidate.Chain = (ArrayList)pathEnum.Key; // :: ArrayList(Candidate)
+                string wordsInPath = GetWordsInPath(candidate.Chain);
                 candidate.Prob = (double)pathEnum.Value;
                 candidates.Add(candidate);
             }
@@ -634,7 +634,7 @@ namespace GBI_Aligner
             int minimalDistance = 10000;
             foreach (Candidate c in candidates)
             {
-                int distance = ComputeDistance(c.Sequence); // something about distance between words
+                int distance = ComputeDistance(c.Chain); // something about distance between words
                 if (distance < minimalDistance) minimalDistance = distance;
             }
 
@@ -647,12 +647,12 @@ namespace GBI_Aligner
                     {
                         ;
                     }
-                    int distance = ComputeDistance(c.Sequence);
+                    int distance = ComputeDistance(c.Chain);
                     double distanceProb = Math.Log((double)minimalDistance / (double)distance);
-                    double orderProb = ComputeOrderProb(c.Sequence);  // something about word order
+                    double orderProb = ComputeOrderProb(c.Chain);  // something about word order
                     double adjustedProb = c.Prob + c.Prob + distanceProb + orderProb / 2.0;
                     c.Prob = adjustedProb;
-                    pathProbs2.Add(c.Sequence, adjustedProb);
+                    pathProbs2.Add(c.Chain, adjustedProb);
                 }
             }
             else
@@ -670,7 +670,7 @@ namespace GBI_Aligner
         //
         public static string GetWords(Candidate c)
         {
-            ArrayList wordsInPath = GetTargetWordsInPath(c.Sequence);
+            ArrayList wordsInPath = GetTargetWordsInPath(c.Chain);
 
             string words = string.Empty;
 
@@ -854,7 +854,7 @@ namespace GBI_Aligner
                 {
                     return path
                         .Cast<Candidate>()
-                        .SelectMany(c => helper(c.Sequence));
+                        .SelectMany(c => helper(c.Chain));
                 }
                 else
                 {
@@ -1044,7 +1044,7 @@ namespace GBI_Aligner
                 ArrayList path = (ArrayList)paths[i];
                 Candidate c = new Candidate();
                 c.Prob = (double)probs[path];
-                c.Sequence = path;
+                c.Chain = path;
                 if (topProb == 10) topProb = c.Prob;
                 if (c.Prob < topProb) break;
                 topCandidates.Add(c);
@@ -1364,19 +1364,42 @@ namespace GBI_Aligner
 
     public class Candidate
     {
-        public ArrayList Sequence = new ArrayList();
+        public ArrayList Chain = new ArrayList();
         public double Prob;
 
         public Candidate()
         {
-            Sequence = new ArrayList();
+            Chain = new ArrayList();
         }
 
         public Candidate(TargetWord tw, double probability)
         {
-            Sequence = new ArrayList();
-            Sequence.Add(tw);
+            Chain = new ArrayList();
+            Chain.Add(tw);
             Prob = probability;
+        }
+    }
+
+    /// <summary>
+    /// A CandidateChain is a sequence of TargetWord objects
+    /// or a sequence of Candidate objects.
+    /// </summary>
+    /// 
+    public class CandidateChain : ArrayList
+    {
+        public CandidateChain()
+            : base()
+        {
+        }
+
+        public CandidateChain(List<Candidate> candidates)
+            : base(candidates)
+        {
+        }
+
+        public CandidateChain(List<TargetWord> targetWords)
+            : base(targetWords)
+        {
         }
     }
 }

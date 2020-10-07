@@ -40,7 +40,7 @@ namespace GBI_Aligner
             //Console.WriteLine("\nAlignTheRest\n\n");
 
             List<LinkedWord> linkedWords = new List<LinkedWord>();
-            GetLinkedWords(topCandidate.Sequence, linkedWords, topCandidate.Prob);
+            GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
 
             // linkedWords has a LinkedWord for each target word found in
             // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
@@ -103,10 +103,10 @@ namespace GBI_Aligner
 
 
         static void AlignWord(
-            ref MappedWords link, // output goes here
-            string[] targetWords,
-            Dictionary<string, MappedWords> linksTable,
-            List<string> linkedTargets, 
+            ref MappedWords link, // (target word is fake)
+            string[] targetWords, // each in the form of "text_id"
+            Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
+            List<string> linkedTargets, // target word IDs from non-fake words
             Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
             Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
@@ -121,10 +121,6 @@ namespace GBI_Aligner
             bool contentWordsOnly
             )
         {
-            // Console.WriteLine("AlignWord");
-            // TimUtil.PrintAsJson("link", link);
-            // Console.WriteLine("\n");
-
             if (stopWords.Contains(link.SourceNode.Lemma)) return;
             if (contentWordsOnly && sourceFuncWords.Contains(link.SourceNode.Lemma)) return;
             if (useAlignModel && preAlignment.ContainsKey(link.SourceNode.MorphID))
@@ -151,11 +147,11 @@ namespace GBI_Aligner
                     return;
                 }
             }
-//            string cat = link.SourceNode.Category;
-//            if (cat == "det" || cat == "conj" || cat == "art" || cat == "cj" || cat == "pron" || cat == "prep") return;
+
             bool stopped = false;
             ArrayList linkedSiblings = GetLinkedSiblings(link.SourceNode.TreeNode, linksTable, ref stopped);
             // linkedSiblings :: ArrayList(MappedWords)
+
             if (linkedSiblings.Count > 0)
             {
                 MappedWords preNeighbor = GetPreNeighbor(link, linkedSiblings);
@@ -303,7 +299,10 @@ namespace GBI_Aligner
         // linksTable :: Hashtable(sourceId => MappedWords)
         // returns ArrayList(MappedWords)
         //
-        static ArrayList GetLinkedSiblings(XmlNode treeNode, Dictionary<string, MappedWords> linksTable, ref bool stopped)
+        static ArrayList GetLinkedSiblings(
+            XmlNode treeNode,
+            Dictionary<string, MappedWords> linksTable, // key is source morphId
+            ref bool stopped)
         {
             ArrayList linkedSiblings = new ArrayList();
 
@@ -311,12 +310,6 @@ namespace GBI_Aligner
 
             while (!stopped && treeNode.ParentNode != null && linkedSiblings.Count == 0)
             {
-/*                int chunkLength = Int32.Parse(Utils.GetAttribValue(treeNode.ParentNode, "Length"));
-                if (chunkLength > 2)
-                {
-                    stopped = true;
-                    break;
-                } */
                 foreach(XmlNode childNode in treeNode.ParentNode.ChildNodes)
                 {
                     if (childNode != treeNode)
@@ -345,6 +338,7 @@ namespace GBI_Aligner
             return linkedSiblings;
         }
 
+
         static MappedWords GetPreNeighbor(MappedWords unLinked, ArrayList linkedSiblings)
         {
             MappedWords preNeighbor = null;
@@ -372,6 +366,7 @@ namespace GBI_Aligner
             return preNeighbor;
         }
 
+
         static MappedWords GetPostNeighbor(MappedWords unLinked, ArrayList linkedSiblings)
         {
             MappedWords postNeighbor = null;
@@ -390,6 +385,7 @@ namespace GBI_Aligner
 
             return postNeighbor;
         }
+
 
         // conflicts :: ArrayList(ArrayList(MappedWords))
         // links :: ArrayList(MappedWords)
@@ -459,7 +455,7 @@ namespace GBI_Aligner
                 {
                     foreach (Candidate c in path)
                     {
-                        GetLinkedWords(c.Sequence, links, c.Prob);
+                        GetLinkedWords(c.Chain, links, c.Prob);
                     }
                 }
                 else

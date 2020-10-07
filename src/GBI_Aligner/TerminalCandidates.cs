@@ -153,13 +153,13 @@ namespace GBI_Aligner
 
         static string GetTargetID(Candidate c)
         {
-            if (c.Sequence.Count == 0)
+            if (c.Chain.Count == 0)
             {
                 return string.Empty;
             }
             else
             {
-                TargetWord tWord = (TargetWord)c.Sequence[0];
+                TargetWord tWord = (TargetWord)c.Chain[0];
                 return tWord.ID;
             }
         }
