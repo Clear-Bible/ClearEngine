@@ -576,7 +576,7 @@ namespace GBI_Aligner
             while (pathEnum.MoveNext())
             {
                 Candidate candidate = new Candidate(
-                    (ArrayList)pathEnum.Key,
+                    (CandidateChain)pathEnum.Key,
                     (double)pathEnum.Value);
                 candidates.Add(candidate);
             }
@@ -973,7 +973,7 @@ namespace GBI_Aligner
 
             for (int i = 0; i < paths.Count; i++)
             {
-                ArrayList path = (ArrayList)paths[i];
+                CandidateChain path = (CandidateChain)paths[i];
                 Candidate c = new Candidate(path, (double)probs[path]);
                 if (topProb == 10) topProb = c.Prob;
                 if (c.Prob < topProb) break;
@@ -1294,22 +1294,21 @@ namespace GBI_Aligner
 
     public class Candidate
     {
-        public ArrayList Chain = new ArrayList();
+        public CandidateChain Chain;
         public double Prob;
 
         public Candidate()
         {
-            Chain = new ArrayList();
+            Chain = new CandidateChain();
         }
 
         public Candidate(TargetWord tw, double probability)
         {
-            Chain = new ArrayList();
-            Chain.Add(tw);
+            Chain = new CandidateChain(Enumerable.Repeat(tw, 1));
             Prob = probability;
         }
 
-        public Candidate(ArrayList chain, double probability)
+        public Candidate(CandidateChain chain, double probability)
         {
             Chain = chain;
             Prob = probability;
