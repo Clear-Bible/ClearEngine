@@ -343,9 +343,7 @@ namespace GBI_Aligner
                 TargetWord target = OldLinks.GetTarget(targetAltID, tWords);
                 if (target != null)
                 {
-                    Candidate c = new Candidate();
-                    c.Prob = 0.0;
-                    c.Chain.Add(target);
+                    Candidate c = new Candidate(target, 0.0);
                     topCandidates.Add(c);
                     return topCandidates;
                 }
@@ -363,9 +361,7 @@ namespace GBI_Aligner
                 ArrayList matchingTwords = GetMatchingTwords(wordIds, tWords);
                 foreach(TargetWord target in matchingTwords)
                 {
-                    Candidate c = new Candidate();
-                    c.Prob = 0.0;
-                    c.Chain.Add(target);
+                    Candidate c = new Candidate(target, 0.0);
                     topCandidates.Add(c);
                 }
                 return topCandidates;
@@ -481,12 +477,17 @@ namespace GBI_Aligner
         //
         static ArrayList ComputeTopCandidates(ArrayList childCandidateList, int n, int maxPaths, ArrayList sNodes, XmlNode treeNode)
         {
+            // I think that childCandidateList is a list of alternatives ...
+
             Hashtable pathProbs = new Hashtable();
+
             ArrayList allPaths = CreatePaths(childCandidateList, maxPaths);
             // allPaths :: ArrayList(ArrayList(Candidate))
+
             ArrayList paths = FilterPaths(allPaths);
             // paths :: ArrayList(ArrayList(Candidate))
             // paths = those where the candidates use different words
+
             if (paths.Count == 0)
             {
                 ArrayList topPath = (ArrayList)allPaths[0];
@@ -574,12 +575,9 @@ namespace GBI_Aligner
             IDictionaryEnumerator pathEnum = pathProbs.GetEnumerator();
             while (pathEnum.MoveNext())
             {
-                // Make a new candidate that has the path inside of it,
-                // and put that new candidate on candidates.
-                Candidate candidate = new Candidate();
-                candidate.Chain = (ArrayList)pathEnum.Key; // :: ArrayList(Candidate)
-                string wordsInPath = GetWordsInPath(candidate.Chain);
-                candidate.Prob = (double)pathEnum.Value;
+                Candidate candidate = new Candidate(
+                    (ArrayList)pathEnum.Key,
+                    (double)pathEnum.Value);
                 candidates.Add(candidate);
             }
 
@@ -607,12 +605,9 @@ namespace GBI_Aligner
                     pathProbs2.Add(c.Chain, adjustedProb);
                 }
             }
-            else
+            else if (candidates.Count > 0)
             {
-                foreach (Candidate c in candidates)
-                {
-                    pathProbs2 = pathProbs;
-                }
+                pathProbs2 = pathProbs;
             }
 
             return pathProbs2;
@@ -979,9 +974,7 @@ namespace GBI_Aligner
             for (int i = 0; i < paths.Count; i++)
             {
                 ArrayList path = (ArrayList)paths[i];
-                Candidate c = new Candidate();
-                c.Prob = (double)probs[path];
-                c.Chain = path;
+                Candidate c = new Candidate(path, (double)probs[path]);
                 if (topProb == 10) topProb = c.Prob;
                 if (c.Prob < topProb) break;
                 topCandidates.Add(c);
@@ -1313,6 +1306,12 @@ namespace GBI_Aligner
         {
             Chain = new ArrayList();
             Chain.Add(tw);
+            Prob = probability;
+        }
+
+        public Candidate(ArrayList chain, double probability)
+        {
+            Chain = chain;
             Prob = probability;
         }
     }
