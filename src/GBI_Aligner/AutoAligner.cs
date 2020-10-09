@@ -800,7 +800,7 @@ namespace GBI_Aligner
         {
             string strongs = string.Empty;
 
-            ArrayList terminals = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminals = Terminals.GetTerminalXmlNodes(treeNode);
             string lang = GetLanguage((XmlNode)terminals[0]);
             foreach (XmlNode terminal in terminals)
             {
@@ -879,7 +879,7 @@ namespace GBI_Aligner
         {
             string ids = string.Empty;
 
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
 
             foreach (XmlNode terminalNode in terminalNodes)
             {

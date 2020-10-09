@@ -226,7 +226,7 @@ namespace GBI_Aligner
         {
             Dictionary<string, WordInfo> morphTable = new Dictionary<string, WordInfo>();
 
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(tree);
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(tree);
 
             foreach(XmlNode terminalNode in terminalNodes)
             {
