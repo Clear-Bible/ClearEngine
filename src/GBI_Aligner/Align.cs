@@ -479,7 +479,8 @@ namespace GBI_Aligner
         {
             // I think that childCandidateList is a list of alternatives ...
 
-            Hashtable pathProbs = new Hashtable();
+            Dictionary<CandidateChain, double> pathProbs =
+                new Dictionary<CandidateChain, double>();
 
             ArrayList allPaths = CreatePaths(childCandidateList, maxPaths);
             // allPaths :: ArrayList(ArrayList(Candidate))
@@ -496,7 +497,7 @@ namespace GBI_Aligner
 
             ArrayList topCandidates = new ArrayList();
 
-            foreach (ArrayList path in paths)
+            foreach (CandidateChain path in paths)
             {
                 // path :: ArrayList(Candidate)
                 double jointProb = ComputeJointProb(path); // sum of candidate probabilities in a path
@@ -510,14 +511,11 @@ namespace GBI_Aligner
 
                     // ArrayList sortedCandidates2 = Sort.SortTableDoubleDesc(pathProbs);
 
-                    ArrayList sortedCandidates2 =
-                        new ArrayList(
+                    List<CandidateChain> sortedCandidates2 =
                             pathProbs
-                                .Cast<DictionaryEntry>()
                                 .OrderByDescending(kvp => (double)kvp.Value)
                                 .Select(kvp => kvp.Key)
-                                .ToList()
-                            );
+                                .ToList();
 
                     int topN2 = sortedCandidates2.Count / 10;
                     if (topN2 < n) topN2 = n;
@@ -529,11 +527,11 @@ namespace GBI_Aligner
 
             // pathProbs :: Hashtable(ArrayList(Candidate), jointProb)
 
-            Hashtable pathProbs2 = AdjustProbsByDistanceAndOrder(pathProbs);
+            Dictionary<CandidateChain, double> pathProbs2 = AdjustProbsByDistanceAndOrder(pathProbs);
 
             // pathProbs :: Hashtable(ArrayList(Candidate), revisedProb)
 
-            ArrayList sortedCandidates = Data.SortPaths(pathProbs2);
+            List<CandidateChain> sortedCandidates = Data.SortPaths(pathProbs2);
             // sortedCandidates :: ArrayList(Candidate)
 
             // (topN not actually used)
@@ -566,17 +564,19 @@ namespace GBI_Aligner
         // pathProbs :: Hashtable(ArrayList(Candidate), jointProb)
         // returns a datum of the same type
         //
-        static Hashtable AdjustProbsByDistanceAndOrder(Hashtable pathProbs)
+        static Dictionary<CandidateChain, double>
+            AdjustProbsByDistanceAndOrder(
+                Dictionary<CandidateChain, double> pathProbs)
         {
-            Hashtable pathProbs2 = new Hashtable();
+            Dictionary<CandidateChain, double> pathProbs2 =
+                new Dictionary<CandidateChain, double>();
 
             ArrayList candidates = new ArrayList(); // ::= ArrayList(Candidate)
 
-            IDictionaryEnumerator pathEnum = pathProbs.GetEnumerator();
-            while (pathEnum.MoveNext())
+            foreach (var pathEnum in pathProbs)
             {
                 Candidate candidate = new Candidate(
-                    (CandidateChain)pathEnum.Key,
+                    pathEnum.Key,
                     (double)pathEnum.Value);
                 candidates.Add(candidate);
             }
@@ -965,7 +965,7 @@ namespace GBI_Aligner
         }
 
 
-        static ArrayList GetTopPaths2(ArrayList paths, Hashtable probs)
+        static ArrayList GetTopPaths2(List<CandidateChain> paths, Dictionary<CandidateChain, double> probs)
         {
             ArrayList topCandidates = new ArrayList();
 
@@ -973,7 +973,7 @@ namespace GBI_Aligner
 
             for (int i = 0; i < paths.Count; i++)
             {
-                CandidateChain path = (CandidateChain)paths[i];
+                CandidateChain path = paths[i];
                 Candidate c = new Candidate(path, (double)probs[path]);
                 if (topProb == 10) topProb = c.Prob;
                 if (c.Prob < topProb) break;
