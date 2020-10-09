@@ -796,9 +796,7 @@ namespace GBI_Aligner
             return max;
         }
 
-        // headCandidates :: ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
-        // result is copy of initial segment of the list, of length depth
-        //
+ 
         static CandidateChain Get_Nth_Candidate(List<Candidate> headCandidates, int depth)
         {
             return new CandidateChain(
@@ -838,7 +836,7 @@ namespace GBI_Aligner
         {
             List<SourceWord> wordList = new List<SourceWord>();
 
-            Hashtable wordCount = new Hashtable();
+            Dictionary<string, int> wordCount = new Dictionary<string, int>();
 
             for (int i = 0; i < words.Length; i++)
             {
@@ -876,7 +874,7 @@ namespace GBI_Aligner
         {
             List<TargetWord> wordList = new List<TargetWord>();
 
-            Hashtable wordCount = new Hashtable();
+            Dictionary<string, int> wordCount = new Dictionary<string, int>();
 
             for (int i = 0; i < words.Length; i++)
             {
@@ -889,7 +887,7 @@ namespace GBI_Aligner
                 w.ID = word.Substring(word.LastIndexOf("_") + 1);
                 if (wordCount.ContainsKey(w.Text2))
                 {
-                    int count = (int)wordCount[w.Text2];
+                    int count = wordCount[w.Text2];
                     count++;
                     w.AltID = w.Text2 + "-" + count;
                     wordCount[w.Text2] = count;
@@ -953,7 +951,7 @@ namespace GBI_Aligner
             return sourceNodes;
         }
 
-        public static Candidate GetWinningCandidate(ArrayList conflictingCandidates)
+        public static Candidate GetWinningCandidate(List<Candidate> conflictingCandidates)
         {
             double topProb = GetTopProb(conflictingCandidates);
             int count = CountTopProb(conflictingCandidates, topProb);
@@ -966,7 +964,7 @@ namespace GBI_Aligner
             return null;
         }
 
-        static Candidate GetWinningCandidate(double topProb, ArrayList conflictingCandidates)
+        static Candidate GetWinningCandidate(double topProb, List<Candidate> conflictingCandidates)
         {
             Candidate winningCandidate = null;
 
@@ -982,7 +980,7 @@ namespace GBI_Aligner
             return winningCandidate;
         }
 
-        static double GetTopProb(ArrayList conflictingCandidates)
+        static double GetTopProb(List<Candidate> conflictingCandidates)
         {
             Candidate firstCandidate = (Candidate)conflictingCandidates[0];
             double topProb = firstCandidate.Prob;
@@ -998,7 +996,7 @@ namespace GBI_Aligner
             return topProb;
         }
 
-        static int CountTopProb(ArrayList conflictingCandidates, double topProb)
+        static int CountTopProb(List<Candidate> conflictingCandidates, double topProb)
         {
             int count = 0;
 
@@ -1015,14 +1013,6 @@ namespace GBI_Aligner
 
         public static TargetWord CreateFakeTargetWord()
         {
-            //TargetWord tWord = new TargetWord();
-            //tWord.Text = string.Empty;
-            //tWord.Position = -1;
-            //tWord.IsFake = true;
-            //tWord.ID = "0";
-
-            //return tWord;
-
             return new TargetWord()
             {
                 Text = string.Empty,

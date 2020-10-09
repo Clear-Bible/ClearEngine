@@ -116,7 +116,7 @@ namespace GBI_Aligner
                 {
                     string target = conflictEnum.Key;
                     List<string> positions = conflictEnum.Value;                    
-                    ArrayList conflictingCandidates = GetConflictingCandidates(target, positions, candidateTable);
+                    List<Candidate> conflictingCandidates = GetConflictingCandidates(target, positions, candidateTable);
                     Candidate winningCandidate = Align.GetWinningCandidate(conflictingCandidates);
                     if (winningCandidate != null)
                     {
@@ -158,9 +158,9 @@ namespace GBI_Aligner
             }
         }
 
-        static ArrayList GetConflictingCandidates(string target, List<string> positions, AlternativesForTerminals candidateTable)
+        static List<Candidate> GetConflictingCandidates(string target, List<string> positions, AlternativesForTerminals candidateTable)
         {
-            ArrayList conflictingCandidates = new ArrayList();
+            List<Candidate> conflictingCandidates = new List<Candidate>();
 
             foreach(string morphID in positions)
             {
