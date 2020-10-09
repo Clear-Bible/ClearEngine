@@ -20,7 +20,7 @@ namespace GBI_Aligner
             Dictionary<string, Dictionary<string, double>> model,
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                 // Hashtable(source => Hashtable(target => Stats{ count, probability})
-            Hashtable alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
             int n,  // number of target tokens
             string verseID, // from the syntax tree

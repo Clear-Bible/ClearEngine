@@ -22,7 +22,7 @@ namespace GBI_Aligner
             string target, // name of tokens.txt file, after alignment
             Dictionary<string, Dictionary<string, double>> model,  
             Dictionary<string, Dictionary<string, Stats>> manModel, 
-            Hashtable alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
@@ -103,7 +103,7 @@ namespace GBI_Aligner
             Dictionary<string, Dictionary<string, double>> model, // translation model, Hashtable(source => Hashtable(target => probability))
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                 // Hashtable(source => Hashtable(target => Stats{ count, probability})
-            Hashtable alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
@@ -296,7 +296,7 @@ namespace GBI_Aligner
             ArrayList tWords, // ArrayList(TargetWord)
             Dictionary<string, Dictionary<string, double>> model,
             Dictionary<string, Dictionary<string, Stats>> manModel,
-            Hashtable alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
             int n, // number of target tokens (not actually used)
             ArrayList puncs,

@@ -139,9 +139,9 @@ namespace AlignmentTool
         // Reading the file produces a data structure of the form
         //   Hashtable(pair => probability)
         //
-        public static Hashtable GetAlignmentModel(string alignFile)
+        public static Dictionary<string, double> GetAlignmentModel(string alignFile)
         {
-            Hashtable alignModel = new Hashtable();
+            Dictionary<string, double> alignModel = new Dictionary<string, double>();
 
             string[] lines = File.ReadAllLines(alignFile);
             foreach (string line in lines)
@@ -351,7 +351,7 @@ namespace AlignmentTool
         // If there are multiple possibilities for ...src... we take
         // the first one encountered.
         //
-        public static Hashtable BuildPreAlignmentTable(Hashtable alignModel)
+        public static Hashtable BuildPreAlignmentTable(Dictionary<string, double> alignModel)
         {
             Hashtable preAlignedTable = new Hashtable();
 
