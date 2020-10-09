@@ -125,7 +125,7 @@ namespace RegressionTest1
                 "1:10;H:5", 0.1,
                 transModelPath, alignModelPath);
 
-            Hashtable bookNames = BookTables.LoadBookNames3();
+            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
             string jsonOutput = output("alignment.json");
 

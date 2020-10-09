@@ -33,7 +33,7 @@ namespace GBI_Aligner
                                      // of the form: Hashtable(source => Hashtable(target => Stats{ count, probability})
                                      // source = strongs, target = lower-cased translated text
             string treeFolder, // the folder where syntatic trees are kept.
-            Hashtable bookNames, // for getting booknames that are used in the tree files
+            Dictionary<string, string> bookNames, // for getting booknames that are used in the tree files
             Dictionary<string, double> alignProbs, // alignment probabilities
                                                    // comes from Data.GetAlignmentModel(alignModel.txt)
                                                    //   Hashtable(pair => probability)
@@ -918,7 +918,7 @@ namespace GBI_Aligner
         {
             XmlNode tree = null;
             ArrayList treeNodes = new ArrayList();
-            Hashtable bookNames = BookTables.LoadBookNames3();
+            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
             string chapter = mWords[0].id.ToString().PadLeft(12, '0').Substring(0, 5);
             Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();
             VerseTrees.GetChapterTree2(chapter, treeFolder, trees, bookNames);

@@ -28,7 +28,7 @@ namespace GBI_Aligner
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
             string treeFolder,
-            Hashtable bookNames,
+            Dictionary<string, string> bookNames,
             string jsonOutput,
             int maxPaths,
 			ArrayList puncs,

@@ -41,7 +41,7 @@ namespace RegressionTest3
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);
 
-            Hashtable bookNames = BookTables.LoadBookNames3();
+            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
             Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
             Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
