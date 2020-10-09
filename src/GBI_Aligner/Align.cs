@@ -20,8 +20,7 @@ namespace GBI_Aligner
             string source,  // name of file with source IDs
             string sourceLemma,  // name of file with source lemma IDs
             string target, // name of tokens.txt file, after alignment
-//			string targetLower,
-            Hashtable model,  // translation model, Hashtable(source => Hashtable(target => probability))
+            Dictionary<string, Dictionary<string, double>> model,  // translation model, (source => (target => probability))
             Hashtable manModel, // manually checked alignments
                                 // Hashtable(source => Hashtable(target => Stats{ count, probability})
             Hashtable alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
@@ -102,7 +101,7 @@ namespace GBI_Aligner
             string sourceVerse2, // string, sourceIDs
             string targetVerse,  // tokens, lowercase
             string targetVerse2, // tokens, not lowercase
-            Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
+            Dictionary<string, Dictionary<string, double>> model, // translation model, Hashtable(source => Hashtable(target => probability))
             Hashtable manModel, // manually checked alignments
                                 // Hashtable(source => Hashtable(target => Stats{ count, probability})
             Hashtable alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
@@ -296,7 +295,7 @@ namespace GBI_Aligner
         public static AlternativeCandidates GetTopCandidates(
             SourceWord sWord,
             ArrayList tWords, // ArrayList(TargetWord)
-            Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
+            Dictionary<string, Dictionary<string, double>> model, 
             Hashtable manModel, // manually checked alignments
                                 // Hashtable(source => Hashtable(target => Stats{ count, probability})
             Hashtable alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
@@ -364,7 +363,7 @@ namespace GBI_Aligner
             }
             else if (model.ContainsKey(sWord.Lemma))
             {
-                Hashtable translations = (Hashtable)model[sWord.Lemma];
+                Dictionary<string, double> translations = model[sWord.Lemma];
                 // tWord.Text => double
 
                 for (int i = 0; i < tWords.Count; i++)

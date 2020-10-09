@@ -59,9 +59,10 @@ namespace AlignmentTool
         // Reading the data file produces a data structure of the form
         //   Hashtable(source => Hashtable(target => probability))
         //
-        public static Hashtable GetTranslationModel(string file)
+        public static Dictionary<string, Dictionary<string, double>> GetTranslationModel(string file)
         {
-            Hashtable transModel = new Hashtable();
+            Dictionary<string, Dictionary<string, double>> transModel =
+                new Dictionary<string, Dictionary<string, double>>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -76,12 +77,12 @@ namespace AlignmentTool
 
                     if (transModel.ContainsKey(source))
                     {
-                        Hashtable translations = (Hashtable)transModel[source];
+                        Dictionary<string, double> translations = transModel[source];
                         translations.Add(target, prob);
                     }
                     else
                     {
-                        Hashtable translations = new Hashtable();
+                        Dictionary<string, double> translations = new Dictionary<string, double>();
                         translations.Add(target, prob);
                         transModel.Add(source, translations);
                     }

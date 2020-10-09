@@ -129,7 +129,8 @@ namespace RegressionTest1
 
             string jsonOutput = output("alignment.json");
 
-            Hashtable transModel = Data.GetTranslationModel(transModelPath);
+            Dictionary<string, Dictionary<string, double>> transModel =
+                Data.GetTranslationModel(transModelPath);
             Hashtable manTransModel = Data.GetTranslationModel2(common("manTransModel.txt"));
             Hashtable alignProbs = Data.GetAlignmentModel(alignModelPath);
             Hashtable preAlignment = Data.BuildPreAlignmentTable(alignProbs);

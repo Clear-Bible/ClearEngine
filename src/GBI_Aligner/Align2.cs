@@ -23,7 +23,7 @@ namespace GBI_Aligner
             ArrayList terminals, // :: ArrayList(XmlNode)
             string[] sourceWords, // lemmas
             string[] targetWords,  // lowercased tokens        
-            Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
+            Dictionary<string, Dictionary<string, double>> model, 
             Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             ArrayList puncs,
@@ -107,7 +107,7 @@ namespace GBI_Aligner
             string[] targetWords, // each in the form of "text_id"
             Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
             List<string> linkedTargets, // target word IDs from non-fake words
-            Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
+            Dictionary<string, Dictionary<string, double>> model, // translation model, Hashtable(source => Hashtable(target => probability))
             Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             ArrayList puncs,
@@ -539,7 +539,7 @@ namespace GBI_Aligner
         static LinkedWord GetTopCandidate(
             SourceNode sWord, 
             ArrayList tWords, 
-            Hashtable model, 
+            Dictionary<string, Dictionary<string, double>> model, 
             List<string> linkedTargets, 
             ArrayList puncs, 
             ArrayList stopWords, 
@@ -572,7 +572,7 @@ namespace GBI_Aligner
 
                 if (model.ContainsKey(sWord.Lemma))
                 {
-                    Hashtable translations = (Hashtable)model[sWord.Lemma];
+                    Dictionary<string, double> translations = model[sWord.Lemma];
                     if (translations.ContainsKey(tWord.Text))
                     {
                         double prob = (double)translations[tWord.Text];
