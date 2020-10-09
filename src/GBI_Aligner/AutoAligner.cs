@@ -28,7 +28,7 @@ namespace GBI_Aligner
             string target, // name of tokens.txt file, after alignment
             string jsonOutput, // output of aligner, alignment.json file
             Dictionary<string, Dictionary<string, double>> transModel, // source => target => probability
-            Hashtable manTransModel, // translation model from manually checked alignments
+            Dictionary<string, Dictionary<string, Stats>> manTransModel, // translation model from manually checked alignments
                                      // comes from Data.GetTranslationModel2(manTransModelFile)
                                      // of the form: Hashtable(source => Hashtable(target => Stats{ count, probability})
                                      // source = strongs, target = lower-cased translated text

@@ -131,7 +131,8 @@ namespace RegressionTest1
 
             Dictionary<string, Dictionary<string, double>> transModel =
                 Data.GetTranslationModel(transModelPath);
-            Hashtable manTransModel = Data.GetTranslationModel2(common("manTransModel.txt"));
+            Dictionary<string, Dictionary<string, Stats>> manTransModel =
+                Data.GetTranslationModel2(common("manTransModel.txt"));
             Hashtable alignProbs = Data.GetAlignmentModel(alignModelPath);
             Hashtable preAlignment = Data.BuildPreAlignmentTable(alignProbs);
             bool useAlignModel = true;
