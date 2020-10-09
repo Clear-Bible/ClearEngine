@@ -18,7 +18,7 @@ namespace GBI_Aligner
     {
         // returns ArrayList(MappedWords)
         //
-        public static ArrayList AlignTheRest(
+        public static List<MappedWords> AlignTheRest(
             Candidate topCandidate,
             List<XmlNode> terminals, 
             string[] sourceWords, // lemmas
@@ -98,7 +98,7 @@ namespace GBI_Aligner
                 ResolveConflicts(conflicts, links, 2);
             }
 
-            return new ArrayList(links);
+            return links;
         }
 
 
@@ -601,16 +601,18 @@ namespace GBI_Aligner
             return null;
         }
 
-        public static void FixCrossingLinks(ref ArrayList links)
+        public static void FixCrossingLinks(ref List<MappedGroup> links)
         {
-            Hashtable uniqueLemmaLinks = GetUniqueLemmaLinks(links);
-            ArrayList crossingLinks = IdentifyCrossingLinks(uniqueLemmaLinks);
-            SwapTargets(crossingLinks, ref links);
+            Dictionary<string, List<MappedGroup>> uniqueLemmaLinks =
+                GetUniqueLemmaLinks(links);
+            List<CrossingLinks> crossingLinks = IdentifyCrossingLinks(uniqueLemmaLinks);
+            SwapTargets(crossingLinks, links);
         }
 
-        static Hashtable GetUniqueLemmaLinks(ArrayList links)
+        static Dictionary<string, List<MappedGroup>> GetUniqueLemmaLinks(List<MappedGroup> links)
         {
-            Hashtable uniqueLemmaLinks = new Hashtable();
+            Dictionary<string, List<MappedGroup>> uniqueLemmaLinks =
+                new Dictionary<string, List<MappedGroup>>();
 
             foreach(MappedGroup link in links)
             {
@@ -620,12 +622,12 @@ namespace GBI_Aligner
                     string lemma = sNode.Lemma;
                     if (uniqueLemmaLinks.ContainsKey(lemma))
                     {
-                        ArrayList linkedNodes = (ArrayList)uniqueLemmaLinks[lemma];
+                        List<MappedGroup> linkedNodes = uniqueLemmaLinks[lemma];
                         linkedNodes.Add(link);
                     }
                     else
                     {
-                        ArrayList linkedNodes = new ArrayList();
+                        List<MappedGroup> linkedNodes = new List<MappedGroup>();
                         linkedNodes.Add(link);
                         uniqueLemmaLinks.Add(lemma, linkedNodes);
                     }
@@ -635,21 +637,19 @@ namespace GBI_Aligner
             return uniqueLemmaLinks;
         }
 
-        static ArrayList IdentifyCrossingLinks(Hashtable uniqueLemmaLinks)
+        static List<CrossingLinks> IdentifyCrossingLinks(Dictionary<string, List<MappedGroup>> uniqueLemmaLinks)
         {
-            ArrayList crossingLinks = new ArrayList();
+            List<CrossingLinks> crossingLinks = new List<CrossingLinks>();
 
-            IDictionaryEnumerator lemmaEnum = uniqueLemmaLinks.GetEnumerator();
-
-            while (lemmaEnum.MoveNext())
+            foreach (var lemmaEnum in uniqueLemmaLinks)
             {
                 string lemma = (string)lemmaEnum.Key;
-                ArrayList links = (ArrayList)lemmaEnum.Value;
+                List<MappedGroup> links = lemmaEnum.Value;
                 if (links.Count == 2 && Crossing(links))
                 {
                     CrossingLinks cl = new CrossingLinks();
-                    cl.Link1 = (MappedGroup)links[0];
-                    cl.Link2 = (MappedGroup)links[1];
+                    cl.Link1 = links[0];
+                    cl.Link2 = links[1];
                     crossingLinks.Add(cl);
                 }
             }
@@ -657,10 +657,10 @@ namespace GBI_Aligner
             return crossingLinks;
         }
 
-        static bool Crossing(ArrayList links)
+        static bool Crossing(List<MappedGroup> links)
         {
-            MappedGroup link1 = (MappedGroup)links[0];
-            MappedGroup link2 = (MappedGroup)links[1];
+            MappedGroup link1 = links[0];
+            MappedGroup link2 = links[1];
             SourceNode sWord1 = (SourceNode)link1.SourceNodes[0];
             LinkedWord tWord1 = (LinkedWord)link1.TargetNodes[0];
             SourceNode sWord2 = (SourceNode)link2.SourceNodes[0];
@@ -676,19 +676,19 @@ namespace GBI_Aligner
             return false;
         }
 
-        static void SwapTargets(ArrayList crossingLinks, ref ArrayList links)
+        static void SwapTargets(List<CrossingLinks> crossingLinks, List<MappedGroup> links)
         {
             for (int i = 0; i < crossingLinks.Count; i++)
             {
-                CrossingLinks cl = (CrossingLinks)crossingLinks[i];
+                CrossingLinks cl = crossingLinks[i];
                 SourceNode sNode1 = (SourceNode)cl.Link1.SourceNodes[0];
                 SourceNode sNode2 = (SourceNode)cl.Link2.SourceNodes[0];
-                ArrayList TargetNodes0 = (ArrayList)cl.Link1.TargetNodes;
+                ArrayList TargetNodes0 = cl.Link1.TargetNodes;
                 cl.Link1.TargetNodes = cl.Link2.TargetNodes;
                 cl.Link2.TargetNodes = TargetNodes0;
                 for(int j = 0; j < links.Count; j++)
                 {
-                    MappedGroup mp = (MappedGroup)links[j];
+                    MappedGroup mp = links[j];
                     SourceNode sNode = (SourceNode)mp.SourceNodes[0];
                     if (sNode.MorphID == sNode1.MorphID) mp.TargetNodes = cl.Link1.TargetNodes;
                     if (sNode.MorphID == sNode2.MorphID) mp.TargetNodes = cl.Link2.TargetNodes;
