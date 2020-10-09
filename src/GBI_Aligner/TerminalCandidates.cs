@@ -24,7 +24,7 @@ namespace GBI_Aligner
             bool useAlignModel,
             int n,  // number of target tokens
             string verseID, // from the syntax tree
-            ArrayList puncs, 
+            List<string> puncs, 
             ArrayList stopWords, 
             Hashtable goodLinks,  // Hashtable(link => count)
             int goodLinkMinCount,
@@ -32,7 +32,7 @@ namespace GBI_Aligner
             int badLinkMinCount,
             Hashtable existingLinks, // Hashtable(mWord.altId => tWord.altId)
             Dictionary<string, string> idMap, 
-            ArrayList sourceFuncWords,
+            List<string> sourceFuncWords,
             bool contentWordsOnly,  // not actually used
             Hashtable strongs
             )

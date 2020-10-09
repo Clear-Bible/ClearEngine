@@ -74,7 +74,7 @@ namespace RegressionTest1
             string versePath = input("Verse.txt");
             string tokPath = output("target.punc.txt");
             string lang = "English";
-            ArrayList puncs = Data.GetWordList(common("puncs.txt"));
+            List<string> puncs = Data.GetWordList(common("puncs.txt"));
 
             Console.WriteLine("Tokenizing");
             Tokens.Tokenize(versePath, tokPath, puncs, lang);
@@ -103,8 +103,8 @@ namespace RegressionTest1
                 parallelTargetPath, parallelTargetIdPath,
                 versificationList);
 
-            ArrayList sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
-            ArrayList targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
+            List<string> sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
+            List<string> targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
 
             string parallelCwSourcePath = output("sourceFile.cw.txt");
             string parallelCwSourceIdPath = output("sourceFile.id.cw.txt");

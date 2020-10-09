@@ -49,7 +49,7 @@ namespace RegressionTest3
             bool useAlignModel = true;
             int maxPaths = 1000000;
 
-            ArrayList puncs = Data.GetWordList(InPath("puncs.txt"));
+            List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
             Hashtable groups = Data.LoadGroups(InPath("groups.txt"));           
             ArrayList stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
@@ -62,8 +62,8 @@ namespace RegressionTest3
 
             Hashtable oldLinks = Data.GetOldLinks(InPath("oldAlignment.json"), ref groups);
 
-            ArrayList sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
-            ArrayList targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));
+            List<string> sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
+            List<string> targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));
 
             bool contentWordsOnly = true;
 

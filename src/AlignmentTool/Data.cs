@@ -41,9 +41,9 @@ namespace AlignmentTool
             return glossTable;
         }
 
-        public static ArrayList GetWordList(string file)
+        public static List<string> GetWordList(string file)
         {
-            ArrayList wordList = new ArrayList();
+            List<string> wordList = new List<string>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -602,7 +602,7 @@ namespace AlignmentTool
             return oldLinks;  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
         }
 
-        public static void FilterOutFunctionWords(string file, string cwFile, ArrayList funcWords)
+        public static void FilterOutFunctionWords(string file, string cwFile, List<string> funcWords)
         {
             StreamWriter sw = new StreamWriter(cwFile, false, Encoding.UTF8);
 
