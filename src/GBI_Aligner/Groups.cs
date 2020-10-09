@@ -14,15 +14,15 @@ namespace GBI_Aligner
     {
         public static void AlignGroups(
             ref ArrayList links, // ArrayList(MappedGroup)
-            ArrayList sourceWords, // ArrayList(SourceWord)
-            ArrayList targetWords, // ArrayList(TargetWord)
+            List<SourceWord> sourceWords, // ArrayList(SourceWord)
+            List<TargetWord> targetWords, // ArrayList(TargetWord)
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
             ArrayList terminals // ArrayList(XmlNode)
             )
         {
-            SourceWord[] sWords = BuildSourceArray(sourceWords);
-            TargetWord[] tWords = BuildTargetArray(targetWords);
+            SourceWord[] sWords = BuildSourceArray(new ArrayList(sourceWords));
+            TargetWord[] tWords = BuildTargetArray(new ArrayList(targetWords));
             ArrayList mappedGroups = GetGroupLinks(sWords, tWords, groups);
             // mappedGroups :: ArrayList(string[][])
             if (mappedGroups.Count > 0)
@@ -30,7 +30,7 @@ namespace GBI_Aligner
                 RemoveOldLinks(mappedGroups, ref links);
                 foreach (string[][] group in mappedGroups)
                 {
-                    AddGroup(group, ref links, terminals, targetWords);
+                    AddGroup(group, ref links, terminals, new ArrayList(targetWords));
                 }
             }
         }

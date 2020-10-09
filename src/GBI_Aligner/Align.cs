@@ -145,29 +145,15 @@ namespace GBI_Aligner
             Dictionary<string, WordInfo> wordInfoTable =
                 Data.BuildWordInfoTable(treeNode);
            
-            ArrayList sWords = GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
-            // ArrayList(SourceWord)
-            // sourceWords2 not actually used
-
-            // TIM Study
-            // TimUtil.PrintArrayList("sWords", sWords);
+            List<SourceWord> sWords = GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
            
-            ArrayList tWords = GetTargetWords(targetWords, targetWords2);
-            // ArrayList(TargetWord)
-            // targetWords not actually used
+            List<TargetWord> tWords = GetTargetWords(targetWords, targetWords2);
 
-            // TIM Study
-            // TimUtil.PrintArrayList("tWords", tWords);
-
-            Hashtable idMap = OldLinks.CreateIdMap(sWords);  // HashTable(SourceWord.ID => SourceWord.AltID)
+            Dictionary<string, string> idMap = OldLinks.CreateIdMap(sWords);  // HashTable(SourceWord.ID => SourceWord.AltID)
 
             string verseNodeID = Utils.GetAttribValue(treeNode, "nodeId");
             verseNodeID = verseNodeID.Substring(0, verseNodeID.Length - 1);
             string verseID = verseNodeID.Substring(0, 8);
-            if (verseID == "41002004")
-            {
-                ;
-            }
 
             Hashtable existingLinks = new Hashtable();
             if (oldLinks.ContainsKey(verseID))  // verseID as obtained from tree
@@ -185,7 +171,8 @@ namespace GBI_Aligner
                 existingLinks, idMap, sourceFuncWords, contentWordsOnly,
                 strongs);
             
-            Hashtable alignments = new Hashtable();
+            Dictionary<string, List<Candidate>> alignments =
+                new Dictionary<string, List<Candidate>>();
             AlignNodes(
                 treeNode, tWords, alignments, n, sourceWords.Length,
                 maxPaths, terminalCandidates);
@@ -194,7 +181,7 @@ namespace GBI_Aligner
             //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
             //   or Candidate)
 
-            ArrayList verseAlignment = (ArrayList) alignments[verseNodeID];
+            ArrayList verseAlignment = new ArrayList(alignments[verseNodeID]);
             Candidate topCandidate = (Candidate)verseAlignment[0];
 
             // TIM Study
@@ -220,12 +207,8 @@ namespace GBI_Aligner
 
         static void AlignNodes(
             XmlNode treeNode,
-            ArrayList tWords, // ArrayList(TargetWord)
-
-            Hashtable alignments, // Hashtable(nodeId =>
-                                      //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
-                                      //   or Candidate)
-
+            List<TargetWord> tWords,
+            Dictionary<string, List<Candidate>> alignments,
             int n, // number of target tokens
             int sLength, // number of source words
             int maxPaths,
@@ -278,20 +261,20 @@ namespace GBI_Aligner
                     }
                 }
 
-                ArrayList makeNonEmpty(ArrayList list) =>
+                List<Candidate> makeNonEmpty(List<Candidate> list) =>
                     list.Count == 0
                     ? CreateEmptyCandidate()
                     : list;
 
-                ArrayList candidatesForNode(XmlNode node) =>
-                    makeNonEmpty((ArrayList)alignments[getNodeId(node)]);
+                List<Candidate> candidatesForNode(XmlNode node) =>
+                    makeNonEmpty(alignments[getNodeId(node)]);
 
-                ArrayList candidates = new ArrayList(
+                List<List<Candidate>> candidates = 
                     treeNode
                     .ChildNodes
                     .Cast<XmlNode>()
                     .Select(childNode => candidatesForNode(childNode))
-                    .ToList());
+                    .ToList();
 
                 ArrayList sNodes = GetSourceNodes(treeNode);
 
@@ -472,7 +455,7 @@ namespace GBI_Aligner
         // childCandidateList = ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
         // returns ArrayList(Candidate)
         //
-        static ArrayList ComputeTopCandidates(ArrayList childCandidateList, int n, int maxPaths, ArrayList sNodes, XmlNode treeNode)
+        static List<Candidate> ComputeTopCandidates(List<List<Candidate>> childCandidateList, int n, int maxPaths, ArrayList sNodes, XmlNode treeNode)
         {
             // I think that childCandidateList is a list of alternatives ...
 
@@ -492,7 +475,7 @@ namespace GBI_Aligner
                 paths.Add(topPath);
             }
 
-            ArrayList topCandidates = new ArrayList();
+            List<Candidate> topCandidates = new List<Candidate>();
 
             foreach (CandidateChain path in paths)
             {
@@ -816,7 +799,7 @@ namespace GBI_Aligner
         // returns a list of paths, which also has the type
         // ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
         //
-        static List<CandidateChain> CreatePaths(ArrayList childCandidatesList, int maxPaths)
+        static List<CandidateChain> CreatePaths(List<List<Candidate>> childCandidatesList, int maxPaths)
         {
  //           int arcsLimit = 2000000;
             int maxArcs = GetMaxArcs(childCandidatesList); // product of all sub-list lengths
@@ -846,7 +829,7 @@ namespace GBI_Aligner
         // returns a list of paths, which also has the type
         // ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
         //
-        static List<CandidateChain> Create_Depth_N_paths(ArrayList childCandidatesList, int depth)
+        static List<CandidateChain> Create_Depth_N_paths(List<List<Candidate>> childCandidatesList, int depth)
         {
             List<CandidateChain> paths = new List<CandidateChain>();
 
@@ -858,7 +841,7 @@ namespace GBI_Aligner
                 //{
                 //    return paths;
                 //}
-                ArrayList headCandidates = (ArrayList)childCandidatesList[0];
+                List<Candidate> headCandidates = childCandidatesList[0];
                 // ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
 
                 int headDepth = headCandidates.Count - 1;
@@ -872,7 +855,7 @@ namespace GBI_Aligner
                 ArrayList nHeadCandidates = Get_Nth_Candidate(headCandidates, headDepth);
                 // nHeadCandidates = first headDepth members of headCandidates
 
-                ArrayList tailCandidatesList = (ArrayList)childCandidatesList.Clone();
+                List<List<Candidate>> tailCandidatesList = childCandidatesList.ToList();
                 tailCandidatesList.Remove(headCandidates);
                 // tailCandidatesList = the remaining members of childCandidatesList
 
@@ -904,7 +887,7 @@ namespace GBI_Aligner
                 //{
                 //    return paths;
                 //}
-                ArrayList candidates = (ArrayList)childCandidatesList[0];
+                List<Candidate> candidates = childCandidatesList[0];
                 for (int i = 0; i < candidates.Count && i <= depth; i++)
                 {
                     Candidate candidate = (Candidate)candidates[i];
@@ -920,11 +903,11 @@ namespace GBI_Aligner
             return paths;
         }
 
-        static int GetMaxDepth(ArrayList childCandidatesList)
+        static int GetMaxDepth(List<List<Candidate>> childCandidatesList)
         {
             int max = 0;
 
-            foreach(ArrayList candidates in childCandidatesList)
+            foreach(List<Candidate> candidates in childCandidatesList)
             {
                 if (candidates.Count > max) max = candidates.Count;
             }
@@ -932,11 +915,11 @@ namespace GBI_Aligner
             return max;
         }
 
-        static int GetMaxArcs(ArrayList childCandidatesList)
+        static int GetMaxArcs(List<List<Candidate>> childCandidatesList)
         {
             int max = 1;
 
-            foreach (ArrayList candidates in childCandidatesList)
+            foreach (List<Candidate> candidates in childCandidatesList)
             {
                 max *= candidates.Count;
             }
@@ -947,7 +930,7 @@ namespace GBI_Aligner
         // headCandidates :: ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
         // result is copy of initial segment of the list, of length depth
         //
-        static CandidateChain Get_Nth_Candidate(ArrayList headCandidates, int depth)
+        static CandidateChain Get_Nth_Candidate(List<Candidate> headCandidates, int depth)
         {
             return new CandidateChain(
                 headCandidates.Cast<Candidate>().Take(depth + 1));
@@ -961,9 +944,9 @@ namespace GBI_Aligner
         }
 
 
-        static ArrayList GetTopPaths2(List<CandidateChain> paths, Dictionary<CandidateChain, double> probs)
+        static List<Candidate> GetTopPaths2(List<CandidateChain> paths, Dictionary<CandidateChain, double> probs)
         {
-            ArrayList topCandidates = new ArrayList();
+            List<Candidate> topCandidates = new List<Candidate>();
 
             double topProb = 10;
 
@@ -979,12 +962,12 @@ namespace GBI_Aligner
             return topCandidates;
         }
 
-        static ArrayList GetSourceWords(
+        static List<SourceWord> GetSourceWords(
             string[] words,
             string[] words2,
             Dictionary<string, WordInfo> wordInfoTable)
         {
-            ArrayList wordList = new ArrayList();
+            List<SourceWord> wordList = new List<SourceWord>();
 
             Hashtable wordCount = new Hashtable();
 
@@ -1020,9 +1003,9 @@ namespace GBI_Aligner
             return wordList;
         }
 
-        static ArrayList GetTargetWords(string[] words, string[] words2)
+        static List<TargetWord> GetTargetWords(string[] words, string[] words2)
         {
-            ArrayList wordList = new ArrayList();
+            List<TargetWord> wordList = new List<TargetWord>();
 
             Hashtable wordCount = new Hashtable();
 
@@ -1060,9 +1043,9 @@ namespace GBI_Aligner
             return word.Substring(word.LastIndexOf("_") + 1, 8);
         }
 
-        public static ArrayList CreateEmptyCandidate()
+        public static List<Candidate> CreateEmptyCandidate()
         {
-            ArrayList candidates = new ArrayList();
+            List<Candidate> candidates = new List<Candidate>();
             Candidate c = new Candidate();
             c.Prob = 0.0;
             candidates.Add(c);
@@ -1340,7 +1323,7 @@ namespace GBI_Aligner
     /// objects that are alternatives to one another.
     /// </summary>
     /// 
-    public class AlternativeCandidates : ArrayList
+    public class AlternativeCandidates : List<Candidate>
     {
         public AlternativeCandidates()
             : base()
@@ -1348,7 +1331,7 @@ namespace GBI_Aligner
         }
 
         public AlternativeCandidates(IEnumerable<Candidate> candidates)
-            : base(candidates.ToList())
+            : base(candidates)
         { 
         }
     }
@@ -1359,7 +1342,7 @@ namespace GBI_Aligner
     /// SourceWord.ID => AlternativeCandidates.
     /// </summary>
     /// 
-    public class AlternativesForTerminals : Hashtable
+    public class AlternativesForTerminals : Dictionary<string, List<Candidate>>
     {
         public AlternativesForTerminals()
             : base()
