@@ -37,7 +37,7 @@ namespace GBI_Aligner
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
                 // ArrayList(XmlNode)
 
             foreach(XmlNode terminalNode in terminalNodes)

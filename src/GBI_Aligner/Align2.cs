@@ -20,7 +20,7 @@ namespace GBI_Aligner
         //
         public static ArrayList AlignTheRest(
             Candidate topCandidate,
-            ArrayList terminals, // :: ArrayList(XmlNode)
+            List<XmlNode> terminals, 
             string[] sourceWords, // lemmas
             string[] targetWords,  // lowercased tokens        
             Dictionary<string, Dictionary<string, double>> model, 
@@ -314,7 +314,7 @@ namespace GBI_Aligner
                 {
                     if (childNode != treeNode)
                     {
-                        ArrayList terminals = Terminals.GetTerminalXmlNodes(childNode);
+                        List<XmlNode> terminals = Terminals.GetTerminalXmlNodes(childNode);
                         foreach(XmlNode terminal in terminals)
                         {
                             string morphID = Utils.GetAttribValue(terminal, "morphId");

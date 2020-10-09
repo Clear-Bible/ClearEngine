@@ -17,7 +17,7 @@ namespace GBI_Aligner
             List<SourceWord> sourceWords, // ArrayList(SourceWord)
             List<TargetWord> targetWords, // ArrayList(TargetWord)
             Dictionary<string, List<TargetGroup>> groups,
-            ArrayList terminals // ArrayList(XmlNode)
+            List<XmlNode> terminals 
             )
         {
             SourceWord[] sWords = BuildSourceArray(new ArrayList(sourceWords));
@@ -262,7 +262,7 @@ namespace GBI_Aligner
             return inGroup;
         }
 
-        static void AddGroup(string[][]group, ref ArrayList links, ArrayList terminals, ArrayList targets)
+        static void AddGroup(string[][]group, ref ArrayList links, List<XmlNode> terminals, ArrayList targets)
         {
             string[] sourceWords = group[0];
             string[] targetWords = group[1];
@@ -272,7 +272,7 @@ namespace GBI_Aligner
             links.Add(mg);
         }
 
-        static void AddSourceNodes(string[] sourceWords, ref ArrayList sourceNodes, ArrayList terminals)
+        static void AddSourceNodes(string[] sourceWords, ref ArrayList sourceNodes, List<XmlNode> terminals)
         {
             for (int i = 0; i < sourceWords.Length; i++)
             {
@@ -281,7 +281,7 @@ namespace GBI_Aligner
             }
         }
 
-        static SourceNode GetSourceNode(string id, ArrayList terminals)
+        static SourceNode GetSourceNode(string id, List<XmlNode> terminals)
         {
             SourceNode sNode = new SourceNode();
             XmlNode treeNode = LocateTreeNode(id, terminals);
@@ -296,7 +296,7 @@ namespace GBI_Aligner
             return sNode;
         }
 
-        static XmlNode LocateTreeNode(string id, ArrayList terminals)
+        static XmlNode LocateTreeNode(string id, List<XmlNode> terminals)
         {
             XmlNode treeNode = null;
 

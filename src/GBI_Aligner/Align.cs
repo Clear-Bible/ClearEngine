@@ -169,7 +169,7 @@ namespace GBI_Aligner
             List<Candidate> verseAlignment = alignments[verseNodeID];
             Candidate topCandidate = verseAlignment[0];
 
-            ArrayList terminals = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminals = Terminals.GetTerminalXmlNodes(treeNode);
             ArrayList links = Align2.AlignTheRest(topCandidate, terminals, sourceWords, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
             // links :: ArrayList(MappedWords)
 
@@ -1047,7 +1047,7 @@ namespace GBI_Aligner
         {
             ArrayList sourceNodes = new ArrayList();
 
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
             foreach(XmlNode terminalNode in terminalNodes)
             {
                 string cat = Utils.GetAttribValue(terminalNode, "Cat");
