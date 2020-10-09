@@ -43,7 +43,7 @@ namespace RegressionTest3
 
             Hashtable bookNames = BookTables.LoadBookNames3();
 
-            Hashtable alignProbs = Data.GetAlignmentModel(alignModelPath);
+            Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
             Hashtable preAlignment = Data.BuildPreAlignmentTable(alignProbs);
 
             bool useAlignModel = true;

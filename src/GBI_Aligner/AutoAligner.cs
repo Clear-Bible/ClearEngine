@@ -34,7 +34,7 @@ namespace GBI_Aligner
                                      // source = strongs, target = lower-cased translated text
             string treeFolder, // the folder where syntatic trees are kept.
             Hashtable bookNames, // for getting booknames that are used in the tree files
-            Hashtable alignProbs, // alignment probabilities
+            Dictionary<string, double> alignProbs, // alignment probabilities
                                   // comes from Data.GetAlignmentModel(alignModel.txt)
                                   //   Hashtable(pair => probability)
                                   //   the pair is a string of the form: bbcccvvvwwwn-bbcccvvvwww 
