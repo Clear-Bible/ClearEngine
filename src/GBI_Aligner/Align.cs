@@ -31,7 +31,7 @@ namespace GBI_Aligner
             Dictionary<string, string> bookNames,
             string jsonOutput,
             int maxPaths,
-			ArrayList puncs,
+			List<string> puncs,
             ArrayList stopWords,
             Hashtable goodLinks, // Hashtable(link => count)
             int goodLinkMinCount,
@@ -39,8 +39,8 @@ namespace GBI_Aligner
             int badLinkMinCount,
             Hashtable glossTable,
             Hashtable oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
-            ArrayList sourceFuncWords, 
-            ArrayList targetFuncWords,
+            List<string> sourceFuncWords, 
+            List<string> targetFuncWords,
             bool contentWordsOnly,
             Hashtable strongs
             )
@@ -112,7 +112,7 @@ namespace GBI_Aligner
             ref Alignment2 align,  // Output goes here.
             int i,
             int maxPaths,
-			ArrayList puncs,
+			List<string> puncs,
             ArrayList stopWords,
             Hashtable goodLinks,
             int goodLinkMinCount,
@@ -120,8 +120,8 @@ namespace GBI_Aligner
             int badLinkMinCount,
             Hashtable glossTable,
             Hashtable oldLinks,  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
-            ArrayList sourceFuncWords,
-            ArrayList targetFuncWords,
+            List<string> sourceFuncWords,
+            List<string> targetFuncWords,
             bool contentWordsOnly,
             Hashtable strongs
             )
@@ -299,7 +299,7 @@ namespace GBI_Aligner
             Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
             int n, // number of target tokens (not actually used)
-            ArrayList puncs,
+            List<string> puncs,
             ArrayList stopWords,
             Hashtable goodLinks, // (not actually used)
             int goodLinkMinCount, // (not actually used)
@@ -307,7 +307,7 @@ namespace GBI_Aligner
             int badLinkMinCount,
             Hashtable existingLinks, // Hashtable(mWord.altId => tWord.altId)
                                      // it gets used here
-            ArrayList sourceFuncWords,
+            List<string> sourceFuncWords,
             bool contentWordsOnly, // (not actually used)
             Hashtable strongs
             )
@@ -421,7 +421,7 @@ namespace GBI_Aligner
 
         public static bool IsContentWord(
             string lemma,
-            ArrayList sourceFuncWords)
+            List<string> sourceFuncWords)
             => !sourceFuncWords.Contains(lemma);
  
 

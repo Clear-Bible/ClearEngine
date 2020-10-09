@@ -26,14 +26,14 @@ namespace GBI_Aligner
             Dictionary<string, Dictionary<string, double>> model, 
             Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            ArrayList puncs,
+            List<string> puncs,
             ArrayList stopWords,
             Hashtable goodLinks,
             int goodLinkMinCount,
             Hashtable badLinks,
             int badLinkMinCount,
-            ArrayList sourceFuncWords, 
-            ArrayList targetFuncWords,
+            List<string> sourceFuncWords, 
+            List<string> targetFuncWords,
             bool contentWordsOnly
             )
         {
@@ -110,14 +110,14 @@ namespace GBI_Aligner
             Dictionary<string, Dictionary<string, double>> model, // translation model, Hashtable(source => Hashtable(target => probability))
             Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            ArrayList puncs,
+            List<string> puncs,
             ArrayList stopWords,
             Hashtable goodLinks,
             int goodLinkMinCount,
             Hashtable badLinks,
             int badLinkMinCount, 
-            ArrayList sourceFuncWords,
-            ArrayList targetFuncWords,
+            List<string> sourceFuncWords,
+            List<string> targetFuncWords,
             bool contentWordsOnly
             )
         {
@@ -231,7 +231,7 @@ namespace GBI_Aligner
             return position;
         }
 
-        static ArrayList GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, ArrayList puncs, ArrayList targetFuncWords, bool contentWordsOnly)
+        static ArrayList GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
         {
             ArrayList candidates = new ArrayList();
 
@@ -269,7 +269,7 @@ namespace GBI_Aligner
             return candidates;
         }
 
-        static ArrayList GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, ArrayList puncBounds, ArrayList targetFuncWords, bool contentWordsOnly)
+        static ArrayList GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncBounds, List<string> targetFuncWords, bool contentWordsOnly)
         {
             ArrayList candidates = new ArrayList();
 
@@ -541,7 +541,7 @@ namespace GBI_Aligner
             ArrayList tWords, 
             Dictionary<string, Dictionary<string, double>> model, 
             List<string> linkedTargets, 
-            ArrayList puncs, 
+            List<string> puncs, 
             ArrayList stopWords, 
             Hashtable goodLinks,
             int goodLinkMinCount,

@@ -16,7 +16,7 @@ namespace Tokenizer
             string rawFile, // the original verse text file in verse-per-line format
             string tokFile, // the tokenized file in original case
 //            string tokLowerFile, // the tokenized file all in lower case
-            ArrayList puncs, // list of punctuation marks
+            List<string> puncs, // list of punctuation marks
             string lang // language of the verse text
             )
         {
@@ -48,7 +48,7 @@ namespace Tokenizer
  //           sw2.Close();
         }
 
-        static void SegPuncs(ref string puncText, ref string puncLowerText, string verseText, ArrayList puncs, string lang)
+        static void SegPuncs(ref string puncText, ref string puncLowerText, string verseText, List<string> puncs, string lang)
         {
             verseText = verseText.Replace("—", " — ");
             verseText = verseText.Replace("-", " - ");
@@ -80,7 +80,7 @@ namespace Tokenizer
             }
         }
 
-        static void SepPuncs(ref string puncText, ref string puncLowerText, string word, ArrayList puncs, string lang)
+        static void SepPuncs(ref string puncText, ref string puncLowerText, string word, List<string> puncs, string lang)
         {
             ArrayList postPuncs = new ArrayList();
 
@@ -156,7 +156,7 @@ namespace Tokenizer
             puncLowerText = puncLowerText.Trim();
         }
 
-        static bool StartsWithPunc(string word, ArrayList puncs)
+        static bool StartsWithPunc(string word, List<string> puncs)
         {
             string firstChar = word.Substring(0, 1);
             if (puncs.Contains(firstChar))
@@ -169,7 +169,7 @@ namespace Tokenizer
             }
         }
 
-        static bool StartsWithPunc2(string word, ArrayList puncs)
+        static bool StartsWithPunc2(string word, List<string> puncs)
         {
             if (word.Length > 1)
             {
@@ -187,7 +187,7 @@ namespace Tokenizer
             return false;
         }
 
-        static bool EndsWithPunc(string word, ArrayList puncs)
+        static bool EndsWithPunc(string word, List<string> puncs)
         {
             string lastChar = word.Substring(word.Length - 1);
             if (puncs.Contains(lastChar))
@@ -200,7 +200,7 @@ namespace Tokenizer
             }
         }
 
-        static bool EndsWithPunc2(string word, ArrayList puncs)
+        static bool EndsWithPunc2(string word, List<string> puncs)
         {
             if (word.Length > 1)
             {
@@ -218,7 +218,7 @@ namespace Tokenizer
             return false;
         }
 
-        static char FindPunc(string word, ArrayList puncs)
+        static char FindPunc(string word, List<string> puncs)
         {
             Regex r = new Regex("[0-9]+.+[0-9]+");
             Match m = r.Match(word);

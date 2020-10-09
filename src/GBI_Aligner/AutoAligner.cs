@@ -45,7 +45,7 @@ namespace GBI_Aligner
             bool useAlignModel, // use the alignProbs and preAlignment only in batch mode where the verses 
                                 // to be aligned are the same as the verses used in building the models
             int maxPaths, // the maximal number paths we can keep at any point
-            ArrayList puncs, // list of punctuation marks
+            List<string> puncs, // list of punctuation marks
             Hashtable groups, // one-to-many, many-to-one, and many-to-many mappings
                               // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
@@ -58,8 +58,8 @@ namespace GBI_Aligner
             int badLinkMinCount, // the mininmal counts required for a bad link to be considered
             Hashtable glossTable, // gloss information of the source text 
             Hashtable oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
-            ArrayList sourceFuncWords, // function words in Hebrew and Greek
-            ArrayList targetFuncWords,
+            List<string> sourceFuncWords, // function words in Hebrew and Greek
+            List<string> targetFuncWords,
             bool contentWordsOnly,
             Hashtable strongs
             )
@@ -87,7 +87,7 @@ namespace GBI_Aligner
             string treeFolder, // the folder where syntactic trees are stored           
             ref Hashtable goodLinks, // links to functional words that are otherwise ignored
             string goodLinkFile, // the text file that contains good links
-            ArrayList sourceFuncWords
+            List<string> sourceFuncWords
             )
         {
             string jsonText = File.ReadAllText(jsonFile);
@@ -191,7 +191,7 @@ namespace GBI_Aligner
             string tmFile, // text file that contains the translation memory; to be loaded into the transModel Hashtable when the system starts
             Hashtable freqPhrases,
             string treeFolder,
-            ArrayList sourceFuncWords // (uses the lemma)
+            List<string> sourceFuncWords // (uses the lemma)
             )
         {
             string jsonText = File.ReadAllText(jsonFile);
@@ -534,7 +534,7 @@ namespace GBI_Aligner
         //   where link is made out of mWord.text + '#' + tText
         //   tText was the lower-cased translated text
         //
-        static void UpdateGoodLinks(ManuscriptWord mWord, string tText, ref Hashtable goodLinks, ArrayList sourceFuncWords)
+        static void UpdateGoodLinks(ManuscriptWord mWord, string tText, ref Hashtable goodLinks, List<string> sourceFuncWords)
         {
             if (Align.IsContentWord(mWord.lemma, sourceFuncWords)) return;
 
