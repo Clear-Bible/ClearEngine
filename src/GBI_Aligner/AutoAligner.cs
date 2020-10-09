@@ -46,7 +46,7 @@ namespace GBI_Aligner
                                 // to be aligned are the same as the verses used in building the models
             int maxPaths, // the maximal number paths we can keep at any point
             List<string> puncs, // list of punctuation marks
-            Hashtable groups, // one-to-many, many-to-one, and many-to-many mappings
+            Dictionary<string, List<TargetGroup>> groups, // one-to-many, many-to-one, and many-to-many mappings
                               // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
             ArrayList stopWords, // target words not to be linked

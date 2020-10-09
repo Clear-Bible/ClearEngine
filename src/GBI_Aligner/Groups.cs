@@ -16,8 +16,7 @@ namespace GBI_Aligner
             ref ArrayList links, // ArrayList(MappedGroup)
             List<SourceWord> sourceWords, // ArrayList(SourceWord)
             List<TargetWord> targetWords, // ArrayList(TargetWord)
-            Hashtable groups, // comes from Data.LoadGroups("groups.txt")
-                              //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
+            Dictionary<string, List<TargetGroup>> groups,
             ArrayList terminals // ArrayList(XmlNode)
             )
         {
@@ -36,7 +35,7 @@ namespace GBI_Aligner
         }
 
         // returns ArrayList(string[][])
-        static ArrayList GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, Hashtable groups)
+        static ArrayList GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, Dictionary<string, List<TargetGroup>> groups)
         {
             ArrayList mappedGroups = new ArrayList();
 
@@ -56,7 +55,7 @@ namespace GBI_Aligner
                     string trigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID + " " + sourceWords[i + 2].ID;
                     if (groups.ContainsKey(trigram))
                     {
-                        ArrayList targetGroups = (ArrayList)groups[trigram];
+                        List<TargetGroup> targetGroups = groups[trigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -75,7 +74,7 @@ namespace GBI_Aligner
                     string bigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID;
                     if (groups.ContainsKey(bigram))
                     {
-                        ArrayList targetGroups = (ArrayList)groups[bigram];
+                        List<TargetGroup> targetGroups = groups[bigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -94,7 +93,7 @@ namespace GBI_Aligner
                     string unigramIDs = sourceWords[i].ID;
                     if (groups.ContainsKey(unigram))
                     {
-                        ArrayList targetGroups = (ArrayList)groups[unigram];
+                        List<TargetGroup> targetGroups = groups[unigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 2);
                         if (match != string.Empty)
                         {
@@ -111,7 +110,7 @@ namespace GBI_Aligner
             return mappedGroups;
         }
 
-        static string FindTargetMatch(TargetWord[] targetWords, ArrayList targetGroups, int minLength)
+        static string FindTargetMatch(TargetWord[] targetWords, List<TargetGroup> targetGroups, int minLength)
         {
             string match = string.Empty;
 
