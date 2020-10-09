@@ -20,7 +20,7 @@ namespace GBI_Aligner
             List<TargetWord> targetWords, 
             ref Alignment2 align, 
             int k, 
-            Hashtable glossTable, 
+            Dictionary<string, Gloss> glossTable, 
             Dictionary<string, List<TargetGroup>> groups
             )
         {
