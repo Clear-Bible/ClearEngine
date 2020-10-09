@@ -40,19 +40,17 @@ namespace GBI_Aligner
         }
 
         // pathProbs :: path => score
-        public static ArrayList SortPaths(Hashtable pathProbs)
+        public static List<CandidateChain> SortPaths(Dictionary<CandidateChain, double> pathProbs)
         {
-            int hashCodeOfWordsInPath(ArrayList path) =>
+            int hashCodeOfWordsInPath(CandidateChain path) =>
                 Align.GetTargetWordsInPath(path).GetHashCode();
 
-            return new ArrayList(
-                pathProbs
-                    .Cast<DictionaryEntry>()
-                    .OrderByDescending(kvp => (double)kvp.Value)
-                    .ThenByDescending(kvp =>
-                        hashCodeOfWordsInPath((ArrayList)kvp.Key))
-                    .Select(kvp => kvp.Key)
-                    .ToList());
+            return pathProbs
+                .OrderByDescending(kvp => kvp.Value)
+                .ThenByDescending(kvp =>
+                    hashCodeOfWordsInPath(kvp.Key))
+                .Select(kvp => kvp.Key)
+                .ToList();
         }
  
         //// pathProbs :: Hashtable(Candidate, probability)
