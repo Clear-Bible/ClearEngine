@@ -22,8 +22,8 @@ namespace GBI_Aligner
             string target, // name of tokens.txt file, after alignment
             Dictionary<string, Dictionary<string, double>> model,  
             Dictionary<string, Dictionary<string, Stats>> manModel, 
-            Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
-            Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+            Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             Dictionary<string, List<TargetGroup>> groups,
             string treeFolder,
@@ -32,12 +32,12 @@ namespace GBI_Aligner
             int maxPaths,
 			List<string> puncs,
             List<string> stopWords,
-            Dictionary<string, int> goodLinks, // Hashtable(link => count)
+            Dictionary<string, int> goodLinks, // (link => count)
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
             Dictionary<string, Gloss> glossTable,
-            Dictionary<string, Dictionary<string, string>> oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            Dictionary<string, Dictionary<string, string>> oldLinks, // (verseID => (mWord.altId => tWord.altId))
             List<string> sourceFuncWords, 
             List<string> targetFuncWords,
             bool contentWordsOnly,
@@ -94,14 +94,14 @@ namespace GBI_Aligner
             string sourceVerse2, // string, sourceIDs
             string targetVerse,  // tokens, lowercase
             string targetVerse2, // tokens, not lowercase
-            Dictionary<string, Dictionary<string, double>> model, // translation model, Hashtable(source => Hashtable(target => probability))
+            Dictionary<string, Dictionary<string, double>> model, // translation model, (source => (target => probability))
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
-                                // Hashtable(source => Hashtable(target => Stats{ count, probability})
-            Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
-            Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+                                // (source => (target => Stats{ count, probability})
+            Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             Dictionary<string, List<TargetGroup>> groups, // comes from Data.LoadGroups("groups.txt")
-                              //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
+                              //   of the form (...source... => (TargetGroup{...text..., primaryPosition}))
             Dictionary<string, XmlNode> trees, // verseID => XmlNode
             ref Alignment2 align,  // Output goes here.
             int i,
@@ -113,7 +113,7 @@ namespace GBI_Aligner
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
             Dictionary<string, Gloss> glossTable,
-            Dictionary<string, Dictionary<string, string>> oldLinks,  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            Dictionary<string, Dictionary<string, string>> oldLinks,  // (verseID => (mWord.altId => tWord.altId))
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
             bool contentWordsOnly,
@@ -139,7 +139,7 @@ namespace GBI_Aligner
            
             List<TargetWord> tWords = GetTargetWords(targetWords, targetWords2);
 
-            Dictionary<string, string> idMap = OldLinks.CreateIdMap(sWords);  // HashTable(SourceWord.ID => SourceWord.AltID)
+            Dictionary<string, string> idMap = OldLinks.CreateIdMap(sWords);  // (SourceWord.ID => SourceWord.AltID)
 
             string verseNodeID = Utils.GetAttribValue(treeNode, "nodeId");
             verseNodeID = verseNodeID.Substring(0, verseNodeID.Length - 1);
@@ -263,14 +263,12 @@ namespace GBI_Aligner
         // uses model if it is there and it is not punctuation or a stop word
         //   and gets candidates of maximal probability
         //
-        // returns ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
-        //
         public static AlternativeCandidates GetTopCandidates(
             SourceWord sWord,
             List<TargetWord> tWords,
             Dictionary<string, Dictionary<string, double>> model,
             Dictionary<string, Dictionary<string, Stats>> manModel,
-            Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
             int n, // number of target tokens (not actually used)
             List<string> puncs,
@@ -279,7 +277,7 @@ namespace GBI_Aligner
             int goodLinkMinCount, // (not actually used)
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
-            Dictionary<string, string> existingLinks, // Hashtable(mWord.altId => tWord.altId)
+            Dictionary<string, string> existingLinks, // (mWord.altId => tWord.altId)
                                      // it gets used here
             List<string> sourceFuncWords,
             bool contentWordsOnly, // (not actually used)
@@ -804,7 +802,7 @@ namespace GBI_Aligner
         }
 
         // prepends head to a copy of tail to obtain result
-        static CandidateChain ConsChain(Candidate head, ArrayList tail)
+        static CandidateChain ConsChain(Candidate head, CandidateChain tail)
         {
             return new CandidateChain(
                 tail.Cast<Candidate>().Prepend(head));
@@ -1026,10 +1024,10 @@ namespace GBI_Aligner
         {
             XmlNode treeNode = null;
 
-            ArrayList subTrees = GetSubTrees(sStartVerseID, sEndVerseID, trees);
+            List<XmlNode> subTrees = GetSubTrees(sStartVerseID, sEndVerseID, trees);
             if (subTrees.Count == 1)
             {
-                treeNode = (XmlNode)subTrees[0];
+                treeNode = subTrees[0];
             }
             else
             {
@@ -1039,9 +1037,9 @@ namespace GBI_Aligner
             return treeNode;
         }
 
-        static ArrayList GetSubTrees(string sStartVerseID, string sEndVerseID, Dictionary<string, XmlNode> trees)
+        static List<XmlNode> GetSubTrees(string sStartVerseID, string sEndVerseID, Dictionary<string, XmlNode> trees)
         {
-            ArrayList subTrees = new ArrayList();
+            List<XmlNode> subTrees = new List<XmlNode>();
 
             string book = sStartVerseID.Substring(0, 2);
             string startChapter = sStartVerseID.Substring(2, 3);
@@ -1049,7 +1047,7 @@ namespace GBI_Aligner
 
             if (startChapter == endChapter)
             {
-                GetSubTreesInSameChapter(sStartVerseID, sEndVerseID, book, startChapter, ref subTrees, trees);
+                GetSubTreesInSameChapter(sStartVerseID, sEndVerseID, book, startChapter, subTrees, trees);
             }
             else
             {
@@ -1059,7 +1057,7 @@ namespace GBI_Aligner
             return subTrees;
         }
 
-        static void GetSubTreesInSameChapter(string sStartVerseID, string sEndVerseID, string book, string chapter, ref ArrayList subTrees, Dictionary<string, XmlNode> trees)
+        static void GetSubTreesInSameChapter(string sStartVerseID, string sEndVerseID, string book, string chapter, List<XmlNode> subTrees, Dictionary<string, XmlNode> trees)
         {
             int startVerse = Int32.Parse(sStartVerseID.Substring(5, 3));
             int endVerse = Int32.Parse(sEndVerseID.Substring(5, 3));
@@ -1093,12 +1091,12 @@ namespace GBI_Aligner
             return matchingTwords;
         }
 
-        static void GetSubTreesInDiffChapter(string sStartVerseID, string sEndVerseID, string book, string chapter1, string chapter2, ref ArrayList subTrees, Dictionary<string, XmlNode> trees)
+        static void GetSubTreesInDiffChapter(string sStartVerseID, string sEndVerseID, string book, string chapter1, string chapter2, ref List<XmlNode> subTrees, Dictionary<string, XmlNode> trees)
         {
             string hypotheticalLastVerse = book + chapter1 + "100";
-            GetSubTreesInSameChapter(sStartVerseID, hypotheticalLastVerse, book, chapter1, ref subTrees, trees);
+            GetSubTreesInSameChapter(sStartVerseID, hypotheticalLastVerse, book, chapter1, subTrees, trees);
             string hypotheticalFirstVerse = book + chapter2 + "001";
-            GetSubTreesInSameChapter(hypotheticalFirstVerse, sEndVerseID, book, chapter2, ref subTrees, trees);
+            GetSubTreesInSameChapter(hypotheticalFirstVerse, sEndVerseID, book, chapter2, subTrees, trees);
         }
     }
 
