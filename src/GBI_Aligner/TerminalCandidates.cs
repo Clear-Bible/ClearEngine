@@ -25,10 +25,10 @@ namespace GBI_Aligner
             int n,  // number of target tokens
             string verseID, // from the syntax tree
             List<string> puncs, 
-            ArrayList stopWords, 
-            Hashtable goodLinks,  // Hashtable(link => count)
+            List<string> stopWords, 
+            Dictionary<string, int> goodLinks,  // Hashtable(link => count)
             int goodLinkMinCount,
-            Hashtable badLinks,  // Hashtable(link => count)
+            Dictionary<string, int> badLinks,  // Hashtable(link => count)
             int badLinkMinCount,
             Hashtable existingLinks, // Hashtable(mWord.altId => tWord.altId)
             Dictionary<string, string> idMap, 

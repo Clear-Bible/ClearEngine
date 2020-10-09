@@ -309,9 +309,9 @@ namespace AlignmentTool
         // Output datum is of the form
         //   Hashtable(link => count)
         //
-        public static Hashtable GetXLinks(string file)
+        public static Dictionary<string, int> GetXLinks(string file)
         {
-            Hashtable xLinks = new Hashtable();
+            Dictionary<string, int> xLinks = new Dictionary<string, int>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -328,9 +328,9 @@ namespace AlignmentTool
             return xLinks;
         }
 
-        public static ArrayList GetStopWords(string file)
+        public static List<string> GetStopWords(string file)
         {
-            ArrayList wordList = new ArrayList();
+            List<string> wordList = new List<string>();
 
             using (StreamReader sr = new StreamReader(file, Encoding.UTF8))
             {

@@ -27,10 +27,10 @@ namespace GBI_Aligner
             Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             List<string> puncs,
-            ArrayList stopWords,
-            Hashtable goodLinks,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
-            Hashtable badLinks,
+            Dictionary<string, int> badLinks,
             int badLinkMinCount,
             List<string> sourceFuncWords, 
             List<string> targetFuncWords,
@@ -111,10 +111,10 @@ namespace GBI_Aligner
             Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             List<string> puncs,
-            ArrayList stopWords,
-            Hashtable goodLinks,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
-            Hashtable badLinks,
+            Dictionary<string, int> badLinks,
             int badLinkMinCount, 
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
@@ -132,11 +132,11 @@ namespace GBI_Aligner
                 }
                 string targetWord = GetTargetWord(targetID, targetWords);
                 string pair = link.SourceNode.Lemma + "#" + targetWord;
-                if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.Contains(pair))
+                if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.ContainsKey(pair))
                 {
                     return;
                 }
-                if (!(badLinks.Contains(pair) || puncs.Contains(targetWord) || stopWords.Contains(targetWord)))
+                if (!(badLinks.ContainsKey(pair) || puncs.Contains(targetWord) || stopWords.Contains(targetWord)))
                 {
                     link.TargetNode.Text = targetWord;
                     link.TargetNode.Prob = 0;
@@ -542,10 +542,10 @@ namespace GBI_Aligner
             Dictionary<string, Dictionary<string, double>> model, 
             List<string> linkedTargets, 
             List<string> puncs, 
-            ArrayList stopWords, 
-            Hashtable goodLinks,
+            List<string> stopWords, 
+            Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
-            Hashtable badLinks, 
+            Dictionary<string, int> badLinks, 
             int badLinkMinCount
             )
         {
