@@ -689,14 +689,9 @@ namespace GBI_Aligner
         }
 
 
-        // childCandidateList = ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
-        //
-        // returns a list of paths, which also has the type
-        // ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
-        //
+        
         static List<CandidateChain> CreatePaths(List<List<Candidate>> childCandidatesList, int maxPaths)
         {
- //           int arcsLimit = 2000000;
             int maxArcs = GetMaxArcs(childCandidatesList); // product of all sub-list lengths
             int maxDepth = GetMaxDepth(childCandidatesList); // maximum sub-list length
             if (maxArcs > maxPaths || maxArcs <= 0)
@@ -719,25 +714,14 @@ namespace GBI_Aligner
         }
 
 
-        // childCandidateList = ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
-        //
-        // returns a list of paths, which also has the type
-        // ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
-        //
+ 
         static List<CandidateChain> Create_Depth_N_paths(List<List<Candidate>> childCandidatesList, int depth)
         {
             List<CandidateChain> paths = new List<CandidateChain>();
 
-            // string[] sChildCandidates = childCandidatesList.Cast<ArrayList>().Select(p => GetWordsInPath(p)).ToArray();
-
             if (childCandidatesList.Count > 1)
             {
-                //if (paths.Count > 16000000)  // seems like this can never happen ...
-                //{
-                //    return paths;
-                //}
                 List<Candidate> headCandidates = childCandidatesList[0];
-                // ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
 
                 int headDepth = headCandidates.Count - 1;
                 if (headDepth > depth)
@@ -747,7 +731,7 @@ namespace GBI_Aligner
                 // headDepth is one less than number of head candidates,
                 // but truncated to depth
 
-                ArrayList nHeadCandidates = Get_Nth_Candidate(headCandidates, headDepth);
+                CandidateChain nHeadCandidates = Get_Nth_Candidate(headCandidates, headDepth);
                 // nHeadCandidates = first headDepth members of headCandidates
 
                 List<List<Candidate>> tailCandidatesList = childCandidatesList.ToList();
@@ -760,13 +744,11 @@ namespace GBI_Aligner
                 for (int i = 0; i < nHeadCandidates.Count; i++) // for each member of nHeadCandidates
                 {
                     Candidate nHeadCandidate = (Candidate)nHeadCandidates[i];
-                    // nHeadCandidate :: Candidate{ Sequence ArrayList(TargetWord), Prob double }
 
-                    for (int j = 0; j < tailPaths.Count; j++)  // for each tail path
+                    for (int j = 0; j < tailPaths.Count; j++)
                     { 
-                        ArrayList tailPath = (ArrayList)tailPaths[j];
+                        CandidateChain tailPath = tailPaths[j];
                         CandidateChain path = ConsChain(nHeadCandidate, tailPath);
-                        // path is copy of tailPath with nHeadCandidate prepended.
 
                         if (paths.Count > 16000000)
                         {
@@ -778,22 +760,14 @@ namespace GBI_Aligner
             }
             else
             {
-                //if (paths.Count > 16000000)  // seems like this can never happen
-                //{
-                //    return paths;
-                //}
                 List<Candidate> candidates = childCandidatesList[0];
                 for (int i = 0; i < candidates.Count && i <= depth; i++)
                 {
-                    Candidate candidate = (Candidate)candidates[i];
+                    Candidate candidate = candidates[i];
                     CandidateChain path = new CandidateChain(Enumerable.Repeat(candidate, 1));
                     paths.Add(path);
                 }
-
-                // Puts each candidate into its own path.
             }
-
-            //  string[] sPaths = paths.Cast<ArrayList>().Select(p => GetWordsInPath(p)).ToArray();
 
             return paths;
         }
