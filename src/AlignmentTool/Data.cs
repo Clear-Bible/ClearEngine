@@ -165,9 +165,10 @@ namespace AlignmentTool
         // Output datum is of the form
         //   Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
         //
-        public static Hashtable LoadGroups(string file)
+        public static Dictionary<string, List<TargetGroup>> LoadGroups(string file)
         {
-            Hashtable table = new Hashtable();
+            Dictionary<string, List<TargetGroup>> table =
+                new Dictionary<string, List<TargetGroup>>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -182,12 +183,12 @@ namespace AlignmentTool
 
                     if (table.ContainsKey(source))
                     {
-                        ArrayList targets = (ArrayList)table[source];
+                        List<TargetGroup> targets = table[source];
                         targets.Add(tg);
                     }
                     else
                     {
-                        ArrayList targets = new ArrayList();
+                        List<TargetGroup> targets = new List<TargetGroup>();
                         targets.Add(tg);
                         table.Add(source, targets);
                     }
@@ -402,14 +403,14 @@ namespace AlignmentTool
             return strongTable;
         }
 
-        public static void UpdateGroups(ref Hashtable groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
+        public static void UpdateGroups(Dictionary<string, List<TargetGroup>> groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
         {
             string sourceText = GetSourceText(sourceLinks, manuscript);
             TargetGroup targetGroup = GetTargetText(targetLinks, translation);
 
             if (groups.ContainsKey(sourceText))
             {
-                ArrayList translations = (ArrayList)groups[sourceText];
+                List<TargetGroup> translations = groups[sourceText];
                 if (!HasGroup(translations, targetGroup))
                 {
                     translations.Add(targetGroup);
@@ -417,13 +418,13 @@ namespace AlignmentTool
             }
             else
             {
-                ArrayList translations = new ArrayList();
+                List<TargetGroup> translations = new List<TargetGroup>();
                 translations.Add(targetGroup);
                 groups.Add(sourceText, translations);
             }
         }
 
-        public static bool HasGroup(ArrayList translations, TargetGroup targetGroup)
+        public static bool HasGroup(List<TargetGroup> translations, TargetGroup targetGroup)
         {
             bool hasGroup = false;
 
@@ -553,7 +554,7 @@ namespace AlignmentTool
         // In addition, this routine calls UpdateGroups() whenever it encounters
         // a link that is not one-to-one.
         //
-        public static Hashtable GetOldLinks(string jsonFile, ref Hashtable groups)
+        public static Hashtable GetOldLinks(string jsonFile, Dictionary<string, List<TargetGroup>> groups)
         {
             Hashtable oldLinks = new Hashtable();
 
@@ -573,7 +574,7 @@ namespace AlignmentTool
 
                     if (sourceLinks.Length > 1 || targetLinks.Length > 1)
                     {
-                        UpdateGroups(ref groups, sourceLinks, targetLinks, line.manuscript, line.translation);
+                        UpdateGroups(groups, sourceLinks, targetLinks, line.manuscript, line.translation);
                     }
                     else
                     {

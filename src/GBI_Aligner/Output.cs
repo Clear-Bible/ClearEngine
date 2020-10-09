@@ -21,7 +21,7 @@ namespace GBI_Aligner
             ref Alignment2 align, 
             int k, 
             Hashtable glossTable, 
-            Hashtable groups
+            Dictionary<string, List<TargetGroup>> groups
             )
         {
             Hashtable targetPositionMap = BuildTargetPositionMap(new ArrayList(targetWords));
@@ -184,15 +184,13 @@ namespace GBI_Aligner
             }
         }
 
-        static Hashtable BuildPrimaryTable(Hashtable groups)
+        static Hashtable BuildPrimaryTable(Dictionary<string, List<TargetGroup>> groups)
         {
             Hashtable primaryTable = new Hashtable();
 
-            IDictionaryEnumerator groupEnum = groups.GetEnumerator();
-
-            while (groupEnum.MoveNext())
+            foreach (var groupEnum in groups)
             {
-                ArrayList targetGroups = (ArrayList)groupEnum.Value;
+                List<TargetGroup> targetGroups = groupEnum.Value;
                 foreach (TargetGroup tg in targetGroups)
                 {
                     string tgText = tg.Text;

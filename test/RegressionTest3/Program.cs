@@ -50,7 +50,7 @@ namespace RegressionTest3
             int maxPaths = 1000000;
 
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
-            Hashtable groups = Data.LoadGroups(InPath("groups.txt"));           
+            Dictionary<string, List<TargetGroup>> groups = Data.LoadGroups(InPath("groups.txt"));           
             ArrayList stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
             Hashtable goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
@@ -60,7 +60,7 @@ namespace RegressionTest3
 
             Hashtable glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
 
-            Hashtable oldLinks = Data.GetOldLinks(InPath("oldAlignment.json"), ref groups);
+            Hashtable oldLinks = Data.GetOldLinks(InPath("oldAlignment.json"), groups);
 
             List<string> sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
             List<string> targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));

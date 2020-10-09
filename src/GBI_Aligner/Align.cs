@@ -25,8 +25,7 @@ namespace GBI_Aligner
             Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            Hashtable groups, // comes from Data.LoadGroups("groups.txt")
-                              //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
+            Dictionary<string, List<TargetGroup>> groups,
             string treeFolder,
             Dictionary<string, string> bookNames,
             string jsonOutput,
@@ -106,7 +105,7 @@ namespace GBI_Aligner
             Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            Hashtable groups, // comes from Data.LoadGroups("groups.txt")
+            Dictionary<string, List<TargetGroup>> groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
             Dictionary<string, XmlNode> trees, // verseID => XmlNode
             ref Alignment2 align,  // Output goes here.
