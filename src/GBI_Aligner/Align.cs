@@ -309,7 +309,7 @@ namespace GBI_Aligner
             if (strongs.ContainsKey(sWord.Strong))
             {
                 Dictionary<string, int> wordIds = strongs[sWord.Strong];
-                ArrayList matchingTwords = GetMatchingTwords(wordIds, tWords);
+                List<TargetWord> matchingTwords = GetMatchingTwords(wordIds, tWords);
                 foreach(TargetWord target in matchingTwords)
                 {
                     Candidate c = new Candidate(target, 0.0);
@@ -1188,9 +1188,9 @@ namespace GBI_Aligner
             }
         }
 
-        static ArrayList GetMatchingTwords(Dictionary<string, int> wordIds, ArrayList tWords)
+        static List<TargetWord> GetMatchingTwords(Dictionary<string, int> wordIds, ArrayList tWords)
         {
-            ArrayList matchingTwords = new ArrayList();
+            List<TargetWord> matchingTwords = new List<TargetWord>();
 
             foreach(TargetWord tWord in tWords)
             {
