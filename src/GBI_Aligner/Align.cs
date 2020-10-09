@@ -267,7 +267,7 @@ namespace GBI_Aligner
         //
         public static AlternativeCandidates GetTopCandidates(
             SourceWord sWord,
-            ArrayList tWords, // ArrayList(TargetWord)
+            List<TargetWord> tWords,
             Dictionary<string, Dictionary<string, double>> model,
             Dictionary<string, Dictionary<string, Stats>> manModel,
             Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
@@ -1188,7 +1188,7 @@ namespace GBI_Aligner
             }
         }
 
-        static List<TargetWord> GetMatchingTwords(Dictionary<string, int> wordIds, ArrayList tWords)
+        static List<TargetWord> GetMatchingTwords(Dictionary<string, int> wordIds, List<TargetWord> tWords)
         {
             List<TargetWord> matchingTwords = new List<TargetWord>();
 

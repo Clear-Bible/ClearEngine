@@ -63,7 +63,7 @@ namespace GBI_Aligner
  //               if (contentWordsOnly && sourceFuncWords.Contains(sWord.Lemma)) continue;
 
                 AlternativeCandidates topCandidates =
-                    Align.GetTopCandidates(sWord, new ArrayList(tWords), model, manModel,
+                    Align.GetTopCandidates(sWord, tWords, model, manModel,
                         alignProbs, useAlignModel, n, puncs, stopWords,
                         goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                         existingLinks, sourceFuncWords, contentWordsOnly,
