@@ -28,7 +28,7 @@ namespace GBI_Aligner
             return verseTrees;
         }
 
-        public static void GetChapterTree(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Hashtable bookNames)
+        public static void GetChapterTree(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Dictionary<string, string> bookNames)
         {
             string bookNumber = chapterID.Substring(0, 2);
             string bookName = (string)bookNames[bookNumber];
@@ -40,7 +40,7 @@ namespace GBI_Aligner
             }
         }
 
-        public static void GetChapterTree2(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Hashtable bookNames)
+        public static void GetChapterTree2(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Dictionary<string, string> bookNames)
         {
             string bookNumber = chapterID.Substring(0, 2);
             string bookName = (string)bookNames[bookNumber];
