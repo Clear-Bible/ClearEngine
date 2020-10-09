@@ -194,8 +194,6 @@ namespace GBI_Aligner
                 return;
             }
 
-            // string nodeString = TimUtil.DebugTreeToString(treeNode);
-
             // Recursive calls.
             //
             foreach(XmlNode subTree in treeNode)
@@ -302,8 +300,8 @@ namespace GBI_Aligner
                 }
             }
 
-            Hashtable probs = new Hashtable();
-            // TargetWord => log of probability
+            Dictionary<TargetWord, double> probs =
+                new Dictionary<TargetWord, double>();
 
             bool isContentWord = IsContentWord(sWord.Lemma, sourceFuncWords);
             if (!isContentWord) return topCandidates;
@@ -402,25 +400,23 @@ namespace GBI_Aligner
  
 
         // the values of the Hashtable are probabilities that are doubles
-        static double FindBestProb(Hashtable probs)
+        static double FindBestProb(Dictionary<TargetWord, double> probs)
         {
             return probs
-                .Cast<DictionaryEntry>()
-                .Select(kvp => (double)kvp.Value)
+                .Select(kvp => kvp.Value)
                 .Concat(Enumerable.Repeat(-10.0, 1))
                 .Max();
         }
 
 
 
-        static List<Candidate> GetCandidatesWithSpecifiedProbability(double bestProb, Hashtable probs)
+        static List<Candidate> GetCandidatesWithSpecifiedProbability(double bestProb, Dictionary<TargetWord, double> probs)
         {
             return probs
-                .Cast<DictionaryEntry>()
-                .Where(kvp => (double)kvp.Value == bestProb)
+                .Where(kvp => kvp.Value == bestProb)
                 .Select(kvp => new Candidate(
-                    (TargetWord)kvp.Key,
-                    (double)kvp.Value))
+                    kvp.Key,
+                    kvp.Value))
                 .ToList();
         }
 
