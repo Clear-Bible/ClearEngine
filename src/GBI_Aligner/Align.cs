@@ -194,9 +194,6 @@ namespace GBI_Aligner
             //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
             //   or Candidate)
 
-            // TIM Study
-            // TimUtil.PrintHashTable("alignments", alignments);
-
             ArrayList verseAlignment = (ArrayList) alignments[verseNodeID];
             Candidate topCandidate = (Candidate)verseAlignment[0];
 
@@ -482,16 +479,16 @@ namespace GBI_Aligner
             Dictionary<CandidateChain, double> pathProbs =
                 new Dictionary<CandidateChain, double>();
 
-            ArrayList allPaths = CreatePaths(childCandidateList, maxPaths);
+            List<CandidateChain> allPaths = CreatePaths(childCandidateList, maxPaths);
             // allPaths :: ArrayList(ArrayList(Candidate))
 
-            ArrayList paths = FilterPaths(allPaths);
+            List<CandidateChain> paths = FilterPaths(allPaths);
             // paths :: ArrayList(ArrayList(Candidate))
             // paths = those where the candidates use different words
 
             if (paths.Count == 0)
             {
-                ArrayList topPath = (ArrayList)allPaths[0];
+                CandidateChain topPath = allPaths[0];
                 paths.Add(topPath);
             }
 
@@ -647,11 +644,11 @@ namespace GBI_Aligner
         // returns the valid paths, which are ones where the candidates
         // use different words
         //
-        static ArrayList FilterPaths(ArrayList paths)
+        static List<CandidateChain> FilterPaths(List<CandidateChain> paths)
         {
-            ArrayList filteredPaths = new ArrayList();
+            List<CandidateChain> filteredPaths = new List<CandidateChain>();
 
-            foreach(ArrayList path in paths)
+            foreach(CandidateChain path in paths)
             {
                 if (IsValidPath(path))
                 {
@@ -662,7 +659,7 @@ namespace GBI_Aligner
             return filteredPaths;
         }
 
-        // path is valid if candidates use different words
+
         static bool IsValidPath(ArrayList path)
         {
             string wordsInPath = GetWordsInPath(path);
@@ -819,7 +816,7 @@ namespace GBI_Aligner
         // returns a list of paths, which also has the type
         // ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
         //
-        static ArrayList CreatePaths(ArrayList childCandidatesList, int maxPaths)
+        static List<CandidateChain> CreatePaths(ArrayList childCandidatesList, int maxPaths)
         {
  //           int arcsLimit = 2000000;
             int maxArcs = GetMaxArcs(childCandidatesList); // product of all sub-list lengths
@@ -830,7 +827,7 @@ namespace GBI_Aligner
                 maxDepth = (int)root;
             }
 
-            ArrayList depth_N_paths = new ArrayList();
+            List<CandidateChain> depth_N_paths = new List<CandidateChain>();
             try
             {
                 depth_N_paths = Create_Depth_N_paths(childCandidatesList, maxDepth);
@@ -849,9 +846,9 @@ namespace GBI_Aligner
         // returns a list of paths, which also has the type
         // ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
         //
-        static ArrayList Create_Depth_N_paths(ArrayList childCandidatesList, int depth)
+        static List<CandidateChain> Create_Depth_N_paths(ArrayList childCandidatesList, int depth)
         {
-            ArrayList paths = new ArrayList();
+            List<CandidateChain> paths = new List<CandidateChain>();
 
             // string[] sChildCandidates = childCandidatesList.Cast<ArrayList>().Select(p => GetWordsInPath(p)).ToArray();
 
@@ -879,7 +876,7 @@ namespace GBI_Aligner
                 tailCandidatesList.Remove(headCandidates);
                 // tailCandidatesList = the remaining members of childCandidatesList
 
-                ArrayList tailPaths = Create_Depth_N_paths(tailCandidatesList, depth);
+                List<CandidateChain> tailPaths = Create_Depth_N_paths(tailCandidatesList, depth);
                 // (recursive call)
 
                 for (int i = 0; i < nHeadCandidates.Count; i++) // for each member of nHeadCandidates
@@ -890,7 +887,7 @@ namespace GBI_Aligner
                     for (int j = 0; j < tailPaths.Count; j++)  // for each tail path
                     { 
                         ArrayList tailPath = (ArrayList)tailPaths[j];
-                        ArrayList path = ConsChain(nHeadCandidate, tailPath);
+                        CandidateChain path = ConsChain(nHeadCandidate, tailPath);
                         // path is copy of tailPath with nHeadCandidate prepended.
 
                         if (paths.Count > 16000000)
@@ -911,8 +908,7 @@ namespace GBI_Aligner
                 for (int i = 0; i < candidates.Count && i <= depth; i++)
                 {
                     Candidate candidate = (Candidate)candidates[i];
-                    ArrayList path = new ArrayList();
-                    path.Add(candidate);
+                    CandidateChain path = new CandidateChain(Enumerable.Repeat(candidate, 1));
                     paths.Add(path);
                 }
 
