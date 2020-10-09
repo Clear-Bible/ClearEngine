@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 using AlignmentTool;
@@ -35,7 +36,8 @@ namespace RegressionTest3
 
             string jsonOutput = OutPath("alignment.json");
 
-            Hashtable transModel = Data.GetTranslationModel(transModelPath);
+            Dictionary<string, Dictionary<string, double>> transModel =
+                Data.GetTranslationModel(transModelPath);
             Hashtable manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);
 

@@ -17,7 +17,7 @@ namespace GBI_Aligner
             AlternativesForTerminals candidateTable,  // the output goes here
             XmlNode treeNode, // syntax tree for current verse
             List<TargetWord> tWords, // ArrayList(TargetWord)
-            Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
+            Dictionary<string, Dictionary<string, double>> model, 
             Hashtable manModel, // manually checked alignments
                                 // Hashtable(source => Hashtable(target => Stats{ count, probability})
             Hashtable alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)

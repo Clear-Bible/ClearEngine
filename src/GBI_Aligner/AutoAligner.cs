@@ -27,8 +27,7 @@ namespace GBI_Aligner
             string sourceLemma,  // name of file with source lemma IDs
             string target, // name of tokens.txt file, after alignment
             string jsonOutput, // output of aligner, alignment.json file
-            Hashtable transModel, // translation model, comes from Data.GetTranslationModel(transModelFile)
-                                  // of the form: Hashtable(source => Hashtable(target => probability))
+            Dictionary<string, Dictionary<string, double>> transModel, // source => target => probability
             Hashtable manTransModel, // translation model from manually checked alignments
                                      // comes from Data.GetTranslationModel2(manTransModelFile)
                                      // of the form: Hashtable(source => Hashtable(target => Stats{ count, probability})
