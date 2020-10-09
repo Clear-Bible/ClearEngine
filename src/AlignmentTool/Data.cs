@@ -351,9 +351,10 @@ namespace AlignmentTool
         // If there are multiple possibilities for ...src... we take
         // the first one encountered.
         //
-        public static Hashtable BuildPreAlignmentTable(Dictionary<string, double> alignModel)
+        public static Dictionary<string, string> BuildPreAlignmentTable(Dictionary<string, double> alignModel)
         {
-            Hashtable preAlignedTable = new Hashtable();
+            Dictionary<string, string> preAlignedTable =
+                new Dictionary<string, string>();
 
             IDictionaryEnumerator modelEnum = alignModel.GetEnumerator();
             while (modelEnum.MoveNext())
