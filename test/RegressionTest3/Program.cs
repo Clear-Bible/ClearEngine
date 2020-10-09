@@ -38,7 +38,7 @@ namespace RegressionTest3
 
             Dictionary<string, Dictionary<string, double>> transModel =
                 Data.GetTranslationModel(transModelPath);
-            Hashtable manTransModel =
+            Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);
 
             Hashtable bookNames = BookTables.LoadBookNames3();
