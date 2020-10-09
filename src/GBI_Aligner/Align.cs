@@ -51,7 +51,7 @@ namespace GBI_Aligner
 
             string prevChapter = string.Empty;
 
-            Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();  // Hashtable(verseID => XmlNode)
+            Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();
 
             Alignment2 align = new Alignment2();  // The output goes here.
             align.Lines = new Line[sourceVerses.Count];
@@ -67,11 +67,6 @@ namespace GBI_Aligner
                 string targetVerse = (string)targetVerses[i];   // tokens, lowercase
                 string targetVerse2 = (string)targetVerses2[i]; // tokens, not lowercase
                 string chapterID = GetChapterID(sourceVerse);  // string with chapter number
-
-                //Console.WriteLine($"sourceVerse: {sourceVerse}\n");
-                //Console.WriteLine($"sourceVerse2: {sourceVerse2}\n");
-                //Console.WriteLine($"targetVerse: {targetVerse}\n");
-                //Console.WriteLine($"targetVerse2: {targetVerse2}\n");
 
                 if (chapterID != prevChapter)
                 {
@@ -137,8 +132,6 @@ namespace GBI_Aligner
 
             XmlNode treeNode = GetTreeNode(sStartVerseID, sEndVerseID, trees);
 
-            // TimUtil.PrintXmlNode(treeNode);
-
             Dictionary<string, WordInfo> wordInfoTable =
                 Data.BuildWordInfoTable(treeNode);
            
@@ -156,7 +149,6 @@ namespace GBI_Aligner
             if (oldLinks.ContainsKey(verseID))  // verseID as obtained from tree
             {
                 existingLinks = oldLinks[verseID];
-                // Hashtable(mWord.altId => tWord.altId)
             }
 
             AlternativesForTerminals terminalCandidates =
@@ -174,20 +166,8 @@ namespace GBI_Aligner
                 treeNode, tWords, alignments, n, sourceWords.Length,
                 maxPaths, terminalCandidates);
 
-            // alignments :: Hashtable(nodeId =>
-            //   ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double })
-            //   or Candidate)
-
-            ArrayList verseAlignment = new ArrayList(alignments[verseNodeID]);
-            Candidate topCandidate = (Candidate)verseAlignment[0];
-
-            // TIM Study
-            // TimUtil.PrintAsJson("verseAlignment", verseAlignment);
-
-
-            string linkedWords = GetWords(topCandidate);
-            //Console.WriteLine($"\nGetWords(topCandidate) = {linkedWords}\n");
-
+            List<Candidate> verseAlignment = alignments[verseNodeID];
+            Candidate topCandidate = verseAlignment[0];
 
             ArrayList terminals = Terminals.GetTerminalXmlNodes(treeNode);
             ArrayList links = Align2.AlignTheRest(topCandidate, terminals, sourceWords, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
