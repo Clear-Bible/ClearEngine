@@ -17,9 +17,9 @@ namespace AlignmentTool
 {
     public class Data
     {
-        public static Hashtable BuildGlossTableFromFile(string glossFile)
+        public static Dictionary<string, Gloss> BuildGlossTableFromFile(string glossFile)
         {
-            Hashtable glossTable = new Hashtable();
+            Dictionary<string, Gloss> glossTable = new Dictionary<string, Gloss>();
 
             string[] lines = File.ReadAllLines(glossFile);
             foreach (string line in lines)
@@ -372,9 +372,10 @@ namespace AlignmentTool
             return preAlignedTable;
         }
 
-        public static Hashtable BuildStrongTable(string strongFile)
+        public static Dictionary<string, Dictionary<string, int>> BuildStrongTable(string strongFile)
         {
-            Hashtable strongTable = new Hashtable();
+            Dictionary<string, Dictionary<string, int>> strongTable =
+                new Dictionary<string, Dictionary<string, int>>();
 
             string[] strongLines = File.ReadAllLines(strongFile);
 
@@ -387,15 +388,13 @@ namespace AlignmentTool
 
                 if (strongTable.ContainsKey(strong))
                 {
-                    Hashtable wordIds = (Hashtable)strongTable[strong];
+                    Dictionary<String, int> wordIds = strongTable[strong];
                     wordIds.Add(wordId, 1);
                 }
                 else
                 {
-                    Hashtable wordIds = new Hashtable
-                    {
-                        { wordId, 1 }
-                    };
+                    Dictionary<string, int> wordIds = new Dictionary<string, int>();
+                    wordIds.Add(wordId, 1);
                     strongTable.Add(strong, wordIds);
                 }
             }
@@ -554,9 +553,10 @@ namespace AlignmentTool
         // In addition, this routine calls UpdateGroups() whenever it encounters
         // a link that is not one-to-one.
         //
-        public static Hashtable GetOldLinks(string jsonFile, Dictionary<string, List<TargetGroup>> groups)
+        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, Dictionary<string, List<TargetGroup>> groups)
         {
-            Hashtable oldLinks = new Hashtable();
+            Dictionary<string, Dictionary<string, string>> oldLinks =
+                new Dictionary<string, Dictionary<string, string>>();
 
             string jsonText = File.ReadAllText(jsonFile);
             Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
@@ -587,12 +587,12 @@ namespace AlignmentTool
 
                         if (oldLinks.ContainsKey(verseID))
                         {
-                            Hashtable verseLinks = (Hashtable)oldLinks[verseID];
+                            Dictionary<string, string> verseLinks = oldLinks[verseID];
                             verseLinks.Add(mWord.altId, tWord.altId);
                         }
                         else
                         {
-                            Hashtable verseLinks = new Hashtable();
+                            Dictionary<string, string> verseLinks = new Dictionary<string, string>();
                             verseLinks.Add(mWord.altId, tWord.altId);
                             oldLinks.Add(verseID, verseLinks);
                         }
@@ -600,7 +600,7 @@ namespace AlignmentTool
                 }
             }
 
-            return oldLinks;  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            return oldLinks; 
         }
 
         public static void FilterOutFunctionWords(string file, string cwFile, List<string> funcWords)

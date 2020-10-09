@@ -58,16 +58,18 @@ namespace RegressionTest3
             Dictionary<string, int> badLinks = Data.GetXLinks(InPath("badLinks.txt"));
             int badLinkMinCount = 3;
 
-            Hashtable glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
+            Dictionary<string, Gloss> glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
 
-            Hashtable oldLinks = Data.GetOldLinks(InPath("oldAlignment.json"), groups);
+            Dictionary<string, Dictionary<string, string>> oldLinks =
+                Data.GetOldLinks(InPath("oldAlignment.json"), groups);
 
             List<string> sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
             List<string> targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));
 
             bool contentWordsOnly = true;
 
-            Hashtable strongs = Data.BuildStrongTable(InPath("strongs.txt"));
+            Dictionary<string, Dictionary<string, int>> strongs =
+                Data.BuildStrongTable(InPath("strongs.txt"));
 
 
             Console.WriteLine("Calling Auto Aligner.");

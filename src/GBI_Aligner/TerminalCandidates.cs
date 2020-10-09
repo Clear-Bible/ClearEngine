@@ -30,11 +30,11 @@ namespace GBI_Aligner
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,  // Hashtable(link => count)
             int badLinkMinCount,
-            Hashtable existingLinks, // Hashtable(mWord.altId => tWord.altId)
+            Dictionary<string, string> existingLinks, // Hashtable(mWord.altId => tWord.altId)
             Dictionary<string, string> idMap, 
             List<string> sourceFuncWords,
             bool contentWordsOnly,  // not actually used
-            Hashtable strongs
+            Dictionary<string, Dictionary<string, int>> strongs
             )
         {
             ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);

@@ -56,12 +56,12 @@ namespace GBI_Aligner
             int goodLinkMinCount, // the mininmal counts required for a good link to be used
             Dictionary<string, int> badLinks, // list of word pairs that should not be linked, also Hashtable(link => count)
             int badLinkMinCount, // the mininmal counts required for a bad link to be considered
-            Hashtable glossTable, // gloss information of the source text 
-            Hashtable oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            Dictionary<string, Gloss> glossTable, // gloss information of the source text 
+            Dictionary<string, Dictionary<string, string>> oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
             List<string> sourceFuncWords, // function words in Hebrew and Greek
             List<string> targetFuncWords,
             bool contentWordsOnly,
-            Hashtable strongs
+            Dictionary<string, Dictionary<string, int>> strongs
             )
         {
  //           Hashtable oldLinks = OldLinks.GetOldLinks(oldJson, ref groups);

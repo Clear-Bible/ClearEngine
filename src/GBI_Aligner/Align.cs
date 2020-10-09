@@ -36,12 +36,12 @@ namespace GBI_Aligner
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
-            Hashtable glossTable,
-            Hashtable oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            Dictionary<string, Gloss> glossTable,
+            Dictionary<string, Dictionary<string, string>> oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
             List<string> sourceFuncWords, 
             List<string> targetFuncWords,
             bool contentWordsOnly,
-            Hashtable strongs
+            Dictionary<string, Dictionary<string, int>> strongs
             )
         {
             List<string> sourceVerses = Data.GetVerses(sourceLemma, false);
@@ -117,12 +117,12 @@ namespace GBI_Aligner
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
-            Hashtable glossTable,
-            Hashtable oldLinks,  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            Dictionary<string, Gloss> glossTable,
+            Dictionary<string, Dictionary<string, string>> oldLinks,  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
             bool contentWordsOnly,
-            Hashtable strongs
+            Dictionary<string, Dictionary<string, int>> strongs
             )
         {  
             string[] sourceWords = sourceVerse.Split(" ".ToCharArray());   // lemmas
@@ -152,10 +152,10 @@ namespace GBI_Aligner
             verseNodeID = verseNodeID.Substring(0, verseNodeID.Length - 1);
             string verseID = verseNodeID.Substring(0, 8);
 
-            Hashtable existingLinks = new Hashtable();
+            Dictionary<string, string> existingLinks = new Dictionary<string, string>();
             if (oldLinks.ContainsKey(verseID))  // verseID as obtained from tree
             {
-                existingLinks = (Hashtable)oldLinks[verseID];
+                existingLinks = oldLinks[verseID];
                 // Hashtable(mWord.altId => tWord.altId)
             }
 
@@ -304,11 +304,11 @@ namespace GBI_Aligner
             int goodLinkMinCount, // (not actually used)
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
-            Hashtable existingLinks, // Hashtable(mWord.altId => tWord.altId)
+            Dictionary<string, string> existingLinks, // Hashtable(mWord.altId => tWord.altId)
                                      // it gets used here
             List<string> sourceFuncWords,
             bool contentWordsOnly, // (not actually used)
-            Hashtable strongs
+            Dictionary<string, Dictionary<string, int>> strongs
             )
         {
             AlternativeCandidates topCandidates = new AlternativeCandidates();
@@ -333,7 +333,7 @@ namespace GBI_Aligner
 
             if (strongs.ContainsKey(sWord.Strong))
             {
-                Hashtable wordIds = (Hashtable)strongs[sWord.Strong];
+                Dictionary<string, int> wordIds = strongs[sWord.Strong];
                 ArrayList matchingTwords = GetMatchingTwords(wordIds, tWords);
                 foreach(TargetWord target in matchingTwords)
                 {
@@ -1215,7 +1215,7 @@ namespace GBI_Aligner
             }
         }
 
-        static ArrayList GetMatchingTwords(Hashtable wordIds, ArrayList tWords)
+        static ArrayList GetMatchingTwords(Dictionary<string, int> wordIds, ArrayList tWords)
         {
             ArrayList matchingTwords = new ArrayList();
 
