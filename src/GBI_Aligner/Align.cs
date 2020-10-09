@@ -31,10 +31,10 @@ namespace GBI_Aligner
             string jsonOutput,
             int maxPaths,
 			List<string> puncs,
-            ArrayList stopWords,
-            Hashtable goodLinks, // Hashtable(link => count)
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks, // Hashtable(link => count)
             int goodLinkMinCount,
-            Hashtable badLinks,
+            Dictionary<string, int> badLinks,
             int badLinkMinCount,
             Hashtable glossTable,
             Hashtable oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
@@ -112,10 +112,10 @@ namespace GBI_Aligner
             int i,
             int maxPaths,
 			List<string> puncs,
-            ArrayList stopWords,
-            Hashtable goodLinks,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
-            Hashtable badLinks,
+            Dictionary<string, int> badLinks,
             int badLinkMinCount,
             Hashtable glossTable,
             Hashtable oldLinks,  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
@@ -299,10 +299,10 @@ namespace GBI_Aligner
             bool useAlignModel,
             int n, // number of target tokens (not actually used)
             List<string> puncs,
-            ArrayList stopWords,
-            Hashtable goodLinks, // (not actually used)
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks, // (not actually used)
             int goodLinkMinCount, // (not actually used)
-            Hashtable badLinks,
+            Dictionary<string, int> badLinks,
             int badLinkMinCount,
             Hashtable existingLinks, // Hashtable(mWord.altId => tWord.altId)
                                      // it gets used here

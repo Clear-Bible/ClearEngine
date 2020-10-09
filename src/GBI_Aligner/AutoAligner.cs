@@ -49,12 +49,12 @@ namespace GBI_Aligner
             Dictionary<string, List<TargetGroup>> groups, // one-to-many, many-to-one, and many-to-many mappings
                               // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
-            ArrayList stopWords, // target words not to be linked
-            Hashtable goodLinks, // list of word pairs that should be linked
+            List<string> stopWords, // target words not to be linked
+            Dictionary<string, int> goodLinks, // list of word pairs that should be linked
                                  // from Data.GetXLinks("goodLinks.txt")
                                  //   of the form Hashtable(link => count)
             int goodLinkMinCount, // the mininmal counts required for a good link to be used
-            Hashtable badLinks, // list of word pairs that should not be linked, also Hashtable(link => count)
+            Dictionary<string, int> badLinks, // list of word pairs that should not be linked, also Hashtable(link => count)
             int badLinkMinCount, // the mininmal counts required for a bad link to be considered
             Hashtable glossTable, // gloss information of the source text 
             Hashtable oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))

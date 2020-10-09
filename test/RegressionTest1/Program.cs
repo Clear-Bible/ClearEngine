@@ -138,10 +138,10 @@ namespace RegressionTest1
             bool useAlignModel = true;
             int maxPaths = 1000000;
             Dictionary<string, List<TargetGroup>> groups = Data.LoadGroups(common("groups.txt"));
-            ArrayList stopWords = Data.GetStopWords(common("stopWords.txt"));
-            Hashtable goodLinks = Data.GetXLinks(common("goodLinks.txt"));
+            List<string> stopWords = Data.GetStopWords(common("stopWords.txt"));
+            Dictionary<string, int> goodLinks = Data.GetXLinks(common("goodLinks.txt"));
             int goodLinkMinCount = 3;
-            Hashtable badLinks = Data.GetXLinks(common("badLinks.txt"));
+            Dictionary<string, int> badLinks = Data.GetXLinks(common("badLinks.txt"));
             int badLinkMinCount = 3;
             Hashtable glossTable = Data.BuildGlossTableFromFile(common("Gloss.txt"));
             Hashtable oldLinks = Data.GetOldLinks(common("oldAlignment.json"), groups);

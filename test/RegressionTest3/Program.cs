@@ -51,11 +51,11 @@ namespace RegressionTest3
 
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
             Dictionary<string, List<TargetGroup>> groups = Data.LoadGroups(InPath("groups.txt"));           
-            ArrayList stopWords = Data.GetStopWords(InPath("stopWords.txt"));
+            List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
-            Hashtable goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
+            Dictionary<string, int> goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
             int goodLinkMinCount = 3;
-            Hashtable badLinks = Data.GetXLinks(InPath("badLinks.txt"));
+            Dictionary<string, int> badLinks = Data.GetXLinks(InPath("badLinks.txt"));
             int badLinkMinCount = 3;
 
             Hashtable glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
