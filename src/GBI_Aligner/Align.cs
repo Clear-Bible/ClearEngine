@@ -324,10 +324,10 @@ namespace GBI_Aligner
 
                 for (int i = 0; i < tWords.Count; i++)
                 {
-                    TargetWord tWord = (TargetWord)tWords[i];
+                    TargetWord tWord = tWords[i];
                     if (translations.ContainsKey(tWord.Text))
                     {
-                        Stats s = (Stats)translations[tWord.Text];
+                        Stats s = translations[tWord.Text];
                         if (s.Prob < 0.2) s.Prob = 0.2;
                         probs.Add(tWord, Math.Log(s.Prob));
                     }
@@ -336,7 +336,6 @@ namespace GBI_Aligner
             else if (model.ContainsKey(sWord.Lemma))
             {
                 Dictionary<string, double> translations = model[sWord.Lemma];
-                // tWord.Text => double
 
                 for (int i = 0; i < tWords.Count; i++)
                 {
@@ -399,7 +398,6 @@ namespace GBI_Aligner
             => !sourceFuncWords.Contains(lemma);
  
 
-        // the values of the Hashtable are probabilities that are doubles
         static double FindBestProb(Dictionary<TargetWord, double> probs)
         {
             return probs
@@ -421,9 +419,6 @@ namespace GBI_Aligner
         }
 
 
-        // childCandidateList = ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
-        // returns ArrayList(Candidate)
-        //
         static List<Candidate> ComputeTopCandidates(List<List<Candidate>> childCandidateList, int n, int maxPaths, List<string> sNodes, XmlNode treeNode)
         {
             // I think that childCandidateList is a list of alternatives ...
@@ -432,10 +427,8 @@ namespace GBI_Aligner
                 new Dictionary<CandidateChain, double>();
 
             List<CandidateChain> allPaths = CreatePaths(childCandidateList, maxPaths);
-            // allPaths :: ArrayList(ArrayList(Candidate))
 
             List<CandidateChain> paths = FilterPaths(allPaths);
-            // paths :: ArrayList(ArrayList(Candidate))
             // paths = those where the candidates use different words
 
             if (paths.Count == 0)
@@ -448,7 +441,6 @@ namespace GBI_Aligner
 
             foreach (CandidateChain path in paths)
             {
-                // path :: ArrayList(Candidate)
                 double jointProb = ComputeJointProb(path); // sum of candidate probabilities in a path
                 try
                 {
@@ -458,8 +450,6 @@ namespace GBI_Aligner
                 {
                     Console.WriteLine("Hashtable out of memory.");
 
-                    // ArrayList sortedCandidates2 = Sort.SortTableDoubleDesc(pathProbs);
-
                     List<CandidateChain> sortedCandidates2 =
                             pathProbs
                                 .OrderByDescending(kvp => (double)kvp.Value)
@@ -468,51 +458,23 @@ namespace GBI_Aligner
 
                     int topN2 = sortedCandidates2.Count / 10;
                     if (topN2 < n) topN2 = n;
-                    //                    topCandidates = GetTopPaths(sortedCandidates2, pathProbs, topN2);
+
                     topCandidates = GetTopPaths2(sortedCandidates2, pathProbs);
                     return topCandidates;
                 }
             }
 
-            // pathProbs :: Hashtable(ArrayList(Candidate), jointProb)
-
-            Dictionary<CandidateChain, double> pathProbs2 = AdjustProbsByDistanceAndOrder(pathProbs);
-
-            // pathProbs :: Hashtable(ArrayList(Candidate), revisedProb)
+            Dictionary<CandidateChain, double> pathProbs2 =
+                AdjustProbsByDistanceAndOrder(pathProbs);
 
             List<CandidateChain> sortedCandidates = Data.SortPaths(pathProbs2);
-            // sortedCandidates :: ArrayList(Candidate)
-
-            // (topN not actually used)
-            int topN = sortedCandidates.Count / 10;
-            if (topN < n) topN = n;
 
             topCandidates = GetTopPaths2(sortedCandidates, pathProbs);
-            // topCandidates :: ArrayList(Candidate)
-            // one for each path of maximal probability
-
-            // (doesn't actually do anything)
-            foreach (Candidate c in topCandidates)
-            {
-                string linkedWords = GetWords(c);
-            }
-
-            // (doesn't actually do anything)
-            for (int i = 0; i < topCandidates.Count; i++)
-            {
-                Candidate c = (Candidate)topCandidates[i];
-            }
-
-            // (doesn't actually do anything)
-            Candidate topCandidate = (Candidate)topCandidates[0];
 
             return topCandidates;
         }
 
 
-        // pathProbs :: Hashtable(ArrayList(Candidate), jointProb)
-        // returns a datum of the same type
-        //
         static Dictionary<CandidateChain, double>
             AdjustProbsByDistanceAndOrder(
                 Dictionary<CandidateChain, double> pathProbs)
@@ -520,7 +482,7 @@ namespace GBI_Aligner
             Dictionary<CandidateChain, double> pathProbs2 =
                 new Dictionary<CandidateChain, double>();
 
-            ArrayList candidates = new ArrayList(); // ::= ArrayList(Candidate)
+            List<Candidate> candidates = new List<Candidate>();
 
             foreach (var pathEnum in pathProbs)
             {
@@ -533,7 +495,7 @@ namespace GBI_Aligner
             int minimalDistance = 10000;
             foreach (Candidate c in candidates)
             {
-                int distance = ComputeDistance(c.Chain); // something about distance between words
+                int distance = ComputeDistance(c.Chain); 
                 if (distance < minimalDistance) minimalDistance = distance;
             }
 
@@ -541,11 +503,7 @@ namespace GBI_Aligner
             {
                 foreach (Candidate c in candidates)
                 {
-                    string linkedWords = GetWords(c);
-                    if (linkedWords == "chaos-4 --1 vide-8")
-                    {
-                        ;
-                    }
+                    string linkedWords = GetWords(c);                 
                     int distance = ComputeDistance(c.Chain);
                     double distanceProb = Math.Log((double)minimalDistance / (double)distance);
                     double orderProb = ComputeOrderProb(c.Chain);  // something about word order
@@ -562,11 +520,12 @@ namespace GBI_Aligner
             return pathProbs2;
         }
 
+
         // returns "text1-posn1 text2-posn2 ..."
         //
         public static string GetWords(Candidate c)
         {
-            ArrayList wordsInPath = GetTargetWordsInPath(c.Chain);
+            List<TargetWord> wordsInPath = GetTargetWordsInPath(c.Chain);
 
             string words = string.Empty;
 
@@ -580,7 +539,7 @@ namespace GBI_Aligner
 
         public static string GetWordsInPath(ArrayList path)
         {
-            ArrayList wordsInPath = GetTargetWordsInPath(path);
+            List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
 
             string words = string.Empty;
 
@@ -649,7 +608,7 @@ namespace GBI_Aligner
         static int ComputeDistance(ArrayList path)
         {
 
-            ArrayList wordsInPath = GetTargetWordsInPath(path);
+            List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
 
             int distance = 0;
 
@@ -672,7 +631,7 @@ namespace GBI_Aligner
             //ArrayList wordsInPath = new ArrayList();
             //GetWordsInPath(path, ref wordsInPath);
 
-            ArrayList wordsInPath = GetTargetWordsInPath(path);
+            List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
 
             int violations = 0;
             int countedWords = 1;
@@ -696,7 +655,7 @@ namespace GBI_Aligner
             return Math.Log(prob);
         }
 
-        static int GetInitialPosition(ArrayList wordsInPath)
+        static int GetInitialPosition(List<TargetWord> wordsInPath)
         {
             int initialPosition = 0;
 
@@ -712,33 +671,8 @@ namespace GBI_Aligner
             return initialPosition;
         }
 
-        //public static void GetWordsInPath(ArrayList path, ref ArrayList wordsInPath)
-        //{
-        //    ArrayList words = new ArrayList();
 
-        //    if (path.Count == 0)
-        //    {
-        //        TargetWord tWord = CreateFakeTargetWord();
-        //    }
-        //    else if (path[0] is Candidate)
-        //    {
-        //        foreach (Candidate c in path)
-        //        {
-        //            GetWordsInPath(c.Sequence, ref wordsInPath);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        foreach (TargetWord tWord in path)
-        //        {
-        //            wordsInPath.Add(tWord);
-        //        }
-        //    }
-        //}
-
-
-        // returns an ArrayList of TargetWord objects.
-        public static ArrayList GetTargetWordsInPath(ArrayList path)
+        public static List<TargetWord> GetTargetWordsInPath(ArrayList path)
         {
             IEnumerable<TargetWord> helper(ArrayList path)
             {
@@ -759,7 +693,7 @@ namespace GBI_Aligner
             }
 
 
-            return new ArrayList(helper(path).ToList());
+            return helper(path).ToList();
         }
 
 
