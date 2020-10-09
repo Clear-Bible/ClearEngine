@@ -248,7 +248,7 @@ namespace GBI_Aligner
                     .Select(childNode => candidatesForNode(childNode))
                     .ToList();
 
-                ArrayList sNodes = GetSourceNodes(treeNode);
+                List<string> sNodes = GetSourceNodes(treeNode);
 
                 alignments[nodeID] = ComputeTopCandidates(
                     candidates, n, maxPaths, sNodes, treeNode);
@@ -424,7 +424,7 @@ namespace GBI_Aligner
         // childCandidateList = ArrayList(ArrayList(Candidate{ Sequence ArrayList(TargetWord), Prob double }))
         // returns ArrayList(Candidate)
         //
-        static List<Candidate> ComputeTopCandidates(List<List<Candidate>> childCandidateList, int n, int maxPaths, ArrayList sNodes, XmlNode treeNode)
+        static List<Candidate> ComputeTopCandidates(List<List<Candidate>> childCandidateList, int n, int maxPaths, List<string> sNodes, XmlNode treeNode)
         {
             // I think that childCandidateList is a list of alternatives ...
 
@@ -1036,9 +1036,9 @@ namespace GBI_Aligner
             return firstWord.Substring(firstWord.LastIndexOf("_") + 1, 5);
         }
 
-        static ArrayList GetSourceNodes(XmlNode treeNode)
+        static List<string> GetSourceNodes(XmlNode treeNode)
         {
-            ArrayList sourceNodes = new ArrayList();
+            List<string> sourceNodes = new List<string>();
 
             List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
             foreach(XmlNode terminalNode in terminalNodes)
