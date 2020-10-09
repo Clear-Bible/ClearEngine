@@ -44,7 +44,7 @@ namespace RegressionTest3
             Hashtable bookNames = BookTables.LoadBookNames3();
 
             Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
-            Hashtable preAlignment = Data.BuildPreAlignmentTable(alignProbs);
+            Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
 
             bool useAlignModel = true;
             int maxPaths = 1000000;

@@ -24,7 +24,7 @@ namespace GBI_Aligner
             string[] sourceWords, // lemmas
             string[] targetWords,  // lowercased tokens        
             Dictionary<string, Dictionary<string, double>> model, 
-            Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+            Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             ArrayList puncs,
             ArrayList stopWords,
@@ -108,7 +108,7 @@ namespace GBI_Aligner
             Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
             List<string> linkedTargets, // target word IDs from non-fake words
             Dictionary<string, Dictionary<string, double>> model, // translation model, Hashtable(source => Hashtable(target => probability))
-            Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+            Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             ArrayList puncs,
             ArrayList stopWords,

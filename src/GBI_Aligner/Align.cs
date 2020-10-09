@@ -23,7 +23,7 @@ namespace GBI_Aligner
             Dictionary<string, Dictionary<string, double>> model,  
             Dictionary<string, Dictionary<string, Stats>> manModel, 
             Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
-            Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+            Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
@@ -104,7 +104,7 @@ namespace GBI_Aligner
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                 // Hashtable(source => Hashtable(target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
-            Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+            Dictionary<string, string> preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             Hashtable groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))

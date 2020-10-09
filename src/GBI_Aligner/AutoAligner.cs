@@ -35,11 +35,11 @@ namespace GBI_Aligner
             string treeFolder, // the folder where syntatic trees are kept.
             Hashtable bookNames, // for getting booknames that are used in the tree files
             Dictionary<string, double> alignProbs, // alignment probabilities
-                                  // comes from Data.GetAlignmentModel(alignModel.txt)
-                                  //   Hashtable(pair => probability)
-                                  //   the pair is a string of the form: bbcccvvvwwwn-bbcccvvvwww 
-                                  //      for example: 400010010011-40001001001 
-            Hashtable preAlignment, // alignments from the decoder of the statisical aligner
+                                                   // comes from Data.GetAlignmentModel(alignModel.txt)
+                                                   //   Hashtable(pair => probability)
+                                                   //   the pair is a string of the form: bbcccvvvwwwn-bbcccvvvwww 
+                                                   //      for example: 400010010011-40001001001 
+            Dictionary<string, string> preAlignment, // alignments from the decoder of the statisical aligner
                                     // comes from Data.BuildPreAlignmentTable(alignProbs)
                                     //   of the form Hashtable(bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel, // use the alignProbs and preAlignment only in batch mode where the verses 

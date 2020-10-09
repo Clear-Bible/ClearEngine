@@ -134,7 +134,7 @@ namespace RegressionTest1
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(common("manTransModel.txt"));
             Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
-            Hashtable preAlignment = Data.BuildPreAlignmentTable(alignProbs);
+            Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
             bool useAlignModel = true;
             int maxPaths = 1000000;
             Hashtable groups = Data.LoadGroups(common("groups.txt"));
