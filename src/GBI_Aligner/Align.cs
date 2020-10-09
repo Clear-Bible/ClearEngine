@@ -339,7 +339,7 @@ namespace GBI_Aligner
 
                 for (int i = 0; i < tWords.Count; i++)
                 {
-                    TargetWord tWord = (TargetWord)tWords[i];
+                    TargetWord tWord = tWords[i];
                     string link = sWord.Lemma + "#" + tWord.Text;
                     if (badLinks.ContainsKey(link) && (int)badLinks[link] >= badLinkMinCount)
                     {
@@ -381,11 +381,6 @@ namespace GBI_Aligner
             double bestProb = FindBestProb(probs);
             topCandidates = new AlternativeCandidates(
                 GetCandidatesWithSpecifiedProbability(bestProb, probs));
-
-            foreach (Candidate c in topCandidates)
-            {
-                string linkedWords = GetWords(c);
-            }
 
             return topCandidates;
         }
@@ -537,7 +532,7 @@ namespace GBI_Aligner
             return words.Trim();
         }
 
-        public static string GetWordsInPath(ArrayList path)
+        public static string GetWordsInPath(CandidateChain path)
         {
             List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
 
@@ -551,10 +546,7 @@ namespace GBI_Aligner
             return words.Trim();
         }
 
-        // paths :: ArrayList(ArrayList(Candidate))
-        // returns the valid paths, which are ones where the candidates
-        // use different words
-        //
+
         static List<CandidateChain> FilterPaths(List<CandidateChain> paths)
         {
             List<CandidateChain> filteredPaths = new List<CandidateChain>();
@@ -571,11 +563,11 @@ namespace GBI_Aligner
         }
 
 
-        static bool IsValidPath(ArrayList path)
+        static bool IsValidPath(CandidateChain path)
         {
             string wordsInPath = GetWordsInPath(path);
             string[] words = wordsInPath.Split(" ".ToCharArray());
-            ArrayList usedWords = new ArrayList();
+            List<string> usedWords = new List<string>();
             for (int i = 0; i < words.Length; i++)
             {
                 string word = words[i];
@@ -593,10 +585,12 @@ namespace GBI_Aligner
             return true;
         }
 
-        static double ComputeJointProb(ArrayList path)
+        static double ComputeJointProb(CandidateChain path)
         {
             double jointProb = 0.0;
 
+            // Look at this again.
+            // It assumes that the chain is all Candidates.
             foreach(Candidate c in path)
             {
                 jointProb += c.Prob;
@@ -605,9 +599,9 @@ namespace GBI_Aligner
             return jointProb;
         }
 
-        static int ComputeDistance(ArrayList path)
-        {
 
+        static int ComputeDistance(CandidateChain path)
+        {
             List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
 
             int distance = 0;
@@ -626,11 +620,9 @@ namespace GBI_Aligner
             return distance;
         }
 
-        static double ComputeOrderProb(ArrayList path)
-        {
-            //ArrayList wordsInPath = new ArrayList();
-            //GetWordsInPath(path, ref wordsInPath);
 
+        static double ComputeOrderProb(CandidateChain path)
+        {
             List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
 
             int violations = 0;
@@ -672,7 +664,7 @@ namespace GBI_Aligner
         }
 
 
-        public static List<TargetWord> GetTargetWordsInPath(ArrayList path)
+        public static List<TargetWord> GetTargetWordsInPath(CandidateChain path)
         {
             IEnumerable<TargetWord> helper(ArrayList path)
             {
