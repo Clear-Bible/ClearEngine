@@ -16,15 +16,15 @@ namespace GBI_Aligner
     {
         public static void WriteAlignment(
             ArrayList links, // ArrayList(MappedGroup)
-            ArrayList sourceWords, 
-            ArrayList targetWords, 
+            List<SourceWord> sourceWords, 
+            List<TargetWord> targetWords, 
             ref Alignment2 align, 
             int k, 
             Hashtable glossTable, 
             Hashtable groups
             )
         {
-            Hashtable targetPositionMap = BuildTargetPositionMap(targetWords);
+            Hashtable targetPositionMap = BuildTargetPositionMap(new ArrayList(targetWords));
 
             // Create line object
             Line line = new Line();
@@ -68,7 +68,7 @@ namespace GBI_Aligner
             Hashtable primaryPositions = BuildPrimaryTable(groups);
 
             links = RemoveEmptyLinks(links);
-            RestoreOriginalPositions(ref links, sourceWords);
+            RestoreOriginalPositions(ref links, new ArrayList(sourceWords));
             line.links = new List<Link>();
             for (int j = 0; j < links.Count; j++)
             {
