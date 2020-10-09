@@ -13,31 +13,30 @@ namespace GBI_Aligner
     class Groups
     {
         public static void AlignGroups(
-            ref ArrayList links, // ArrayList(MappedGroup)
-            List<SourceWord> sourceWords, // ArrayList(SourceWord)
-            List<TargetWord> targetWords, // ArrayList(TargetWord)
+            List<MappedGroup> links,
+            List<SourceWord> sourceWords,
+            List<TargetWord> targetWords,
             Dictionary<string, List<TargetGroup>> groups,
             List<XmlNode> terminals 
             )
         {
             SourceWord[] sWords = BuildSourceArray(new ArrayList(sourceWords));
             TargetWord[] tWords = BuildTargetArray(new ArrayList(targetWords));
-            ArrayList mappedGroups = GetGroupLinks(sWords, tWords, groups);
-            // mappedGroups :: ArrayList(string[][])
+            List<string[][]> mappedGroups = GetGroupLinks(sWords, tWords, groups);
             if (mappedGroups.Count > 0)
             {
                 RemoveOldLinks(mappedGroups, ref links);
                 foreach (string[][] group in mappedGroups)
                 {
-                    AddGroup(group, ref links, terminals, new ArrayList(targetWords));
+                    AddGroup(group, links, terminals, new ArrayList(targetWords));
                 }
             }
         }
 
         // returns ArrayList(string[][])
-        static ArrayList GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, Dictionary<string, List<TargetGroup>> groups)
+        static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, Dictionary<string, List<TargetGroup>> groups)
         {
-            ArrayList mappedGroups = new ArrayList();
+            List<string[][]> mappedGroups = new List<string[][]>();
 
             for (int i = 0; i < sourceWords.Length; i++)
             {
@@ -186,9 +185,9 @@ namespace GBI_Aligner
 
 
 
-        static void RemoveOldLinks(ArrayList mappedGroups, ref ArrayList links)
+        static void RemoveOldLinks(List<string[][]> mappedGroups, ref List<MappedGroup> links)
         {
-            ArrayList cleanLinks = new ArrayList();
+            List<MappedGroup> cleanLinks = new List<MappedGroup>();
 
             ArrayList sourceWordsInGroups = GetSourceWordsInGroups(mappedGroups);
             ArrayList targetWordsInGroups = GetTargetWordsInGroups(mappedGroups);
@@ -204,7 +203,7 @@ namespace GBI_Aligner
             links = cleanLinks;
         }
 
-        static ArrayList GetSourceWordsInGroups(ArrayList mappedGroups)
+        static ArrayList GetSourceWordsInGroups(List<string[][]> mappedGroups)
         {
             ArrayList wordsInGroups = new ArrayList();
 
@@ -220,7 +219,7 @@ namespace GBI_Aligner
             return wordsInGroups;
         }
 
-        static ArrayList GetTargetWordsInGroups(ArrayList mappedGroups)
+        static ArrayList GetTargetWordsInGroups(List<string[][]> mappedGroups)
         {
             ArrayList wordsInGroups = new ArrayList();
 
@@ -262,7 +261,7 @@ namespace GBI_Aligner
             return inGroup;
         }
 
-        static void AddGroup(string[][]group, ref ArrayList links, List<XmlNode> terminals, ArrayList targets)
+        static void AddGroup(string[][]group, List<MappedGroup> links, List<XmlNode> terminals, ArrayList targets)
         {
             string[] sourceWords = group[0];
             string[] targetWords = group[1];
@@ -383,19 +382,19 @@ namespace GBI_Aligner
         // wordLinks :: ArrayList(MappedWords)
         // returns ArrayList(MappedGroup)
         //
-        public static ArrayList WordsToGroups(ArrayList wordLinks)
+        public static List<MappedGroup> WordsToGroups(List<MappedWords> wordLinks)
         {
-            ArrayList gourpLinks = new ArrayList();
+            List<MappedGroup> groupLinks = new List<MappedGroup>();
 
             foreach(MappedWords wordLink in wordLinks)
             {
                 MappedGroup groupLink = new MappedGroup();
                 groupLink.SourceNodes.Add(wordLink.SourceNode);
                 groupLink.TargetNodes.Add(wordLink.TargetNode);
-                gourpLinks.Add(groupLink);
+                groupLinks.Add(groupLink);
             }
 
-            return gourpLinks;
+            return groupLinks;
         }
     }
 

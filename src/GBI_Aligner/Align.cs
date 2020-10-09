@@ -170,16 +170,13 @@ namespace GBI_Aligner
             Candidate topCandidate = verseAlignment[0];
 
             List<XmlNode> terminals = Terminals.GetTerminalXmlNodes(treeNode);
-            ArrayList links = Align2.AlignTheRest(topCandidate, terminals, sourceWords, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
-            // links :: ArrayList(MappedWords)
+            List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sourceWords, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
 
-            links = Groups.WordsToGroups(links);
-            // links :: ArrayList(MappedGroup)
+            List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
-            Groups.AlignGroups(ref links, sWords, tWords, groups, terminals);
-            Align2.FixCrossingLinks(ref links);
-            //            Output.WriteAlignment(links, sourceWords, targetWords2, ref align, i, wordInfoTable, groups);
-            Output.WriteAlignment(links, sWords, tWords, ref align, i, glossTable, groups);
+            Groups.AlignGroups(links2, sWords, tWords, groups, terminals);
+            Align2.FixCrossingLinks(ref links2);
+            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups);
         }
 
         static void AlignNodes(
