@@ -189,8 +189,8 @@ namespace GBI_Aligner
         {
             List<MappedGroup> cleanLinks = new List<MappedGroup>();
 
-            ArrayList sourceWordsInGroups = GetSourceWordsInGroups(mappedGroups);
-            ArrayList targetWordsInGroups = GetTargetWordsInGroups(mappedGroups);
+            List<string> sourceWordsInGroups = GetSourceWordsInGroups(mappedGroups);
+            List<string> targetWordsInGroups = GetTargetWordsInGroups(mappedGroups);
 
             foreach (MappedGroup mg in links)
             {
@@ -203,9 +203,9 @@ namespace GBI_Aligner
             links = cleanLinks;
         }
 
-        static ArrayList GetSourceWordsInGroups(List<string[][]> mappedGroups)
+        static List<string> GetSourceWordsInGroups(List<string[][]> mappedGroups)
         {
-            ArrayList wordsInGroups = new ArrayList();
+            List<string> wordsInGroups = new List<string>();
 
             foreach(string[][] mg in mappedGroups)
             {
@@ -219,9 +219,9 @@ namespace GBI_Aligner
             return wordsInGroups;
         }
 
-        static ArrayList GetTargetWordsInGroups(List<string[][]> mappedGroups)
+        static List<string> GetTargetWordsInGroups(List<string[][]> mappedGroups)
         {
-            ArrayList wordsInGroups = new ArrayList();
+            List<string> wordsInGroups = new List<string>();
 
             foreach (string[][] mg in mappedGroups)
             {
@@ -235,7 +235,7 @@ namespace GBI_Aligner
             return wordsInGroups;
         }
 
-        static bool InGroup(MappedGroup mg, ArrayList sourceWordsInGroups, ArrayList targetWordsInGroups)
+        static bool InGroup(MappedGroup mg, List<string> sourceWordsInGroups, List<string> targetWordsInGroups)
         {
             bool inGroup = false;
 
