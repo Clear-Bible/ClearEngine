@@ -144,7 +144,7 @@ namespace GBI_Aligner
 
         static void RestoreOriginalPositions(List<MappedGroup> links, List<SourceWord> sourceWords)
         {
-            Hashtable positionTable = new Hashtable();
+            Dictionary<string, int> positionTable = new Dictionary<string, int>();
 
             for (int i = 0; i < sourceWords.Count; i++)
             {
