@@ -67,7 +67,7 @@ namespace GBI_Aligner
             Dictionary<string, int> primaryPositions = BuildPrimaryTable(groups);
 
             links = RemoveEmptyLinks(links);
-            RestoreOriginalPositions(links, new ArrayList(sourceWords));
+            RestoreOriginalPositions(links, sourceWords);
             line.links = new List<Link>();
             for (int j = 0; j < links.Count; j++)
             {
@@ -109,23 +109,7 @@ namespace GBI_Aligner
             align.Lines[k] = line;
         }
 
-        static Hashtable BuildTargetPositionMap(ArrayList targetWords)
-        {
-            Hashtable positionMap = new Hashtable();
-
-            for (int i = 0; i < targetWords.Count; i++)
-            {
-                TargetWord targetWord = (TargetWord)targetWords[i];
-                string tWord = targetWord.Text2;
-                string targetID = targetWord.ID;
-                if (!positionMap.ContainsKey(targetID))
-                {
-                    positionMap.Add(targetID, i);
-                }
-            }
-
-            return positionMap;
-        }
+ 
 
         static List<MappedGroup> RemoveEmptyLinks(List<MappedGroup> links)
         {
@@ -158,13 +142,13 @@ namespace GBI_Aligner
             return isTrue;
         }
 
-        static void RestoreOriginalPositions(List<MappedGroup> links, ArrayList sourceWords)
+        static void RestoreOriginalPositions(List<MappedGroup> links, List<SourceWord> sourceWords)
         {
             Hashtable positionTable = new Hashtable();
 
             for (int i = 0; i < sourceWords.Count; i++)
             {
-                SourceWord sourceWord = (SourceWord)sourceWords[i];
+                SourceWord sourceWord = sourceWords[i];
                 string id = sourceWord.ID;
                 positionTable.Add(id, i);
             }
