@@ -130,11 +130,11 @@ namespace GBI_Aligner
                 int wordIndex = 0;
                 int currRange = 0;
                 bool inRange = false;
-                ArrayList targetWordsInGroup = new ArrayList();
+                List<int> targetWordsInGroup = new List<int>();
 
                 for (int i = 0; i < targetWords.Length && wordIndex < words.Length; i++)
                 {
-                    TargetWord targetWord = (TargetWord)targetWords[i];
+                    TargetWord targetWord = targetWords[i];
                     if (targetWord.InGroup) continue;
                     string word = words[wordIndex].Trim();
                     if (targetWord.Text == word)
@@ -157,7 +157,7 @@ namespace GBI_Aligner
                 }
                 if (words.Length == targetWordsInGroup.Count)
                 {
-                    SetInGroup2(ref targetWords, targetWordsInGroup);
+                    SetInGroup2(targetWords, targetWordsInGroup);
                     break;
                 }
                 else
@@ -171,7 +171,7 @@ namespace GBI_Aligner
 
         
 
-        static void SetInGroup2(ref TargetWord[] targetWords, ArrayList targetWordsInGroup)
+        static void SetInGroup2(TargetWord[] targetWords, List<int> targetWordsInGroup)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {

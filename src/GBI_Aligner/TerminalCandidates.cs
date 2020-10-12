@@ -133,7 +133,7 @@ namespace GBI_Aligner
                 List<Candidate> candidates = candidateTable[morphID];
                 for (int i = 0; i < candidates.Count; i++)
                 {
-                    Candidate c = (Candidate)candidates[i];
+                    Candidate c = candidates[i];
                     string targetID = GetTargetID(c);
                     if (targetID == string.Empty) continue;
                     string linkedWords = Align.GetWords(c);
