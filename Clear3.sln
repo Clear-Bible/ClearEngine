@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegressionTest2", "test\Reg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegressionTest3", "test\RegressionTest3\RegressionTest3.csproj", "{1B08ADB9-0D0A-4297-BBA1-655C9E6FA28D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegressionTest4", "test\RegressionTest4\RegressionTest4.csproj", "{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -193,5 +195,17 @@ Global
 		{1B08ADB9-0D0A-4297-BBA1-655C9E6FA28D}.Debug|x64.Build.0 = Debug|Any CPU
 		{1B08ADB9-0D0A-4297-BBA1-655C9E6FA28D}.Release|x64.ActiveCfg = Release|Any CPU
 		{1B08ADB9-0D0A-4297-BBA1-655C9E6FA28D}.Release|x64.Build.0 = Release|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Debug|x86.Build.0 = Debug|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Release|x86.ActiveCfg = Release|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Release|x86.Build.0 = Release|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Debug|x64.Build.0 = Debug|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Release|x64.ActiveCfg = Release|Any CPU
+		{6AD5DEB4-5FC7-4F3C-97D7-5497AA211E60}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
