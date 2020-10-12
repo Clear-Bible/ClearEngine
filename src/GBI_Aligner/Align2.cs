@@ -153,12 +153,11 @@ namespace GBI_Aligner
             {
                 MappedWords preNeighbor = GetPreNeighbor(link, linkedSiblings);
                 MappedWords postNeighbor = GetPostNeighbor(link, linkedSiblings);
-                ArrayList targetCandidates = new ArrayList();
+                List<TargetWord> targetCandidates = new List<TargetWord>();
                 bool foundTarget = false;
                 if (!(preNeighbor == null || postNeighbor == null))
                 {
                     targetCandidates = GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
-                    // targetCandidates :: ArrayList(TargetWord)
                     if (targetCandidates.Count > 0)
                     {
                         LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
@@ -228,9 +227,9 @@ namespace GBI_Aligner
             return position;
         }
 
-        static ArrayList GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
+        static List<TargetWord> GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
         {
-            ArrayList candidates = new ArrayList();
+            List<TargetWord> candidates = new List<TargetWord>();
 
             int anchorPosition = postNeighbor.TargetNode.Word.Position;
 
@@ -266,9 +265,9 @@ namespace GBI_Aligner
             return candidates;
         }
 
-        static ArrayList GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncBounds, List<string> targetFuncWords, bool contentWordsOnly)
+        static List<TargetWord> GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncBounds, List<string> targetFuncWords, bool contentWordsOnly)
         {
-            ArrayList candidates = new ArrayList();
+            List<TargetWord> candidates = new List<TargetWord>();
 
             int startPosition = preNeighbor.TargetNode.Word.Position;
             int endPosition = postNeighbor.TargetNode.Word.Position;
@@ -535,7 +534,7 @@ namespace GBI_Aligner
 
         static LinkedWord GetTopCandidate(
             SourceNode sWord, 
-            ArrayList tWords, 
+            List<TargetWord> tWords, 
             Dictionary<string, Dictionary<string, double>> model, 
             List<string> linkedTargets, 
             List<string> puncs, 
