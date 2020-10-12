@@ -16,8 +16,6 @@ namespace GBI_Aligner
 {
     class Align2
     {
-        // returns ArrayList(MappedWords)
-        //
         public static List<MappedWords> AlignTheRest(
             Candidate topCandidate,
             List<XmlNode> terminals, 
@@ -149,8 +147,7 @@ namespace GBI_Aligner
             }
 
             bool stopped = false;
-            ArrayList linkedSiblings = GetLinkedSiblings(link.SourceNode.TreeNode, linksTable, ref stopped);
-            // linkedSiblings :: ArrayList(MappedWords)
+            List<MappedWords> linkedSiblings = GetLinkedSiblings(link.SourceNode.TreeNode, linksTable, ref stopped);
 
             if (linkedSiblings.Count > 0)
             {
@@ -299,12 +296,12 @@ namespace GBI_Aligner
         // linksTable :: Hashtable(sourceId => MappedWords)
         // returns ArrayList(MappedWords)
         //
-        static ArrayList GetLinkedSiblings(
+        static List<MappedWords> GetLinkedSiblings(
             XmlNode treeNode,
             Dictionary<string, MappedWords> linksTable, // key is source morphId
             ref bool stopped)
         {
-            ArrayList linkedSiblings = new ArrayList();
+            List<MappedWords> linkedSiblings = new List<MappedWords>();
 
             if (treeNode.ParentNode == null || treeNode.ParentNode.Name == "Tree") stopped = true;
 
@@ -339,7 +336,7 @@ namespace GBI_Aligner
         }
 
 
-        static MappedWords GetPreNeighbor(MappedWords unLinked, ArrayList linkedSiblings)
+        static MappedWords GetPreNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
             MappedWords preNeighbor = null;
 
@@ -367,7 +364,7 @@ namespace GBI_Aligner
         }
 
 
-        static MappedWords GetPostNeighbor(MappedWords unLinked, ArrayList linkedSiblings)
+        static MappedWords GetPostNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
             MappedWords postNeighbor = null;
 
