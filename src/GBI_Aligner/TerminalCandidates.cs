@@ -79,7 +79,7 @@ namespace GBI_Aligner
 
         static void FillGaps(AlternativesForTerminals candidateTable)
         {
-            ArrayList gaps = FindGaps(candidateTable);
+            List<string> gaps = FindGaps(candidateTable);
 
             foreach(string morphID in gaps)
             {
@@ -88,9 +88,9 @@ namespace GBI_Aligner
             }
         }
 
-        static ArrayList FindGaps(AlternativesForTerminals candidateTable)
+        static List<string> FindGaps(AlternativesForTerminals candidateTable)
         {
-            ArrayList gaps = new ArrayList();
+            List<string> gaps = new List<string>();
 
             foreach (var tableEnum in candidateTable)
             {
