@@ -24,7 +24,6 @@ namespace GBI_Aligner
             Dictionary<string, List<TargetGroup>> groups
             )
         {
-            Hashtable targetPositionMap = BuildTargetPositionMap(new ArrayList(targetWords));
 
             // Create line object
             Line line = new Line();
@@ -44,7 +43,7 @@ namespace GBI_Aligner
                 mWord.strong = sourceWord.Strong;
                 mWord.pos = sourceWord.Cat;
                 mWord.morph = sourceWord.Morph;
-                Gloss g = (Gloss)glossTable[id];
+                Gloss g = glossTable[id];
                 mWord.gloss = g.Gloss1;
                 mWord.gloss2 = g.Gloss2;
                 line.manuscript.words[i] = mWord;
@@ -65,7 +64,7 @@ namespace GBI_Aligner
             }
 
             // Create the links element
-            Hashtable primaryPositions = BuildPrimaryTable(groups);
+            Dictionary<string, int> primaryPositions = BuildPrimaryTable(groups);
 
             links = RemoveEmptyLinks(links);
             RestoreOriginalPositions(links, new ArrayList(sourceWords));
@@ -184,9 +183,9 @@ namespace GBI_Aligner
             }
         }
 
-        static Hashtable BuildPrimaryTable(Dictionary<string, List<TargetGroup>> groups)
+        static Dictionary<string, int> BuildPrimaryTable(Dictionary<string, List<TargetGroup>> groups)
         {
-            Hashtable primaryTable = new Hashtable();
+            Dictionary<string, int> primaryTable = new Dictionary<string, int>();
 
             foreach (var groupEnum in groups)
             {
@@ -205,13 +204,13 @@ namespace GBI_Aligner
             return primaryTable;
         }
 
-        static List<LinkedWord> ReorderNodes(List<LinkedWord> targetNodes, Hashtable primaryPositions)
+        static List<LinkedWord> ReorderNodes(List<LinkedWord> targetNodes, Dictionary<string, int> primaryPositions)
         {
             List<LinkedWord> targetNodes2 = new List<LinkedWord>();
 
             string targetText = GetTargetText(targetNodes);
-            int primaryPosition = (int)primaryPositions[targetText];
-            LinkedWord primaryWord = (LinkedWord)targetNodes[primaryPosition];
+            int primaryPosition = primaryPositions[targetText];
+            LinkedWord primaryWord = targetNodes[primaryPosition];
             targetNodes2.Add(primaryWord);
             targetNodes.Remove(primaryWord);
             foreach(LinkedWord lw in targetNodes)

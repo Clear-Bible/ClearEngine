@@ -33,7 +33,7 @@ namespace GBI_Aligner
             }
         }
 
-        // returns ArrayList(string[][])
+
         static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, Dictionary<string, List<TargetGroup>> groups)
         {
             List<string[][]> mappedGroups = new List<string[][]>();
@@ -377,11 +377,8 @@ namespace GBI_Aligner
             return targetArray;
         }
 
-//        static XmlNode GetNode(string id, ArrayList terminals)
 
-        // wordLinks :: ArrayList(MappedWords)
-        // returns ArrayList(MappedGroup)
-        //
+
         public static List<MappedGroup> WordsToGroups(List<MappedWords> wordLinks)
         {
             List<MappedGroup> groupLinks = new List<MappedGroup>();
