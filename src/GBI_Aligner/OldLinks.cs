@@ -12,9 +12,9 @@ namespace GBI_Aligner
 {
     class OldLinks
     {
-        public static Hashtable CreateIdMap(ArrayList sWords)
+        public static Dictionary<string, string> CreateIdMap(List<SourceWord> sWords)
         {
-            Hashtable idMap = new Hashtable();
+            Dictionary<string, string> idMap = new Dictionary<string, string>();
 
             foreach(SourceWord sWord in sWords)
             {
@@ -24,7 +24,7 @@ namespace GBI_Aligner
             return idMap;
         }
 
-        public static TargetWord GetTarget(string altID, ArrayList targetWords)
+        public static TargetWord GetTarget(string altID, List<TargetWord> targetWords)
         {
             foreach(TargetWord targetWord in targetWords)
             {

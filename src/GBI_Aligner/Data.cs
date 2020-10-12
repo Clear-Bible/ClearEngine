@@ -40,145 +40,38 @@ namespace GBI_Aligner
         }
 
         // pathProbs :: path => score
-        public static ArrayList SortPaths(Hashtable pathProbs)
+        public static List<CandidateChain> SortPaths(Dictionary<CandidateChain, double> pathProbs)
         {
-            int hashCodeOfWordsInPath(ArrayList path) =>
+            int hashCodeOfWordsInPath(CandidateChain path) =>
                 Align.GetTargetWordsInPath(path).GetHashCode();
 
-            return new ArrayList(
-                pathProbs
-                    .Cast<DictionaryEntry>()
-                    .OrderByDescending(kvp => (double)kvp.Value)
-                    .ThenByDescending(kvp =>
-                        hashCodeOfWordsInPath((ArrayList)kvp.Key))
-                    .Select(kvp => kvp.Key)
-                    .ToList());
+            return pathProbs
+                .OrderByDescending(kvp => kvp.Value)
+                .ThenByDescending(kvp =>
+                    hashCodeOfWordsInPath(kvp.Key))
+                .Select(kvp => kvp.Key)
+                .ToList();
         }
- 
-        //// pathProbs :: Hashtable(Candidate, probability)
-        //// returns ArrayList(Candidate)
-        ////
-        //public static ArrayList SortPaths(Hashtable pathProbs)
-        //{
-        //    ArrayList sortedPaths = Sort.SortTableDoubleDesc(pathProbs);
-        //    return SecondarySort(sortedPaths, pathProbs);
-        //}
 
-        //// 
-        //static public ArrayList SecondarySort(ArrayList paths, Hashtable pathProbs)
-        //{
-        //    ArrayList probGroups = new ArrayList();
-
-        //    double currentProb = 10.0;
-        //    Hashtable group = new Hashtable();
-
-        //    for (int i = 0; i < paths.Count; i++)
-        //    {
-        //        ArrayList path = (ArrayList)paths[i];
-        //        double prob = (double)pathProbs[path];
-        //        ArrayList wordsInPath = new ArrayList();
-        //        Align.GetWordsInPath(path, ref wordsInPath);
-        //        string words = GetWords(wordsInPath);
-        //        int hashCode = words.GetHashCode();
-        //        if (prob != currentProb && group.Count > 0)
-        //        {
-        //            probGroups.Add(group.Clone());
-        //            group.Clear();
-        //            group.Add(path, hashCode);
-        //        }
-        //        else
-        //        {
-        //            group.Add(path, hashCode);
-        //        }
-
-        //        currentProb = prob;
-        //    }
-
-        //    probGroups.Add(group);
-
-        //    ArrayList paths2 = new ArrayList();
-
-        //    foreach(Hashtable probGroup in probGroups)
-        //    {
-        //        ArrayList sortedPaths = Sort.SortTableIntDesc(probGroup);
-        //        foreach(ArrayList sortedPath in sortedPaths)
-        //        {
-        //            paths2.Add(sortedPath);
-        //        }
-        //    }
-
-        //    return paths2;
-        //}
 
 
         // pathProbs ::= TargetWord => score
-        public static ArrayList SortWordCandidates(Hashtable pathProbs)
+        public static List<TargetWord> SortWordCandidates(Dictionary<TargetWord, double> pathProbs)
         {
             int hashCodeOfWordAndPosition(TargetWord tw) =>
                 $"{tw.Text}-{tw.Position}".GetHashCode();
 
-            return new ArrayList(
+            return
                 pathProbs
-                    .Cast<DictionaryEntry>()
-                    .OrderByDescending(kvp => (double)kvp.Value)
+                    .OrderByDescending(kvp => kvp.Value)
                     .ThenByDescending(kvp =>
-                        hashCodeOfWordAndPosition((TargetWord)kvp.Key))
+                        hashCodeOfWordAndPosition(kvp.Key))
                     .Select(kvp => kvp.Key)
-                    .ToList()
-                );
-            
+                    .ToList();           
         }
 
 
-        //public static ArrayList SortWordCandidates(Hashtable pathProbs)
-        //{
-        //    ArrayList sortedCandidates = Sort.SortTableDoubleDesc(pathProbs);
-        //    return SecondarySort2(sortedCandidates, pathProbs);
-        //}
-
-        //static public ArrayList SecondarySort2(ArrayList candidates, Hashtable pathProbs)
-        //{
-        //    ArrayList probGroups = new ArrayList();
-
-        //    double currentProb = 10.0;
-        //    Hashtable group = new Hashtable();
-
-        //    for (int i = 0; i < candidates.Count; i++)
-        //    {
-        //        TargetWord tWord = (TargetWord)candidates[i];
-        //        double prob = (double)pathProbs[tWord];
-        //        string word = tWord.Text + "-" + tWord.Position;
-        //        int hashCode = word.GetHashCode();
-        //        if (prob != currentProb && group.Count > 0)
-        //        {
-        //            probGroups.Add(group.Clone());
-        //            group.Clear();
-        //            group.Add(tWord, hashCode);
-        //        }
-        //        else
-        //        {
-        //            group.Add(tWord, hashCode);
-        //        }
-
-        //        currentProb = prob;
-        //    }
-
-        //    probGroups.Add(group);
-
-        //    ArrayList paths2 = new ArrayList();
-
-        //    foreach (Hashtable probGroup in probGroups)
-        //    {
-        //        //               ArrayList sortedPaths = Sort.SortTableIntDesc2(probGroup);
-        //        ArrayList sortedPaths = Sort.TableToListByInt(probGroup, true);
-        //        foreach (TargetWord tWord in sortedPaths)
-        //        {
-        //            paths2.Add(tWord);
-        //        }
-        //    }
-
-        //    return paths2;
-        //}
+ 
 
         static string GetWords(ArrayList wordsInPath)
         {
@@ -228,7 +121,7 @@ namespace GBI_Aligner
         {
             Dictionary<string, WordInfo> morphTable = new Dictionary<string, WordInfo>();
 
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(tree);
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(tree);
 
             foreach(XmlNode terminalNode in terminalNodes)
             {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Utilities
 {
@@ -611,9 +612,9 @@ namespace Utilities
             return bookNames2;
         }
 
-        public static Hashtable LoadBookNames3()
+        public static Dictionary<string, string> LoadBookNames3()
         {
-            Hashtable bookNames2 = new Hashtable();
+            Dictionary<string, string> bookNames2 = new Dictionary<string, string>();
 
             bookNames2.Add("01", "gn");
             bookNames2.Add("02", "ex");

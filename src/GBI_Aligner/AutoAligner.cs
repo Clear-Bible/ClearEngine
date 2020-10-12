@@ -27,47 +27,46 @@ namespace GBI_Aligner
             string sourceLemma,  // name of file with source lemma IDs
             string target, // name of tokens.txt file, after alignment
             string jsonOutput, // output of aligner, alignment.json file
-            Hashtable transModel, // translation model, comes from Data.GetTranslationModel(transModelFile)
-                                  // of the form: Hashtable(source => Hashtable(target => probability))
-            Hashtable manTransModel, // translation model from manually checked alignments
+            Dictionary<string, Dictionary<string, double>> transModel, // source => target => probability
+            Dictionary<string, Dictionary<string, Stats>> manTransModel, // translation model from manually checked alignments
                                      // comes from Data.GetTranslationModel2(manTransModelFile)
-                                     // of the form: Hashtable(source => Hashtable(target => Stats{ count, probability})
+                                     // of the form: (source => (target => Stats{ count, probability})
                                      // source = strongs, target = lower-cased translated text
             string treeFolder, // the folder where syntatic trees are kept.
-            Hashtable bookNames, // for getting booknames that are used in the tree files
-            Hashtable alignProbs, // alignment probabilities
-                                  // comes from Data.GetAlignmentModel(alignModel.txt)
-                                  //   Hashtable(pair => probability)
-                                  //   the pair is a string of the form: bbcccvvvwwwn-bbcccvvvwww 
-                                  //      for example: 400010010011-40001001001 
-            Hashtable preAlignment, // alignments from the decoder of the statisical aligner
+            Dictionary<string, string> bookNames, // for getting booknames that are used in the tree files
+            Dictionary<string, double> alignProbs, // alignment probabilities
+                                                   // comes from Data.GetAlignmentModel(alignModel.txt)
+                                                   //   (pair => probability)
+                                                   //   the pair is a string of the form: bbcccvvvwwwn-bbcccvvvwww 
+                                                   //      for example: 400010010011-40001001001 
+            Dictionary<string, string> preAlignment, // alignments from the decoder of the statisical aligner
                                     // comes from Data.BuildPreAlignmentTable(alignProbs)
-                                    //   of the form Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+                                    //   of the form (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel, // use the alignProbs and preAlignment only in batch mode where the verses 
                                 // to be aligned are the same as the verses used in building the models
             int maxPaths, // the maximal number paths we can keep at any point
-            ArrayList puncs, // list of punctuation marks
-            Hashtable groups, // one-to-many, many-to-one, and many-to-many mappings
+            List<string> puncs, // list of punctuation marks
+            Dictionary<string, List<TargetGroup>> groups, // one-to-many, many-to-one, and many-to-many mappings
                               // comes from Data.LoadGroups("groups.txt")
-                              //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
-            ArrayList stopWords, // target words not to be linked
-            Hashtable goodLinks, // list of word pairs that should be linked
+                              //   of the form (...source... => List(TargetGroup{...text..., primaryPosition}))
+            List<string> stopWords, // target words not to be linked
+            Dictionary<string, int> goodLinks, // list of word pairs that should be linked
                                  // from Data.GetXLinks("goodLinks.txt")
-                                 //   of the form Hashtable(link => count)
+                                 //   of the form (link => count)
             int goodLinkMinCount, // the mininmal counts required for a good link to be used
-            Hashtable badLinks, // list of word pairs that should not be linked, also Hashtable(link => count)
+            Dictionary<string, int> badLinks, // list of word pairs that should not be linked, also (link => count)
             int badLinkMinCount, // the mininmal counts required for a bad link to be considered
-            Hashtable glossTable, // gloss information of the source text 
-            Hashtable oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
-            ArrayList sourceFuncWords, // function words in Hebrew and Greek
-            ArrayList targetFuncWords,
+            Dictionary<string, Gloss> glossTable, // gloss information of the source text 
+            Dictionary<string, Dictionary<string, string>> oldLinks, // (verseID => e(mWord.altId => tWord.altId))
+            List<string> sourceFuncWords, // function words in Hebrew and Greek
+            List<string> targetFuncWords,
             bool contentWordsOnly,
-            Hashtable strongs
+            Dictionary<string, Dictionary<string, int>> strongs
             )
         {
- //           Hashtable oldLinks = OldLinks.GetOldLinks(oldJson, ref groups);
 
-//            Alignment2 align = Align.AlignCorpus(source, sourceLemma, target, targetLower, transModel, manTransModel, alignProbs, preAlignment, useAlignModel, groups, treeFolder, bookNames, jsonOutput, 1000000, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, glossTable, oldLinks, contentWordsOnly, strongs);
+
+
             Alignment2 align = Align.AlignCorpus(source, sourceLemma, target, transModel, manTransModel, alignProbs, preAlignment, useAlignModel, groups, treeFolder, bookNames, jsonOutput, 1000000, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, glossTable, oldLinks, sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
 
             // Create JSON file
@@ -88,7 +87,7 @@ namespace GBI_Aligner
             string treeFolder, // the folder where syntactic trees are stored           
             ref Hashtable goodLinks, // links to functional words that are otherwise ignored
             string goodLinkFile, // the text file that contains good links
-            ArrayList sourceFuncWords
+            List<string> sourceFuncWords
             )
         {
             string jsonText = File.ReadAllText(jsonFile);
@@ -192,7 +191,7 @@ namespace GBI_Aligner
             string tmFile, // text file that contains the translation memory; to be loaded into the transModel Hashtable when the system starts
             Hashtable freqPhrases,
             string treeFolder,
-            ArrayList sourceFuncWords // (uses the lemma)
+            List<string> sourceFuncWords // (uses the lemma)
             )
         {
             string jsonText = File.ReadAllText(jsonFile);
@@ -535,7 +534,7 @@ namespace GBI_Aligner
         //   where link is made out of mWord.text + '#' + tText
         //   tText was the lower-cased translated text
         //
-        static void UpdateGoodLinks(ManuscriptWord mWord, string tText, ref Hashtable goodLinks, ArrayList sourceFuncWords)
+        static void UpdateGoodLinks(ManuscriptWord mWord, string tText, ref Hashtable goodLinks, List<string> sourceFuncWords)
         {
             if (Align.IsContentWord(mWord.lemma, sourceFuncWords)) return;
 
@@ -801,7 +800,7 @@ namespace GBI_Aligner
         {
             string strongs = string.Empty;
 
-            ArrayList terminals = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminals = Terminals.GetTerminalXmlNodes(treeNode);
             string lang = GetLanguage((XmlNode)terminals[0]);
             foreach (XmlNode terminal in terminals)
             {
@@ -880,7 +879,7 @@ namespace GBI_Aligner
         {
             string ids = string.Empty;
 
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
 
             foreach (XmlNode terminalNode in terminalNodes)
             {
@@ -919,7 +918,7 @@ namespace GBI_Aligner
         {
             XmlNode tree = null;
             ArrayList treeNodes = new ArrayList();
-            Hashtable bookNames = BookTables.LoadBookNames3();
+            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
             string chapter = mWords[0].id.ToString().PadLeft(12, '0').Substring(0, 5);
             Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();
             VerseTrees.GetChapterTree2(chapter, treeFolder, trees, bookNames);

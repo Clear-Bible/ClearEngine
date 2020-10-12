@@ -28,7 +28,7 @@ namespace GBI_Aligner
             return verseTrees;
         }
 
-        public static void GetChapterTree(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Hashtable bookNames)
+        public static void GetChapterTree(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Dictionary<string, string> bookNames)
         {
             string bookNumber = chapterID.Substring(0, 2);
             string bookName = (string)bookNames[bookNumber];
@@ -40,7 +40,7 @@ namespace GBI_Aligner
             }
         }
 
-        public static void GetChapterTree2(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Hashtable bookNames)
+        public static void GetChapterTree2(string chapterID, string treeFolder, Dictionary<string, XmlNode> trees, Dictionary<string, string> bookNames)
         {
             string bookNumber = chapterID.Substring(0, 2);
             string bookName = (string)bookNames[bookNumber];
@@ -82,7 +82,7 @@ namespace GBI_Aligner
             }
         }
 
-        public static XmlNode CombineSubtrees(ArrayList subTrees)
+        public static XmlNode CombineSubtrees(List<XmlNode> subTrees)
         {
             int nodeLength = ComputeNodeLength(subTrees);
             string nodeID = GetNodeID(subTrees, nodeLength);
@@ -111,9 +111,9 @@ namespace GBI_Aligner
             return root;
         }
 
-        public static XmlNode CombineTrees(ArrayList trees)
+        public static XmlNode CombineTrees(List<XmlNode> trees)
         {
-            ArrayList topTreeNodes = new ArrayList();
+            List<XmlNode> topTreeNodes = new List<XmlNode>();
             foreach(XmlNode tree in trees)
             {
                 foreach (XmlNode childNode in tree.ChildNodes)
@@ -154,7 +154,7 @@ namespace GBI_Aligner
             return root;
         }
 
-        static int ComputeNodeLength(ArrayList subTrees)
+        static int ComputeNodeLength(List<XmlNode> subTrees)
         {
             int nodeLength = 0;
 
@@ -167,9 +167,9 @@ namespace GBI_Aligner
             return nodeLength;
         }
 
-        static string GetNodeID(ArrayList subTrees, int nodeLength)
+        static string GetNodeID(List<XmlNode> subTrees, int nodeLength)
         {
-            XmlNode firstNode = (XmlNode)subTrees[0];
+            XmlNode firstNode = subTrees[0];
             string nodeID = Utils.GetAttribValue(firstNode, "nodeId");
             nodeID = nodeID.Substring(0, 11) + Utils.Pad3(nodeLength.ToString()) + "0";
             return nodeID;

@@ -16,37 +16,35 @@ namespace GBI_Aligner
 {
     class Align2
     {
-        // returns ArrayList(MappedWords)
-        //
-        public static ArrayList AlignTheRest(
+        public static List<MappedWords> AlignTheRest(
             Candidate topCandidate,
-            ArrayList terminals, // :: ArrayList(XmlNode)
+            List<XmlNode> terminals, 
             string[] sourceWords, // lemmas
             string[] targetWords,  // lowercased tokens        
-            Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
-            Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+            Dictionary<string, Dictionary<string, double>> model, 
+            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            ArrayList puncs,
-            ArrayList stopWords,
-            Hashtable goodLinks,
+            List<string> puncs,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
-            Hashtable badLinks,
+            Dictionary<string, int> badLinks,
             int badLinkMinCount,
-            ArrayList sourceFuncWords, 
-            ArrayList targetFuncWords,
+            List<string> sourceFuncWords, 
+            List<string> targetFuncWords,
             bool contentWordsOnly
             )
         {
             //Console.WriteLine("\nAlignTheRest\n\n");
 
-            ArrayList linkedWords = new ArrayList();
-            GetLinkedWords(topCandidate.Sequence, ref linkedWords, topCandidate.Prob);
-            // linkedWords :: ArrayList(LinkedWord)
+            List<LinkedWord> linkedWords = new List<LinkedWord>();
+            GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
 
-            // TIM Study
-            //TimUtil.PrintArrayList("linkedWords", linkedWords);
+            // linkedWords has a LinkedWord for each target word found in
+            // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
+            // TargetWord for zero-length sub-paths in topCandidate.sequence.
 
-            ArrayList links = new ArrayList();
+            List<MappedWords> links = new List<MappedWords>();
             for (int i = 0; i < terminals.Count; i++)
             {
                 XmlNode terminal = (XmlNode)terminals[i];
@@ -59,43 +57,27 @@ namespace GBI_Aligner
                 sourceLink.RelativePos = (double)sourceLink.Position / (double)sourceWords.Length;
                 if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
                 sourceLink.TreeNode = terminal;
-                LinkedWord targetLink = (LinkedWord)linkedWords[i];
+                LinkedWord targetLink = linkedWords[i];
+                // (looks like linkedWords and terminals are expected to be
+                // in 1-to-1 correspondence.)
                 MappedWords link = new MappedWords();
                 link.SourceNode = sourceLink;
                 link.TargetNode = targetLink;
                 links.Add(link);
             }
-
-            // links :: ArrayList(MappedWords)
-
-            // TIM Study
-            //TimUtil.PrintArrayList("links", links);
             
 
-            ArrayList conflicts = FindConflictingLinks(links);
-            // conflicts :: ArrayList(ArrayList(MappedWords))
-
-            // TIM Study
-            //TimUtil.PrintArrayList("conflicts", conflicts);
+            List<List<MappedWords>> conflicts = FindConflictingLinks(links);
 
             if (conflicts.Count > 0)
             {
-                ResolveConflicts(conflicts, ref links, 1);
+                ResolveConflicts(conflicts, links, 1);
             }
 
-            ArrayList linkedTargets = GetLinkedTargets(links);
-            // linkedTargets :: ArrayList(MappedWords)
-            // a copy of links with the fakes removed
-
-            // TIM Study
-            //TimUtil.PrintArrayList("linkedTargets", linkedTargets);
+            List<string> linkedTargets = GetLinkedTargets(links);
 
 
-            Hashtable linksTable = CreateLinksTable(links);
-            // linksTable :: Hashtable(sourceId => MappedWords)
-
-            // TIM Study
-            //TimUtil.PrintHashTable("linksTable", linksTable);
+            Dictionary<string, MappedWords> linksTable = CreateLinksTable(links);
 
             for (int i = 0; i < links.Count; i++)
             {
@@ -103,22 +85,15 @@ namespace GBI_Aligner
 
                 if (link.TargetNode.Word.IsFake)
                 {
-                    bool linked = false;
-                    if (!linked)  // (always true)
-                    { 
-                        AlignWord(ref link, targetWords, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
-                    }
+                    AlignWord(ref link, targetWords, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
                 }
             }
 
             conflicts = FindConflictingLinks(links);
 
-            // TIM Study
-            //TimUtil.PrintArrayList("conflicts", conflicts);
-
             if (conflicts.Count > 0)
             {
-                ResolveConflicts(conflicts, ref links, 2);
+                ResolveConflicts(conflicts, links, 2);
             }
 
             return links;
@@ -126,28 +101,24 @@ namespace GBI_Aligner
 
 
         static void AlignWord(
-            ref MappedWords link, // output goes here
-            string[] targetWords,
-            Hashtable linksTable, // Hashtable(sourceId => MappedWords)
-            ArrayList linkedTargets, // ArrayList(MappedWords)
-            Hashtable model, // translation model, Hashtable(source => Hashtable(target => probability))
-            Hashtable preAlignment, // Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+            ref MappedWords link, // (target word is fake)
+            string[] targetWords, // each in the form of "text_id"
+            Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
+            List<string> linkedTargets, // target word IDs from non-fake words
+            Dictionary<string, Dictionary<string, double>> model, // translation model, (source => (target => probability))
+            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            ArrayList puncs,
-            ArrayList stopWords,
-            Hashtable goodLinks,
+            List<string> puncs,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
-            Hashtable badLinks,
+            Dictionary<string, int> badLinks,
             int badLinkMinCount, 
-            ArrayList sourceFuncWords,
-            ArrayList targetFuncWords,
+            List<string> sourceFuncWords,
+            List<string> targetFuncWords,
             bool contentWordsOnly
             )
         {
-            // Console.WriteLine("AlignWord");
-            // TimUtil.PrintAsJson("link", link);
-            // Console.WriteLine("\n");
-
             if (stopWords.Contains(link.SourceNode.Lemma)) return;
             if (contentWordsOnly && sourceFuncWords.Contains(link.SourceNode.Lemma)) return;
             if (useAlignModel && preAlignment.ContainsKey(link.SourceNode.MorphID))
@@ -159,11 +130,11 @@ namespace GBI_Aligner
                 }
                 string targetWord = GetTargetWord(targetID, targetWords);
                 string pair = link.SourceNode.Lemma + "#" + targetWord;
-                if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.Contains(pair))
+                if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.ContainsKey(pair))
                 {
                     return;
                 }
-                if (!(badLinks.Contains(pair) || puncs.Contains(targetWord) || stopWords.Contains(targetWord)))
+                if (!(badLinks.ContainsKey(pair) || puncs.Contains(targetWord) || stopWords.Contains(targetWord)))
                 {
                     link.TargetNode.Text = targetWord;
                     link.TargetNode.Prob = 0;
@@ -174,21 +145,19 @@ namespace GBI_Aligner
                     return;
                 }
             }
-//            string cat = link.SourceNode.Category;
-//            if (cat == "det" || cat == "conj" || cat == "art" || cat == "cj" || cat == "pron" || cat == "prep") return;
+
             bool stopped = false;
-            ArrayList linkedSiblings = GetLinkedSiblings(link.SourceNode.TreeNode, linksTable, ref stopped);
-            // linkedSiblings :: ArrayList(MappedWords)
+            List<MappedWords> linkedSiblings = GetLinkedSiblings(link.SourceNode.TreeNode, linksTable, ref stopped);
+
             if (linkedSiblings.Count > 0)
             {
                 MappedWords preNeighbor = GetPreNeighbor(link, linkedSiblings);
                 MappedWords postNeighbor = GetPostNeighbor(link, linkedSiblings);
-                ArrayList targetCandidates = new ArrayList();
+                List<TargetWord> targetCandidates = new List<TargetWord>();
                 bool foundTarget = false;
                 if (!(preNeighbor == null || postNeighbor == null))
                 {
                     targetCandidates = GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
-                    // targetCandidates :: ArrayList(TargetWord)
                     if (targetCandidates.Count > 0)
                     {
                         LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
@@ -258,9 +227,9 @@ namespace GBI_Aligner
             return position;
         }
 
-        static ArrayList GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, ArrayList linkedTargets, ArrayList puncs, ArrayList targetFuncWords, bool contentWordsOnly)
+        static List<TargetWord> GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
         {
-            ArrayList candidates = new ArrayList();
+            List<TargetWord> candidates = new List<TargetWord>();
 
             int anchorPosition = postNeighbor.TargetNode.Word.Position;
 
@@ -296,9 +265,9 @@ namespace GBI_Aligner
             return candidates;
         }
 
-        static ArrayList GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, string[] targetWords, ArrayList linkedTargets, ArrayList puncBounds, ArrayList targetFuncWords, bool contentWordsOnly)
+        static List<TargetWord> GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncBounds, List<string> targetFuncWords, bool contentWordsOnly)
         {
-            ArrayList candidates = new ArrayList();
+            List<TargetWord> candidates = new List<TargetWord>();
 
             int startPosition = preNeighbor.TargetNode.Word.Position;
             int endPosition = postNeighbor.TargetNode.Word.Position;
@@ -323,35 +292,30 @@ namespace GBI_Aligner
             return candidates;
         }
 
-        // linksTable :: Hashtable(sourceId => MappedWords)
-        // returns ArrayList(MappedWords)
-        //
-        static ArrayList GetLinkedSiblings(XmlNode treeNode, Hashtable linksTable, ref bool stopped)
+        
+        static List<MappedWords> GetLinkedSiblings(
+            XmlNode treeNode,
+            Dictionary<string, MappedWords> linksTable, // key is source morphId
+            ref bool stopped)
         {
-            ArrayList linkedSiblings = new ArrayList();
+            List<MappedWords> linkedSiblings = new List<MappedWords>();
 
             if (treeNode.ParentNode == null || treeNode.ParentNode.Name == "Tree") stopped = true;
 
             while (!stopped && treeNode.ParentNode != null && linkedSiblings.Count == 0)
             {
-/*                int chunkLength = Int32.Parse(Utils.GetAttribValue(treeNode.ParentNode, "Length"));
-                if (chunkLength > 2)
-                {
-                    stopped = true;
-                    break;
-                } */
                 foreach(XmlNode childNode in treeNode.ParentNode.ChildNodes)
                 {
                     if (childNode != treeNode)
                     {
-                        ArrayList terminals = Terminals.GetTerminalXmlNodes(childNode);
+                        List<XmlNode> terminals = Terminals.GetTerminalXmlNodes(childNode);
                         foreach(XmlNode terminal in terminals)
                         {
                             string morphID = Utils.GetAttribValue(terminal, "morphId");
                             if (morphID.Length == 11) morphID += "1";
                             if (linksTable.ContainsKey(morphID))
                             {
-                                MappedWords map = (MappedWords)linksTable[morphID];
+                                MappedWords map = linksTable[morphID];
                                 linkedSiblings.Add(map);
                             }
                         }
@@ -368,7 +332,8 @@ namespace GBI_Aligner
             return linkedSiblings;
         }
 
-        static MappedWords GetPreNeighbor(MappedWords unLinked, ArrayList linkedSiblings)
+
+        static MappedWords GetPreNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
             MappedWords preNeighbor = null;
 
@@ -395,7 +360,8 @@ namespace GBI_Aligner
             return preNeighbor;
         }
 
-        static MappedWords GetPostNeighbor(MappedWords unLinked, ArrayList linkedSiblings)
+
+        static MappedWords GetPostNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
             MappedWords postNeighbor = null;
 
@@ -414,178 +380,134 @@ namespace GBI_Aligner
             return postNeighbor;
         }
 
-        // conflicts :: ArrayList(ArrayList(MappedWords))
-        // links :: ArrayList(MappedWords)
+
+
         // replaces some members of links with a special non-link MappedWords datum
         //
-        public static void ResolveConflicts(ArrayList conflicts, ref ArrayList links, int pass)
+        public static void ResolveConflicts(
+            List<List<MappedWords>> conflicts,
+            List<MappedWords> links,
+            int pass)
         {
-            ArrayList linksToRemove = new ArrayList();
-
-            foreach (ArrayList conflict in conflicts)
-            {
-                ArrayList winners = FindWinners(conflict, pass);
-                // winners :: ArrayList(MappedWord)
-                if (winners.Count > 1)
-                {
-                    MappedWords winner = (MappedWords)winners[0];
-                    winners.Clear();
-                    winners.Add(winner);
-                }
-                foreach (MappedWords map in conflict)
-                {
-                    if (!winners.Contains(map))
-                    {
-                        linksToRemove.Add(map);
-                    }
-                }
-            }
+            List<MappedWords> linksToRemove = conflicts.
+                SelectMany(conflict =>
+                    conflict.Except(
+                        FindWinners(conflict, pass).Where((_, n) => n == 0)))
+                .ToList();
 
             for (int i = 0; i < links.Count; i++)
             {
-                MappedWords link = (MappedWords)links[i];
+                MappedWords link = links[i];
                 if (linksToRemove.Contains(link))
                 {
-                    MappedWords nonLink = new MappedWords();
-                    nonLink.SourceNode = link.SourceNode;
-                    LinkedWord nonTarget = new LinkedWord();
-                    nonTarget.Prob = -1000;
-                    nonTarget.Word = Align.CreateFakeTargetWord();
-                    nonLink.TargetNode = nonTarget;
-                    links[i] = nonLink;
+                    links[i] = new MappedWords
+                    {
+                        SourceNode = link.SourceNode,
+                        TargetNode = new LinkedWord()
+                        {
+                            Prob = -1000,
+                            Word = Align.CreateFakeTargetWord()
+                        }
+                    };
                 }
             }
         }
 
-        static ArrayList GetLinkedTargets(ArrayList links)
+
+        static List<string> GetLinkedTargets(List<MappedWords> links)
         {
-            ArrayList linkedTargets = new ArrayList();
-
-            foreach(MappedWords link in links)
-            {
-                if (!link.TargetNode.Word.IsFake)
-                {
-                    linkedTargets.Add(link.TargetNode.Word.ID);
-                }
-            }
-
-            return linkedTargets;
+            return links
+                .Where(mw => !mw.TargetNode.Word.IsFake)
+                .Select(mw => mw.TargetNode.Word.ID)
+                .ToList();
         }
 
-        static void GetLinkedWords(ArrayList path, ref ArrayList links, double prob)
+
+        static void GetLinkedWords(ArrayList path, List<LinkedWord> links, double prob)
         {
             ArrayList words = new ArrayList();
 
             if (path.Count == 0)
             {
-                LinkedWord linkedWord = new LinkedWord();
-                TargetWord tWord = new TargetWord();
-                tWord.Text = string.Empty;
-                tWord.Position = -1;
-                tWord.IsFake = true;
-                tWord.ID = "0";
-                linkedWord.Word = tWord;
-                linkedWord.Prob = -1000;
-                linkedWord.Text = string.Empty;
-                links.Add(linkedWord);
+                links.Add(new LinkedWord()
+                {
+                    Word = new TargetWord
+                    {
+                        Text = string.Empty,
+                        Position = -1,
+                        IsFake = true,
+                        ID = "0"
+                    },
+                    Prob = -1000,
+                    Text = string.Empty
+                });
             }
             else
             {
-                Object obj = path[0];
-                string type = obj.GetType().ToString();
-                if (type == "GBI_Aligner.Candidate")
+                if (path[0] is Candidate)
                 {
                     foreach (Candidate c in path)
                     {
-                        GetLinkedWords(c.Sequence, ref links, c.Prob);
+                        GetLinkedWords(c.Chain, links, c.Prob);
                     }
                 }
                 else
                 {
                     foreach (TargetWord tWord in path)
                     {
-                        LinkedWord linkedWord = new LinkedWord();
-                        linkedWord.Word = tWord;
-                        linkedWord.Prob = prob;
-                        linkedWord.Text = tWord.Text;
-                        links.Add(linkedWord);
+                        links.Add(new LinkedWord()
+                        {
+                            Word = tWord,
+                            Prob = prob,
+                            Text = tWord.Text
+                        });
                     }
                 }
             }
         }
 
-        // links :: ArrayList(MappedWords)
-        // returns ArrayList(ArrayList(MappedWords)) where each member has length > 1
-        //
-        public static ArrayList FindConflictingLinks(ArrayList links)
+        
+        public static List<List<MappedWords>> FindConflictingLinks(List<MappedWords> links)
         {
-            ArrayList conflicts = new ArrayList();
-
-            Hashtable targetLinks = new Hashtable();
-            // Hashtable("tWord-tPosition" => ArrayList(MappedWords))
-
-            foreach(MappedWords link in links)
-            {
-                string tWord = link.TargetNode.Word.Text;
-                string tPosition = link.TargetNode.Word.ID;
-                if (tWord == string.Empty) continue;
-                string key = tWord + "-" + tPosition;
-                if (targetLinks.ContainsKey(key))
-                {
-                    ArrayList targets = (ArrayList)targetLinks[key];
-                    targets.Add(link);
-                }
-                else
-                {
-                    ArrayList targets = new ArrayList();
-                    targets.Add(link);
-                    targetLinks.Add(key, targets);
-                }    
-            }
-
-            IDictionaryEnumerator targetEnum = targetLinks.GetEnumerator();
-
-            while (targetEnum.MoveNext())
-            {
-                ArrayList targets = (ArrayList)targetEnum.Value;
-                if (targets.Count > 1)
-                {
-                    conflicts.Add(targets);
-                }
-            }
-
-            return conflicts;
+            return links
+                .Where(link => link.TargetNode.Word.Text != string.Empty)
+                .GroupBy(link =>
+                    $"{link.TargetNode.Word.Text}-{link.TargetNode.Word.ID}")
+                .Where(group => group.Count() > 1)
+                .Select(group => group.ToList())
+                .ToList();
         }
 
  
-        // conflict :: ArrayList(MappedWord)
-        // returns ArrayList(MappedWord)
-        //
-        static ArrayList FindWinners(ArrayList conflict, int pass)
+  
+        static List<MappedWords> FindWinners(List<MappedWords> conflict, int pass)
         {
-            double bestProb = GetBestProb(conflict);
-            double minDistance = GetMinDistance(conflict);
-            ArrayList winners = new ArrayList();
-            foreach (MappedWords mappedWord in conflict)
-            {
-                double prob = mappedWord.TargetNode.Prob;
-                if (prob == bestProb)
-                {
-                    winners.Add(mappedWord);
-                }
-            }
+            double prob(MappedWords mw) => mw.TargetNode.Prob;
+
+            double distance(MappedWords mw) =>
+                Math.Abs(mw.SourceNode.RelativePos -
+                         mw.TargetNode.Word.RelativePos);
+
+            // We know that conflict is not the empty list.
+
+            double bestProb = conflict.Max(mw => prob(mw));           
+
+            List<MappedWords> winners = conflict
+                .Where(mw => mw.TargetNode.Prob == bestProb)
+                .ToList();
 
             if (pass == 2 && winners.Count > 1)
             {
-                foreach (MappedWords winner in winners)
+                double minDistance = conflict.Min(mw => distance(mw));
+
+                MappedWords winner2 = winners
+                    .Where(mw => distance(mw) == minDistance)
+                    .FirstOrDefault();
+
+                if (winner2 != null)
                 {
-                    double distance = Math.Abs(winner.SourceNode.RelativePos - winner.TargetNode.Word.RelativePos);
-                    if (distance == minDistance)
-                    {
-                        winners.Clear();
-                        winners.Add(winner);
-                        break;
-                    }
+                    winners = new List<MappedWords>();
+                    winners.Add(winner2);
                 }
             }
 
@@ -593,52 +515,13 @@ namespace GBI_Aligner
         }
 
 
-
-        static double GetBestProb(ArrayList conflict)
+        static Dictionary<string, MappedWords> CreateLinksTable(List<MappedWords> links)
         {
-            double bestProb = -1000;
-
-            foreach(MappedWords mappedWord in conflict)
-            {
-                double prob = mappedWord.TargetNode.Prob;
-                if (prob > bestProb) bestProb = prob;
-            }
-
-            return bestProb;
+            return links
+                .Where(mw => !mw.TargetNode.Word.IsFake)
+                .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
         }
 
- 
-
-        static double GetMinDistance(ArrayList conflict)
-        {
-            double minDistance = 100;
-
-            foreach (MappedWords mappedWord in conflict)
-            {
-                double distance = Math.Abs(mappedWord.SourceNode.RelativePos - mappedWord.TargetNode.Word.RelativePos);
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                }
-            }
-
-            return minDistance;
-        }
-
-
-        static Hashtable CreateLinksTable(ArrayList links)
-        {
-            Hashtable linksTable = new Hashtable();
-
-            foreach(MappedWords link in links)
-            {
-                if (link.TargetNode.Word.IsFake) continue;
-                string sourceID = link.SourceNode.MorphID;
-                linksTable.Add(sourceID, link);
-            }
-
-            return linksTable;
-        }
 
         public static string GetTargetID (string target)
         {
@@ -647,20 +530,18 @@ namespace GBI_Aligner
 
         static LinkedWord GetTopCandidate(
             SourceNode sWord, 
-            ArrayList tWords, 
-            Hashtable model, 
-            ArrayList linkedTargets, 
-            ArrayList puncs, 
-            ArrayList stopWords, 
-            Hashtable goodLinks,
+            List<TargetWord> tWords, 
+            Dictionary<string, Dictionary<string, double>> model, 
+            List<string> linkedTargets, 
+            List<string> puncs, 
+            List<string> stopWords, 
+            Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
-            Hashtable badLinks, 
+            Dictionary<string, int> badLinks, 
             int badLinkMinCount
             )
         {
-            Hashtable probs = new Hashtable();
-
-            ArrayList topCandidates = new ArrayList();
+            Dictionary<TargetWord, double> probs = new Dictionary<TargetWord, double>();
 
             for (int i = 0; i < tWords.Count; i++)
             {
@@ -681,7 +562,7 @@ namespace GBI_Aligner
 
                 if (model.ContainsKey(sWord.Lemma))
                 {
-                    Hashtable translations = (Hashtable)model[sWord.Lemma];
+                    Dictionary<string, double> translations = model[sWord.Lemma];
                     if (translations.ContainsKey(tWord.Text))
                     {
                         double prob = (double)translations[tWord.Text];
@@ -695,13 +576,13 @@ namespace GBI_Aligner
 
             if (probs.Count > 0)
             {
-                ArrayList candidates = Data.SortWordCandidates(probs);
+                List<TargetWord> candidates = Data.SortWordCandidates(probs);
 
-                TargetWord topCandidate = (TargetWord)candidates[0];
+                TargetWord topCandidate = candidates[0];
                 topCandidate.IsFake = false;
 
                 LinkedWord linkedWord = new LinkedWord();
-                linkedWord.Prob = (double)probs[topCandidate];
+                linkedWord.Prob = probs[topCandidate];
                 linkedWord.Text = topCandidate.Text;
                 linkedWord.Word = topCandidate;
                 return linkedWord;
@@ -710,31 +591,33 @@ namespace GBI_Aligner
             return null;
         }
 
-        public static void FixCrossingLinks(ref ArrayList links)
+        public static void FixCrossingLinks(ref List<MappedGroup> links)
         {
-            Hashtable uniqueLemmaLinks = GetUniqueLemmaLinks(links);
-            ArrayList crossingLinks = IdentifyCrossingLinks(uniqueLemmaLinks);
-            SwapTargets(crossingLinks, ref links);
+            Dictionary<string, List<MappedGroup>> uniqueLemmaLinks =
+                GetUniqueLemmaLinks(links);
+            List<CrossingLinks> crossingLinks = IdentifyCrossingLinks(uniqueLemmaLinks);
+            SwapTargets(crossingLinks, links);
         }
 
-        static Hashtable GetUniqueLemmaLinks(ArrayList links)
+        static Dictionary<string, List<MappedGroup>> GetUniqueLemmaLinks(List<MappedGroup> links)
         {
-            Hashtable uniqueLemmaLinks = new Hashtable();
+            Dictionary<string, List<MappedGroup>> uniqueLemmaLinks =
+                new Dictionary<string, List<MappedGroup>>();
 
             foreach(MappedGroup link in links)
             {
                 if (link.SourceNodes.Count == 1 && link.TargetNodes.Count == 1)
                 {
-                    SourceNode sNode = (SourceNode)link.SourceNodes[0];
+                    SourceNode sNode = link.SourceNodes[0];
                     string lemma = sNode.Lemma;
                     if (uniqueLemmaLinks.ContainsKey(lemma))
                     {
-                        ArrayList linkedNodes = (ArrayList)uniqueLemmaLinks[lemma];
+                        List<MappedGroup> linkedNodes = uniqueLemmaLinks[lemma];
                         linkedNodes.Add(link);
                     }
                     else
                     {
-                        ArrayList linkedNodes = new ArrayList();
+                        List<MappedGroup> linkedNodes = new List<MappedGroup>();
                         linkedNodes.Add(link);
                         uniqueLemmaLinks.Add(lemma, linkedNodes);
                     }
@@ -744,21 +627,18 @@ namespace GBI_Aligner
             return uniqueLemmaLinks;
         }
 
-        static ArrayList IdentifyCrossingLinks(Hashtable uniqueLemmaLinks)
+        static List<CrossingLinks> IdentifyCrossingLinks(Dictionary<string, List<MappedGroup>> uniqueLemmaLinks)
         {
-            ArrayList crossingLinks = new ArrayList();
+            List<CrossingLinks> crossingLinks = new List<CrossingLinks>();
 
-            IDictionaryEnumerator lemmaEnum = uniqueLemmaLinks.GetEnumerator();
-
-            while (lemmaEnum.MoveNext())
+            foreach (var lemmaEnum in uniqueLemmaLinks)
             {
-                string lemma = (string)lemmaEnum.Key;
-                ArrayList links = (ArrayList)lemmaEnum.Value;
+                List<MappedGroup> links = lemmaEnum.Value;
                 if (links.Count == 2 && Crossing(links))
                 {
                     CrossingLinks cl = new CrossingLinks();
-                    cl.Link1 = (MappedGroup)links[0];
-                    cl.Link2 = (MappedGroup)links[1];
+                    cl.Link1 = links[0];
+                    cl.Link2 = links[1];
                     crossingLinks.Add(cl);
                 }
             }
@@ -766,14 +646,14 @@ namespace GBI_Aligner
             return crossingLinks;
         }
 
-        static bool Crossing(ArrayList links)
+        static bool Crossing(List<MappedGroup> links)
         {
-            MappedGroup link1 = (MappedGroup)links[0];
-            MappedGroup link2 = (MappedGroup)links[1];
-            SourceNode sWord1 = (SourceNode)link1.SourceNodes[0];
-            LinkedWord tWord1 = (LinkedWord)link1.TargetNodes[0];
-            SourceNode sWord2 = (SourceNode)link2.SourceNodes[0];
-            LinkedWord tWord2 = (LinkedWord)link2.TargetNodes[0];
+            MappedGroup link1 = links[0];
+            MappedGroup link2 = links[1];
+            SourceNode sWord1 = link1.SourceNodes[0];
+            LinkedWord tWord1 = link1.TargetNodes[0];
+            SourceNode sWord2 = link2.SourceNodes[0];
+            LinkedWord tWord2 = link2.TargetNodes[0];
             if (tWord1.Word.Position < 0 || tWord2.Word.Position < 0) return false;
             if ( (sWord1.Position < sWord2.Position && tWord1.Word.Position > tWord2.Word.Position)
                || (sWord1.Position > sWord2.Position && tWord1.Word.Position < tWord2.Word.Position)
@@ -785,19 +665,19 @@ namespace GBI_Aligner
             return false;
         }
 
-        static void SwapTargets(ArrayList crossingLinks, ref ArrayList links)
+        static void SwapTargets(List<CrossingLinks> crossingLinks, List<MappedGroup> links)
         {
             for (int i = 0; i < crossingLinks.Count; i++)
             {
-                CrossingLinks cl = (CrossingLinks)crossingLinks[i];
-                SourceNode sNode1 = (SourceNode)cl.Link1.SourceNodes[0];
-                SourceNode sNode2 = (SourceNode)cl.Link2.SourceNodes[0];
-                ArrayList TargetNodes0 = (ArrayList)cl.Link1.TargetNodes;
+                CrossingLinks cl = crossingLinks[i];
+                SourceNode sNode1 = cl.Link1.SourceNodes[0];
+                SourceNode sNode2 = cl.Link2.SourceNodes[0];
+                List<LinkedWord> TargetNodes0 = cl.Link1.TargetNodes;
                 cl.Link1.TargetNodes = cl.Link2.TargetNodes;
                 cl.Link2.TargetNodes = TargetNodes0;
                 for(int j = 0; j < links.Count; j++)
                 {
-                    MappedGroup mp = (MappedGroup)links[j];
+                    MappedGroup mp = links[j];
                     SourceNode sNode = (SourceNode)mp.SourceNodes[0];
                     if (sNode.MorphID == sNode1.MorphID) mp.TargetNodes = cl.Link1.TargetNodes;
                     if (sNode.MorphID == sNode2.MorphID) mp.TargetNodes = cl.Link2.TargetNodes;
@@ -832,8 +712,8 @@ namespace GBI_Aligner
 
     public class MappedGroup
     {
-        public ArrayList SourceNodes = new ArrayList();
-        public ArrayList TargetNodes = new ArrayList();
+        public List<SourceNode> SourceNodes = new List<SourceNode>();
+        public List<LinkedWord> TargetNodes = new List<LinkedWord>();
     }
 
     public class CrossingLinks

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Utilities;
@@ -53,7 +54,7 @@ namespace Trees
 			   || ( rule == "CompoundVP" && length == 4 )
 			   || ( rule == "CompoundVP2" && length == 4 )
 			   || ( rule == "CompoundADVP" && length == 4 )
-			   || ( rule == "AdvP-A" && treeNode.Attributes.GetNamedItem("adLemma") != null && treeNode.Attributes.GetNamedItem("adLemma").Value == "×î" )
+			   || ( rule == "AdvP-A" && treeNode.Attributes.GetNamedItem("adLemma") != null && treeNode.Attributes.GetNamedItem("adLemma").Value == "??" )
 			   || ( rule == "AdvP-V" && length == 2 )
 			   ) // terminal ndoe
 			{
@@ -118,15 +119,15 @@ namespace Trees
 			}
 		}
 
-		public static ArrayList GetTerminalXmlNodes ( XmlNode treeNode )
+		public static List<XmlNode> GetTerminalXmlNodes ( XmlNode treeNode )
 		{
-			ArrayList terminalNodes = new ArrayList();
-            GetTerminalXmlNodes(treeNode, ref terminalNodes);
+			List<XmlNode> terminalNodes = new List<XmlNode>();
+            GetTerminalXmlNodes(treeNode, terminalNodes);
 
 			return terminalNodes;
 		}
 
-		public static void GetTerminalXmlNodes ( XmlNode treeNode, ref ArrayList terminalNodes )
+		public static void GetTerminalXmlNodes ( XmlNode treeNode, List<XmlNode> terminalNodes )
 		{
 			if ( treeNode.NodeType.ToString().Equals("Text") ) // Terminal node
 			{
@@ -155,7 +156,7 @@ namespace Trees
 
 				for ( int i = 0; i < subNodes.Count; i++ )
 				{
-					GetTerminalXmlNodes( subNodes[i], ref terminalNodes );
+					GetTerminalXmlNodes( subNodes[i], terminalNodes );
 				}	
 			}
 		}
@@ -246,7 +247,7 @@ namespace Trees
 
         public static string NodeStrongs(XmlNode treeNode)
         {
-            ArrayList terminals = GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminals = GetTerminalXmlNodes(treeNode);
 
             string nodeStrongs = " ";
 
@@ -260,7 +261,7 @@ namespace Trees
 
         public static string NodeUnicodeLemmas(XmlNode treeNode)
         {
-            ArrayList terminals = GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminals = GetTerminalXmlNodes(treeNode);
 
             string nodeUnicodeLemmas = string.Empty;
 
@@ -276,7 +277,7 @@ namespace Trees
 
         public static string NodeUnicodeText(XmlNode treeNode)
         {
-            ArrayList terminals = GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminals = GetTerminalXmlNodes(treeNode);
 
             string nodeUnicodes = string.Empty;
 
@@ -415,7 +416,7 @@ namespace Trees
         {
             string strongs = string.Empty;
 
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
 
             foreach (XmlNode terminalNode in terminalNodes)
             {
@@ -431,7 +432,7 @@ namespace Trees
         {
             string lemmas = string.Empty;
 
-            ArrayList terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
 
             foreach (XmlNode terminalNode in terminalNodes)
             {
