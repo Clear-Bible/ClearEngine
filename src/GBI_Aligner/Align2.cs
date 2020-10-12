@@ -608,7 +608,7 @@ namespace GBI_Aligner
             {
                 if (link.SourceNodes.Count == 1 && link.TargetNodes.Count == 1)
                 {
-                    SourceNode sNode = (SourceNode)link.SourceNodes[0];
+                    SourceNode sNode = link.SourceNodes[0];
                     string lemma = sNode.Lemma;
                     if (uniqueLemmaLinks.ContainsKey(lemma))
                     {
@@ -633,7 +633,6 @@ namespace GBI_Aligner
 
             foreach (var lemmaEnum in uniqueLemmaLinks)
             {
-                string lemma = (string)lemmaEnum.Key;
                 List<MappedGroup> links = lemmaEnum.Value;
                 if (links.Count == 2 && Crossing(links))
                 {
@@ -651,10 +650,10 @@ namespace GBI_Aligner
         {
             MappedGroup link1 = links[0];
             MappedGroup link2 = links[1];
-            SourceNode sWord1 = (SourceNode)link1.SourceNodes[0];
-            LinkedWord tWord1 = (LinkedWord)link1.TargetNodes[0];
-            SourceNode sWord2 = (SourceNode)link2.SourceNodes[0];
-            LinkedWord tWord2 = (LinkedWord)link2.TargetNodes[0];
+            SourceNode sWord1 = link1.SourceNodes[0];
+            LinkedWord tWord1 = link1.TargetNodes[0];
+            SourceNode sWord2 = link2.SourceNodes[0];
+            LinkedWord tWord2 = link2.TargetNodes[0];
             if (tWord1.Word.Position < 0 || tWord2.Word.Position < 0) return false;
             if ( (sWord1.Position < sWord2.Position && tWord1.Word.Position > tWord2.Word.Position)
                || (sWord1.Position > sWord2.Position && tWord1.Word.Position < tWord2.Word.Position)
@@ -671,9 +670,9 @@ namespace GBI_Aligner
             for (int i = 0; i < crossingLinks.Count; i++)
             {
                 CrossingLinks cl = crossingLinks[i];
-                SourceNode sNode1 = (SourceNode)cl.Link1.SourceNodes[0];
-                SourceNode sNode2 = (SourceNode)cl.Link2.SourceNodes[0];
-                ArrayList TargetNodes0 = cl.Link1.TargetNodes;
+                SourceNode sNode1 = cl.Link1.SourceNodes[0];
+                SourceNode sNode2 = cl.Link2.SourceNodes[0];
+                List<LinkedWord> TargetNodes0 = cl.Link1.TargetNodes;
                 cl.Link1.TargetNodes = cl.Link2.TargetNodes;
                 cl.Link2.TargetNodes = TargetNodes0;
                 for(int j = 0; j < links.Count; j++)
@@ -713,8 +712,8 @@ namespace GBI_Aligner
 
     public class MappedGroup
     {
-        public ArrayList SourceNodes = new ArrayList();
-        public ArrayList TargetNodes = new ArrayList();
+        public List<SourceNode> SourceNodes = new List<SourceNode>();
+        public List<LinkedWord> TargetNodes = new List<LinkedWord>();
     }
 
     public class CrossingLinks

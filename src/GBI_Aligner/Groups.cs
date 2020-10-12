@@ -266,12 +266,12 @@ namespace GBI_Aligner
             string[] sourceWords = group[0];
             string[] targetWords = group[1];
             MappedGroup mg = new MappedGroup();
-            AddSourceNodes(sourceWords, ref mg.SourceNodes, terminals);
-            AddTargetNodes(targetWords, ref mg.TargetNodes, targets);
+            AddSourceNodes(sourceWords, mg.SourceNodes, terminals);
+            AddTargetNodes(targetWords, mg.TargetNodes, targets);
             links.Add(mg);
         }
 
-        static void AddSourceNodes(string[] sourceWords, ref ArrayList sourceNodes, List<XmlNode> terminals)
+        static void AddSourceNodes(string[] sourceWords, List<SourceNode> sourceNodes, List<XmlNode> terminals)
         {
             for (int i = 0; i < sourceWords.Length; i++)
             {
@@ -311,7 +311,7 @@ namespace GBI_Aligner
             return treeNode;
         }
 
-        static void AddTargetNodes(string[] targetWords, ref ArrayList targetNodes, ArrayList targets)
+        static void AddTargetNodes(string[] targetWords, List<LinkedWord> targetNodes, ArrayList targets)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {
