@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 using AlignmentTool;
@@ -35,37 +36,40 @@ namespace RegressionTest3
 
             string jsonOutput = OutPath("alignment.json");
 
-            Hashtable transModel = Data.GetTranslationModel(transModelPath);
-            Hashtable manTransModel =
+            Dictionary<string, Dictionary<string, double>> transModel =
+                Data.GetTranslationModel(transModelPath);
+            Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);
 
-            Hashtable bookNames = BookTables.LoadBookNames3();
+            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
-            Hashtable alignProbs = Data.GetAlignmentModel(alignModelPath);
-            Hashtable preAlignment = Data.BuildPreAlignmentTable(alignProbs);
+            Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
+            Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
 
             bool useAlignModel = true;
             int maxPaths = 1000000;
 
-            ArrayList puncs = Data.GetWordList(InPath("puncs.txt"));
-            Hashtable groups = Data.LoadGroups(InPath("groups.txt"));           
-            ArrayList stopWords = Data.GetStopWords(InPath("stopWords.txt"));
+            List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
+            Dictionary<string, List<TargetGroup>> groups = Data.LoadGroups(InPath("groups.txt"));           
+            List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
-            Hashtable goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
+            Dictionary<string, int> goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
             int goodLinkMinCount = 3;
-            Hashtable badLinks = Data.GetXLinks(InPath("badLinks.txt"));
+            Dictionary<string, int> badLinks = Data.GetXLinks(InPath("badLinks.txt"));
             int badLinkMinCount = 3;
 
-            Hashtable glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
+            Dictionary<string, Gloss> glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
 
-            Hashtable oldLinks = Data.GetOldLinks(InPath("oldAlignment.json"), ref groups);
+            Dictionary<string, Dictionary<string, string>> oldLinks =
+                Data.GetOldLinks(InPath("oldAlignment.json"), groups);
 
-            ArrayList sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
-            ArrayList targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));
+            List<string> sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
+            List<string> targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));
 
             bool contentWordsOnly = true;
 
-            Hashtable strongs = Data.BuildStrongTable(InPath("strongs.txt"));
+            Dictionary<string, Dictionary<string, int>> strongs =
+                Data.BuildStrongTable(InPath("strongs.txt"));
 
 
             Console.WriteLine("Calling Auto Aligner.");

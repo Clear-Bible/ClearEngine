@@ -74,7 +74,7 @@ namespace RegressionTest1
             string versePath = input("Verse.txt");
             string tokPath = output("target.punc.txt");
             string lang = "English";
-            ArrayList puncs = Data.GetWordList(common("puncs.txt"));
+            List<string> puncs = Data.GetWordList(common("puncs.txt"));
 
             Console.WriteLine("Tokenizing");
             Tokens.Tokenize(versePath, tokPath, puncs, lang);
@@ -103,8 +103,8 @@ namespace RegressionTest1
                 parallelTargetPath, parallelTargetIdPath,
                 versificationList);
 
-            ArrayList sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
-            ArrayList targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
+            List<string> sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
+            List<string> targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
 
             string parallelCwSourcePath = output("sourceFile.cw.txt");
             string parallelCwSourceIdPath = output("sourceFile.id.cw.txt");
@@ -125,26 +125,28 @@ namespace RegressionTest1
                 "1:10;H:5", 0.1,
                 transModelPath, alignModelPath);
 
-            Hashtable bookNames = BookTables.LoadBookNames3();
+            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
             string jsonOutput = output("alignment.json");
 
-            Hashtable transModel = Data.GetTranslationModel(transModelPath);
-            Hashtable manTransModel = Data.GetTranslationModel2(common("manTransModel.txt"));
-            Hashtable alignProbs = Data.GetAlignmentModel(alignModelPath);
-            Hashtable preAlignment = Data.BuildPreAlignmentTable(alignProbs);
+            Dictionary<string, Dictionary<string, double>> transModel =
+                Data.GetTranslationModel(transModelPath);
+            Dictionary<string, Dictionary<string, Stats>> manTransModel =
+                Data.GetTranslationModel2(common("manTransModel.txt"));
+            Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
+            Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
             bool useAlignModel = true;
             int maxPaths = 1000000;
-            Hashtable groups = Data.LoadGroups(common("groups.txt"));
-            ArrayList stopWords = Data.GetStopWords(common("stopWords.txt"));
-            Hashtable goodLinks = Data.GetXLinks(common("goodLinks.txt"));
+            Dictionary<string, List<TargetGroup>> groups = Data.LoadGroups(common("groups.txt"));
+            List<string> stopWords = Data.GetStopWords(common("stopWords.txt"));
+            Dictionary<string, int> goodLinks = Data.GetXLinks(common("goodLinks.txt"));
             int goodLinkMinCount = 3;
-            Hashtable badLinks = Data.GetXLinks(common("badLinks.txt"));
+            Dictionary<string, int> badLinks = Data.GetXLinks(common("badLinks.txt"));
             int badLinkMinCount = 3;
-            Hashtable glossTable = Data.BuildGlossTableFromFile(common("Gloss.txt"));
-            Hashtable oldLinks = Data.GetOldLinks(common("oldAlignment.json"), ref groups);
+            Dictionary<string, Gloss> glossTable = Data.BuildGlossTableFromFile(common("Gloss.txt"));
+            Dictionary<string, Dictionary<string, string>> oldLinks = Data.GetOldLinks(common("oldAlignment.json"), groups);
             bool contentWordsOnly = true;
-            Hashtable strongs = Data.BuildStrongTable(common("strongs.txt"));
+            Dictionary<string, Dictionary<string, int>> strongs = Data.BuildStrongTable(common("strongs.txt"));
 
             Console.WriteLine("Auto Alignment");
             AutoAligner.AutoAlign(

@@ -13,32 +13,30 @@ namespace GBI_Aligner
     class Groups
     {
         public static void AlignGroups(
-            ref ArrayList links, // ArrayList(MappedGroup)
-            ArrayList sourceWords, // ArrayList(SourceWord)
-            ArrayList targetWords, // ArrayList(TargetWord)
-            Hashtable groups, // comes from Data.LoadGroups("groups.txt")
-                              //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
-            ArrayList terminals // ArrayList(XmlNode)
+            List<MappedGroup> links,
+            List<SourceWord> sourceWords,
+            List<TargetWord> targetWords,
+            Dictionary<string, List<TargetGroup>> groups,
+            List<XmlNode> terminals 
             )
         {
             SourceWord[] sWords = BuildSourceArray(sourceWords);
             TargetWord[] tWords = BuildTargetArray(targetWords);
-            ArrayList mappedGroups = GetGroupLinks(sWords, tWords, groups);
-            // mappedGroups :: ArrayList(string[][])
+            List<string[][]> mappedGroups = GetGroupLinks(sWords, tWords, groups);
             if (mappedGroups.Count > 0)
             {
                 RemoveOldLinks(mappedGroups, ref links);
                 foreach (string[][] group in mappedGroups)
                 {
-                    AddGroup(group, ref links, terminals, targetWords);
+                    AddGroup(group, links, terminals, targetWords);
                 }
             }
         }
 
-        // returns ArrayList(string[][])
-        static ArrayList GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, Hashtable groups)
+
+        static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, Dictionary<string, List<TargetGroup>> groups)
         {
-            ArrayList mappedGroups = new ArrayList();
+            List<string[][]> mappedGroups = new List<string[][]>();
 
             for (int i = 0; i < sourceWords.Length; i++)
             {
@@ -56,7 +54,7 @@ namespace GBI_Aligner
                     string trigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID + " " + sourceWords[i + 2].ID;
                     if (groups.ContainsKey(trigram))
                     {
-                        ArrayList targetGroups = (ArrayList)groups[trigram];
+                        List<TargetGroup> targetGroups = groups[trigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -75,7 +73,7 @@ namespace GBI_Aligner
                     string bigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID;
                     if (groups.ContainsKey(bigram))
                     {
-                        ArrayList targetGroups = (ArrayList)groups[bigram];
+                        List<TargetGroup> targetGroups = groups[bigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -94,7 +92,7 @@ namespace GBI_Aligner
                     string unigramIDs = sourceWords[i].ID;
                     if (groups.ContainsKey(unigram))
                     {
-                        ArrayList targetGroups = (ArrayList)groups[unigram];
+                        List<TargetGroup> targetGroups = groups[unigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 2);
                         if (match != string.Empty)
                         {
@@ -111,7 +109,7 @@ namespace GBI_Aligner
             return mappedGroups;
         }
 
-        static string FindTargetMatch(TargetWord[] targetWords, ArrayList targetGroups, int minLength)
+        static string FindTargetMatch(TargetWord[] targetWords, List<TargetGroup> targetGroups, int minLength)
         {
             string match = string.Empty;
 
@@ -132,11 +130,11 @@ namespace GBI_Aligner
                 int wordIndex = 0;
                 int currRange = 0;
                 bool inRange = false;
-                ArrayList targetWordsInGroup = new ArrayList();
+                List<int> targetWordsInGroup = new List<int>();
 
                 for (int i = 0; i < targetWords.Length && wordIndex < words.Length; i++)
                 {
-                    TargetWord targetWord = (TargetWord)targetWords[i];
+                    TargetWord targetWord = targetWords[i];
                     if (targetWord.InGroup) continue;
                     string word = words[wordIndex].Trim();
                     if (targetWord.Text == word)
@@ -159,7 +157,7 @@ namespace GBI_Aligner
                 }
                 if (words.Length == targetWordsInGroup.Count)
                 {
-                    SetInGroup2(ref targetWords, targetWordsInGroup);
+                    SetInGroup2(targetWords, targetWordsInGroup);
                     break;
                 }
                 else
@@ -173,7 +171,7 @@ namespace GBI_Aligner
 
         
 
-        static void SetInGroup2(ref TargetWord[] targetWords, ArrayList targetWordsInGroup)
+        static void SetInGroup2(TargetWord[] targetWords, List<int> targetWordsInGroup)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {
@@ -187,12 +185,12 @@ namespace GBI_Aligner
 
 
 
-        static void RemoveOldLinks(ArrayList mappedGroups, ref ArrayList links)
+        static void RemoveOldLinks(List<string[][]> mappedGroups, ref List<MappedGroup> links)
         {
-            ArrayList cleanLinks = new ArrayList();
+            List<MappedGroup> cleanLinks = new List<MappedGroup>();
 
-            ArrayList sourceWordsInGroups = GetSourceWordsInGroups(mappedGroups);
-            ArrayList targetWordsInGroups = GetTargetWordsInGroups(mappedGroups);
+            List<string> sourceWordsInGroups = GetSourceWordsInGroups(mappedGroups);
+            List<string> targetWordsInGroups = GetTargetWordsInGroups(mappedGroups);
 
             foreach (MappedGroup mg in links)
             {
@@ -205,9 +203,9 @@ namespace GBI_Aligner
             links = cleanLinks;
         }
 
-        static ArrayList GetSourceWordsInGroups(ArrayList mappedGroups)
+        static List<string> GetSourceWordsInGroups(List<string[][]> mappedGroups)
         {
-            ArrayList wordsInGroups = new ArrayList();
+            List<string> wordsInGroups = new List<string>();
 
             foreach(string[][] mg in mappedGroups)
             {
@@ -221,9 +219,9 @@ namespace GBI_Aligner
             return wordsInGroups;
         }
 
-        static ArrayList GetTargetWordsInGroups(ArrayList mappedGroups)
+        static List<string> GetTargetWordsInGroups(List<string[][]> mappedGroups)
         {
-            ArrayList wordsInGroups = new ArrayList();
+            List<string> wordsInGroups = new List<string>();
 
             foreach (string[][] mg in mappedGroups)
             {
@@ -237,7 +235,7 @@ namespace GBI_Aligner
             return wordsInGroups;
         }
 
-        static bool InGroup(MappedGroup mg, ArrayList sourceWordsInGroups, ArrayList targetWordsInGroups)
+        static bool InGroup(MappedGroup mg, List<string> sourceWordsInGroups, List<string> targetWordsInGroups)
         {
             bool inGroup = false;
 
@@ -263,17 +261,17 @@ namespace GBI_Aligner
             return inGroup;
         }
 
-        static void AddGroup(string[][]group, ref ArrayList links, ArrayList terminals, ArrayList targets)
+        static void AddGroup(string[][]group, List<MappedGroup> links, List<XmlNode> terminals, List<TargetWord> targets)
         {
             string[] sourceWords = group[0];
             string[] targetWords = group[1];
             MappedGroup mg = new MappedGroup();
-            AddSourceNodes(sourceWords, ref mg.SourceNodes, terminals);
-            AddTargetNodes(targetWords, ref mg.TargetNodes, targets);
+            AddSourceNodes(sourceWords, mg.SourceNodes, terminals);
+            AddTargetNodes(targetWords, mg.TargetNodes, targets);
             links.Add(mg);
         }
 
-        static void AddSourceNodes(string[] sourceWords, ref ArrayList sourceNodes, ArrayList terminals)
+        static void AddSourceNodes(string[] sourceWords, List<SourceNode> sourceNodes, List<XmlNode> terminals)
         {
             for (int i = 0; i < sourceWords.Length; i++)
             {
@@ -282,7 +280,7 @@ namespace GBI_Aligner
             }
         }
 
-        static SourceNode GetSourceNode(string id, ArrayList terminals)
+        static SourceNode GetSourceNode(string id, List<XmlNode> terminals)
         {
             SourceNode sNode = new SourceNode();
             XmlNode treeNode = LocateTreeNode(id, terminals);
@@ -297,7 +295,7 @@ namespace GBI_Aligner
             return sNode;
         }
 
-        static XmlNode LocateTreeNode(string id, ArrayList terminals)
+        static XmlNode LocateTreeNode(string id, List<XmlNode> terminals)
         {
             XmlNode treeNode = null;
 
@@ -313,7 +311,7 @@ namespace GBI_Aligner
             return treeNode;
         }
 
-        static void AddTargetNodes(string[] targetWords, ref ArrayList targetNodes, ArrayList targets)
+        static void AddTargetNodes(string[] targetWords, List<LinkedWord> targetNodes, List<TargetWord> targets)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {
@@ -322,7 +320,7 @@ namespace GBI_Aligner
             }
         }
 
-        static LinkedWord GetTargetNode(string id, ArrayList targets)
+        static LinkedWord GetTargetNode(string id, List<TargetWord> targets)
         {
             LinkedWord lw = new LinkedWord();
             TargetWord tWord = LocateTargetword(id, targets);
@@ -333,7 +331,7 @@ namespace GBI_Aligner
             return lw;
         }
 
-        static TargetWord LocateTargetword(string id, ArrayList targets)
+        static TargetWord LocateTargetword(string id, List<TargetWord> targets)
         {
             TargetWord tw = null;
 
@@ -349,7 +347,7 @@ namespace GBI_Aligner
             return tw;
         }
 
-        static SourceWord[] BuildSourceArray(ArrayList sourceWords)
+        static SourceWord[] BuildSourceArray(List<SourceWord> sourceWords)
         {
             SourceWord[] sourceArray = new SourceWord[sourceWords.Count];
 
@@ -364,7 +362,7 @@ namespace GBI_Aligner
             return sourceArray;
         }
 
-        static TargetWord[] BuildTargetArray(ArrayList targetWords)
+        static TargetWord[] BuildTargetArray(List<TargetWord> targetWords)
         {
             TargetWord[] targetArray = new TargetWord[targetWords.Count];
 
@@ -379,24 +377,21 @@ namespace GBI_Aligner
             return targetArray;
         }
 
-//        static XmlNode GetNode(string id, ArrayList terminals)
 
-        // wordLinks :: ArrayList(MappedWords)
-        // returns ArrayList(MappedGroup)
-        //
-        public static ArrayList WordsToGroups(ArrayList wordLinks)
+
+        public static List<MappedGroup> WordsToGroups(List<MappedWords> wordLinks)
         {
-            ArrayList gourpLinks = new ArrayList();
+            List<MappedGroup> groupLinks = new List<MappedGroup>();
 
             foreach(MappedWords wordLink in wordLinks)
             {
                 MappedGroup groupLink = new MappedGroup();
                 groupLink.SourceNodes.Add(wordLink.SourceNode);
                 groupLink.TargetNodes.Add(wordLink.TargetNode);
-                gourpLinks.Add(groupLink);
+                groupLinks.Add(groupLink);
             }
 
-            return gourpLinks;
+            return groupLinks;
         }
     }
 

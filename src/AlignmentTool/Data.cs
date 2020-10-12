@@ -17,9 +17,9 @@ namespace AlignmentTool
 {
     public class Data
     {
-        public static Hashtable BuildGlossTableFromFile(string glossFile)
+        public static Dictionary<string, Gloss> BuildGlossTableFromFile(string glossFile)
         {
-            Hashtable glossTable = new Hashtable();
+            Dictionary<string, Gloss> glossTable = new Dictionary<string, Gloss>();
 
             string[] lines = File.ReadAllLines(glossFile);
             foreach (string line in lines)
@@ -41,9 +41,9 @@ namespace AlignmentTool
             return glossTable;
         }
 
-        public static ArrayList GetWordList(string file)
+        public static List<string> GetWordList(string file)
         {
-            ArrayList wordList = new ArrayList();
+            List<string> wordList = new List<string>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -59,9 +59,10 @@ namespace AlignmentTool
         // Reading the data file produces a data structure of the form
         //   Hashtable(source => Hashtable(target => probability))
         //
-        public static Hashtable GetTranslationModel(string file)
+        public static Dictionary<string, Dictionary<string, double>> GetTranslationModel(string file)
         {
-            Hashtable transModel = new Hashtable();
+            Dictionary<string, Dictionary<string, double>> transModel =
+                new Dictionary<string, Dictionary<string, double>>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -76,12 +77,12 @@ namespace AlignmentTool
 
                     if (transModel.ContainsKey(source))
                     {
-                        Hashtable translations = (Hashtable)transModel[source];
+                        Dictionary<string, double> translations = transModel[source];
                         translations.Add(target, prob);
                     }
                     else
                     {
-                        Hashtable translations = new Hashtable();
+                        Dictionary<string, double> translations = new Dictionary<string, double>();
                         translations.Add(target, prob);
                         transModel.Add(source, translations);
                     }
@@ -97,9 +98,10 @@ namespace AlignmentTool
         // Reading the file produces a data structure of the form
         //   Hashtable(source => Hashtable(target => Stats{count, probability})
         //
-        public static Hashtable GetTranslationModel2(string file)
+        public static Dictionary<string, Dictionary<string, Stats>> GetTranslationModel2(string file)
         {
-            Hashtable transModel = new Hashtable();
+            Dictionary<string, Dictionary<string, Stats>> transModel =
+                new Dictionary<string, Dictionary<string, Stats>>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -117,12 +119,12 @@ namespace AlignmentTool
 
                     if (transModel.ContainsKey(source))
                     {
-                        Hashtable translations = (Hashtable)transModel[source];
+                        Dictionary<string, Stats> translations = transModel[source];
                         translations.Add(target, s);
                     }
                     else
                     {
-                        Hashtable translations = new Hashtable();
+                        Dictionary<string, Stats> translations = new Dictionary<string, Stats>();
                         translations.Add(target, s);
                         transModel.Add(source, translations);
                     }
@@ -137,9 +139,9 @@ namespace AlignmentTool
         // Reading the file produces a data structure of the form
         //   Hashtable(pair => probability)
         //
-        public static Hashtable GetAlignmentModel(string alignFile)
+        public static Dictionary<string, double> GetAlignmentModel(string alignFile)
         {
-            Hashtable alignModel = new Hashtable();
+            Dictionary<string, double> alignModel = new Dictionary<string, double>();
 
             string[] lines = File.ReadAllLines(alignFile);
             foreach (string line in lines)
@@ -163,9 +165,10 @@ namespace AlignmentTool
         // Output datum is of the form
         //   Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
         //
-        public static Hashtable LoadGroups(string file)
+        public static Dictionary<string, List<TargetGroup>> LoadGroups(string file)
         {
-            Hashtable table = new Hashtable();
+            Dictionary<string, List<TargetGroup>> table =
+                new Dictionary<string, List<TargetGroup>>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -180,12 +183,12 @@ namespace AlignmentTool
 
                     if (table.ContainsKey(source))
                     {
-                        ArrayList targets = (ArrayList)table[source];
+                        List<TargetGroup> targets = table[source];
                         targets.Add(tg);
                     }
                     else
                     {
-                        ArrayList targets = new ArrayList();
+                        List<TargetGroup> targets = new List<TargetGroup>();
                         targets.Add(tg);
                         table.Add(source, targets);
                     }
@@ -306,9 +309,9 @@ namespace AlignmentTool
         // Output datum is of the form
         //   Hashtable(link => count)
         //
-        public static Hashtable GetXLinks(string file)
+        public static Dictionary<string, int> GetXLinks(string file)
         {
-            Hashtable xLinks = new Hashtable();
+            Dictionary<string, int> xLinks = new Dictionary<string, int>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -325,9 +328,9 @@ namespace AlignmentTool
             return xLinks;
         }
 
-        public static ArrayList GetStopWords(string file)
+        public static List<string> GetStopWords(string file)
         {
-            ArrayList wordList = new ArrayList();
+            List<string> wordList = new List<string>();
 
             using (StreamReader sr = new StreamReader(file, Encoding.UTF8))
             {
@@ -349,9 +352,10 @@ namespace AlignmentTool
         // If there are multiple possibilities for ...src... we take
         // the first one encountered.
         //
-        public static Hashtable BuildPreAlignmentTable(Hashtable alignModel)
+        public static Dictionary<string, string> BuildPreAlignmentTable(Dictionary<string, double> alignModel)
         {
-            Hashtable preAlignedTable = new Hashtable();
+            Dictionary<string, string> preAlignedTable =
+                new Dictionary<string, string>();
 
             IDictionaryEnumerator modelEnum = alignModel.GetEnumerator();
             while (modelEnum.MoveNext())
@@ -368,9 +372,10 @@ namespace AlignmentTool
             return preAlignedTable;
         }
 
-        public static Hashtable BuildStrongTable(string strongFile)
+        public static Dictionary<string, Dictionary<string, int>> BuildStrongTable(string strongFile)
         {
-            Hashtable strongTable = new Hashtable();
+            Dictionary<string, Dictionary<string, int>> strongTable =
+                new Dictionary<string, Dictionary<string, int>>();
 
             string[] strongLines = File.ReadAllLines(strongFile);
 
@@ -383,15 +388,13 @@ namespace AlignmentTool
 
                 if (strongTable.ContainsKey(strong))
                 {
-                    Hashtable wordIds = (Hashtable)strongTable[strong];
+                    Dictionary<String, int> wordIds = strongTable[strong];
                     wordIds.Add(wordId, 1);
                 }
                 else
                 {
-                    Hashtable wordIds = new Hashtable
-                    {
-                        { wordId, 1 }
-                    };
+                    Dictionary<string, int> wordIds = new Dictionary<string, int>();
+                    wordIds.Add(wordId, 1);
                     strongTable.Add(strong, wordIds);
                 }
             }
@@ -399,14 +402,14 @@ namespace AlignmentTool
             return strongTable;
         }
 
-        public static void UpdateGroups(ref Hashtable groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
+        public static void UpdateGroups(Dictionary<string, List<TargetGroup>> groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
         {
             string sourceText = GetSourceText(sourceLinks, manuscript);
             TargetGroup targetGroup = GetTargetText(targetLinks, translation);
 
             if (groups.ContainsKey(sourceText))
             {
-                ArrayList translations = (ArrayList)groups[sourceText];
+                List<TargetGroup> translations = groups[sourceText];
                 if (!HasGroup(translations, targetGroup))
                 {
                     translations.Add(targetGroup);
@@ -414,13 +417,13 @@ namespace AlignmentTool
             }
             else
             {
-                ArrayList translations = new ArrayList();
+                List<TargetGroup> translations = new List<TargetGroup>();
                 translations.Add(targetGroup);
                 groups.Add(sourceText, translations);
             }
         }
 
-        public static bool HasGroup(ArrayList translations, TargetGroup targetGroup)
+        public static bool HasGroup(List<TargetGroup> translations, TargetGroup targetGroup)
         {
             bool hasGroup = false;
 
@@ -550,9 +553,10 @@ namespace AlignmentTool
         // In addition, this routine calls UpdateGroups() whenever it encounters
         // a link that is not one-to-one.
         //
-        public static Hashtable GetOldLinks(string jsonFile, ref Hashtable groups)
+        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, Dictionary<string, List<TargetGroup>> groups)
         {
-            Hashtable oldLinks = new Hashtable();
+            Dictionary<string, Dictionary<string, string>> oldLinks =
+                new Dictionary<string, Dictionary<string, string>>();
 
             string jsonText = File.ReadAllText(jsonFile);
             Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
@@ -570,7 +574,7 @@ namespace AlignmentTool
 
                     if (sourceLinks.Length > 1 || targetLinks.Length > 1)
                     {
-                        UpdateGroups(ref groups, sourceLinks, targetLinks, line.manuscript, line.translation);
+                        UpdateGroups(groups, sourceLinks, targetLinks, line.manuscript, line.translation);
                     }
                     else
                     {
@@ -583,12 +587,12 @@ namespace AlignmentTool
 
                         if (oldLinks.ContainsKey(verseID))
                         {
-                            Hashtable verseLinks = (Hashtable)oldLinks[verseID];
+                            Dictionary<string, string> verseLinks = oldLinks[verseID];
                             verseLinks.Add(mWord.altId, tWord.altId);
                         }
                         else
                         {
-                            Hashtable verseLinks = new Hashtable();
+                            Dictionary<string, string> verseLinks = new Dictionary<string, string>();
                             verseLinks.Add(mWord.altId, tWord.altId);
                             oldLinks.Add(verseID, verseLinks);
                         }
@@ -596,10 +600,10 @@ namespace AlignmentTool
                 }
             }
 
-            return oldLinks;  // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            return oldLinks; 
         }
 
-        public static void FilterOutFunctionWords(string file, string cwFile, ArrayList funcWords)
+        public static void FilterOutFunctionWords(string file, string cwFile, List<string> funcWords)
         {
             StreamWriter sw = new StreamWriter(cwFile, false, Encoding.UTF8);
 

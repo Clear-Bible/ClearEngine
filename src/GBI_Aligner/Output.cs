@@ -15,16 +15,15 @@ namespace GBI_Aligner
     class Output
     {
         public static void WriteAlignment(
-            ArrayList links, // ArrayList(MappedGroup)
-            ArrayList sourceWords, 
-            ArrayList targetWords, 
+            List<MappedGroup> links,
+            List<SourceWord> sourceWords, 
+            List<TargetWord> targetWords, 
             ref Alignment2 align, 
             int k, 
-            Hashtable glossTable, 
-            Hashtable groups
+            Dictionary<string, Gloss> glossTable, 
+            Dictionary<string, List<TargetGroup>> groups
             )
         {
-            Hashtable targetPositionMap = BuildTargetPositionMap(targetWords);
 
             // Create line object
             Line line = new Line();
@@ -44,7 +43,7 @@ namespace GBI_Aligner
                 mWord.strong = sourceWord.Strong;
                 mWord.pos = sourceWord.Cat;
                 mWord.morph = sourceWord.Morph;
-                Gloss g = (Gloss)glossTable[id];
+                Gloss g = glossTable[id];
                 mWord.gloss = g.Gloss1;
                 mWord.gloss2 = g.Gloss2;
                 line.manuscript.words[i] = mWord;
@@ -65,10 +64,10 @@ namespace GBI_Aligner
             }
 
             // Create the links element
-            Hashtable primaryPositions = BuildPrimaryTable(groups);
+            Dictionary<string, int> primaryPositions = BuildPrimaryTable(groups);
 
             links = RemoveEmptyLinks(links);
-            RestoreOriginalPositions(ref links, sourceWords);
+            RestoreOriginalPositions(links, sourceWords);
             line.links = new List<Link>();
             for (int j = 0; j < links.Count; j++)
             {
@@ -77,7 +76,7 @@ namespace GBI_Aligner
                 int[] s = new int[mappedGroup.SourceNodes.Count];
                 for (int i = 0; i < mappedGroup.SourceNodes.Count; i++)
                 {
-                    SourceNode sourceNode = (SourceNode)mappedGroup.SourceNodes[i];
+                    SourceNode sourceNode = mappedGroup.SourceNodes[i];
                     s[i] = sourceNode.Position;
                 }
 
@@ -110,27 +109,11 @@ namespace GBI_Aligner
             align.Lines[k] = line;
         }
 
-        static Hashtable BuildTargetPositionMap(ArrayList targetWords)
+ 
+
+        static List<MappedGroup> RemoveEmptyLinks(List<MappedGroup> links)
         {
-            Hashtable positionMap = new Hashtable();
-
-            for (int i = 0; i < targetWords.Count; i++)
-            {
-                TargetWord targetWord = (TargetWord)targetWords[i];
-                string tWord = targetWord.Text2;
-                string targetID = targetWord.ID;
-                if (!positionMap.ContainsKey(targetID))
-                {
-                    positionMap.Add(targetID, i);
-                }
-            }
-
-            return positionMap;
-        }
-
-        static ArrayList RemoveEmptyLinks(ArrayList links)
-        {
-            ArrayList trueLinks = new ArrayList();
+            List<MappedGroup> trueLinks = new List<MappedGroup>();
 
             foreach(MappedGroup mg in links)
             {
@@ -159,24 +142,24 @@ namespace GBI_Aligner
             return isTrue;
         }
 
-        static void RestoreOriginalPositions(ref ArrayList links, ArrayList sourceWords)
+        static void RestoreOriginalPositions(List<MappedGroup> links, List<SourceWord> sourceWords)
         {
-            Hashtable positionTable = new Hashtable();
+            Dictionary<string, int> positionTable = new Dictionary<string, int>();
 
             for (int i = 0; i < sourceWords.Count; i++)
             {
-                SourceWord sourceWord = (SourceWord)sourceWords[i];
+                SourceWord sourceWord = sourceWords[i];
                 string id = sourceWord.ID;
                 positionTable.Add(id, i);
             }
 
             for (int i = 0; i < links.Count; i++)
             {
-                MappedGroup mappedGroup = (MappedGroup)links[i];
-                ArrayList sourceNodes = mappedGroup.SourceNodes;
+                MappedGroup mappedGroup = links[i];
+                List<SourceNode> sourceNodes = mappedGroup.SourceNodes;
                 for (int j = 0; j < sourceNodes.Count; j++)
                 {
-                    SourceNode sourceNode = (SourceNode)mappedGroup.SourceNodes[j];
+                    SourceNode sourceNode = mappedGroup.SourceNodes[j];
                     string id = sourceNode.MorphID;
                     int position = (int)positionTable[id];
                     sourceNode.Position = position;
@@ -184,15 +167,13 @@ namespace GBI_Aligner
             }
         }
 
-        static Hashtable BuildPrimaryTable(Hashtable groups)
+        static Dictionary<string, int> BuildPrimaryTable(Dictionary<string, List<TargetGroup>> groups)
         {
-            Hashtable primaryTable = new Hashtable();
+            Dictionary<string, int> primaryTable = new Dictionary<string, int>();
 
-            IDictionaryEnumerator groupEnum = groups.GetEnumerator();
-
-            while (groupEnum.MoveNext())
+            foreach (var groupEnum in groups)
             {
-                ArrayList targetGroups = (ArrayList)groupEnum.Value;
+                List<TargetGroup> targetGroups = groupEnum.Value;
                 foreach (TargetGroup tg in targetGroups)
                 {
                     string tgText = tg.Text;
@@ -207,13 +188,13 @@ namespace GBI_Aligner
             return primaryTable;
         }
 
-        static ArrayList ReorderNodes(ArrayList targetNodes, Hashtable primaryPositions)
+        static List<LinkedWord> ReorderNodes(List<LinkedWord> targetNodes, Dictionary<string, int> primaryPositions)
         {
-            ArrayList targetNodes2 = new ArrayList();
+            List<LinkedWord> targetNodes2 = new List<LinkedWord>();
 
             string targetText = GetTargetText(targetNodes);
-            int primaryPosition = (int)primaryPositions[targetText];
-            LinkedWord primaryWord = (LinkedWord)targetNodes[primaryPosition];
+            int primaryPosition = primaryPositions[targetText];
+            LinkedWord primaryWord = targetNodes[primaryPosition];
             targetNodes2.Add(primaryWord);
             targetNodes.Remove(primaryWord);
             foreach(LinkedWord lw in targetNodes)
@@ -224,7 +205,7 @@ namespace GBI_Aligner
             return targetNodes2;
         }
 
-        static string GetTargetText(ArrayList targetNodes)
+        static string GetTargetText(List<LinkedWord> targetNodes)
         {
             string text = string.Empty;
 
