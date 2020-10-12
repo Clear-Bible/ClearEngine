@@ -77,7 +77,7 @@ namespace GBI_Aligner
                 int[] s = new int[mappedGroup.SourceNodes.Count];
                 for (int i = 0; i < mappedGroup.SourceNodes.Count; i++)
                 {
-                    SourceNode sourceNode = (SourceNode)mappedGroup.SourceNodes[i];
+                    SourceNode sourceNode = mappedGroup.SourceNodes[i];
                     s[i] = sourceNode.Position;
                 }
 
@@ -172,11 +172,11 @@ namespace GBI_Aligner
 
             for (int i = 0; i < links.Count; i++)
             {
-                MappedGroup mappedGroup = (MappedGroup)links[i];
-                ArrayList sourceNodes = mappedGroup.SourceNodes;
+                MappedGroup mappedGroup = links[i];
+                List<SourceNode> sourceNodes = mappedGroup.SourceNodes;
                 for (int j = 0; j < sourceNodes.Count; j++)
                 {
-                    SourceNode sourceNode = (SourceNode)mappedGroup.SourceNodes[j];
+                    SourceNode sourceNode = mappedGroup.SourceNodes[j];
                     string id = sourceNode.MorphID;
                     int position = (int)positionTable[id];
                     sourceNode.Position = position;
@@ -205,9 +205,9 @@ namespace GBI_Aligner
             return primaryTable;
         }
 
-        static ArrayList ReorderNodes(ArrayList targetNodes, Hashtable primaryPositions)
+        static List<LinkedWord> ReorderNodes(List<LinkedWord> targetNodes, Hashtable primaryPositions)
         {
-            ArrayList targetNodes2 = new ArrayList();
+            List<LinkedWord> targetNodes2 = new List<LinkedWord>();
 
             string targetText = GetTargetText(targetNodes);
             int primaryPosition = (int)primaryPositions[targetText];
@@ -222,7 +222,7 @@ namespace GBI_Aligner
             return targetNodes2;
         }
 
-        static string GetTargetText(ArrayList targetNodes)
+        static string GetTargetText(List<LinkedWord> targetNodes)
         {
             string text = string.Empty;
 
