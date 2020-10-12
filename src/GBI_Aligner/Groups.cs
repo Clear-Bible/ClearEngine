@@ -28,7 +28,7 @@ namespace GBI_Aligner
                 RemoveOldLinks(mappedGroups, ref links);
                 foreach (string[][] group in mappedGroups)
                 {
-                    AddGroup(group, links, terminals, new ArrayList(targetWords));
+                    AddGroup(group, links, terminals, targetWords);
                 }
             }
         }
@@ -261,7 +261,7 @@ namespace GBI_Aligner
             return inGroup;
         }
 
-        static void AddGroup(string[][]group, List<MappedGroup> links, List<XmlNode> terminals, ArrayList targets)
+        static void AddGroup(string[][]group, List<MappedGroup> links, List<XmlNode> terminals, List<TargetWord> targets)
         {
             string[] sourceWords = group[0];
             string[] targetWords = group[1];
@@ -311,7 +311,7 @@ namespace GBI_Aligner
             return treeNode;
         }
 
-        static void AddTargetNodes(string[] targetWords, List<LinkedWord> targetNodes, ArrayList targets)
+        static void AddTargetNodes(string[] targetWords, List<LinkedWord> targetNodes, List<TargetWord> targets)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {
@@ -320,7 +320,7 @@ namespace GBI_Aligner
             }
         }
 
-        static LinkedWord GetTargetNode(string id, ArrayList targets)
+        static LinkedWord GetTargetNode(string id, List<TargetWord> targets)
         {
             LinkedWord lw = new LinkedWord();
             TargetWord tWord = LocateTargetword(id, targets);
@@ -331,7 +331,7 @@ namespace GBI_Aligner
             return lw;
         }
 
-        static TargetWord LocateTargetword(string id, ArrayList targets)
+        static TargetWord LocateTargetword(string id, List<TargetWord> targets)
         {
             TargetWord tw = null;
 
