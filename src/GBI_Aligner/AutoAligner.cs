@@ -30,43 +30,43 @@ namespace GBI_Aligner
             Dictionary<string, Dictionary<string, double>> transModel, // source => target => probability
             Dictionary<string, Dictionary<string, Stats>> manTransModel, // translation model from manually checked alignments
                                      // comes from Data.GetTranslationModel2(manTransModelFile)
-                                     // of the form: Hashtable(source => Hashtable(target => Stats{ count, probability})
+                                     // of the form: (source => (target => Stats{ count, probability})
                                      // source = strongs, target = lower-cased translated text
             string treeFolder, // the folder where syntatic trees are kept.
             Dictionary<string, string> bookNames, // for getting booknames that are used in the tree files
             Dictionary<string, double> alignProbs, // alignment probabilities
                                                    // comes from Data.GetAlignmentModel(alignModel.txt)
-                                                   //   Hashtable(pair => probability)
+                                                   //   (pair => probability)
                                                    //   the pair is a string of the form: bbcccvvvwwwn-bbcccvvvwww 
                                                    //      for example: 400010010011-40001001001 
             Dictionary<string, string> preAlignment, // alignments from the decoder of the statisical aligner
                                     // comes from Data.BuildPreAlignmentTable(alignProbs)
-                                    //   of the form Hashtable(bbcccvvvwwwn => bbcccvvvwww)
+                                    //   of the form (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel, // use the alignProbs and preAlignment only in batch mode where the verses 
                                 // to be aligned are the same as the verses used in building the models
             int maxPaths, // the maximal number paths we can keep at any point
             List<string> puncs, // list of punctuation marks
             Dictionary<string, List<TargetGroup>> groups, // one-to-many, many-to-one, and many-to-many mappings
                               // comes from Data.LoadGroups("groups.txt")
-                              //   of the form Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
+                              //   of the form (...source... => List(TargetGroup{...text..., primaryPosition}))
             List<string> stopWords, // target words not to be linked
             Dictionary<string, int> goodLinks, // list of word pairs that should be linked
                                  // from Data.GetXLinks("goodLinks.txt")
-                                 //   of the form Hashtable(link => count)
+                                 //   of the form (link => count)
             int goodLinkMinCount, // the mininmal counts required for a good link to be used
-            Dictionary<string, int> badLinks, // list of word pairs that should not be linked, also Hashtable(link => count)
+            Dictionary<string, int> badLinks, // list of word pairs that should not be linked, also (link => count)
             int badLinkMinCount, // the mininmal counts required for a bad link to be considered
             Dictionary<string, Gloss> glossTable, // gloss information of the source text 
-            Dictionary<string, Dictionary<string, string>> oldLinks, // Hashtable(verseID => Hashtable(mWord.altId => tWord.altId))
+            Dictionary<string, Dictionary<string, string>> oldLinks, // (verseID => e(mWord.altId => tWord.altId))
             List<string> sourceFuncWords, // function words in Hebrew and Greek
             List<string> targetFuncWords,
             bool contentWordsOnly,
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
- //           Hashtable oldLinks = OldLinks.GetOldLinks(oldJson, ref groups);
 
-//            Alignment2 align = Align.AlignCorpus(source, sourceLemma, target, targetLower, transModel, manTransModel, alignProbs, preAlignment, useAlignModel, groups, treeFolder, bookNames, jsonOutput, 1000000, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, glossTable, oldLinks, contentWordsOnly, strongs);
+
+
             Alignment2 align = Align.AlignCorpus(source, sourceLemma, target, transModel, manTransModel, alignProbs, preAlignment, useAlignModel, groups, treeFolder, bookNames, jsonOutput, 1000000, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, glossTable, oldLinks, sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
 
             // Create JSON file
