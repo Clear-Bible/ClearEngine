@@ -19,18 +19,18 @@ namespace GBI_Aligner
             List<TargetWord> tWords, // ArrayList(TargetWord)
             Dictionary<string, Dictionary<string, double>> model,
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
-                                // Hashtable(source => Hashtable(target => Stats{ count, probability})
-            Dictionary<string, double> alignProbs, // Hashtable("bbcccvvvwwwn-bbcccvvvwww" => probability)
+                                // (source => (target => Stats{ count, probability})
+            Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
             int n,  // number of target tokens
             string verseID, // from the syntax tree
             List<string> puncs, 
             List<string> stopWords, 
-            Dictionary<string, int> goodLinks,  // Hashtable(link => count)
+            Dictionary<string, int> goodLinks,  // (link => count)
             int goodLinkMinCount,
-            Dictionary<string, int> badLinks,  // Hashtable(link => count)
+            Dictionary<string, int> badLinks,  // (link => count)
             int badLinkMinCount,
-            Dictionary<string, string> existingLinks, // Hashtable(mWord.altId => tWord.altId)
+            Dictionary<string, string> existingLinks, // (mWord.altId => tWord.altId)
             Dictionary<string, string> idMap, 
             List<string> sourceFuncWords,
             bool contentWordsOnly,  // not actually used
