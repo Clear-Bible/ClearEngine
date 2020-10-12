@@ -20,8 +20,8 @@ namespace GBI_Aligner
             List<XmlNode> terminals 
             )
         {
-            SourceWord[] sWords = BuildSourceArray(new ArrayList(sourceWords));
-            TargetWord[] tWords = BuildTargetArray(new ArrayList(targetWords));
+            SourceWord[] sWords = BuildSourceArray(sourceWords);
+            TargetWord[] tWords = BuildTargetArray(targetWords);
             List<string[][]> mappedGroups = GetGroupLinks(sWords, tWords, groups);
             if (mappedGroups.Count > 0)
             {
@@ -347,7 +347,7 @@ namespace GBI_Aligner
             return tw;
         }
 
-        static SourceWord[] BuildSourceArray(ArrayList sourceWords)
+        static SourceWord[] BuildSourceArray(List<SourceWord> sourceWords)
         {
             SourceWord[] sourceArray = new SourceWord[sourceWords.Count];
 
@@ -362,7 +362,7 @@ namespace GBI_Aligner
             return sourceArray;
         }
 
-        static TargetWord[] BuildTargetArray(ArrayList targetWords)
+        static TargetWord[] BuildTargetArray(List<TargetWord> targetWords)
         {
             TargetWord[] targetArray = new TargetWord[targetWords.Count];
 
