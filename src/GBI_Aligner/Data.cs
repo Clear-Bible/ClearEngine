@@ -110,21 +110,18 @@ namespace GBI_Aligner
 
 
         // pathProbs ::= TargetWord => score
-        public static ArrayList SortWordCandidates(Hashtable pathProbs)
+        public static List<TargetWord> SortWordCandidates(Dictionary<TargetWord, double> pathProbs)
         {
             int hashCodeOfWordAndPosition(TargetWord tw) =>
                 $"{tw.Text}-{tw.Position}".GetHashCode();
 
-            return new ArrayList(
+            return
                 pathProbs
-                    .Cast<DictionaryEntry>()
-                    .OrderByDescending(kvp => (double)kvp.Value)
+                    .OrderByDescending(kvp => kvp.Value)
                     .ThenByDescending(kvp =>
-                        hashCodeOfWordAndPosition((TargetWord)kvp.Key))
+                        hashCodeOfWordAndPosition(kvp.Key))
                     .Select(kvp => kvp.Key)
-                    .ToList()
-                );
-            
+                    .ToList();           
         }
 
 

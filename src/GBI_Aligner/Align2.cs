@@ -292,9 +292,7 @@ namespace GBI_Aligner
             return candidates;
         }
 
-        // linksTable :: Hashtable(sourceId => MappedWords)
-        // returns ArrayList(MappedWords)
-        //
+        
         static List<MappedWords> GetLinkedSiblings(
             XmlNode treeNode,
             Dictionary<string, MappedWords> linksTable, // key is source morphId
@@ -383,8 +381,7 @@ namespace GBI_Aligner
         }
 
 
-        // conflicts :: ArrayList(ArrayList(MappedWords))
-        // links :: ArrayList(MappedWords)
+
         // replaces some members of links with a special non-link MappedWords datum
         //
         public static void ResolveConflicts(
@@ -482,8 +479,7 @@ namespace GBI_Aligner
         }
 
  
-        // returns ArrayList(MappedWord)
-        //
+  
         static List<MappedWords> FindWinners(List<MappedWords> conflict, int pass)
         {
             double prob(MappedWords mw) => mw.TargetNode.Prob;
@@ -545,9 +541,7 @@ namespace GBI_Aligner
             int badLinkMinCount
             )
         {
-            Hashtable probs = new Hashtable();
-
-            ArrayList topCandidates = new ArrayList();
+            Dictionary<TargetWord, double> probs = new Dictionary<TargetWord, double>();
 
             for (int i = 0; i < tWords.Count; i++)
             {
@@ -582,13 +576,13 @@ namespace GBI_Aligner
 
             if (probs.Count > 0)
             {
-                ArrayList candidates = Data.SortWordCandidates(probs);
+                List<TargetWord> candidates = Data.SortWordCandidates(probs);
 
-                TargetWord topCandidate = (TargetWord)candidates[0];
+                TargetWord topCandidate = candidates[0];
                 topCandidate.IsFake = false;
 
                 LinkedWord linkedWord = new LinkedWord();
-                linkedWord.Prob = (double)probs[topCandidate];
+                linkedWord.Prob = probs[topCandidate];
                 linkedWord.Text = topCandidate.Text;
                 linkedWord.Word = topCandidate;
                 return linkedWord;
