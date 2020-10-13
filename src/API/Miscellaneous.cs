@@ -20,7 +20,9 @@ namespace ClearBible.Clear3.API
     {
         OK,
         SetLocalResourceFolderFailed,
-        QueryLocalResourcesFailed
+        QueryLocalResourcesFailed,
+        NullOrBlankKey,
+        KeyIsNotPresent
     }
 
 

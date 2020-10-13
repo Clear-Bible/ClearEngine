@@ -5,4 +5,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\GBI_Aligner\GBI_Aligner.csproj" />
+    <ProjectReference Include="..\..\src\AlignmentTool\AlignmentTool.csproj" />
+    <ProjectReference Include="..\..\src\InternalDb\InternalDb.csproj" />
+  </ItemGroup>
 </Project>

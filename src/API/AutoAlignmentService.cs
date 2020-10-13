@@ -10,9 +10,9 @@ namespace ClearBible.Clear3.API
         Task<AutoAlignmentResult> LaunchAutoAlignmentAsync(
             TreeService treeService,
             TranslationPairTable translationPairTable,
-            PhraseTranslationModel smtTransModel,
+            IPhraseTranslationModel smtTransModel,
             PlaceAlignmentModel smtAlignModel,
-            PhraseTranslationModel manualTransModel,
+            IPhraseTranslationModel manualTransModel,
             PlaceAlignmentModel manualAlignModel,
             Corpus manualCorpus,
             HashSet<string> sourceFunctionWords,

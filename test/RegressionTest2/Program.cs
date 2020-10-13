@@ -97,7 +97,7 @@ namespace RegressionTest2
             Task<SMTResult> smtTask = PerformSMT(service, smtTable);
             SMTResult smtResult = smtTask.Result;
 
-            PhraseTranslationModel emptyManualPhraseTranslationModel =
+            IPhraseTranslationModel emptyManualPhraseTranslationModel =
                 service.EmptyPhraseTranslationModel;
 
             PlaceAlignmentModel emptyManualPlaceAlignmentModel =
@@ -425,9 +425,9 @@ namespace RegressionTest2
             Clear30ServiceAPI service,
             TreeService treeService,
             TranslationPairTable translationPairTable,
-            PhraseTranslationModel smtTransModel,
+            IPhraseTranslationModel smtTransModel,
             PlaceAlignmentModel smtAlignModel,
-            PhraseTranslationModel manualTransModel,
+            IPhraseTranslationModel manualTransModel,
             PlaceAlignmentModel manualAlignModel,
             Corpus manualCorpus,
             HashSet<string> sourceFunctionWords,

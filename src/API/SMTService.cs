@@ -19,7 +19,7 @@ namespace ClearBible.Clear3.API
 
         DateTime CreationDate { get; }
 
-        PhraseTranslationModel TransModel { get; }
+        IPhraseTranslationModel TransModel { get; }
 
         PlaceAlignmentModel AlignModel { get; }
     }
