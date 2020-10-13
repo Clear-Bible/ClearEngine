@@ -11,33 +11,33 @@ namespace ClearBible.Clear3.API
     /// a particular relationship has been added and removed.
     /// </summary>
     /// 
-    public interface PhraseTranslationModel
+    public interface IPhraseTranslationModel
     {
         string Key { get; }
 
-        IEnumerable<Phrase> FindSourcePhrasesByTextMembers(
+        IEnumerable<IPhrase> FindSourcePhrasesByTextMembers(
             IEnumerable<string> someOfTheTextMembers);
 
-        IEnumerable<Phrase> FindTargetPhrasesByTextMembers(
+        IEnumerable<IPhrase> FindTargetPhrasesByTextMembers(
             IEnumerable<string> someOfTheTextMembers);
 
-        IEnumerable<Phrase> SourcePhrases { get; }
+        IEnumerable<IPhrase> SourcePhrases { get; }
 
-        IEnumerable<Phrase> TargetPhrases { get; }
+        IEnumerable<IPhrase> TargetPhrases { get; }
 
-        IEnumerable<Phrase> TargetsForSource(string sourceKey);
+        IEnumerable<IPhrase> TargetsForSource(string sourceKey);
 
-        IEnumerable<Phrase> SourcesForTarget(string targetKey);
+        IEnumerable<IPhrase> SourcesForTarget(string targetKey);
 
         double Rate(string sourceKey, string targetKey);
 
         double Count(string sourceKey, string targetKey);
 
-        PhraseTranslationModel Add(
-            Phrase sourcePhrase,
-            Phrase targetPhrase);
+        IPhraseTranslationModel Add(
+            IPhrase sourcePhrase,
+            IPhrase targetPhrase);
 
-        PhraseTranslationModel Remove(
+        IPhraseTranslationModel Remove(
             string sourceKey,
             string targetKey);
     }

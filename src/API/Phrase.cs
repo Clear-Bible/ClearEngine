@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
-    public interface Phrase
+    public interface IPhrase
     {
         string Key { get; }
 
-        IEnumerable<PhraseUnit> PhraseUnits { get; }
+        IEnumerable<IPhraseUnit> PhraseUnits { get; }
 
         int PrimaryPhraseUnitIndex { get; }
     }
@@ -17,7 +17,7 @@ namespace ClearBible.Clear3.API
     /// A PhraseUnit is either a Text or an Ellipsis.
     /// </summary>
     /// 
-    public interface PhraseUnit
+    public interface IPhraseUnit
     {
         string Key { get; }
 
@@ -27,20 +27,20 @@ namespace ClearBible.Clear3.API
     }
 
 
-    public interface PhraseService
+    public interface IPhraseService
     {
-        PhraseUnit PhraseUnit(string text);
+        IPhraseUnit PhraseUnit(string text);
 
-        PhraseUnit PhraseUnitEllipsis();
+        IPhraseUnit PhraseUnitEllipsis();
 
-        PhraseUnit PhraseUnitByKey(string key);
+        IPhraseUnit PhraseUnitByKey(string key);
 
-        Phrase Phrase(
-            IEnumerable<PhraseUnit> phraseUnits,
+        IPhrase Phrase(
+            IEnumerable<IPhraseUnit> phraseUnits,
             int primaryPhraseUnitIndex);
 
-        Phrase PhraseFromText(string text);
+        IPhrase PhraseFromText(string text);
 
-        Phrase PhraseByKey(string key);
+        IPhrase PhraseByKey(string key);
     }
 }

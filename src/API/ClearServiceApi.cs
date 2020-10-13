@@ -17,7 +17,7 @@ namespace ClearBible.Clear3.API
 
         AutoAlignmentService AutoAlignmentService { get; }
 
-        PhraseService PhraseService { get; }
+        IPhraseService PhraseService { get; }
 
         ZoneService ZoneService { get; }
 
@@ -30,7 +30,7 @@ namespace ClearBible.Clear3.API
 
         TranslationPairTable EmptyTranslationPairTable { get; }       
 
-        PhraseTranslationModel EmptyPhraseTranslationModel { get; }
+        IPhraseTranslationModel EmptyPhraseTranslationModel { get; }
 
         PlaceAlignmentModel EmptyPlaceAlignmentModel { get; }
         
