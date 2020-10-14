@@ -173,9 +173,9 @@ namespace GBI_Aligner
         {
             Dictionary<string, int> primaryTable = new Dictionary<string, int>();
 
-            foreach (List<TargetGroup> targetGroups in groups.AllValues)
+            foreach (TargetGroups targetGroups in groups.AllValues)
             {
-                foreach (TargetGroup tg in targetGroups)
+                foreach (TargetGroup tg in targetGroups.AllMembers)
                 {
                     string tgText = tg.Text;
                     tgText = tgText.Replace(" ~ ", " ");

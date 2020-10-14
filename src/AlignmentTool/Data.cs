@@ -183,7 +183,7 @@ namespace AlignmentTool
 
                     if (table.ContainsKey(source))
                     {
-                        List<TargetGroup> targets = table[source];
+                        TargetGroups targets = table[source];
                         targets.Add(tg);
                     }
                     else
@@ -409,7 +409,7 @@ namespace AlignmentTool
 
             if (groups.ContainsKey(sourceText))
             {
-                List<TargetGroup> translations = groups[sourceText];
+                TargetGroups translations = groups[sourceText];
                 if (!HasGroup(translations, targetGroup))
                 {
                     translations.Add(targetGroup);
@@ -423,11 +423,11 @@ namespace AlignmentTool
             }
         }
 
-        public static bool HasGroup(List<TargetGroup> translations, TargetGroup targetGroup)
+        public static bool HasGroup(TargetGroups translations, TargetGroup targetGroup)
         {
             bool hasGroup = false;
 
-            foreach (TargetGroup tg in translations)
+            foreach (TargetGroup tg in translations.AllMembers)
             {
                 if (tg.Text == targetGroup.Text)
                 {

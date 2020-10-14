@@ -56,7 +56,7 @@ namespace GBI_Aligner
                     string trigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID + " " + sourceWords[i + 2].ID;
                     if (groups.ContainsKey(trigram))
                     {
-                        List<TargetGroup> targetGroups = groups[trigram];
+                        TargetGroups targetGroups = groups[trigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -75,7 +75,7 @@ namespace GBI_Aligner
                     string bigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID;
                     if (groups.ContainsKey(bigram))
                     {
-                        List<TargetGroup> targetGroups = groups[bigram];
+                        TargetGroups targetGroups = groups[bigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -94,7 +94,7 @@ namespace GBI_Aligner
                     string unigramIDs = sourceWords[i].ID;
                     if (groups.ContainsKey(unigram))
                     {
-                        List<TargetGroup> targetGroups = groups[unigram];
+                        TargetGroups targetGroups = groups[unigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 2);
                         if (match != string.Empty)
                         {
@@ -111,13 +111,13 @@ namespace GBI_Aligner
             return mappedGroups;
         }
 
-        static string FindTargetMatch(TargetWord[] targetWords, List<TargetGroup> targetGroups, int minLength)
+        static string FindTargetMatch(TargetWord[] targetWords, TargetGroups targetGroups, int minLength)
         {
             string match = string.Empty;
 
             bool isSplit = false;
             int maxRange;
-            foreach (TargetGroup targetGroup in targetGroups)
+            foreach (TargetGroup targetGroup in targetGroups.AllMembers)
             {
                 if (targetGroup.Text.Contains("~"))
                 {
