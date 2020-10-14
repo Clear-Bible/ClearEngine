@@ -11,15 +11,15 @@ namespace WorkInProgressStaging
         private Dictionary<string, double> _inner =
             new Dictionary<string, double>();
 
-        public bool ContainsKey(string s) =>
-            _inner.ContainsKey(s);
+        public bool ContainsTargetText(string targetText) =>
+            _inner.ContainsKey(targetText);
 
-        public double this[string s] =>
-            _inner[s];
+        public double ScoreForTargetText(string targetText) =>
+            _inner[targetText];
 
-        public void Add(string s, double d)
+        public void AddTranslation(string targetText, double score)
         {
-            _inner.Add(s, d);
+            _inner.Add(targetText, score);
         }
     }
 
@@ -29,15 +29,15 @@ namespace WorkInProgressStaging
         private Dictionary<string, Translations> _inner =
             new Dictionary<string, Translations>();
 
-        public bool ContainsKey(string s) =>
-            _inner.ContainsKey(s);
+        public bool ContainsSourceLemma(string sourceLemma) =>
+            _inner.ContainsKey(sourceLemma);
 
-        public Translations this[string s] =>
-            _inner[s];
+        public Translations TranslationsForSourceLemma(string sourceLemma) =>
+            _inner[sourceLemma];
 
-        public void Add(string s, Translations translations)
+        public void AddTranslations(string sourceLemma, Translations translations)
         {
-            _inner.Add(s, translations);
+            _inner.Add(sourceLemma, translations);
         }
     }
 }

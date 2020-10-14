@@ -333,9 +333,9 @@ namespace GBI_Aligner
                     }
                 }
             }
-            else if (model.ContainsKey(sWord.Lemma))
+            else if (model.ContainsSourceLemma(sWord.Lemma))
             {
-                Translations translations = model[sWord.Lemma];
+                Translations translations = model.TranslationsForSourceLemma(sWord.Lemma);
 
                 for (int i = 0; i < tWords.Count; i++)
                 {
@@ -349,9 +349,9 @@ namespace GBI_Aligner
                     if (stopWords.Contains(sWord.Lemma)) continue;
                     if (stopWords.Contains(tWord.Text)) continue;
 
-                    if (translations.ContainsKey(tWord.Text))
+                    if (translations.ContainsTargetText(tWord.Text))
                     {
-                        double prob = (double)translations[tWord.Text];
+                        double prob = translations.ScoreForTargetText(tWord.Text);
                         string idKey = sWord.ID + "-" + tWord.ID;
                         double adjustedProb;
                         if (useAlignModel)

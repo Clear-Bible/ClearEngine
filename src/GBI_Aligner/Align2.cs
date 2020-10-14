@@ -562,12 +562,12 @@ namespace GBI_Aligner
 
                 if (linkedTargets.Contains(tWord.ID)) continue;
 
-                if (model.ContainsKey(sWord.Lemma))
+                if (model.ContainsSourceLemma(sWord.Lemma))
                 {
-                    Translations translations = model[sWord.Lemma];
-                    if (translations.ContainsKey(tWord.Text))
+                    Translations translations = model.TranslationsForSourceLemma(sWord.Lemma);
+                    if (translations.ContainsTargetText(tWord.Text))
                     {
-                        double prob = (double)translations[tWord.Text];
+                        double prob = translations.ScoreForTargetText(tWord.Text);
                         if (prob >= 0.17)
                         {
                             probs.Add(tWord, Math.Log(prob));
