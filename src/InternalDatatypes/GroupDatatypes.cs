@@ -5,45 +5,49 @@ using System.Linq;
 
 namespace ClearBible.Clear3.InternalDatatypes
 {
-    public class TargetGroup
+    public class GroupTranslation
     {
-        public string Text;
+        public string TargetGroupAsText;
         public int PrimaryPosition;
     }
 
 
-    public class TargetGroups
+    public class GroupTranslations
     {
-        private List<TargetGroup> _inner =
-            new List<TargetGroup>();
+        private List<GroupTranslation> _inner =
+            new List<GroupTranslation>();
 
-        public IEnumerable<TargetGroup> AllMembers =>
+        public IEnumerable<GroupTranslation> AllTranslations =>
             _inner;
 
-        public void Add(TargetGroup targetGroup)
+        public void Add(GroupTranslation targetGroupTranslation)
         {
-            _inner.Add(targetGroup);
+            _inner.Add(targetGroupTranslation);
         }
     }
 
 
-    public class GroupInfo
+    public class GroupTranslationsTable
     {
-        private Dictionary<string, TargetGroups> _inner =
-            new Dictionary<string, TargetGroups>();
+        private Dictionary<string, GroupTranslations> _inner =
+            new Dictionary<string, GroupTranslations>();
 
-        public bool ContainsKey(string key) =>
-            _inner.ContainsKey(key);
+        public bool ContainsSourceGroupKey(string sourceGroupLemmas) =>
+            _inner.ContainsKey(sourceGroupLemmas);
 
-        public TargetGroups this[string key] =>
-            _inner[key];
+        public GroupTranslations TranslationsForSourceGroup(
+            string sourceGroupLemmas) =>
+                _inner[sourceGroupLemmas];
 
-        public IEnumerable<TargetGroups> AllValues =>
-            _inner.Values;
+        public IEnumerable<KeyValuePair<string, GroupTranslations>>
+            AllEntries =>
+                _inner;
 
-        public void Add(string key, TargetGroups value)
+        public void Add(
+            string sourceGroupLemmas,
+            GroupTranslations translations)
         {
-            _inner.Add(key, value);
+            _inner.Add(sourceGroupLemmas, translations);
         }
     }
 }

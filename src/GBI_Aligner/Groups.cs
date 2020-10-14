@@ -18,7 +18,7 @@ namespace GBI_Aligner
             List<MappedGroup> links,
             List<SourceWord> sourceWords,
             List<TargetWord> targetWords,
-            GroupInfo groups,
+            GroupTranslationsTable groups,
             List<XmlNode> terminals 
             )
         {
@@ -36,7 +36,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, GroupInfo groups)
+        static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, GroupTranslationsTable groups)
         {
             List<string[][]> mappedGroups = new List<string[][]>();
 
@@ -54,9 +54,9 @@ namespace GBI_Aligner
                 {
                     string trigram = sourceWords[i].Lemma + " " + sourceWords[i + 1].Lemma + " " + sourceWords[i + 2].Lemma;
                     string trigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID + " " + sourceWords[i + 2].ID;
-                    if (groups.ContainsKey(trigram))
+                    if (groups.ContainsSourceGroupKey(trigram))
                     {
-                        TargetGroups targetGroups = groups[trigram];
+                        GroupTranslations targetGroups = groups.TranslationsForSourceGroup(trigram);
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -73,9 +73,9 @@ namespace GBI_Aligner
                 {
                     string bigram = sourceWords[i].Lemma + " " + sourceWords[i + 1].Lemma;
                     string bigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID;
-                    if (groups.ContainsKey(bigram))
+                    if (groups.ContainsSourceGroupKey(bigram))
                     {
-                        TargetGroups targetGroups = groups[bigram];
+                        GroupTranslations targetGroups = groups.TranslationsForSourceGroup(bigram);
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -92,9 +92,9 @@ namespace GBI_Aligner
                 {
                     string unigram = sourceWords[i].Lemma;
                     string unigramIDs = sourceWords[i].ID;
-                    if (groups.ContainsKey(unigram))
+                    if (groups.ContainsSourceGroupKey(unigram))
                     {
-                        TargetGroups targetGroups = groups[unigram];
+                        GroupTranslations targetGroups = groups.TranslationsForSourceGroup(unigram);
                         string match = FindTargetMatch(targetWords, targetGroups, 2);
                         if (match != string.Empty)
                         {
@@ -111,21 +111,21 @@ namespace GBI_Aligner
             return mappedGroups;
         }
 
-        static string FindTargetMatch(TargetWord[] targetWords, TargetGroups targetGroups, int minLength)
+        static string FindTargetMatch(TargetWord[] targetWords, GroupTranslations targetGroups, int minLength)
         {
             string match = string.Empty;
 
             bool isSplit = false;
             int maxRange;
-            foreach (TargetGroup targetGroup in targetGroups.AllMembers)
+            foreach (GroupTranslation targetGroup in targetGroups.AllTranslations)
             {
-                if (targetGroup.Text.Contains("~"))
+                if (targetGroup.TargetGroupAsText.Contains("~"))
                 {
                     isSplit = true;
-                    targetGroup.Text = targetGroup.Text.Replace(" ~ ", " ");
+                    targetGroup.TargetGroupAsText = targetGroup.TargetGroupAsText.Replace(" ~ ", " ");
                 }
 
-                string[] words = targetGroup.Text.Split(" ".ToCharArray());
+                string[] words = targetGroup.TargetGroupAsText.Split(" ".ToCharArray());
                 if (isSplit) maxRange = words.Length * 2;
                 else maxRange = words.Length;
 

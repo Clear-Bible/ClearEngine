@@ -23,7 +23,7 @@ namespace GBI_Aligner
             ref Alignment2 align, 
             int k, 
             Dictionary<string, Gloss> glossTable, 
-            GroupInfo groups
+            GroupTranslationsTable groups
             )
         {
 
@@ -169,15 +169,16 @@ namespace GBI_Aligner
             }
         }
 
-        static Dictionary<string, int> BuildPrimaryTable(GroupInfo groups)
+        static Dictionary<string, int> BuildPrimaryTable(GroupTranslationsTable groups)
         {
             Dictionary<string, int> primaryTable = new Dictionary<string, int>();
 
-            foreach (TargetGroups targetGroups in groups.AllValues)
+            foreach (GroupTranslations groupTranslations in
+                groups.AllEntries.Select(kvp => kvp.Value))
             {
-                foreach (TargetGroup tg in targetGroups.AllMembers)
+                foreach (GroupTranslation tg in groupTranslations.AllTranslations)
                 {
-                    string tgText = tg.Text;
+                    string tgText = tg.TargetGroupAsText;
                     tgText = tgText.Replace(" ~ ", " ");
                     if (!primaryTable.ContainsKey(tgText))
                     {

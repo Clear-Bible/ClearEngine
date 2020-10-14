@@ -166,9 +166,9 @@ namespace AlignmentTool
         // Output datum is of the form
         //   Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
         //
-        public static GroupInfo LoadGroups(string file)
+        public static GroupTranslationsTable LoadGroups(string file)
         {
-            GroupInfo table = new GroupInfo();
+            GroupTranslationsTable table = new GroupTranslationsTable();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -177,18 +177,18 @@ namespace AlignmentTool
                 if (groups.Length == 3)
                 {
                     string source = groups[0].Trim();
-                    TargetGroup tg = new TargetGroup();
-                    tg.Text = groups[1].Trim().ToLower();
+                    GroupTranslation tg = new GroupTranslation();
+                    tg.TargetGroupAsText = groups[1].Trim().ToLower();
                     tg.PrimaryPosition = Int32.Parse(groups[2].Trim());
 
-                    if (table.ContainsKey(source))
+                    if (table.ContainsSourceGroupKey(source))
                     {
-                        TargetGroups targets = table[source];
+                        GroupTranslations targets = table.TranslationsForSourceGroup(source);
                         targets.Add(tg);
                     }
                     else
                     {
-                        TargetGroups targets = new TargetGroups();
+                        GroupTranslations targets = new GroupTranslations();
                         targets.Add(tg);
                         table.Add(source, targets);
                     }
@@ -402,14 +402,14 @@ namespace AlignmentTool
             return strongTable;
         }
 
-        public static void UpdateGroups(GroupInfo groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
+        public static void UpdateGroups(GroupTranslationsTable groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
         {
             string sourceText = GetSourceText(sourceLinks, manuscript);
-            TargetGroup targetGroup = GetTargetText(targetLinks, translation);
+            GroupTranslation targetGroup = GetTargetText(targetLinks, translation);
 
-            if (groups.ContainsKey(sourceText))
+            if (groups.ContainsSourceGroupKey(sourceText))
             {
-                TargetGroups translations = groups[sourceText];
+                GroupTranslations translations = groups.TranslationsForSourceGroup(sourceText);
                 if (!HasGroup(translations, targetGroup))
                 {
                     translations.Add(targetGroup);
@@ -417,19 +417,19 @@ namespace AlignmentTool
             }
             else
             {
-                TargetGroups translations = new TargetGroups();
+                GroupTranslations translations = new GroupTranslations();
                 translations.Add(targetGroup);
                 groups.Add(sourceText, translations);
             }
         }
 
-        public static bool HasGroup(TargetGroups translations, TargetGroup targetGroup)
+        public static bool HasGroup(GroupTranslations translations, GroupTranslation targetGroup)
         {
             bool hasGroup = false;
 
-            foreach (TargetGroup tg in translations.AllMembers)
+            foreach (GroupTranslation tg in translations.AllTranslations)
             {
-                if (tg.Text == targetGroup.Text)
+                if (tg.TargetGroupAsText == targetGroup.TargetGroupAsText)
                 {
                     hasGroup = true;
                     break;
@@ -439,6 +439,10 @@ namespace AlignmentTool
             return hasGroup;
         }
 
+        /// <summary>
+        /// Returns a list of the space-separated lemmas packed into a string.
+        /// </summary>
+        /// 
         static string GetSourceText(int[] sourceLinks, Manuscript manuscript)
         {
             string text = string.Empty;
@@ -453,13 +457,13 @@ namespace AlignmentTool
             return text.Trim();
         }
 
-        static TargetGroup GetTargetText(int[] targetLinks, Translation translation)
+        static GroupTranslation GetTargetText(int[] targetLinks, Translation translation)
         {
             string text = string.Empty;
             int primaryIndex = targetLinks[0];
             Array.Sort(targetLinks);
 
-            TargetGroup tg = new TargetGroup();
+            GroupTranslation tg = new GroupTranslation();
             tg.PrimaryPosition = GetPrimaryPosition(primaryIndex, targetLinks);
 
             int prevIndex = -1;
@@ -475,11 +479,11 @@ namespace AlignmentTool
                 {
                     word = translation.words[targetLink].text;
                 }
-                tg.Text += word + " ";
+                tg.TargetGroupAsText += word + " ";
                 prevIndex = targetLink;
             }
 
-            tg.Text = tg.Text.Trim().ToLower();
+            tg.TargetGroupAsText = tg.TargetGroupAsText.Trim().ToLower();
 
             return tg;
         }
@@ -553,7 +557,7 @@ namespace AlignmentTool
         // In addition, this routine calls UpdateGroups() whenever it encounters
         // a link that is not one-to-one.
         //
-        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, GroupInfo groups)
+        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, GroupTranslationsTable groups)
         {
             Dictionary<string, Dictionary<string, string>> oldLinks =
                 new Dictionary<string, Dictionary<string, string>>();
