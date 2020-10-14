@@ -11,7 +11,7 @@
     <ProjectReference Include="..\Utilities\Utilities.csproj" />
     <ProjectReference Include="..\TransModels\TransModels.csproj" />
     <ProjectReference Include="..\Tokenizer\Tokenizer.csproj" />
-    <ProjectReference Include="..\WorkInProgressStaging\WorkInProgressStaging.csproj" />
+    <ProjectReference Include="..\InternalDatatypes\InternalDatatypes.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
