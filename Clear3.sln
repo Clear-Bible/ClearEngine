@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegressionTest4", "test\Reg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InternalDb", "src\InternalDb\InternalDb.csproj", "{3E34434A-E9C7-4BF5-ADF9-B8EC95B2E2A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkInProgressStaging", "src\WorkInProgressStaging\WorkInProgressStaging.csproj", "{19FE71E6-AB36-4CB1-8F13-B94892252029}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -221,5 +223,17 @@ Global
 		{3E34434A-E9C7-4BF5-ADF9-B8EC95B2E2A6}.Debug|x64.Build.0 = Debug|Any CPU
 		{3E34434A-E9C7-4BF5-ADF9-B8EC95B2E2A6}.Release|x64.ActiveCfg = Release|Any CPU
 		{3E34434A-E9C7-4BF5-ADF9-B8EC95B2E2A6}.Release|x64.Build.0 = Release|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Debug|x86.Build.0 = Debug|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Release|x86.ActiveCfg = Release|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Release|x86.Build.0 = Release|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Debug|x64.Build.0 = Debug|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Release|x64.ActiveCfg = Release|Any CPU
+		{19FE71E6-AB36-4CB1-8F13-B94892252029}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
