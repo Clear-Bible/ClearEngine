@@ -13,6 +13,8 @@ using Utilities;
 using GBI_Aligner;
 using Newtonsoft.Json;
 
+using WorkInProgressStaging;
+
 namespace AlignmentTool
 {
     public class Data
@@ -59,10 +61,9 @@ namespace AlignmentTool
         // Reading the data file produces a data structure of the form
         //   Hashtable(source => Hashtable(target => probability))
         //
-        public static Dictionary<string, Dictionary<string, double>> GetTranslationModel(string file)
+        public static TranslationModel GetTranslationModel(string file)
         {
-            Dictionary<string, Dictionary<string, double>> transModel =
-                new Dictionary<string, Dictionary<string, double>>();
+            TranslationModel transModel = new TranslationModel();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)

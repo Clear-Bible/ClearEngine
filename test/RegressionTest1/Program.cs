@@ -11,6 +11,8 @@ using Tokenizer;
 using TransModels;
 using Utilities;
 
+using WorkInProgressStaging;
+
 namespace RegressionTest1
 {
     class Program
@@ -129,7 +131,7 @@ namespace RegressionTest1
 
             string jsonOutput = output("alignment.json");
 
-            Dictionary<string, Dictionary<string, double>> transModel =
+            TranslationModel transModel =
                 Data.GetTranslationModel(transModelPath);
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(common("manTransModel.txt"));
