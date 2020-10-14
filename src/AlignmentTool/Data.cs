@@ -76,16 +76,16 @@ namespace AlignmentTool
                     string sProb = groups[2].Trim();
                     double prob = Double.Parse(sProb);
 
-                    if (transModel.ContainsKey(source))
+                    if (transModel.ContainsSourceLemma(source))
                     {
-                        Translations translations = transModel[source];
-                        translations.Add(target, prob);
+                        Translations translations = transModel.TranslationsForSourceLemma(source);
+                        translations.AddTranslation(target, prob);
                     }
                     else
                     {
                         Translations translations = new Translations();
-                        translations.Add(target, prob);
-                        transModel.Add(source, translations);
+                        translations.AddTranslation(target, prob);
+                        transModel.AddTranslations(source, translations);
                     }
                 }
             }
