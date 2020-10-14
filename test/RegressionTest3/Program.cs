@@ -52,7 +52,7 @@ namespace RegressionTest3
             int maxPaths = 1000000;
 
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
-            GroupInfo groups = Data.LoadGroups(InPath("groups.txt"));           
+            GroupTranslationsTable groups = Data.LoadGroups(InPath("groups.txt"));           
             List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
             Dictionary<string, int> goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));

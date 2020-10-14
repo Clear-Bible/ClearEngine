@@ -27,7 +27,7 @@ namespace GBI_Aligner
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            GroupInfo groups,
+            GroupTranslationsTable groups,
             string treeFolder,
             Dictionary<string, string> bookNames,
             string jsonOutput,
@@ -102,7 +102,7 @@ namespace GBI_Aligner
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            GroupInfo groups, // comes from Data.LoadGroups("groups.txt")
+            GroupTranslationsTable groups, // comes from Data.LoadGroups("groups.txt")
                               //   of the form (...source... => (TargetGroup{...text..., primaryPosition}))
             Dictionary<string, XmlNode> trees, // verseID => XmlNode
             ref Alignment2 align,  // Output goes here.

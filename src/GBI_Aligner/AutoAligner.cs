@@ -48,7 +48,7 @@ namespace GBI_Aligner
                                 // to be aligned are the same as the verses used in building the models
             int maxPaths, // the maximal number paths we can keep at any point
             List<string> puncs, // list of punctuation marks
-            GroupInfo groups, // one-to-many, many-to-one, and many-to-many mappings
+            GroupTranslationsTable groups, // one-to-many, many-to-one, and many-to-many mappings
                               // comes from Data.LoadGroups("groups.txt")
                               //   of the form (...source... => List(TargetGroup{...text..., primaryPosition}))
             List<string> stopWords, // target words not to be linked
@@ -459,9 +459,9 @@ namespace GBI_Aligner
             {
                 string source = (string)modelEnum.Key;
                 ArrayList translations = (ArrayList)modelEnum.Value;
-                foreach (TargetGroup translation in translations)
+                foreach (GroupTranslation translation in translations)
                 {
-                    sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0} # {1} # {2}", source, translation.Text, translation.PrimaryPosition));
+                    sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0} # {1} # {2}", source, translation.TargetGroupAsText, translation.PrimaryPosition));
                 }
             }
 
@@ -982,7 +982,7 @@ namespace GBI_Aligner
         public static void UpdateGroups(ref Hashtable groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
         {
             string sourceText = GetSourceText(sourceLinks, manuscript);
-            TargetGroup targetGroup = GetTargetText(targetLinks, translation);
+            GroupTranslation targetGroup = GetTargetText(targetLinks, translation);
 
             if (groups.ContainsKey(sourceText))
             {
@@ -1000,13 +1000,13 @@ namespace GBI_Aligner
             }
         }
 
-        public static bool HasGroup(ArrayList translations, TargetGroup targetGroup)
+        public static bool HasGroup(ArrayList translations, GroupTranslation targetGroup)
         {
             bool hasGroup = false;
 
-            foreach(TargetGroup tg in translations)
+            foreach(GroupTranslation tg in translations)
             {
-                if (tg.Text == targetGroup.Text)
+                if (tg.TargetGroupAsText == targetGroup.TargetGroupAsText)
                 {
                     hasGroup = true;
                     break;
@@ -1036,13 +1036,13 @@ namespace GBI_Aligner
         //   and primaryPosition is the 0-based position of the first target word (before the
         //   links were sorted) within the text
         //
-        static TargetGroup GetTargetText(int[] targetLinks, Translation translation)
+        static GroupTranslation GetTargetText(int[] targetLinks, Translation translation)
         {
             string text = string.Empty;
             int primaryIndex = targetLinks[0];
             Array.Sort(targetLinks);
 
-            TargetGroup tg = new TargetGroup();  // TargetGroup { string Text; int PrimaryPosition; }
+            GroupTranslation tg = new GroupTranslation();  // TargetGroup { string Text; int PrimaryPosition; }
             tg.PrimaryPosition = GetPrimaryPosition(primaryIndex, targetLinks);
 
             int prevIndex = -1;
@@ -1058,11 +1058,11 @@ namespace GBI_Aligner
                 {
                     word = translation.words[targetLink].text;
                 }
-                tg.Text += word + " ";
+                tg.TargetGroupAsText += word + " ";
                 prevIndex = targetLink;
             }
 
-            tg.Text = tg.Text.Trim().ToLower();
+            tg.TargetGroupAsText = tg.TargetGroupAsText.Trim().ToLower();
 
             return tg;
         }
