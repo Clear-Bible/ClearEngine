@@ -8,6 +8,8 @@ using System.Xml;
 
 using Utilities;
 
+using ClearBible.Clear3.InternalDatatypes;
+
 namespace GBI_Aligner
 {
     class Groups
@@ -16,7 +18,7 @@ namespace GBI_Aligner
             List<MappedGroup> links,
             List<SourceWord> sourceWords,
             List<TargetWord> targetWords,
-            Dictionary<string, List<TargetGroup>> groups,
+            GroupInfo groups,
             List<XmlNode> terminals 
             )
         {
@@ -34,7 +36,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, Dictionary<string, List<TargetGroup>> groups)
+        static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, GroupInfo groups)
         {
             List<string[][]> mappedGroups = new List<string[][]>();
 
@@ -395,9 +397,9 @@ namespace GBI_Aligner
         }
     }
 
-    public class TargetGroup
-    {
-        public string Text;
-        public int PrimaryPosition;
-    }
+    //public class TargetGroup
+    //{
+    //    public string Text;
+    //    public int PrimaryPosition;
+    //}
 }
