@@ -7,7 +7,7 @@ using AlignmentTool;
 using GBI_Aligner;
 using Utilities;
 
-using WorkInProgressStaging;
+using ClearBible.Clear3.InternalDatatypes;
 
 namespace RegressionTest3
 {

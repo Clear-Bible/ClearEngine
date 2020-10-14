@@ -13,6 +13,7 @@
     <ProjectReference Include="..\..\src\TransModels\TransModels.csproj" />
     <ProjectReference Include="..\..\src\Utilities\Utilities.csproj" />
     <ProjectReference Include="..\..\src\WorkInProgressStaging\WorkInProgressStaging.csproj" />
+    <ProjectReference Include="..\..\src\InternalDatatypes\InternalDatatypes.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

@@ -7,7 +7,7 @@ using System.Linq;
 using GBI_Aligner;
 using AlignmentTool;
 
-using WorkInProgressStaging;
+using ClearBible.Clear3.InternalDatatypes;
 
 using ClearBible.Clear3.InternalDb;
 
