@@ -29,7 +29,9 @@ namespace ClearBible.Clear3.API
 
         IEnumerable<IPhrase> SourcesForTarget(string targetKey);
 
-        double Rate(string sourceKey, string targetKey);
+        double SourceRate(string sourceKey, string targetKey);
+
+        double TargetRate(string sourceKey, string targetKey);
 
         double Count(string sourceKey, string targetKey);
 

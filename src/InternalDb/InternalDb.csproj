@@ -7,4 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\API\Api.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
+  </ItemGroup>
 </Project>
