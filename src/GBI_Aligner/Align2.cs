@@ -564,7 +564,7 @@ namespace GBI_Aligner
 
                 if (model.ContainsKey(sWord.Lemma))
                 {
-                    Dictionary<string, double> translations = model[sWord.Lemma];
+                    Translations translations = model[sWord.Lemma];
                     if (translations.ContainsKey(tWord.Text))
                     {
                         double prob = (double)translations[tWord.Text];

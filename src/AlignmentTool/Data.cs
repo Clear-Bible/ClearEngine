@@ -78,12 +78,12 @@ namespace AlignmentTool
 
                     if (transModel.ContainsKey(source))
                     {
-                        Dictionary<string, double> translations = transModel[source];
+                        Translations translations = transModel[source];
                         translations.Add(target, prob);
                     }
                     else
                     {
-                        Dictionary<string, double> translations = new Dictionary<string, double>();
+                        Translations translations = new Translations();
                         translations.Add(target, prob);
                         transModel.Add(source, translations);
                     }

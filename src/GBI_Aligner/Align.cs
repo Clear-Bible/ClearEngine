@@ -335,7 +335,7 @@ namespace GBI_Aligner
             }
             else if (model.ContainsKey(sWord.Lemma))
             {
-                Dictionary<string, double> translations = model[sWord.Lemma];
+                Translations translations = model[sWord.Lemma];
 
                 for (int i = 0; i < tWords.Count; i++)
                 {
