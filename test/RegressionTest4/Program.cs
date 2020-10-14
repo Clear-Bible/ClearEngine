@@ -36,47 +36,47 @@ namespace RegressionTest4
 
             string jsonOutput = OutPath("alignment.json");
 
-            Dictionary<string, Dictionary<string, double>> transModel =
+            TranslationModel transModel =
                 Data.GetTranslationModel(transModelPath);
 
-            Stopwatch watch = Stopwatch.StartNew();
+            //Stopwatch watch = Stopwatch.StartNew();
 
-            TranslationScores scores = TranslationScores.Empty;
+            //TranslationScores scores = TranslationScores.Empty;
 
-            foreach (var x in
-                transModel.SelectMany(kvp =>
-                    kvp.Value.Select(kvp2 => Tuple.Create(kvp.Key, kvp2.Key, kvp2.Value))))
-            {
-                TranslationScore s = new TranslationScore(x.Item1, x.Item2, x.Item3);
-                scores = scores.Add(s);
-            }
+            //foreach (var x in
+            //    transModel.SelectMany(kvp =>
+            //        kvp.Value.Select(kvp2 => Tuple.Create(kvp.Key, kvp2.Key, kvp2.Value))))
+            //{
+            //    TranslationScore s = new TranslationScore(x.Item1, x.Item2, x.Item3);
+            //    scores = scores.Add(s);
+            //}
 
-            watch.Stop();
+            //watch.Stop();
 
-            Console.WriteLine($"sources: {scores.AllSources.Count()}");
-            Console.WriteLine($"targets: {scores.AllTargets.Count()}");
-            Console.WriteLine($"milliseconds: {watch.ElapsedMilliseconds}");
+            //Console.WriteLine($"sources: {scores.AllSources.Count()}");
+            //Console.WriteLine($"targets: {scores.AllTargets.Count()}");
+            //Console.WriteLine($"milliseconds: {watch.ElapsedMilliseconds}");
 
-            watch.Reset();
-            watch.Start();
+            //watch.Reset();
+            //watch.Start();
 
-            TranslationScores2 scores2 = new TranslationScores2();
+            //TranslationScores2 scores2 = new TranslationScores2();
 
-            foreach (var x in
-                transModel.SelectMany(kvp =>
-                    kvp.Value.Select(kvp2 => Tuple.Create(kvp.Key, kvp2.Key, kvp2.Value))))
-            {
-                TranslationScore s = new TranslationScore(x.Item1, x.Item2, x.Item3);
-                scores2.Add(s);
-            }
+            //foreach (var x in
+            //    transModel.SelectMany(kvp =>
+            //        kvp.Value.Select(kvp2 => Tuple.Create(kvp.Key, kvp2.Key, kvp2.Value))))
+            //{
+            //    TranslationScore s = new TranslationScore(x.Item1, x.Item2, x.Item3);
+            //    scores2.Add(s);
+            //}
 
 
-            watch.Stop();
+            //watch.Stop();
 
-            Console.WriteLine("scores2:");
-            Console.WriteLine($"sources: {scores2.AllSources.Count()}");
-            Console.WriteLine($"targets: {scores2.AllTargets.Count()}");
-            Console.WriteLine($"milliseconds: {watch.ElapsedMilliseconds}");
+            //Console.WriteLine("scores2:");
+            //Console.WriteLine($"sources: {scores2.AllSources.Count()}");
+            //Console.WriteLine($"targets: {scores2.AllTargets.Count()}");
+            //Console.WriteLine($"milliseconds: {watch.ElapsedMilliseconds}");
 
 
             //foreach (string s in scores.AllTargets)

@@ -7,6 +7,8 @@ using AlignmentTool;
 using GBI_Aligner;
 using Utilities;
 
+using WorkInProgressStaging;
+
 namespace RegressionTest3
 {
     /// <summary>
@@ -36,7 +38,7 @@ namespace RegressionTest3
 
             string jsonOutput = OutPath("alignment.json");
 
-            Dictionary<string, Dictionary<string, double>> transModel =
+            TranslationModel transModel =
                 Data.GetTranslationModel(transModelPath);
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);

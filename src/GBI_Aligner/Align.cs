@@ -11,6 +11,8 @@ using Newtonsoft.Json;
 using Trees;
 using Utilities;
 
+using WorkInProgressStaging;
+
 namespace GBI_Aligner
 {
     class Align
@@ -20,7 +22,7 @@ namespace GBI_Aligner
             string source,  // name of file with source IDs
             string sourceLemma,  // name of file with source lemma IDs
             string target, // name of tokens.txt file, after alignment
-            Dictionary<string, Dictionary<string, double>> model,  
+            TranslationModel model,  
             Dictionary<string, Dictionary<string, Stats>> manModel, 
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
@@ -94,7 +96,7 @@ namespace GBI_Aligner
             string sourceVerse2, // string, sourceIDs
             string targetVerse,  // tokens, lowercase
             string targetVerse2, // tokens, not lowercase
-            Dictionary<string, Dictionary<string, double>> model, // translation model, (source => (target => probability))
+            TranslationModel model, // translation model, (source => (target => probability))
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                 // (source => (target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
@@ -266,7 +268,7 @@ namespace GBI_Aligner
         public static AlternativeCandidates GetTopCandidates(
             SourceWord sWord,
             List<TargetWord> tWords,
-            Dictionary<string, Dictionary<string, double>> model,
+            TranslationModel model,
             Dictionary<string, Dictionary<string, Stats>> manModel,
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
