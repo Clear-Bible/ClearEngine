@@ -13,9 +13,17 @@ namespace ClearBible.Clear3.InternalDatatypes
 
 
     public class TargetGroups
-        : List<TargetGroup>
     {
+        private List<TargetGroup> _inner =
+            new List<TargetGroup>();
 
+        public IEnumerable<TargetGroup> AllMembers =>
+            _inner;
+
+        public void Add(TargetGroup targetGroup)
+        {
+            _inner.Add(targetGroup);
+        }
     }
 
 
