@@ -173,9 +173,8 @@ namespace GBI_Aligner
         {
             Dictionary<string, int> primaryTable = new Dictionary<string, int>();
 
-            foreach (var groupEnum in groups)
+            foreach (List<TargetGroup> targetGroups in groups.AllValues)
             {
-                List<TargetGroup> targetGroups = groupEnum.Value;
                 foreach (TargetGroup tg in targetGroups)
                 {
                     string tgText = tg.Text;
