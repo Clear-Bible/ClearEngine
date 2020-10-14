@@ -11,21 +11,29 @@ namespace ClearBible.Clear3.InternalDatatypes
         public int PrimaryPosition;
     }
 
+
+    public class TargetGroups
+        : List<TargetGroup>
+    {
+
+    }
+
+
     public class GroupInfo
     {
-        private Dictionary<string, List<TargetGroup>> _inner =
-            new Dictionary<string, List<TargetGroup>>();
+        private Dictionary<string, TargetGroups> _inner =
+            new Dictionary<string, TargetGroups>();
 
         public bool ContainsKey(string key) =>
             _inner.ContainsKey(key);
 
-        public List<TargetGroup> this[string key] =>
+        public TargetGroups this[string key] =>
             _inner[key];
 
-        public IEnumerable<List<TargetGroup>> AllValues =>
+        public IEnumerable<TargetGroups> AllValues =>
             _inner.Values;
 
-        public void Add(string key, List<TargetGroup> value)
+        public void Add(string key, TargetGroups value)
         {
             _inner.Add(key, value);
         }

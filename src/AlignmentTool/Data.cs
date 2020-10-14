@@ -188,7 +188,7 @@ namespace AlignmentTool
                     }
                     else
                     {
-                        List<TargetGroup> targets = new List<TargetGroup>();
+                        TargetGroups targets = new TargetGroups();
                         targets.Add(tg);
                         table.Add(source, targets);
                     }
@@ -417,7 +417,7 @@ namespace AlignmentTool
             }
             else
             {
-                List<TargetGroup> translations = new List<TargetGroup>();
+                TargetGroups translations = new TargetGroups();
                 translations.Add(targetGroup);
                 groups.Add(sourceText, translations);
             }
