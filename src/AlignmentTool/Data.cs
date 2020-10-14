@@ -166,10 +166,9 @@ namespace AlignmentTool
         // Output datum is of the form
         //   Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
         //
-        public static Dictionary<string, List<TargetGroup>> LoadGroups(string file)
+        public static GroupInfo LoadGroups(string file)
         {
-            Dictionary<string, List<TargetGroup>> table =
-                new Dictionary<string, List<TargetGroup>>();
+            GroupInfo table = new GroupInfo();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -403,7 +402,7 @@ namespace AlignmentTool
             return strongTable;
         }
 
-        public static void UpdateGroups(Dictionary<string, List<TargetGroup>> groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
+        public static void UpdateGroups(GroupInfo groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
         {
             string sourceText = GetSourceText(sourceLinks, manuscript);
             TargetGroup targetGroup = GetTargetText(targetLinks, translation);
@@ -554,7 +553,7 @@ namespace AlignmentTool
         // In addition, this routine calls UpdateGroups() whenever it encounters
         // a link that is not one-to-one.
         //
-        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, Dictionary<string, List<TargetGroup>> groups)
+        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, GroupInfo groups)
         {
             Dictionary<string, Dictionary<string, string>> oldLinks =
                 new Dictionary<string, Dictionary<string, string>>();

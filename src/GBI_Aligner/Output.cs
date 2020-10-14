@@ -10,6 +10,8 @@ using System.Xml;
 using Utilities;
 using Trees;
 
+using ClearBible.Clear3.InternalDatatypes;
+
 namespace GBI_Aligner
 {
     class Output
@@ -21,7 +23,7 @@ namespace GBI_Aligner
             ref Alignment2 align, 
             int k, 
             Dictionary<string, Gloss> glossTable, 
-            Dictionary<string, List<TargetGroup>> groups
+            GroupInfo groups
             )
         {
 
@@ -167,7 +169,7 @@ namespace GBI_Aligner
             }
         }
 
-        static Dictionary<string, int> BuildPrimaryTable(Dictionary<string, List<TargetGroup>> groups)
+        static Dictionary<string, int> BuildPrimaryTable(GroupInfo groups)
         {
             Dictionary<string, int> primaryTable = new Dictionary<string, int>();
 
