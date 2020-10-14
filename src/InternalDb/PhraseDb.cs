@@ -27,6 +27,38 @@ namespace ClearBible.Clear3.InternalDb
     }
 
 
+    internal class _PhraseUnitComparer : IComparer<IPhraseUnit>
+    {
+        private IComparer<string> _stringComparer;
+
+        public _PhraseUnitComparer(IComparer<string> stringComparer)
+        {
+            _stringComparer = stringComparer;
+        }
+
+        public _PhraseUnitComparer()
+        {
+            _stringComparer = StringComparer.InvariantCulture;
+        }
+
+        public int Compare(IPhraseUnit p1, IPhraseUnit p2)
+        {
+            if (p1.IsEllipsis)
+            {
+                return p2.IsEllipsis ? 0 : -1;
+            }
+            else if (p2.IsEllipsis)
+            {
+                return 1;
+            }
+            else
+            {
+                return _stringComparer.Compare(p1.Text, p2.Text);
+            }
+        }
+    }
+
+
     internal class _Phrase : IPhrase
     {
         public IEnumerable<IPhraseUnit> PhraseUnits => _phraseUnits;
@@ -48,6 +80,67 @@ namespace ClearBible.Clear3.InternalDb
         public static string MakeKey(IEnumerable<IPhraseUnit> phraseUnits)
         {
             return DbUtility.MakeKey(phraseUnits.Select(p => p.Key));
+        }
+    }
+
+
+    internal class _PhraseComparer : IComparer<IPhrase>
+    {
+        private IComparer<IPhraseUnit> _phraseUnitComparer;
+        private readonly int
+            one_less_than_two = -1,
+            one_equals_two = 0,
+            one_greater_than_two = 1;
+
+        public _PhraseComparer(IComparer<IPhraseUnit> phraseUnitComparer)
+        {
+            _phraseUnitComparer = phraseUnitComparer;
+        }
+
+
+        public int Compare(IPhrase p1, IPhrase p2)
+        {
+            IEnumerator<IPhraseUnit> units1 = p1.PhraseUnits.GetEnumerator();
+            IEnumerator<IPhraseUnit> units2 = p2.PhraseUnits.GetEnumerator();
+
+            while (true)
+            {
+                bool another1 = units1.MoveNext();
+                bool another2 = units2.MoveNext();
+
+                if (another1)
+                {
+                    if (another2)
+                    {
+                        int comparison = _phraseUnitComparer.Compare(
+                            units1.Current,
+                            units2.Current);
+                        if (comparison != one_equals_two)
+                        {
+                            return comparison;
+                        }
+                        else
+                        {
+                            // move on to next phrase unit
+                        }
+                    }
+                    else
+                    {
+                        return one_greater_than_two;
+                    }
+                }
+                else 
+                {
+                    if (another2)
+                    {
+                        return one_less_than_two;
+                    }
+                    else
+                    {
+                        return one_equals_two;
+                    }
+                }
+            }
         }
     }
 
