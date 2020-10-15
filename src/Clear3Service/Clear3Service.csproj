@@ -6,5 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API\Api.csproj" />
+    <ProjectReference Include="..\InternalDatatypes\InternalDatatypes.csproj" />
   </ItemGroup>
 </Project>

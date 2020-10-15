@@ -2,11 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using AlignmentTool;
 using GBI_Aligner;
 using Utilities;
 
+using ClearBible.Clear3.API;
+using ClearBible.Clear3.Service;
 using ClearBible.Clear3.InternalDatatypes;
 
 namespace RegressionTest3
@@ -38,8 +41,13 @@ namespace RegressionTest3
 
             string jsonOutput = OutPath("alignment.json");
 
-            TranslationModel transModel =
-                Data.GetTranslationModel(transModelPath);
+            IClear30ServiceAPI clearService = Clear30Service.FindOrCreate();
+
+            ITranslationModel iTransModel =
+                ImportTranslationModel(clearService, transModelPath);
+
+            TranslationModel transModel = iTransModel as TranslationModel;
+
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);
 
@@ -52,7 +60,7 @@ namespace RegressionTest3
             int maxPaths = 1000000;
 
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
-            GroupTranslationsTable groups = Data.LoadGroups(InPath("groups.txt"));           
+            GroupTranslationsTable groups = Data.LoadGroups(InPath("groups.txt"));
             List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
             Dictionary<string, int> goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
@@ -73,7 +81,6 @@ namespace RegressionTest3
             Dictionary<string, Dictionary<string, int>> strongs =
                 Data.BuildStrongTable(InPath("strongs.txt"));
 
-
             Console.WriteLine("Calling Auto Aligner.");
 
             AutoAligner.AutoAlign(
@@ -90,6 +97,31 @@ namespace RegressionTest3
                 glossTable,
                 oldLinks,
                 sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
+        }
+
+
+
+        static ITranslationModel ImportTranslationModel(
+            IClear30ServiceAPI clearService,
+            string filePath)
+        {
+            ITranslationModel model =
+                clearService.CreateEmptyTranslationModel();
+
+            foreach (string line in File.ReadAllLines(filePath))
+            {
+                string[] fields =
+                    line.Split(' ').Select(s => s.Trim()).ToArray();
+                if (fields.Length == 3)
+                {
+                    model.AddEntry(
+                        sourceLemma: fields[0],
+                        targetMorph: fields[1],
+                        score: Double.Parse(fields[2]));
+                }
+            }
+
+            return model;
         }
     }
 }
