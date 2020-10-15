@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ClearBible.Clear3.API
+
+using ClearBible.Clear3.API;
+using ClearBible.Clear3.InternalDatatypes;
+
+namespace ClearBible.Clear3.Service
 {
-    public interface AutoAlignmentService
+    public class AutoAlignmentService : IAutoAlignmentService
     {
-        Task<AutoAlignmentResult> LaunchAutoAlignmentAsync(
+        public Task<AutoAlignmentResult> LaunchAutoAlignmentAsync(
             TreeService treeService,
             TranslationPairTable translationPairTable,
             IPhraseTranslationModel smtTransModel,
@@ -20,15 +24,8 @@ namespace ClearBible.Clear3.API
             HashSet<string> punctuation,
             HashSet<string> stopWords,
             IProgress<ProgressReport> progress,
-            CancellationToken cancellationToken);
-    }
+            CancellationToken cancellationToken) =>
+                throw new NotImplementedException();
 
-    public interface AutoAlignmentResult
-    {
-        string Key { get; }
-
-        PlaceAlignmentModel AutoAlignmentModel { get; }
-
-        PlaceAlignmentModel ManualAlignmentModel { get; }
     }
 }
