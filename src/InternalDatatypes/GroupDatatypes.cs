@@ -11,6 +11,16 @@ namespace ClearBible.Clear3.InternalDatatypes
     {
         public string TargetGroupAsText;
         public int PrimaryPosition;
+
+        public GroupTranslation(
+            string targetGroupAsText,
+            int primaryPosition)
+        {
+            TargetGroupAsText = targetGroupAsText;
+            PrimaryPosition = primaryPosition;
+        }
+
+        public GroupTranslation() { }
     }
 
 
@@ -50,6 +60,22 @@ namespace ClearBible.Clear3.InternalDatatypes
             GroupTranslations translations)
         {
             _inner.Add(sourceGroupLemmas, translations);
+        }
+
+        public void AddEntry(
+            string sourceGroupLemmas,
+            string targetGroupAsText,
+            int primaryPosition)
+        {
+            if (!_inner.TryGetValue(sourceGroupLemmas,
+                out GroupTranslations groupTranslations))
+            {
+                groupTranslations = new GroupTranslations();
+                _inner.Add(sourceGroupLemmas, groupTranslations);
+            }
+            groupTranslations.Add(new GroupTranslation(
+                targetGroupAsText,
+                primaryPosition));
         }
     }
 }
