@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -63,8 +64,6 @@ namespace RegressionTest3
                 ImportGroupTranslationsTable(
                     clearService,
                     InPath("groups.txt"));
-
-            // IGroupTranslationsTable groups = Data.LoadGroups(InPath("groups.txt"));
 
             List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
