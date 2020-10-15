@@ -63,6 +63,9 @@ namespace ClearBible.Clear3.Service
         public ITranslationModel CreateEmptyTranslationModel() =>
             new TranslationModel();
 
+        public IGroupTranslationsTable CreateEmptyGroupTranslationsTable() =>
+            new GroupTranslationsTable();
+
         #endregion
     }
 }
