@@ -83,11 +83,12 @@ namespace RegressionTest3
 
             Console.WriteLine("Calling Auto Aligner.");
 
-            AutoAligner.AutoAlign(
+            clearService.AutoAlignmentService.AutoAlign_WorkInProgress(
                 parallelSourceIdPath, parallelSourceIdLemmaPath,
                 parallelTargetIdPath,
                 jsonOutput,
-                transModel, manTransModel,
+                iTransModel,
+                manTransModel,
                 treeFolder,
                 bookNames,
                 alignProbs, preAlignment, useAlignModel,
