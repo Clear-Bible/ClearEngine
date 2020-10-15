@@ -38,6 +38,8 @@ namespace ClearBible.Clear3.API
 
         ITranslationModel CreateEmptyTranslationModel();
 
+        IGroupTranslationsTable CreateEmptyGroupTranslationsTable();
+
         #endregion
     }
 }

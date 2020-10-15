@@ -46,8 +46,6 @@ namespace RegressionTest3
             ITranslationModel iTransModel =
                 ImportTranslationModel(clearService, transModelPath);
 
-            TranslationModel transModel = iTransModel as TranslationModel;
-
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);
 
@@ -60,7 +58,7 @@ namespace RegressionTest3
             int maxPaths = 1000000;
 
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
-            GroupTranslationsTable groups = Data.LoadGroups(InPath("groups.txt"));
+            IGroupTranslationsTable groups = Data.LoadGroups(InPath("groups.txt"));
             List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
             Dictionary<string, int> goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
@@ -71,7 +69,9 @@ namespace RegressionTest3
             Dictionary<string, Gloss> glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
 
             Dictionary<string, Dictionary<string, string>> oldLinks =
-                Data.GetOldLinks(InPath("oldAlignment.json"), groups);
+                Data.GetOldLinks(
+                    InPath("oldAlignment.json"),
+                    groups as GroupTranslationsTable);
 
             List<string> sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
             List<string> targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));

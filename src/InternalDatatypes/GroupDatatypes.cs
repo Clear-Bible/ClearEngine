@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using ClearBible.Clear3.API;
+
 namespace ClearBible.Clear3.InternalDatatypes
 {
     public class GroupTranslation
@@ -27,7 +29,7 @@ namespace ClearBible.Clear3.InternalDatatypes
     }
 
 
-    public class GroupTranslationsTable
+    public class GroupTranslationsTable : IGroupTranslationsTable
     {
         private Dictionary<string, GroupTranslations> _inner =
             new Dictionary<string, GroupTranslations>();
