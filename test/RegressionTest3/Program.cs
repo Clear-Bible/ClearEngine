@@ -58,7 +58,14 @@ namespace RegressionTest3
             int maxPaths = 1000000;
 
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
-            IGroupTranslationsTable groups = Data.LoadGroups(InPath("groups.txt"));
+
+            IGroupTranslationsTable groups =
+                ImportGroupTranslationsTable(
+                    clearService,
+                    InPath("groups.txt"));
+
+            // IGroupTranslationsTable groups = Data.LoadGroups(InPath("groups.txt"));
+
             List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
             Dictionary<string, int> goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
@@ -123,6 +130,30 @@ namespace RegressionTest3
             }
 
             return model;
+        }
+
+
+        static IGroupTranslationsTable ImportGroupTranslationsTable(
+            IClear30ServiceAPI clearService,
+            string filePath)
+        {
+            IGroupTranslationsTable table =
+                clearService.CreateEmptyGroupTranslationsTable();
+
+            foreach (string line in File.ReadAllLines(filePath))
+            {
+                string[] fields =
+                    line.Split('#').Select(s => s.Trim()).ToArray();
+                if (fields.Length == 3)
+                {
+                    table.AddEntry(
+                        sourceGroupLemmas: fields[0],
+                        targetGroupAsText: fields[1].ToLower(),
+                        primaryPosition: Int32.Parse(fields[2]));
+                }
+            }
+
+            return table;
         }
     }
 }
