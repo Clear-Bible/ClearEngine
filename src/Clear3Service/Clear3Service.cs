@@ -31,8 +31,8 @@ namespace ClearBible.Clear3.Service
         public SMTService SMTService =>
             throw new NotImplementedException();
 
-        public IAutoAlignmentService AutoAlignmentService =>
-            throw new NotImplementedException();
+        public IAutoAlignmentService AutoAlignmentService { get; } =
+            new AutoAlignmentService();
 
         public IPhraseService PhraseService =>
             throw new NotImplementedException();

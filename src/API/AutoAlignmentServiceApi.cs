@@ -22,14 +22,33 @@ namespace ClearBible.Clear3.API
             IProgress<ProgressReport> progress,
             CancellationToken cancellationToken);
 
-        //void AutoAlign(
-        //    string parallelSourceIdPath,
-        //    string parallelSourceIdLemmaPath,
-        //    string parallelTargetIdPath,
-        //    string jsonOutput,
-        //    ITranslationModel iTranslationModel,
-        //    Dictionary<string, Dictionary<string, Stats>> manTransModel,
-        //    );
+        void AutoAlign_WorkInProgress(
+            string parallelSourceIdPath,
+            string parallelSourceIdLemmaPath,
+            string parallelTargetIdPath,
+            string jsonOutput,
+            ITranslationModel iTranslationModel,
+            object manTransModel,
+            string treeFolder,
+            Dictionary<string, string> bookNames,
+            Dictionary<string, double> alignProbs,
+            Dictionary<string, string> preAlignment,
+            bool useAlignModel,
+            int maxPaths,
+            List<string> puncs,
+            object groups,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
+            int goodLinkMinCount,
+            Dictionary<string, int> badLinks,
+            int badLinkMinCount,
+            object glossTable,
+            Dictionary<string, Dictionary<string, string>> oldLinks,
+            List<string> sourceFuncWords,
+            List<string> targetFuncWords,
+            bool contentWordsOnly,
+            Dictionary<string, Dictionary<string, int>> strongs
+            );
     }
 
     public interface AutoAlignmentResult
