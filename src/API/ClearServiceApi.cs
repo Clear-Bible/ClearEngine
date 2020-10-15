@@ -15,7 +15,7 @@ namespace ClearBible.Clear3.API
 
         SMTService SMTService { get; }
 
-        AutoAlignmentService AutoAlignmentService { get; }
+        IAutoAlignmentService AutoAlignmentService { get; }
 
         IPhraseService PhraseService { get; }
 

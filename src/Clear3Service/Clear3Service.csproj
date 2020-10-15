@@ -7,5 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\API\Api.csproj" />
     <ProjectReference Include="..\InternalDatatypes\InternalDatatypes.csproj" />
+    <ProjectReference Include="..\GBI_Aligner\GBI_Aligner.csproj" />
   </ItemGroup>
 </Project>

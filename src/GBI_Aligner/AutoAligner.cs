@@ -1154,10 +1154,4 @@ namespace GBI_Aligner
         public int Start = -1;
         public int End = -1;
     }
-
-    public class Stats
-    {
-        public int Count;
-        public double Prob;
-    }
 }
