@@ -56,7 +56,7 @@ namespace RegressionTest2
 
         static void Main(string[] args)
         {
-            Clear30ServiceAPI service = Clear30Service.FindOrCreate();
+            IClear30ServiceAPI service = Clear30Service.FindOrCreate();
 
             PrepareResources(service);            
 
@@ -136,7 +136,7 @@ namespace RegressionTest2
 
         
 
-        static void PrepareResources(Clear30ServiceAPI service)
+        static void PrepareResources(IClear30ServiceAPI service)
         {
             ResourceService mgr = service.ResourceService;
 
@@ -171,7 +171,7 @@ namespace RegressionTest2
 
 
         static void GetResources(
-            Clear30ServiceAPI service,
+            IClear30ServiceAPI service,
             out TreeService treeService,
             out HashSet<string> origFunctionWords,
             out HashSet<string> englishFunctionWords,
@@ -217,7 +217,7 @@ namespace RegressionTest2
 
 
         static Corpus GetTargetCorpus(
-            Clear30ServiceAPI service,
+            IClear30ServiceAPI service,
             HashSet<string> punctuation)
         {
             Segmenter segmenter = null;
@@ -330,7 +330,7 @@ namespace RegressionTest2
 
 
         static Versification AdjustVersification(
-            Clear30ServiceAPI service,
+            IClear30ServiceAPI service,
             Versification versification)
         {
             ZoneService zoneService = service.ZoneService;
@@ -347,7 +347,7 @@ namespace RegressionTest2
 
 
         static TranslationPairTable CreateTranslationPairTable(
-            Clear30ServiceAPI service,
+            IClear30ServiceAPI service,
             TreeService treeService,
             Corpus targetCorpus,
             Versification versification)
@@ -370,7 +370,7 @@ namespace RegressionTest2
 
 
         static TranslationPairTable WithSourceLemmasAndContentWords(
-            Clear30ServiceAPI service,
+            IClear30ServiceAPI service,
             TranslationPairTable inputTable,
             TreeService treeService,
             HashSet<string> targetFunctionWords,
@@ -404,7 +404,7 @@ namespace RegressionTest2
 
 
         async static Task<SMTResult> PerformSMT(
-            Clear30ServiceAPI service,
+            IClear30ServiceAPI service,
             TranslationPairTable translationPairTable)
         {
             CancellationTokenSource ctSource = new CancellationTokenSource();
@@ -422,7 +422,7 @@ namespace RegressionTest2
 
 
         async static Task<AutoAlignmentResult> PerformAutoAlignment(
-            Clear30ServiceAPI service,
+            IClear30ServiceAPI service,
             TreeService treeService,
             TranslationPairTable translationPairTable,
             IPhraseTranslationModel smtTransModel,

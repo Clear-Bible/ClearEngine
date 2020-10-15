@@ -7,7 +7,7 @@ namespace ClearBible.Clear3.API
     /// Clear 3.0 Top Level Interface
     /// </summary>
     /// 
-    public interface Clear30ServiceAPI
+    public interface IClear30ServiceAPI
     {
         #region Sub-Services
 
@@ -35,6 +35,8 @@ namespace ClearBible.Clear3.API
         PlaceAlignmentModel EmptyPlaceAlignmentModel { get; }
         
         SegmentInstance SegmentInstance(string Text, Place place);
+
+        ITranslationModel CreateEmptyTranslationModel();
 
         #endregion
     }

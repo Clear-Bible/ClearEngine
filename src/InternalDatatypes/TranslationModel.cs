@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+using ClearBible.Clear3.API;
+
 namespace ClearBible.Clear3.InternalDatatypes
 {
 
@@ -21,10 +23,15 @@ namespace ClearBible.Clear3.InternalDatatypes
         {
             _inner.Add(targetText, score);
         }
+
+        public void SetTranslation(string targetText, double score)
+        {
+            _inner[targetText] = score;
+        }
     }
 
 
-    public class TranslationModel
+    public class TranslationModel : ITranslationModel
     {
         private Dictionary<string, Translations> _inner =
             new Dictionary<string, Translations>();
@@ -38,6 +45,20 @@ namespace ClearBible.Clear3.InternalDatatypes
         public void AddTranslations(string sourceLemma, Translations translations)
         {
             _inner.Add(sourceLemma, translations);
+        }
+
+        public void AddEntry(
+            string sourceLemma,
+            string targetMorph,
+            double score)
+        {
+            if (!_inner.TryGetValue(sourceLemma,
+                out Translations translations))
+            {
+                translations = new Translations();
+                _inner.Add(sourceLemma, translations);
+            }
+            translations.SetTranslation(targetMorph, score);
         }
     }
 }
