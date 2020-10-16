@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
+
+using Newtonsoft.Json;
 
 
 using GBI_Aligner;
+using Utilities;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
@@ -37,7 +42,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string parallelTargetIdPath,
             string jsonOutput,
             ITranslationModel iTranslationModel,
-            object manTransModel,
+            object iManTransModel,
             string treeFolder,
             Dictionary<string, string> bookNames,
             Dictionary<string, double> alignProbs,
@@ -45,13 +50,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             bool useAlignModel,
             int maxPaths,
             List<string> puncs,
-            IGroupTranslationsTable groups,
+            IGroupTranslationsTable iGroups,
             List<string> stopWords,
             Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
-            object glossTable,
+            object iGlossTable,
             Dictionary<string, Dictionary<string, string>> oldLinks,
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
@@ -59,33 +64,89 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            AutoAligner.AutoAlign(
-                parallelSourceIdPath,
-                parallelSourceIdLemmaPath,
-                parallelTargetIdPath,
-                jsonOutput,
-                iTranslationModel as TranslationModel,
-                manTransModel as Dictionary<string, Dictionary<string, Stats>>,
-                treeFolder,
-                bookNames,
-                alignProbs,
-                preAlignment,
-                useAlignModel,
-                maxPaths,
-                puncs,
-                groups as GroupTranslationsTable,
-                stopWords,
-                goodLinks,
-                goodLinkMinCount,
-                badLinks,
-                badLinkMinCount,
-                glossTable as Dictionary<string, Gloss>,
-                oldLinks,
-                sourceFuncWords,
-                targetFuncWords,
-                contentWordsOnly,
-                strongs);
-        }
+            //AutoAligner.AutoAlign(
+            //    parallelSourceIdPath,
+            //    parallelSourceIdLemmaPath,
+            //    parallelTargetIdPath,
+            //    jsonOutput,
+            //    iTranslationModel as TranslationModel,
+            //    iManTransModel as Dictionary<string, Dictionary<string, Stats>>,
+            //    treeFolder,
+            //    bookNames,
+            //    alignProbs,
+            //    preAlignment,
+            //    useAlignModel,
+            //    maxPaths,
+            //    puncs,
+            //    iGroups as GroupTranslationsTable,
+            //    stopWords,
+            //    goodLinks,
+            //    goodLinkMinCount,
+            //    badLinks,
+            //    badLinkMinCount,
+            //    iGlossTable as Dictionary<string, Gloss>,
+            //    oldLinks,
+            //    sourceFuncWords,
+            //    targetFuncWords,
+            //    contentWordsOnly,
+            //    strongs);
 
+            TranslationModel translationModel = (TranslationModel)iTranslationModel;
+            Dictionary<string, Dictionary<string, Stats>> manTransModel =
+                (Dictionary<string, Dictionary<string, Stats>>)iManTransModel;
+            GroupTranslationsTable groups = (GroupTranslationsTable)iGroups;
+            Dictionary<string, Gloss> glossTable = (Dictionary<string, Gloss>)iGlossTable;
+
+            List<string> sourceVerses = GBI_Aligner.Data.GetVerses(parallelSourceIdLemmaPath, false);
+            List<string> sourceVerses2 = GBI_Aligner.Data.GetVerses(parallelSourceIdPath, false);
+            List<string> targetVerses = GBI_Aligner.Data.GetVerses(parallelTargetIdPath, true);
+            List<string> targetVerses2 = GBI_Aligner.Data.GetVerses(parallelTargetIdPath, false);
+
+            string prevChapter = string.Empty;
+
+            Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();
+
+            Alignment2 align = new Alignment2();  // The output goes here.
+            align.Lines = new Line[sourceVerses.Count];
+
+            for (int i = 0; i < sourceVerses.Count; i++)
+            {
+                if (i == 8)
+                {
+                    ;
+                }
+                string sourceVerse = (string)sourceVerses[i];  // lemmas (text_ID)
+                string sourceVerse2 = (string)sourceVerses2[i]; // morphs (text_ID)
+                string targetVerse = (string)targetVerses[i];   // tokens, lowercase (text_ID)
+                string targetVerse2 = (string)targetVerses2[i]; // tokens, original case (text_ID)
+                string chapterID = Align.GetChapterID(sourceVerse);  // string with chapter number
+
+                if (chapterID != prevChapter)
+                {
+                    trees.Clear();
+                    // Get the trees for the current chapter; a verse can cross chapter boundaries
+                    VerseTrees.GetChapterTree(chapterID, treeFolder, trees, bookNames);
+                    string book = chapterID.Substring(0, 2);
+                    string chapter = chapterID.Substring(2, 3);
+                    string prevChapterID = book + Utils.Pad3((Int32.Parse(chapter) - 1).ToString());
+                    VerseTrees.GetChapterTree(prevChapterID, treeFolder, trees, bookNames);
+                    string nextChapterID = book + Utils.Pad3((Int32.Parse(chapter) + 1).ToString());
+                    VerseTrees.GetChapterTree(nextChapterID, treeFolder, trees, bookNames);
+                    prevChapter = chapterID;
+                }
+
+                // Align a single verse
+                Align.AlignVerse(
+                    sourceVerse, sourceVerse2, targetVerse, targetVerse2,
+                    translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
+                    groups, trees, ref align, i, maxPaths, puncs, stopWords,
+                    goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
+                    glossTable, oldLinks, sourceFuncWords, targetFuncWords,
+                    contentWordsOnly, strongs);
+            }
+
+            string json = JsonConvert.SerializeObject(align.Lines, Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText(jsonOutput, json);
+        }
     }
 }

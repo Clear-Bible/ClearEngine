@@ -15,7 +15,7 @@ using ClearBible.Clear3.Impl.Data;
 
 namespace GBI_Aligner
 {
-    class Align
+    public class Align
     {
         // align a set of verses
         public static Alignment2 AlignCorpus(
@@ -91,7 +91,7 @@ namespace GBI_Aligner
             return align;
         }
 
-        static void AlignVerse(
+        public static void AlignVerse(
             string sourceVerse,  // lemmas (text_ID)
             string sourceVerse2, // morphs (text_ID)
             string targetVerse,  // tokens, lowercase (text_ID)
@@ -930,7 +930,7 @@ namespace GBI_Aligner
             return candidates;
         }
 
-        static string GetChapterID(string targetVerse)
+        public static string GetChapterID(string targetVerse)
         {
             string firstWord = string.Empty;
             if (targetVerse.Contains(" "))

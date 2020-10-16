@@ -12,7 +12,7 @@ using Utilities;
 
 namespace GBI_Aligner
 {
-    class Data
+    public class Data
     {
         public static List<string> GetVerses(string file, bool lowercase)
         {

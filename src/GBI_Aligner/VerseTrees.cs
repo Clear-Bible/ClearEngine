@@ -11,7 +11,7 @@ using Utilities;
 
 namespace GBI_Aligner
 {
-    class VerseTrees
+    public class VerseTrees
     {
         public static Dictionary<string, XmlNode> GetVerseTrees(string treeFolder)
         {

@@ -5,9 +5,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-using AlignmentTool;
-using GBI_Aligner;
-using Utilities;
+using Data = AlignmentTool.Data;
+using Gloss = GBI_Aligner.Gloss;
+using BookTables = Utilities.BookTables;
+
 
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.APIImportExport;

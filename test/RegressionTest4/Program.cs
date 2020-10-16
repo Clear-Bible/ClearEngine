@@ -36,8 +36,8 @@ namespace RegressionTest4
 
             string jsonOutput = OutPath("alignment.json");
 
-            TranslationModel transModel =
-                Data.GetTranslationModel(transModelPath);
+            //TranslationModel transModel =
+            //    Data.GetTranslationModel(transModelPath);
 
             //Stopwatch watch = Stopwatch.StartNew();
 
