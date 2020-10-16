@@ -10,7 +10,7 @@ using GBI_Aligner;
 namespace ClearBible.Clear3.Impl.Service
 {
     using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Impl.Datatypes;
+    using ClearBible.Clear3.Impl.Data;
 
     public class AutoAlignmentService : IAutoAlignmentService
     {

@@ -11,7 +11,7 @@ using Tokenizer;
 using TransModels;
 using Utilities;
 
-using ClearBible.Clear3.Impl.Datatypes;
+using ClearBible.Clear3.Impl.Data;
 
 namespace RegressionTest1
 {

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 using Trees;
 using Utilities;
 
-using ClearBible.Clear3.Impl.Datatypes;
+using ClearBible.Clear3.Impl.Data;
 
 namespace GBI_Aligner
 {

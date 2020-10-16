@@ -28,7 +28,7 @@ namespace ClearBible.Clear3.Service
 
 namespace ClearBible.Clear3.Impl.Service
 {
-    using ClearBible.Clear3.Impl.Datatypes;
+    using ClearBible.Clear3.Impl.Data;
 
     internal class Clear30ServiceAPI : IClear30ServiceAPI
     {
