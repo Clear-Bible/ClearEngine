@@ -4,24 +4,29 @@ using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
-    public interface TranslationPairTable
+    public interface ITranslationPairTable_Old
     {
         string Key { get; }
 
-        IEnumerable<TranslationPair> TranslationPairs { get; }
+        IEnumerable<ITranslationPair_Old> TranslationPairs { get; }
 
-        TranslationPairTable Add(
+        ITranslationPairTable_Old Add(
             IEnumerable<SegmentInstance> targetSegments,
             IEnumerable<SegmentInstance> sourceSegments);
     }
 
 
-    public interface TranslationPair
+    public interface ITranslationPair_Old
     {
         string Key { get; }
 
         IEnumerable<SegmentInstance> TargetSegments { get; set; }
 
         IEnumerable<SegmentInstance> SourceSegments { get; set; }
+    }
+
+    public interface ITranslationPairTable
+    {
+
     }
 }

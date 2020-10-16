@@ -79,14 +79,14 @@ namespace RegressionTest2
                 service,
                 s1Versification);
 
-            TranslationPairTable translationPairTable =
+            ITranslationPairTable_Old translationPairTable =
                 CreateTranslationPairTable(
                     service,
                     treeService,
                     targetCorpus,
                     versification);
 
-            TranslationPairTable smtTable =
+            ITranslationPairTable_Old smtTable =
                 WithSourceLemmasAndContentWords(
                     service,
                     translationPairTable,
@@ -346,13 +346,13 @@ namespace RegressionTest2
         }
 
 
-        static TranslationPairTable CreateTranslationPairTable(
+        static ITranslationPairTable_Old CreateTranslationPairTable(
             IClear30ServiceAPI service,
             TreeService treeService,
             Corpus targetCorpus,
             Versification versification)
         {
-            TranslationPairTable table =
+            ITranslationPairTable_Old table =
                 service.EmptyTranslationPairTable;
 
             foreach (Zone zone in targetCorpus.AllZones())
@@ -369,14 +369,14 @@ namespace RegressionTest2
         }
 
 
-        static TranslationPairTable WithSourceLemmasAndContentWords(
+        static ITranslationPairTable_Old WithSourceLemmasAndContentWords(
             IClear30ServiceAPI service,
-            TranslationPairTable inputTable,
+            ITranslationPairTable_Old inputTable,
             TreeService treeService,
             HashSet<string> targetFunctionWords,
             HashSet<string> sourceFunctionWords)
         {
-            TranslationPairTable outputTable =
+            ITranslationPairTable_Old outputTable =
                 service.EmptyTranslationPairTable;
 
             bool targetContentWord(SegmentInstance si) =>
@@ -389,7 +389,7 @@ namespace RegressionTest2
                     treeService.GetLemma(si.Place),
                     si.Place);
 
-            foreach (TranslationPair pair in inputTable.TranslationPairs)
+            foreach (ITranslationPair_Old pair in inputTable.TranslationPairs)
             {
                 outputTable = outputTable.Add(
                     pair.TargetSegments
@@ -405,7 +405,7 @@ namespace RegressionTest2
 
         async static Task<SMTResult> PerformSMT(
             IClear30ServiceAPI service,
-            TranslationPairTable translationPairTable)
+            ITranslationPairTable_Old translationPairTable)
         {
             CancellationTokenSource ctSource = new CancellationTokenSource();
 
@@ -424,7 +424,7 @@ namespace RegressionTest2
         async static Task<AutoAlignmentResult> PerformAutoAlignment(
             IClear30ServiceAPI service,
             TreeService treeService,
-            TranslationPairTable translationPairTable,
+            ITranslationPairTable_Old translationPairTable,
             IPhraseTranslationModel smtTransModel,
             PlaceAlignmentModel smtAlignModel,
             IPhraseTranslationModel manualTransModel,
@@ -461,7 +461,7 @@ namespace RegressionTest2
 
         private static void WriteJsonAlignmentFormat(
             string jsonAlignmentFile,
-            TranslationPairTable translationPairTable,
+            ITranslationPairTable_Old translationPairTable,
             Corpus targetCorpus,
             PlaceAlignmentModel autoAlignmentModel,
             TreeService treeService,
@@ -563,7 +563,7 @@ namespace RegressionTest2
                 return null;
             }
 
-            Line makeLine(TranslationPair pair)
+            Line makeLine(ITranslationPair_Old pair)
             {
                 ManuscriptWord[] manuscriptWords =
                     pair.SourceSegments.Select(makeManuscriptWord).ToArray();

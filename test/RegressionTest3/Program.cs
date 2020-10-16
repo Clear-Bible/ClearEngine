@@ -44,6 +44,11 @@ namespace RegressionTest3
 
             IClear30ServiceAPI clearService = Clear30Service.FindOrCreate();
 
+            TranslationPairTable translationPairTable =
+                GetTranslationPairTable(
+                    parallelSourceIdLemmaPath,
+                    parallelTargetIdPath);
+
             ITranslationModel iTransModel =
                 ImportTranslationModel(clearService, transModelPath);
 
@@ -153,6 +158,41 @@ namespace RegressionTest3
             }
 
             return table;
+        }
+
+
+        static TranslationPairTable GetTranslationPairTable(
+            string parallelSourceIdLemmaPath,
+            string parallelTargetIdPath)
+        {
+            string[] sourceLines = File.ReadAllLines(parallelSourceIdLemmaPath);
+            string[] targetLines = File.ReadAllLines(parallelTargetIdPath);
+
+            if (sourceLines.Length != targetLines.Length)
+            {
+                throw new InvalidDataException();
+            }
+
+            string getText(string s) => s.Substring(0, s.LastIndexOf("_"));
+            string getID(string s) => s.Substring(s.LastIndexOf("_") + 1);
+
+            SourceSegment getSourceSegment(string s) =>
+                new SourceSegment(getText(s), getID(s));
+
+            TargetSegment getTargetSegment(string s) =>
+                new TargetSegment(getText(s), getID(s));
+
+            IEnumerable<SourceSegment> getSourceSegments(string line) =>
+                line.Split(' ').Select(s => getSourceSegment(s.Trim()));
+
+            IEnumerable<TargetSegment> getTargetSegments(string line) =>
+                line.Split(' ').Select(s => getTargetSegment(s.Trim()));
+
+            return new TranslationPairTable(
+                sourceLines.Zip(targetLines)
+                .Select(linePair => new TranslationPair(
+                    getSourceSegments(linePair.First),
+                    getTargetSegments(linePair.Second))));
         }
     }
 }

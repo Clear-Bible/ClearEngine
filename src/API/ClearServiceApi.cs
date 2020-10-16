@@ -28,7 +28,7 @@ namespace ClearBible.Clear3.API
 
         Corpus EmptyCorpus { get; }       
 
-        TranslationPairTable EmptyTranslationPairTable { get; }       
+        ITranslationPairTable_Old EmptyTranslationPairTable { get; }       
 
         IPhraseTranslationModel EmptyPhraseTranslationModel { get; }
 

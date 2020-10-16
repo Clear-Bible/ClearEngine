@@ -7,7 +7,7 @@ namespace ClearBible.Clear3.API
     public interface SMTService
     {
          Task<SMTResult> LaunchAsync(
-            TranslationPairTable translationPairTable,
+            ITranslationPairTable_Old translationPairTable,
             IProgress<ProgressReport> progress,
             CancellationToken cancellationToken);
     }
