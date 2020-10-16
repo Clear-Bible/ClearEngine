@@ -23,9 +23,7 @@ namespace ClearBible.Clear3.API
             CancellationToken cancellationToken);
 
         void AutoAlign_WorkInProgress(
-            string parallelSourceIdPath,
-            string parallelSourceIdLemmaPath,
-            string parallelTargetIdPath,
+            ITranslationPairTable iTranslationPairTable,
             string jsonOutput,
             ITranslationModel iTranslationModel,
             object manTransModel,
