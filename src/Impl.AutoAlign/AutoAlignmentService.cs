@@ -71,35 +71,28 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             GroupTranslationsTable groups = (GroupTranslationsTable)iGroups;
             Dictionary<string, Gloss> glossTable = (Dictionary<string, Gloss>)iGlossTable;
 
-            List<string> sourceVerses =
-                translationPairTable.Entries.Select(entry =>
-                    String.Concat(entry.SourceSegments.Select(seg => $"{seg.Lemma}_{seg.ID} ")).Trim())
-                .ToList();
-            List<string> sourceVerses2 = sourceVerses.ToList();
-            List<string> targetVerses2 =
-                translationPairTable.Entries.Select(entry =>
-                    String.Concat(entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID} ")).Trim())
-                .ToList();
-            List<string> targetVerses =
-                targetVerses2.Select(s => s.ToLower()).ToList();
-
             string prevChapter = string.Empty;
 
             Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();
 
             Alignment2 align = new Alignment2();  // The output goes here.
-            align.Lines = new Line[sourceVerses.Count];
 
-            for (int i = 0; i < sourceVerses.Count; i++)
+            align.Lines = new Line[translationPairTable.Entries.Count()];
+
+            int i = 0;
+
+            foreach (var entry in translationPairTable.Entries)
             {
-                if (i == 8)
-                {
-                    ;
-                }
-                string sourceVerse = (string)sourceVerses[i];  // lemmas (text_ID)
-                string sourceVerse2 = (string)sourceVerses2[i]; // morphs (text_ID)
-                string targetVerse = (string)targetVerses[i];   // tokens, lowercase (text_ID)
-                string targetVerse2 = (string)targetVerses2[i]; // tokens, original case (text_ID)
+                //sourceVerse // lemmas (text_ID)
+                //sourceVerse2  // morphs (text_ID)
+                //targetVerse  // tokens, lowercase (text_ID)
+                //targetVerse2  // tokens, original case (text_ID)
+
+                string sourceVerse = String.Concat(entry.SourceSegments.Select(seg => $"{seg.Lemma}_{seg.ID} ")).Trim();
+                string sourceVerse2 = sourceVerse;
+                string targetVerse2 = String.Concat(entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID} ")).Trim();
+                string targetVerse = targetVerse2.ToLower();
+
                 string chapterID = Align.GetChapterID(sourceVerse);  // string with chapter number
 
                 if (chapterID != prevChapter)
@@ -124,6 +117,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                     glossTable, oldLinks, sourceFuncWords, targetFuncWords,
                     contentWordsOnly, strongs);
+
+                i += 1;
             }
 
             string json = JsonConvert.SerializeObject(align.Lines, Newtonsoft.Json.Formatting.Indented);
