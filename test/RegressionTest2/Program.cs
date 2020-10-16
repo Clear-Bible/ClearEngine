@@ -98,13 +98,13 @@ namespace RegressionTest2
             SMTResult smtResult = smtTask.Result;
 
             IPhraseTranslationModel emptyManualPhraseTranslationModel =
-                service.EmptyPhraseTranslationModel;
+                service.Data.EmptyPhraseTranslationModel;
 
             PlaceAlignmentModel emptyManualPlaceAlignmentModel =
-                service.EmptyPlaceAlignmentModel;
+                service.Data.EmptyPlaceAlignmentModel;
 
             Corpus emptyManualTargetCorpus =
-                service.EmptyCorpus;
+                service.Data.EmptyCorpus;
 
             Task<AutoAlignmentResult> autoAlignmentTask =
                 PerformAutoAlignment(
@@ -235,7 +235,7 @@ namespace RegressionTest2
 
             segmenter.Punctuation = punctuation;
 
-            Corpus targetCorpus = service.EmptyCorpus;
+            Corpus targetCorpus = service.Data.EmptyCorpus;
 
             ZoneService zoneService = service.ZoneService;
 
@@ -353,7 +353,7 @@ namespace RegressionTest2
             Versification versification)
         {
             ITranslationPairTable_Old table =
-                service.EmptyTranslationPairTable;
+                service.Data.EmptyTranslationPairTable;
 
             foreach (Zone zone in targetCorpus.AllZones())
             {
@@ -377,7 +377,7 @@ namespace RegressionTest2
             HashSet<string> sourceFunctionWords)
         {
             ITranslationPairTable_Old outputTable =
-                service.EmptyTranslationPairTable;
+                service.Data.EmptyTranslationPairTable;
 
             bool targetContentWord(SegmentInstance si) =>
                 !targetFunctionWords.Contains(si.Text);
@@ -385,7 +385,7 @@ namespace RegressionTest2
                 !sourceFunctionWords.Contains(si.Text);
 
             SegmentInstance useLemma(SegmentInstance si) =>
-                service.SegmentInstance(
+                service.Data.SegmentInstance(
                     treeService.GetLemma(si.Place),
                     si.Place);
 

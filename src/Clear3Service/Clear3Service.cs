@@ -32,8 +32,6 @@ namespace ClearBible.Clear3.Impl.Service
 
     internal class Clear30ServiceAPI : IClear30ServiceAPI
     {
-        #region Sub-Services
-
         public ResourceService ResourceService =>
             throw new NotImplementedException();
 
@@ -43,41 +41,13 @@ namespace ClearBible.Clear3.Impl.Service
         public IAutoAlignmentService AutoAlignmentService { get; } =
             new AutoAlignmentService();
 
+        public IDataService Data { get; } =
+            new DataService();
+
         public IPhraseService PhraseService =>
             throw new NotImplementedException();
 
         public ZoneService ZoneService =>
             throw new NotImplementedException();
-
-        #endregion
-
-
-        #region Construction of Certain Abstract Data
-
-        public Corpus EmptyCorpus =>
-            throw new NotImplementedException();
-
-        public ITranslationPairTable_Old EmptyTranslationPairTable =>
-            throw new NotImplementedException();
-
-        public IPhraseTranslationModel EmptyPhraseTranslationModel =>
-            throw new NotImplementedException();
-
-        public PlaceAlignmentModel EmptyPlaceAlignmentModel =>
-            throw new NotImplementedException();
-
-        public SegmentInstance SegmentInstance(string Text, Place place) =>
-            throw new NotImplementedException();
-
-        public ITranslationModel CreateEmptyTranslationModel() =>
-            new TranslationModel();
-
-        public IGroupTranslationsTable CreateEmptyGroupTranslationsTable() =>
-            new GroupTranslationsTable();
-
-        public ITranslationPairTable CreateEmptyTranslationPairTable() =>
-            new TranslationPairTable();
-
-        #endregion
     }
 }

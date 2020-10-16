@@ -42,7 +42,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
             }
 
             ITranslationPairTable table =
-                clearService.CreateEmptyTranslationPairTable();
+                clearService.Data.CreateEmptyTranslationPairTable();
 
             foreach (var linePair in sourceLines.Zip(targetLines, Tuple.Create))
             {
@@ -70,7 +70,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
             string filePath)
         {
             ITranslationModel model =
-                clearService.CreateEmptyTranslationModel();
+                clearService.Data.CreateEmptyTranslationModel();
 
             foreach (string line in File.ReadAllLines(filePath))
             {
@@ -94,7 +94,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
             string filePath)
         {
             IGroupTranslationsTable table =
-                clearService.CreateEmptyGroupTranslationsTable();
+                clearService.Data.CreateEmptyGroupTranslationsTable();
 
             foreach (string line in File.ReadAllLines(filePath))
             {

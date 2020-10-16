@@ -9,39 +9,16 @@ namespace ClearBible.Clear3.API
     /// 
     public interface IClear30ServiceAPI
     {
-        #region Sub-Services
-
         ResourceService ResourceService { get; }
 
         SMTService SMTService { get; }
 
         IAutoAlignmentService AutoAlignmentService { get; }
 
+        IDataService Data { get; }
+
         IPhraseService PhraseService { get; }
 
         ZoneService ZoneService { get; }
-
-        #endregion
-
-
-        #region Construction of Certain Abstract Data
-
-        Corpus EmptyCorpus { get; }       
-
-        ITranslationPairTable_Old EmptyTranslationPairTable { get; }       
-
-        IPhraseTranslationModel EmptyPhraseTranslationModel { get; }
-
-        PlaceAlignmentModel EmptyPlaceAlignmentModel { get; }
-        
-        SegmentInstance SegmentInstance(string Text, Place place);
-
-        ITranslationModel CreateEmptyTranslationModel();
-
-        IGroupTranslationsTable CreateEmptyGroupTranslationsTable();
-
-        ITranslationPairTable CreateEmptyTranslationPairTable();
-
-        #endregion
     }
 }
