@@ -15,7 +15,7 @@ using ClearBible.Clear3.APIImportExport;
 using ClearBible.Clear3.Service;
 using ClearBible.Clear3.ServiceImportExport;
 
-using ClearBible.Clear3.InternalDatatypes;
+using ClearBible.Clear3.Impl.Datatypes;
 
 namespace RegressionTest3
 {

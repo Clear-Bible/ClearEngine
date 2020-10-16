@@ -16,7 +16,7 @@ using TransModels;
 using Tokenizer;
 using ParallelFiles;
 
-using ClearBible.Clear3.InternalDatatypes;
+using ClearBible.Clear3.Impl.Datatypes;
 
 namespace GBI_Aligner
 {

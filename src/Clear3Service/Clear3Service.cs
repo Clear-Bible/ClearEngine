@@ -1,10 +1,13 @@
 ﻿using System;
 
 using ClearBible.Clear3.API;
-using ClearBible.Clear3.InternalDatatypes;
+
+
 
 namespace ClearBible.Clear3.Service
 {
+    using ClearBible.Clear3.Impl.Service;
+
     public class Clear30Service
     {
         public static IClear30ServiceAPI FindOrCreate()
@@ -19,7 +22,13 @@ namespace ClearBible.Clear3.Service
 
         private static Clear30ServiceAPI _service;
     }
+}
 
+
+
+namespace ClearBible.Clear3.Impl.Service
+{
+    using ClearBible.Clear3.Impl.Datatypes;
 
     internal class Clear30ServiceAPI : IClear30ServiceAPI
     {
