@@ -27,6 +27,34 @@ namespace ClearBible.Clear3.API
 
     public interface ITranslationPairTable
     {
+        void AddEntry(
+            IEnumerable<LegacySourceSegment> sourceSegments,
+            IEnumerable<LegacyTargetSegment> targetSegments);
+    }
 
+
+    public class LegacySourceSegment
+    {
+        public LegacySourceSegment(string lemma, string legacySourceId)
+        {
+            Lemma = lemma;
+            LegacySourceId = legacySourceId;
+        }
+
+        public string Lemma { get; }
+        public string LegacySourceId { get; }
+    }
+
+
+    public class LegacyTargetSegment
+    {
+        public LegacyTargetSegment(string morph, string legacyTargetId)
+        {
+            Morph = morph;
+            LegacyTargetId = legacyTargetId;
+        }
+
+        public string Morph { get; }
+        public string LegacyTargetId { get; }
     }
 }
