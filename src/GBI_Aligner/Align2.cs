@@ -21,8 +21,8 @@ namespace GBI_Aligner
         public static List<MappedWords> AlignTheRest(
             Candidate topCandidate,
             List<XmlNode> terminals, 
-            string[] sourceWords, // lemmas
-            string[] targetWords,  // lowercased tokens        
+            string[] sourceWords, // lemmas, text_ID; only sourceWords.Length is used
+            string[] targetWords,  // lowercased tokens, text_ID       
             TranslationModel model, 
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
@@ -104,7 +104,7 @@ namespace GBI_Aligner
 
         static void AlignWord(
             ref MappedWords link, // (target word is fake)
-            string[] targetWords, // each in the form of "text_id"
+            string[] targetWords, // lowercased tokens, text_id
             Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
             List<string> linkedTargets, // target word IDs from non-fake words
             TranslationModel model, // translation model, (source => (target => probability))

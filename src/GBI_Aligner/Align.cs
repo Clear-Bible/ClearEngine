@@ -64,10 +64,10 @@ namespace GBI_Aligner
                 {
                     ;
                 }
-                string sourceVerse = (string)sourceVerses[i];  // lemmas
-                string sourceVerse2 = (string)sourceVerses2[i]; // source IDs
-                string targetVerse = (string)targetVerses[i];   // tokens, lowercase
-                string targetVerse2 = (string)targetVerses2[i]; // tokens, not lowercase
+                string sourceVerse = (string)sourceVerses[i];  // lemmas (text_ID)
+                string sourceVerse2 = (string)sourceVerses2[i]; // morphs (text_ID)
+                string targetVerse = (string)targetVerses[i];   // tokens, lowercase (text_ID)
+                string targetVerse2 = (string)targetVerses2[i]; // tokens, original case (text_ID)
                 string chapterID = GetChapterID(sourceVerse);  // string with chapter number
 
                 if (chapterID != prevChapter)
@@ -92,10 +92,10 @@ namespace GBI_Aligner
         }
 
         static void AlignVerse(
-            string sourceVerse,  // string, lemmas
-            string sourceVerse2, // string, sourceIDs
-            string targetVerse,  // tokens, lowercase
-            string targetVerse2, // tokens, not lowercase
+            string sourceVerse,  // lemmas (text_ID)
+            string sourceVerse2, // morphs (text_ID)
+            string targetVerse,  // tokens, lowercase (text_ID)
+            string targetVerse2, // tokens, original_case (text_ID)
             TranslationModel model, // translation model, (source => (target => probability))
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                 // (source => (target => Stats{ count, probability})
@@ -123,9 +123,9 @@ namespace GBI_Aligner
             )
         {  
             string[] sourceWords = sourceVerse.Split(" ".ToCharArray());   // lemmas
-            string[] sourceWords2 = sourceVerse2.Split(" ".ToCharArray()); // source words
+            string[] sourceWords2 = sourceVerse2.Split(" ".ToCharArray()); // morphs
             string[] targetWords = targetVerse.Split(" ".ToCharArray());   // tokens, lowercase
-            string[] targetWords2 = targetVerse2.Split(" ".ToCharArray()); // tokens, not lowercase
+            string[] targetWords2 = targetVerse2.Split(" ".ToCharArray()); // tokens, original case
 
             int n = targetWords.Length;  // n = number of target tokens
 
@@ -138,6 +138,10 @@ namespace GBI_Aligner
                 Data.BuildWordInfoTable(treeNode);
            
             List<SourceWord> sWords = GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
+            // sourceWords2 not actually used
+            // it is the IDs of sourceWords that is used
+            // the data for each source word is actually obtained from the wordInfoTable
+            // by using the IDs from sourceWords.
            
             List<TargetWord> tWords = GetTargetWords(targetWords, targetWords2);
 
@@ -173,6 +177,8 @@ namespace GBI_Aligner
 
             List<XmlNode> terminals = Terminals.GetTerminalXmlNodes(treeNode);
             List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sourceWords, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
+            // AlignTheRest only uses sourceWords.Length. not anything else about the sourceWords.
+
 
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
@@ -830,8 +836,8 @@ namespace GBI_Aligner
         }
 
         static List<SourceWord> GetSourceWords(
-            string[] words,
-            string[] words2,
+            string[] words,  // lemmas, text_ID
+            string[] words2, // morphs, text_ID, not actually used
             Dictionary<string, WordInfo> wordInfoTable)
         {
             List<SourceWord> wordList = new List<SourceWord>();
@@ -870,6 +876,10 @@ namespace GBI_Aligner
             return wordList;
         }
 
+
+        // words: lowercase, text_ID
+        // words2: original case, text_ID
+        //
         static List<TargetWord> GetTargetWords(string[] words, string[] words2)
         {
             List<TargetWord> wordList = new List<TargetWord>();
@@ -1122,8 +1132,8 @@ namespace GBI_Aligner
     {
         public string ID;
         public string AltID;
-        public string Text;
-        public string Text2;
+        public string Text;  // lowercased
+        public string Text2; // original case
         public int Position;
         public bool IsFake;
         public double RelativePos;

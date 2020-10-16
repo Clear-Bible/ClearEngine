@@ -48,7 +48,7 @@ namespace ClearBible.Clear3.Service
         public Corpus EmptyCorpus =>
             throw new NotImplementedException();
 
-        public TranslationPairTable EmptyTranslationPairTable =>
+        public ITranslationPairTable_Old EmptyTranslationPairTable =>
             throw new NotImplementedException();
 
         public IPhraseTranslationModel EmptyPhraseTranslationModel =>

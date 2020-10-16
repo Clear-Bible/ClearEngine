@@ -16,7 +16,7 @@ namespace ClearBible.Clear3.Service
     {
         public Task<AutoAlignmentResult> LaunchAutoAlignmentAsync(
             TreeService treeService,
-            TranslationPairTable translationPairTable,
+            ITranslationPairTable_Old translationPairTable,
             IPhraseTranslationModel smtTransModel,
             PlaceAlignmentModel smtAlignModel,
             IPhraseTranslationModel manualTransModel,
