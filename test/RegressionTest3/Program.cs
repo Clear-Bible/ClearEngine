@@ -59,7 +59,7 @@ namespace RegressionTest3
                     parallelTargetIdPath);
 
             ITranslationModel iTransModel =
-                ImportTranslationModel(clearService, transModelPath);
+                importExportService.ImportTranslationModel(clearService, transModelPath);
 
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);
@@ -75,7 +75,7 @@ namespace RegressionTest3
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
 
             IGroupTranslationsTable groups =
-                ImportGroupTranslationsTable(
+                importExportService.ImportGroupTranslationsTable(
                     clearService,
                     InPath("groups.txt"));
 
@@ -118,55 +118,6 @@ namespace RegressionTest3
                 glossTable,
                 oldLinks,
                 sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
-        }
-
-
-
-        static ITranslationModel ImportTranslationModel(
-            IClear30ServiceAPI clearService,
-            string filePath)
-        {
-            ITranslationModel model =
-                clearService.CreateEmptyTranslationModel();
-
-            foreach (string line in File.ReadAllLines(filePath))
-            {
-                string[] fields =
-                    line.Split(' ').Select(s => s.Trim()).ToArray();
-                if (fields.Length == 3)
-                {
-                    model.AddEntry(
-                        sourceLemma: fields[0],
-                        targetMorph: fields[1],
-                        score: Double.Parse(fields[2]));
-                }
-            }
-
-            return model;
-        }
-
-
-        static IGroupTranslationsTable ImportGroupTranslationsTable(
-            IClear30ServiceAPI clearService,
-            string filePath)
-        {
-            IGroupTranslationsTable table =
-                clearService.CreateEmptyGroupTranslationsTable();
-
-            foreach (string line in File.ReadAllLines(filePath))
-            {
-                string[] fields =
-                    line.Split('#').Select(s => s.Trim()).ToArray();
-                if (fields.Length == 3)
-                {
-                    table.AddEntry(
-                        sourceGroupLemmas: fields[0],
-                        targetGroupAsText: fields[1].ToLower(),
-                        primaryPosition: Int32.Parse(fields[2]));
-                }
-            }
-
-            return table;
         }
     }
 }
