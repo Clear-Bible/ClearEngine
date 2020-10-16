@@ -6,21 +6,19 @@ using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Service
 {
-    using ClearBible.Clear3.Impl.Service;
-
     public class Clear30Service
     {
         public static IClear30ServiceAPI FindOrCreate()
         {
             if (_service == null)
             {
-                _service = new Clear30ServiceAPI();
+                _service = new Impl.Service.Clear30ServiceAPI();
             }
 
             return _service;
         }
 
-        private static Clear30ServiceAPI _service;
+        private static Impl.Service.Clear30ServiceAPI _service;
     }
 }
 
@@ -28,8 +26,6 @@ namespace ClearBible.Clear3.Service
 
 namespace ClearBible.Clear3.Impl.Service
 {
-    using ClearBible.Clear3.Impl.Data;
-
     internal class Clear30ServiceAPI : IClear30ServiceAPI
     {
         public ResourceService ResourceService =>
@@ -39,10 +35,10 @@ namespace ClearBible.Clear3.Impl.Service
             throw new NotImplementedException();
 
         public IAutoAlignmentService AutoAlignmentService { get; } =
-            new AutoAlignmentService();
+            new AutoAlign.AutoAlignmentService();
 
         public IDataService Data { get; } =
-            new DataService();
+            new Data.DataService();
 
         public IPhraseService PhraseService =>
             throw new NotImplementedException();
