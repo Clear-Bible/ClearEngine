@@ -16,7 +16,7 @@ using ClearBible.Clear3.Impl.Data;
 
 namespace GBI_Aligner
 {
-    class Align2
+    public class Align2
     {
         public static List<MappedWords> AlignTheRest(
             Candidate topCandidate,

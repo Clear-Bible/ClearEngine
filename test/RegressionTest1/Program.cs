@@ -1,6 +1,4 @@
 ﻿
-using AlignmentTool;
-using GBI_Aligner;
 using Newtonsoft.Json;
 using ParallelFiles;
 using System;
@@ -10,6 +8,10 @@ using System.IO;
 using Tokenizer;
 using TransModels;
 using Utilities;
+
+using Data = AlignmentTool.Data;
+using Gloss = GBI_Aligner.Gloss;
+using Line = GBI_Aligner.Line;
 
 using ClearBible.Clear3.Impl.Data;
 
@@ -151,7 +153,7 @@ namespace RegressionTest1
             Dictionary<string, Dictionary<string, int>> strongs = Data.BuildStrongTable(common("strongs.txt"));
 
             Console.WriteLine("Auto Alignment");
-            AutoAligner.AutoAlign(
+            GBI_Aligner.AutoAligner.AutoAlign(
                 parallelSourceIdPath, parallelSourceIdLemmaPath,
                 parallelTargetIdPath,
                 jsonOutput,

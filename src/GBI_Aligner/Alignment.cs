@@ -49,7 +49,7 @@ namespace GBI_Aligner
         [JsonConverter(typeof(LinkJsonConverter))]
         public List<Link> links;
     }
-    class Alignment2
+    public class Alignment2
     {
         public Line[] Lines;
     }
