@@ -13,7 +13,7 @@ using ClearBible.Clear3.Impl.Data;
 
 namespace GBI_Aligner
 {
-    class TerminalCandidates
+    public class TerminalCandidates
     {
         public static void GetTerminalCandidates(
             AlternativesForTerminals candidateTable,  // the output goes here

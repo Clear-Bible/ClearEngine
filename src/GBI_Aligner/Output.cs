@@ -14,7 +14,7 @@ using ClearBible.Clear3.Impl.Data;
 
 namespace GBI_Aligner
 {
-    class Output
+    public class Output
     {
         public static void WriteAlignment(
             List<MappedGroup> links,

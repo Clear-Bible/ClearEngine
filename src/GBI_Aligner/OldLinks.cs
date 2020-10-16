@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace GBI_Aligner
 {
-    class OldLinks
+    public class OldLinks
     {
         public static Dictionary<string, string> CreateIdMap(List<SourceWord> sWords)
         {
