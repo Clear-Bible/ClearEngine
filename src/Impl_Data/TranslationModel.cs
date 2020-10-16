@@ -5,7 +5,7 @@ using System.Linq;
 
 using ClearBible.Clear3.API;
 
-namespace ClearBible.Clear3.Impl.Datatypes
+namespace ClearBible.Clear3.Impl.Data
 {
 
     public class Translations

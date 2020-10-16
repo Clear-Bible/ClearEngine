@@ -13,7 +13,7 @@ using Utilities;
 using GBI_Aligner;
 using Newtonsoft.Json;
 
-using ClearBible.Clear3.Impl.Datatypes;
+using ClearBible.Clear3.Impl.Data;
 
 namespace AlignmentTool
 {

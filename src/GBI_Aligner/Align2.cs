@@ -12,7 +12,7 @@ using Trees;
 using Newtonsoft.Json;
 using System.IO;
 
-using ClearBible.Clear3.Impl.Datatypes;
+using ClearBible.Clear3.Impl.Data;
 
 namespace GBI_Aligner
 {
