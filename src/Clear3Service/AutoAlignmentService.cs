@@ -4,14 +4,14 @@ using System.Threading;
 using System.Threading.Tasks;
 
 
-using ClearBible.Clear3.API;
-using ClearBible.Clear3.InternalDatatypes;
-
 using GBI_Aligner;
 
 
-namespace ClearBible.Clear3.Service
+namespace ClearBible.Clear3.Impl.Service
 {
+    using ClearBible.Clear3.API;
+    using ClearBible.Clear3.Impl.Datatypes;
+
     public class AutoAlignmentService : IAutoAlignmentService
     {
         public Task<AutoAlignmentResult> LaunchAutoAlignmentAsync(

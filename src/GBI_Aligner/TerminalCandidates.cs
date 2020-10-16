@@ -9,7 +9,7 @@ using System.Collections;
 using Utilities;
 using Trees;
 
-using ClearBible.Clear3.InternalDatatypes;
+using ClearBible.Clear3.Impl.Datatypes;
 
 namespace GBI_Aligner
 {

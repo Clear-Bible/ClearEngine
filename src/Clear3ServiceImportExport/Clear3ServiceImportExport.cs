@@ -4,16 +4,24 @@ using System.IO;
 using System.Linq;
 
 
-using ClearBible.Clear3.API;
-using ClearBible.Clear3.APIImportExport;
 
 namespace ClearBible.Clear3.ServiceImportExport
 {
+    using ClearBible.Clear3.APIImportExport;
+    using ClearBible.Clear3.Impl.ServiceImportExport;
+
     public class Clear30ServiceImportExport
     {
         public static IClear30ServiceAPIImportExport Create() =>
             new Clear30ServiceAPIImportExport();
     }
+}
+
+
+namespace ClearBible.Clear3.Impl.ServiceImportExport
+{
+    using ClearBible.Clear3.API;
+    using ClearBible.Clear3.APIImportExport;
 
 
     internal class Clear30ServiceAPIImportExport
