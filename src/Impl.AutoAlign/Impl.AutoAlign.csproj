@@ -4,4 +4,9 @@
     <TargetFramework>netstandard2.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\API\Api.csproj" />
+    <ProjectReference Include="..\Impl_Data\Impl.Data.csproj" />
+    <ProjectReference Include="..\GBI_Aligner\GBI_Aligner.csproj" />
+  </ItemGroup>
 </Project>
