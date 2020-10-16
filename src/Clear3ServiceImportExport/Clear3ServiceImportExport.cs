@@ -24,7 +24,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
     using ClearBible.Clear3.APIImportExport;
 
 
-    internal class Clear30ServiceAPIImportExport
+    public class Clear30ServiceAPIImportExport
         : IClear30ServiceAPIImportExport
     {
         public ITranslationPairTable ImportTranslationPairTableFromLegacy1(
@@ -62,6 +62,54 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
 
             string getText(string s) => s.Substring(0, s.LastIndexOf("_"));
             string getID(string s) => s.Substring(s.LastIndexOf("_") + 1);           
+        }
+
+
+        public ITranslationModel ImportTranslationModel(
+            IClear30ServiceAPI clearService,
+            string filePath)
+        {
+            ITranslationModel model =
+                clearService.CreateEmptyTranslationModel();
+
+            foreach (string line in File.ReadAllLines(filePath))
+            {
+                string[] fields =
+                    line.Split(' ').Select(s => s.Trim()).ToArray();
+                if (fields.Length == 3)
+                {
+                    model.AddEntry(
+                        sourceLemma: fields[0],
+                        targetMorph: fields[1],
+                        score: Double.Parse(fields[2]));
+                }
+            }
+
+            return model;
+        }
+
+
+        public IGroupTranslationsTable ImportGroupTranslationsTable(
+            IClear30ServiceAPI clearService,
+            string filePath)
+        {
+            IGroupTranslationsTable table =
+                clearService.CreateEmptyGroupTranslationsTable();
+
+            foreach (string line in File.ReadAllLines(filePath))
+            {
+                string[] fields =
+                    line.Split('#').Select(s => s.Trim()).ToArray();
+                if (fields.Length == 3)
+                {
+                    table.AddEntry(
+                        sourceGroupLemmas: fields[0],
+                        targetGroupAsText: fields[1].ToLower(),
+                        primaryPosition: Int32.Parse(fields[2]));
+                }
+            }
+
+            return table;
         }
     }
 }
