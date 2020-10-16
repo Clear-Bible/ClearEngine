@@ -105,8 +105,7 @@ namespace RegressionTest3
             Console.WriteLine("Calling Auto Aligner.");
 
             clearService.AutoAlignmentService.AutoAlign_WorkInProgress(
-                parallelSourceIdPath, parallelSourceIdLemmaPath,
-                parallelTargetIdPath,
+                iTranslationPairTable,
                 jsonOutput,
                 iTransModel,
                 manTransModel,

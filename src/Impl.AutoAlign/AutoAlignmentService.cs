@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -37,9 +38,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public void AutoAlign_WorkInProgress(
-            string parallelSourceIdPath,
-            string parallelSourceIdLemmaPath,
-            string parallelTargetIdPath,
+            ITranslationPairTable iTranslationPairTable,
             string jsonOutput,
             ITranslationModel iTranslationModel,
             object iManTransModel,
@@ -64,43 +63,25 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            //AutoAligner.AutoAlign(
-            //    parallelSourceIdPath,
-            //    parallelSourceIdLemmaPath,
-            //    parallelTargetIdPath,
-            //    jsonOutput,
-            //    iTranslationModel as TranslationModel,
-            //    iManTransModel as Dictionary<string, Dictionary<string, Stats>>,
-            //    treeFolder,
-            //    bookNames,
-            //    alignProbs,
-            //    preAlignment,
-            //    useAlignModel,
-            //    maxPaths,
-            //    puncs,
-            //    iGroups as GroupTranslationsTable,
-            //    stopWords,
-            //    goodLinks,
-            //    goodLinkMinCount,
-            //    badLinks,
-            //    badLinkMinCount,
-            //    iGlossTable as Dictionary<string, Gloss>,
-            //    oldLinks,
-            //    sourceFuncWords,
-            //    targetFuncWords,
-            //    contentWordsOnly,
-            //    strongs);
-
+            // Go from abstract to concrete data types:
+            TranslationPairTable translationPairTable = (TranslationPairTable)iTranslationPairTable;
             TranslationModel translationModel = (TranslationModel)iTranslationModel;
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 (Dictionary<string, Dictionary<string, Stats>>)iManTransModel;
             GroupTranslationsTable groups = (GroupTranslationsTable)iGroups;
             Dictionary<string, Gloss> glossTable = (Dictionary<string, Gloss>)iGlossTable;
 
-            List<string> sourceVerses = GBI_Aligner.Data.GetVerses(parallelSourceIdLemmaPath, false);
-            List<string> sourceVerses2 = GBI_Aligner.Data.GetVerses(parallelSourceIdPath, false);
-            List<string> targetVerses = GBI_Aligner.Data.GetVerses(parallelTargetIdPath, true);
-            List<string> targetVerses2 = GBI_Aligner.Data.GetVerses(parallelTargetIdPath, false);
+            List<string> sourceVerses =
+                translationPairTable.Entries.Select(entry =>
+                    String.Concat(entry.SourceSegments.Select(seg => $"{seg.Lemma}_{seg.ID} ")).Trim())
+                .ToList();
+            List<string> sourceVerses2 = sourceVerses.ToList();
+            List<string> targetVerses2 =
+                translationPairTable.Entries.Select(entry =>
+                    String.Concat(entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID} ")).Trim())
+                .ToList();
+            List<string> targetVerses =
+                targetVerses2.Select(s => s.ToLower()).ToList();
 
             string prevChapter = string.Empty;
 
