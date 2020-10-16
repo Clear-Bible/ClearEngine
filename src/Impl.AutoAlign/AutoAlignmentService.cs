@@ -93,7 +93,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 string targetVerse2 = String.Concat(entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID} ")).Trim();
                 string targetVerse = targetVerse2.ToLower();
 
-                string chapterID = Align.GetChapterID(sourceVerse);  // string with chapter number
+                string chapterID = Align.GetChapterID(sourceVerse);  // BBCCC = book + chapter 
 
                 if (chapterID != prevChapter)
                 {
@@ -110,7 +110,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
 
                 // Align a single verse
-                Align.AlignVerse(
+                AlignVerse_WorkInProgress(
                     sourceVerse, sourceVerse2, targetVerse, targetVerse2,
                     translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
                     groups, trees, ref align, i, maxPaths, puncs, stopWords,
@@ -124,5 +124,104 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string json = JsonConvert.SerializeObject(align.Lines, Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(jsonOutput, json);
         }
+
+
+        public static void AlignVerse_WorkInProgress(
+            string sourceVerse,  // lemmas (text_ID)
+            string sourceVerse2, // morphs (text_ID)
+            string targetVerse,  // tokens, lowercase (text_ID)
+            string targetVerse2, // tokens, original_case (text_ID)
+            TranslationModel model, // translation model, (source => (target => probability))
+            Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
+                                                                    // (source => (target => Stats{ count, probability})
+            Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
+            bool useAlignModel,
+            GroupTranslationsTable groups, // comes from Data.LoadGroups("groups.txt")
+                                           //   of the form (...source... => (TargetGroup{...text..., primaryPosition}))
+            Dictionary<string, XmlNode> trees, // verseID => XmlNode
+            ref Alignment2 align,  // Output goes here.
+            int i,
+            int maxPaths,
+            List<string> puncs,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
+            int goodLinkMinCount,
+            Dictionary<string, int> badLinks,
+            int badLinkMinCount,
+            Dictionary<string, Gloss> glossTable,
+            Dictionary<string, Dictionary<string, string>> oldLinks,  // (verseID => (mWord.altId => tWord.altId))
+            List<string> sourceFuncWords,
+            List<string> targetFuncWords,
+            bool contentWordsOnly,
+            Dictionary<string, Dictionary<string, int>> strongs
+            )
+        {
+            string[] sourceWords = sourceVerse.Split(" ".ToCharArray());   // lemmas
+            string[] sourceWords2 = sourceVerse2.Split(" ".ToCharArray()); // morphs
+            string[] targetWords = targetVerse.Split(" ".ToCharArray());   // tokens, lowercase
+            string[] targetWords2 = targetVerse2.Split(" ".ToCharArray()); // tokens, original case
+
+            int n = targetWords.Length;  // n = number of target tokens
+
+            string sStartVerseID = Align.GetVerseID(sourceWords[0]);  // bbcccvvv
+            string sEndVerseID = Align.GetVerseID(sourceWords[sourceWords.Length - 1]); // bbcccvvv
+
+            XmlNode treeNode = Align.GetTreeNode(sStartVerseID, sEndVerseID, trees);
+
+            Dictionary<string, WordInfo> wordInfoTable =
+                GBI_Aligner.Data.BuildWordInfoTable(treeNode);
+
+            List<SourceWord> sWords = Align.GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
+            // sourceWords2 not actually used
+            // it is the IDs of sourceWords that is used
+            // the data for each source word is actually obtained from the wordInfoTable
+            // by using the IDs from sourceWords.
+
+            List<TargetWord> tWords = Align.GetTargetWords(targetWords, targetWords2);
+
+            Dictionary<string, string> idMap = OldLinks.CreateIdMap(sWords);  // (SourceWord.ID => SourceWord.AltID)
+
+            string verseNodeID = Utils.GetAttribValue(treeNode, "nodeId");
+            verseNodeID = verseNodeID.Substring(0, verseNodeID.Length - 1);
+            string verseID = verseNodeID.Substring(0, 8);
+
+            Dictionary<string, string> existingLinks = new Dictionary<string, string>();
+            if (oldLinks.ContainsKey(verseID))  // verseID as obtained from tree
+            {
+                existingLinks = oldLinks[verseID];
+            }
+
+            AlternativesForTerminals terminalCandidates =
+                new AlternativesForTerminals();
+            TerminalCandidates.GetTerminalCandidates(
+                terminalCandidates, treeNode, tWords, model, manModel,
+                alignProbs, useAlignModel, n, verseID, puncs, stopWords,
+                goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
+                existingLinks, idMap, sourceFuncWords, contentWordsOnly,
+                strongs);
+
+            Dictionary<string, List<Candidate>> alignments =
+                new Dictionary<string, List<Candidate>>();
+            Align.AlignNodes(
+                treeNode, tWords, alignments, n, sourceWords.Length,
+                maxPaths, terminalCandidates);
+
+            List<Candidate> verseAlignment = alignments[verseNodeID];
+            Candidate topCandidate = verseAlignment[0];
+
+            List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode);
+            List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sourceWords, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
+            // AlignTheRest only uses sourceWords.Length. not anything else about the sourceWords.
+
+
+            List<MappedGroup> links2 = Groups.WordsToGroups(links);
+
+            Groups.AlignGroups(links2, sWords, tWords, groups, terminals);
+            Align2.FixCrossingLinks(ref links2);
+            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups);
+        }
+
+
     }
 }

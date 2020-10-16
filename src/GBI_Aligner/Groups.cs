@@ -12,7 +12,7 @@ using ClearBible.Clear3.Impl.Data;
 
 namespace GBI_Aligner
 {
-    class Groups
+    public class Groups
     {
         public static void AlignGroups(
             List<MappedGroup> links,

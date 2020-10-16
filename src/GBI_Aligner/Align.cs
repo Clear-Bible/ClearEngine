@@ -187,7 +187,7 @@ namespace GBI_Aligner
             Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups);
         }
 
-        static void AlignNodes(
+        public static void AlignNodes(
             XmlNode treeNode,
             List<TargetWord> tWords,
             Dictionary<string, List<Candidate>> alignments,
@@ -835,7 +835,7 @@ namespace GBI_Aligner
             return topCandidates;
         }
 
-        static List<SourceWord> GetSourceWords(
+        public static List<SourceWord> GetSourceWords(
             string[] words,  // lemmas, text_ID
             string[] words2, // morphs, text_ID, not actually used
             Dictionary<string, WordInfo> wordInfoTable)
@@ -880,7 +880,7 @@ namespace GBI_Aligner
         // words: lowercase, text_ID
         // words2: original case, text_ID
         //
-        static List<TargetWord> GetTargetWords(string[] words, string[] words2)
+        public static List<TargetWord> GetTargetWords(string[] words, string[] words2)
         {
             List<TargetWord> wordList = new List<TargetWord>();
 
