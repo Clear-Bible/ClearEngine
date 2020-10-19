@@ -197,7 +197,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Groups.AlignGroups(links2, sWords, tWords, groups, terminals);
             Align2.FixCrossingLinks(ref links2);
+
             Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups);
+            // In spite of its name, Output.WriteAlignment does not touch the
+            // filesystem; it puts its result in align[i].
         }
 
 
