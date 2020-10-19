@@ -83,16 +83,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (var entry in translationPairTable.Entries)
             {
-                //sourceVerse // lemmas (text_ID)
-                //sourceVerse2  // morphs (text_ID)
-                //targetVerse  // tokens, lowercase (text_ID)
-                //targetVerse2  // tokens, original case (text_ID)
-
-                string sourceVerse = String.Concat(entry.SourceSegments.Select(seg => $"{seg.Lemma}_{seg.ID} ")).Trim();
-                string sourceVerse2 = sourceVerse;
-                string targetVerse2 = String.Concat(entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID} ")).Trim();
-                string targetVerse = targetVerse2.ToLower();
-
                 string chapterID = entry.SourceSegments.First().ID.Substring(0, 5);
 
                 if (chapterID != prevChapter)
@@ -112,7 +102,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // Align a single verse
                 AlignVerse_WorkInProgress(
                     entry,
-                    sourceVerse, sourceVerse2, targetVerse, targetVerse2,
                     translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
                     groups, trees, ref align, i, maxPaths, puncs, stopWords,
                     goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
@@ -129,10 +118,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static void AlignVerse_WorkInProgress(
             TranslationPair entry,
-            string sourceVerse,  // lemmas (text_ID)
-            string sourceVerse2, // morphs (text_ID)
-            string targetVerse,  // tokens, lowercase (text_ID)
-            string targetVerse2, // tokens, original_case (text_ID)
             TranslationModel model, // translation model, (source => (target => probability))
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                                                     // (source => (target => Stats{ count, probability})
@@ -159,11 +144,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            //string[] sourceWords = entry.SourceSegments.Select(seg => $"{seg.Lemma}_{seg.ID}").ToArray();
-            //string[] sourceWords2 = sourceWords.ToArray();
-            //string[] targetWords2 = entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID}").ToArray();
-            //string[] targetWords = targetWords2.Select(s => s.ToLower()).ToArray();
-
             string bookChapterVerseFromId(string s) => s.Substring(0, 8);
 
             string sStartVerseID = bookChapterVerseFromId(entry.SourceSegments.First().ID);
