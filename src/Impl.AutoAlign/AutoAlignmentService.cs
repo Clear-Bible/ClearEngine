@@ -176,19 +176,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, WordInfo> wordInfoTable =
                 GBI_Aligner.Data.BuildWordInfoTable(treeNode);
 
-            // List<SourceWord> sWords = Align.GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
-            // sourceWords2 not actually used
-            // it is the IDs of sourceWords that is used
-            // the data for each source word is actually obtained from the wordInfoTable
-            // by using the IDs from sourceWords.
-
             List<SourceWord> sWords = MakeSourceWordList(
                 entry.SourceSegments.Select(seg => seg.ID),
                 wordInfoTable);
 
-
-
-            List<TargetWord> tWords = Align.GetTargetWords(targetWords, targetWords2);
+            List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
 
             Dictionary<string, string> idMap = OldLinks.CreateIdMap(sWords);  // (SourceWord.ID => SourceWord.AltID)
 
@@ -214,7 +206,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();
             Align.AlignNodes(
-                treeNode, tWords, alignments, n, sourceWords.Length,
+                treeNode, tWords, alignments, n, sWords.Count,
                 maxPaths, terminalCandidates);
 
             List<Candidate> verseAlignment = alignments[verseNodeID];
@@ -247,7 +239,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 return n;
             }
 
-            SourceWord makeSourceWord(string id)
+            SourceWord makeSourceWord(string id, int i)
             {
                 WordInfo wi = wordInfoTable[id];
                 return new SourceWord()
@@ -258,7 +250,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     Morph = wi.Morph,
                     Cat = wi.Cat,
                     Strong = wi.Lang + wi.Strong,
-                    AltID = $"{wi.Surface}-{occurrence(wi.Surface)}"
+                    AltID = $"{wi.Surface}-{occurrence(wi.Surface)}",
+                    Position = i
                 };
             }
 
@@ -266,5 +259,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        public static List<TargetWord> MakeTargetWordList(
+            IEnumerable<TargetSegment> targetSegments)
+        {
+            Dictionary<string, int> textsSoFar = new Dictionary<string, int>();
+
+            double totalWords = targetSegments.Count();
+
+            int occurrence(string text)
+            {
+                int n = textsSoFar.GetValueOrDefault(text, 1);
+                textsSoFar[text] = n + 1;
+                return n;
+            }
+
+            TargetWord makeTargetWord(TargetSegment seg, int i) =>
+                new TargetWord()
+                {
+                    ID = seg.ID,
+                    Text = seg.Text.ToLower(),
+                    Text2 = seg.Text,
+                    AltID = $"{seg.Text}-{occurrence(seg.Text)}",
+                    Position = i,
+                    RelativePos = i / totalWords
+                };
+            
+            return targetSegments.Select(makeTargetWord).ToList();
+        }
     }
 }
