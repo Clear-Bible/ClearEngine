@@ -22,8 +22,7 @@ namespace GBI_Aligner
             Candidate topCandidate,
             List<XmlNode> terminals, 
             int numberSourceWords,
-            string[] targetWords,  // lowercased tokens, text_ID
-            List<TargetWord> targetWords2,
+            List<TargetWord> targetWords,
             TranslationModel model, 
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
@@ -88,7 +87,7 @@ namespace GBI_Aligner
 
                 if (link.TargetNode.Word.IsFake)
                 {
-                    AlignWord(ref link, targetWords, targetWords2, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
+                    AlignWord(ref link, targetWords, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
                 }
             }
 
@@ -105,8 +104,7 @@ namespace GBI_Aligner
 
         static void AlignWord(
             ref MappedWords link, // (target word is fake)
-            string[] targetWords, // lowercased tokens, text_id
-            List<TargetWord> targetWords2,
+            List<TargetWord> targetWords,
             Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
             List<string> linkedTargets, // target word IDs from non-fake words
             TranslationModel model, // translation model, (source => (target => probability))
@@ -132,7 +130,7 @@ namespace GBI_Aligner
                 {
                     return;
                 }
-                string targetWord = GetTargetWordTextFromID(targetID, targetWords2);
+                string targetWord = GetTargetWordTextFromID(targetID, targetWords);
                 string pair = link.SourceNode.Lemma + "#" + targetWord;
                 if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.ContainsKey(pair))
                 {
@@ -145,7 +143,7 @@ namespace GBI_Aligner
                     link.TargetNode.Word.ID = targetID;
                     link.TargetNode.Word.IsFake = false;
                     link.TargetNode.Word.Text = targetWord;
-                    link.TargetNode.Word.Position = GetTargetPositionFromID(targetID, targetWords2);
+                    link.TargetNode.Word.Position = GetTargetPositionFromID(targetID, targetWords);
                     return;
                 }
             }
@@ -222,7 +220,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<TargetWord> GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
+        static List<TargetWord> GetTargetCandidates(MappedWords postNeighbor, List<TargetWord> targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
         {
             List<TargetWord> candidates = new List<TargetWord>();
 
@@ -230,10 +228,11 @@ namespace GBI_Aligner
 
             for (int i = anchorPosition - 1; i >= 0 && i >= anchorPosition - 3; i--)
             {
-                string targetWord = targetWords[i];
-                if (contentWordsOnly && targetFuncWords.Contains(targetWord)) continue;
-                string word = Data.GetWord(targetWord);
-                string id = GetTargetID(targetWord);
+                TargetWord targetWord = targetWords[i];
+                // questionable ... from back when targetWord was a string not a TargetWord ...
+                // if (contentWordsOnly && targetFuncWords.Contains(targetWord)) continue;
+                string word = targetWord.Text;
+                string id = targetWord.ID;
                 if (linkedTargets.Contains(word)) continue;
                 if (puncs.Contains(word)) break;
                 TargetWord tWord = new TargetWord();
@@ -242,12 +241,13 @@ namespace GBI_Aligner
                 tWord.Text = word;
                 candidates.Add(tWord);
             }
-            for (int i = anchorPosition + 1; i < targetWords.Length && i <= anchorPosition + 3; i++)
+            for (int i = anchorPosition + 1; i < targetWords.Count && i <= anchorPosition + 3; i++)
             {
-                string targetWord = targetWords[i];
-                if (contentWordsOnly && targetFuncWords.Contains(targetWord)) continue;
-                string word = Data.GetWord(targetWord);
-                string id = GetTargetID(targetWord);
+                TargetWord targetWord = targetWords[i];
+                // questionable ... from back when targetWord was a string not a TargetWord ...
+                // if (contentWordsOnly && targetFuncWords.Contains(targetWord)) continue;
+                string word = targetWord.Text;
+                string id = targetWord.ID;
                 if (linkedTargets.Contains(word)) continue;
                 if (puncs.Contains(word)) break;
                 TargetWord tWord = new TargetWord();
@@ -260,21 +260,23 @@ namespace GBI_Aligner
             return candidates;
         }
 
-        static List<TargetWord> GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncBounds, List<string> targetFuncWords, bool contentWordsOnly)
+
+        static List<TargetWord> GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, List<TargetWord> targetWords, List<string> linkedTargets, List<string> puncBounds, List<string> targetFuncWords, bool contentWordsOnly)
         {
             List<TargetWord> candidates = new List<TargetWord>();
 
             int startPosition = preNeighbor.TargetNode.Word.Position;
             int endPosition = postNeighbor.TargetNode.Word.Position;
 
-            for (int i = startPosition; i >= 0 && i < targetWords.Length && i < endPosition; i++)
+            for (int i = startPosition; i >= 0 && i < targetWords.Count && i < endPosition; i++)
             {
                 if (i == startPosition) continue;
                 if (i == endPosition) continue;
-                string targetWord = targetWords[i];
-                if (contentWordsOnly && targetFuncWords.Contains(targetWord)) continue;
-                string word = Data.GetWord(targetWord);
-                string id = GetTargetID(targetWord);
+                TargetWord targetWord = targetWords[i];
+                // questionable ... from back when targetWord was a string not a TargetWord ...
+                // if (contentWordsOnly && targetFuncWords.Contains(targetWord)) continue;
+                string word = targetWord.Text;
+                string id = targetWord.ID;
                 if (linkedTargets.Contains(word)) continue;
                 if (puncBounds.Contains(word)) break;
                 TargetWord tWord = new TargetWord();
@@ -287,7 +289,7 @@ namespace GBI_Aligner
             return candidates;
         }
 
-        
+
         static List<MappedWords> GetLinkedSiblings(
             XmlNode treeNode,
             Dictionary<string, MappedWords> linksTable, // key is source morphId

@@ -211,7 +211,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Candidate topCandidate = verseAlignment[0];
 
             List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode);
-            List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sWords.Count, targetWords, tWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
+            List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sWords.Count, tWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
             // AlignTheRest only uses sourceWords.Length. not anything else about the sourceWords.
 
 
