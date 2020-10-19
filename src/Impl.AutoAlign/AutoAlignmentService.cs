@@ -93,7 +93,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 string targetVerse2 = String.Concat(entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID} ")).Trim();
                 string targetVerse = targetVerse2.ToLower();
 
-                string chapterID = Align.GetChapterID(sourceVerse);  // BBCCC = book + chapter 
+                string chapterID = entry.SourceSegments.First().ID.Substring(0, 5);
 
                 if (chapterID != prevChapter)
                 {
@@ -111,6 +111,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 // Align a single verse
                 AlignVerse_WorkInProgress(
+                    entry,
                     sourceVerse, sourceVerse2, targetVerse, targetVerse2,
                     translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
                     groups, trees, ref align, i, maxPaths, puncs, stopWords,
@@ -127,6 +128,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static void AlignVerse_WorkInProgress(
+            TranslationPair entry,
             string sourceVerse,  // lemmas (text_ID)
             string sourceVerse2, // morphs (text_ID)
             string targetVerse,  // tokens, lowercase (text_ID)
@@ -157,26 +159,34 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            string[] sourceWords = sourceVerse.Split(" ".ToCharArray());   // lemmas
-            string[] sourceWords2 = sourceVerse2.Split(" ".ToCharArray()); // morphs
-            string[] targetWords = targetVerse.Split(" ".ToCharArray());   // tokens, lowercase
-            string[] targetWords2 = targetVerse2.Split(" ".ToCharArray()); // tokens, original case
+            string[] sourceWords = entry.SourceSegments.Select(seg => $"{seg.Lemma}_{seg.ID}").ToArray();
+            string[] sourceWords2 = sourceWords.ToArray();
+            string[] targetWords2 = entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID}").ToArray();
+            string[] targetWords = targetWords2.Select(s => s.ToLower()).ToArray();
 
             int n = targetWords.Length;  // n = number of target tokens
 
-            string sStartVerseID = Align.GetVerseID(sourceWords[0]);  // bbcccvvv
-            string sEndVerseID = Align.GetVerseID(sourceWords[sourceWords.Length - 1]); // bbcccvvv
+            string bookChapterVerseFromId(string s) => s.Substring(0, 8);
+
+            string sStartVerseID = bookChapterVerseFromId(entry.SourceSegments.First().ID);
+            string sEndVerseID = bookChapterVerseFromId(entry.SourceSegments.Last().ID);
 
             XmlNode treeNode = Align.GetTreeNode(sStartVerseID, sEndVerseID, trees);
 
             Dictionary<string, WordInfo> wordInfoTable =
                 GBI_Aligner.Data.BuildWordInfoTable(treeNode);
 
-            List<SourceWord> sWords = Align.GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
+            // List<SourceWord> sWords = Align.GetSourceWords(sourceWords, sourceWords2, wordInfoTable);
             // sourceWords2 not actually used
             // it is the IDs of sourceWords that is used
             // the data for each source word is actually obtained from the wordInfoTable
             // by using the IDs from sourceWords.
+
+            List<SourceWord> sWords = MakeSourceWordList(
+                entry.SourceSegments.Select(seg => seg.ID),
+                wordInfoTable);
+
+
 
             List<TargetWord> tWords = Align.GetTargetWords(targetWords, targetWords2);
 
@@ -220,6 +230,39 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Groups.AlignGroups(links2, sWords, tWords, groups, terminals);
             Align2.FixCrossingLinks(ref links2);
             Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups);
+        }
+
+
+        public static List<SourceWord> MakeSourceWordList(
+            IEnumerable<string> sourceSegmentIds,
+            Dictionary<string, WordInfo> wordInfoTable
+            )
+        {
+            Dictionary<string, int> textsSoFar = new Dictionary<string, int>();
+
+            int occurrence(string text)
+            {
+                int n = textsSoFar.GetValueOrDefault(text, 1);
+                textsSoFar[text] = n + 1;
+                return n;
+            }
+
+            SourceWord makeSourceWord(string id)
+            {
+                WordInfo wi = wordInfoTable[id];
+                return new SourceWord()
+                {
+                    ID = id,
+                    Text = wi.Surface,
+                    Lemma = wi.Lemma,
+                    Morph = wi.Morph,
+                    Cat = wi.Cat,
+                    Strong = wi.Lang + wi.Strong,
+                    AltID = $"{wi.Surface}-{occurrence(wi.Surface)}"
+                };
+            }
+
+            return sourceSegmentIds.Select(makeSourceWord).ToList();
         }
 
 
