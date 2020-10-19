@@ -76,6 +76,10 @@ namespace GBI_Aligner
                 ResolveConflicts(conflicts, links, 1);
             }
 
+
+
+            #region Andi does not use this part anymore.
+
             List<string> linkedTargets = GetLinkedTargets(links);
 
 
@@ -97,6 +101,10 @@ namespace GBI_Aligner
             {
                 ResolveConflicts(conflicts, links, 2);
             }
+
+            #endregion
+
+
 
             return links;
         }
@@ -229,10 +237,9 @@ namespace GBI_Aligner
             for (int i = anchorPosition - 1; i >= 0 && i >= anchorPosition - 3; i--)
             {
                 TargetWord targetWord = targetWords[i];
-                // questionable ... from back when targetWord was a string not a TargetWord ...
-                // if (contentWordsOnly && targetFuncWords.Contains(targetWord)) continue;
                 string word = targetWord.Text;
                 string id = targetWord.ID;
+                if (contentWordsOnly && targetFuncWords.Contains(word)) continue;
                 if (linkedTargets.Contains(word)) continue;
                 if (puncs.Contains(word)) break;
                 TargetWord tWord = new TargetWord();
@@ -244,10 +251,9 @@ namespace GBI_Aligner
             for (int i = anchorPosition + 1; i < targetWords.Count && i <= anchorPosition + 3; i++)
             {
                 TargetWord targetWord = targetWords[i];
-                // questionable ... from back when targetWord was a string not a TargetWord ...
-                // if (contentWordsOnly && targetFuncWords.Contains(targetWord)) continue;
                 string word = targetWord.Text;
                 string id = targetWord.ID;
+                if (contentWordsOnly && targetFuncWords.Contains(word)) continue;
                 if (linkedTargets.Contains(word)) continue;
                 if (puncs.Contains(word)) break;
                 TargetWord tWord = new TargetWord();
@@ -273,10 +279,9 @@ namespace GBI_Aligner
                 if (i == startPosition) continue;
                 if (i == endPosition) continue;
                 TargetWord targetWord = targetWords[i];
-                // questionable ... from back when targetWord was a string not a TargetWord ...
-                // if (contentWordsOnly && targetFuncWords.Contains(targetWord)) continue;
                 string word = targetWord.Text;
                 string id = targetWord.ID;
+                if (contentWordsOnly && targetFuncWords.Contains(word)) continue;
                 if (linkedTargets.Contains(word)) continue;
                 if (puncBounds.Contains(word)) break;
                 TargetWord tWord = new TargetWord();
