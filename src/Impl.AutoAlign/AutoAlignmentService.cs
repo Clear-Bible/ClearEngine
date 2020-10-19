@@ -159,10 +159,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            string[] sourceWords = entry.SourceSegments.Select(seg => $"{seg.Lemma}_{seg.ID}").ToArray();
-            string[] sourceWords2 = sourceWords.ToArray();
-            string[] targetWords2 = entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID}").ToArray();
-            string[] targetWords = targetWords2.Select(s => s.ToLower()).ToArray();
+            //string[] sourceWords = entry.SourceSegments.Select(seg => $"{seg.Lemma}_{seg.ID}").ToArray();
+            //string[] sourceWords2 = sourceWords.ToArray();
+            //string[] targetWords2 = entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID}").ToArray();
+            //string[] targetWords = targetWords2.Select(s => s.ToLower()).ToArray();
 
             string bookChapterVerseFromId(string s) => s.Substring(0, 8);
 
@@ -212,8 +212,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode);
             List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sWords.Count, tWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
-            // AlignTheRest only uses sourceWords.Length. not anything else about the sourceWords.
-
 
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
