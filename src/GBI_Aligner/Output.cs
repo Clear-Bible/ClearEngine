@@ -67,10 +67,27 @@ namespace GBI_Aligner
 
             // Create the links element
             Dictionary<string, int> primaryPositions = BuildPrimaryTable(groups);
+            // modified-target-group-text => primary-position
 
             links = RemoveEmptyLinks(links);
+            // Removes any link that has a fake word in it.
+
             RestoreOriginalPositions(links, sourceWords);
+            // Changes SourceNode.position to be the position in sourceWords.
+
+
             line.links = new List<Link>();
+
+            // links :: List<MappedGroup>
+            // Line.links :: List<Link>
+            //
+            // public class Link
+            // {
+            //     public int[] source;
+            //     public int[] target;
+            //     public double? cscore;
+            // }
+            //
             for (int j = 0; j < links.Count; j++)
             {
                 MappedGroup mappedGroup = (MappedGroup)links[j];
