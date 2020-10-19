@@ -21,7 +21,7 @@ namespace GBI_Aligner
         public static List<MappedWords> AlignTheRest(
             Candidate topCandidate,
             List<XmlNode> terminals, 
-            string[] sourceWords, // lemmas, text_ID; only sourceWords.Length is used
+            int numberSourceWords,
             string[] targetWords,  // lowercased tokens, text_ID       
             TranslationModel model, 
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
@@ -56,7 +56,7 @@ namespace GBI_Aligner
                 sourceLink.Lemma = Utils.GetAttribValue(terminal, "UnicodeLemma");
                 sourceLink.Category = Utils.GetAttribValue(terminal, "Cat");
                 sourceLink.Position = Int32.Parse(Utils.GetAttribValue(terminal, "Start"));
-                sourceLink.RelativePos = (double)sourceLink.Position / (double)sourceWords.Length;
+                sourceLink.RelativePos = (double)sourceLink.Position / (double)numberSourceWords;
                 if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
                 sourceLink.TreeNode = terminal;
                 LinkedWord targetLink = linkedWords[i];
