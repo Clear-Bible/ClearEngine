@@ -164,8 +164,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string[] targetWords2 = entry.TargetSegments.Select(seg => $"{seg.Text}_{seg.ID}").ToArray();
             string[] targetWords = targetWords2.Select(s => s.ToLower()).ToArray();
 
-            int n = targetWords.Length;  // n = number of target tokens
-
             string bookChapterVerseFromId(string s) => s.Substring(0, 8);
 
             string sStartVerseID = bookChapterVerseFromId(entry.SourceSegments.First().ID);
@@ -198,7 +196,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 new AlternativesForTerminals();
             TerminalCandidates.GetTerminalCandidates(
                 terminalCandidates, treeNode, tWords, model, manModel,
-                alignProbs, useAlignModel, n, verseID, puncs, stopWords,
+                alignProbs, useAlignModel, tWords.Count, verseID, puncs, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 existingLinks, idMap, sourceFuncWords, contentWordsOnly,
                 strongs);
@@ -206,14 +204,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();
             Align.AlignNodes(
-                treeNode, tWords, alignments, n, sWords.Count,
+                treeNode, tWords, alignments, tWords.Count, sWords.Count,
                 maxPaths, terminalCandidates);
 
             List<Candidate> verseAlignment = alignments[verseNodeID];
             Candidate topCandidate = verseAlignment[0];
 
             List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode);
-            List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sourceWords.Length, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
+            List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sWords.Count, targetWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
             // AlignTheRest only uses sourceWords.Length. not anything else about the sourceWords.
 
 
