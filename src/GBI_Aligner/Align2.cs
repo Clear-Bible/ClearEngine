@@ -22,7 +22,8 @@ namespace GBI_Aligner
             Candidate topCandidate,
             List<XmlNode> terminals, 
             int numberSourceWords,
-            string[] targetWords,  // lowercased tokens, text_ID       
+            string[] targetWords,  // lowercased tokens, text_ID
+            List<TargetWord> targetWords2,
             TranslationModel model, 
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
@@ -87,7 +88,7 @@ namespace GBI_Aligner
 
                 if (link.TargetNode.Word.IsFake)
                 {
-                    AlignWord(ref link, targetWords, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
+                    AlignWord(ref link, targetWords, targetWords2, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
                 }
             }
 
@@ -105,6 +106,7 @@ namespace GBI_Aligner
         static void AlignWord(
             ref MappedWords link, // (target word is fake)
             string[] targetWords, // lowercased tokens, text_id
+            List<TargetWord> targetWords2,
             Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
             List<string> linkedTargets, // target word IDs from non-fake words
             TranslationModel model, // translation model, (source => (target => probability))
@@ -130,7 +132,7 @@ namespace GBI_Aligner
                 {
                     return;
                 }
-                string targetWord = GetTargetWord(targetID, targetWords);
+                string targetWord = GetTargetWordTextFromID(targetID, targetWords2);
                 string pair = link.SourceNode.Lemma + "#" + targetWord;
                 if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.ContainsKey(pair))
                 {
@@ -143,7 +145,7 @@ namespace GBI_Aligner
                     link.TargetNode.Word.ID = targetID;
                     link.TargetNode.Word.IsFake = false;
                     link.TargetNode.Word.Text = targetWord;
-                    link.TargetNode.Word.Position = GetPosition(targetID, targetWords);
+                    link.TargetNode.Word.Position = GetTargetPositionFromID(targetID, targetWords2);
                     return;
                 }
             }
@@ -199,35 +201,26 @@ namespace GBI_Aligner
             }
         }
 
-        static string GetTargetWord(string targetID, string[] targetWords)
+
+        static string GetTargetWordTextFromID(string targetID, List<TargetWord> targetWords)
         {
-            string targetWord = string.Empty;
-
-            for (int i = 0; i < targetWords.Length; i++)
-            {
-                if (targetID == targetWords[i].Substring(targetWords[i].LastIndexOf("_") + 1))
-                {
-                    targetWord = targetWords[i].Substring(0, targetWords[i].LastIndexOf("_"));
-                }
-            }
-
-            return targetWord;
+            return targetWords
+                .Where(tw => targetID == tw.ID)
+                .Select(tw => tw.Text)
+                .DefaultIfEmpty("")
+                .First();
         }
 
-        static int GetPosition(string targetID, string[] targetWords)
+
+        static int GetTargetPositionFromID(string targetID, List<TargetWord> targetWords)
         {
-            int position = 0;
-
-            for (int i = 0; i < targetWords.Length; i++)
-            {
-                if (targetID == targetWords[i].Substring(targetWords[i].LastIndexOf("_") + 1))
-                {
-                    return i;
-                }
-            }
-
-            return position;
+            return targetWords
+                .Where(tw => targetID == tw.ID)
+                .Select(tw => tw.Position)
+                .DefaultIfEmpty(0)
+                .First();
         }
+
 
         static List<TargetWord> GetTargetCandidates(MappedWords postNeighbor, string[] targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
         {
