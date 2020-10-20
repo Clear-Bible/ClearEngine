@@ -162,8 +162,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Dictionary<string, string> idMap = OldLinks.CreateIdMap(sWords);  // (SourceWord.ID => SourceWord.AltID)
 
+            // Node IDs are of the form BBCCCVVVPPPSSSL,
+            // where P is the 1-based position of the first word in the node,
+            // S is the span (number of words) in the node,
+            // and L is the level (starting from the leaves).
+            // BBCCCVVV is the book, chapter, and verse of the first
+            // word in the node.
+
             string verseNodeID = Utils.GetAttribValue(treeNode, "nodeId");
             verseNodeID = verseNodeID.Substring(0, verseNodeID.Length - 1);
+
             string verseID = verseNodeID.Substring(0, 8);
 
             Dictionary<string, string> existingLinks = new Dictionary<string, string>();
@@ -191,7 +199,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Candidate topCandidate = verseAlignment[0];
 
             List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode);
-            List<MappedWords> links = Align2.AlignTheRest(topCandidate, terminals, sWords.Count, tWords, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
+            List<MappedWords> links = Align2.AlignTheRest(
+                topCandidate, terminals, sWords.Count, tWords, model,
+                preAlignment, useAlignModel, puncs, stopWords, goodLinks,
+                goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords,
+                targetFuncWords, contentWordsOnly);
+
+            
+            SegBridgeTable segBridgeTable = new SegBridgeTable();
+            foreach (MappedWords mw in
+                links.Where(x => !x.TargetNode.Word.IsFake))
+            {
+                segBridgeTable.AddEntry(
+                    mw.SourceNode.MorphID,
+                    mw.TargetNode.Word.ID,
+                    Math.Exp(mw.TargetNode.Prob));
+            }           
 
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
@@ -201,6 +224,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups);
             // In spite of its name, Output.WriteAlignment does not touch the
             // filesystem; it puts its result in align[i].
+
+            Line line2 = MakeLineWip(segBridgeTable, sWords, tWords, glossTable);
+
+            string json1 = JsonConvert.SerializeObject(align.Lines[i], Newtonsoft.Json.Formatting.Indented);
+            string json2 = JsonConvert.SerializeObject(line2, Newtonsoft.Json.Formatting.Indented);
+            bool wellNow = json1 == json2;
+            if (i == 1)
+            {
+                Console.WriteLine($"{wellNow}");
+                File.WriteAllText("one", json1);
+                File.WriteAllText("two", json2);
+                Console.WriteLine("OK");
+            }
         }
 
 
@@ -265,5 +301,61 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             
             return targetSegments.Select(makeTargetWord).ToList();
         }
+
+
+        public static Line MakeLineWip(
+            SegBridgeTable segBridgeTable,
+            List<SourceWord> sourceWords,
+            List<TargetWord> targetWords,
+            Dictionary<string, Gloss> glossTable)
+        {
+            Dictionary<string, int> bySourceID = sourceWords
+                .Select((sw, n) => new { sw.ID, n })
+                .ToDictionary(x => x.ID, x => x.n);
+
+            Dictionary<string, int> byTargetID = targetWords
+                .Select((tw, n) => new { tw.ID, n })
+                .ToDictionary(x => x.ID, x => x.n);
+
+            return new Line()
+            {
+                manuscript = new Manuscript()
+                {
+                    words = sourceWords
+                        .Select(sw => new ManuscriptWord()
+                        {
+                            id = long.Parse(sw.ID),
+                            altId = sw.AltID,
+                            text = sw.Text,
+                            strong = sw.Strong,
+                            gloss = glossTable[sw.ID].Gloss1,
+                            gloss2 = glossTable[sw.ID].Gloss2,
+                            lemma = sw.Lemma,
+                            pos = sw.Cat,
+                            morph = sw.Morph
+                        }).ToArray()
+                },
+                translation = new Translation()
+                {
+                    words = targetWords
+                        .Select(tw => new TranslationWord()
+                        {
+                            id = long.Parse(tw.ID),
+                            altId = tw.AltID,
+                            text = tw.Text2
+                        }).ToArray()
+                },
+                links = segBridgeTable.AllEntries
+                    .Select(e => new Link()
+                    {
+                        source = new int[] { bySourceID[e.SourceID] },
+                        target = new int[] { byTargetID[e.TargetID] },
+                        cscore = e.Score
+                    })
+                    .OrderBy(x => x.source[0])
+                    .ToList()
+            };
+        }
     }
 }
+
