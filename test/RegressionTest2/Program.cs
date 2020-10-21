@@ -62,7 +62,7 @@ namespace RegressionTest2
 
             GetResources(
                 service,
-                out TreeService treeService,
+                out ITreeService treeService,
                 out HashSet<string> origFunctionWords,
                 out HashSet<string> englishFunctionWords,
                 out HashSet<string> builtInPunctuation,
@@ -172,7 +172,7 @@ namespace RegressionTest2
 
         static void GetResources(
             IClear30ServiceAPI service,
-            out TreeService treeService,
+            out ITreeService treeService,
             out HashSet<string> origFunctionWords,
             out HashSet<string> englishFunctionWords,
             out HashSet<string> builtInPunctuation,
@@ -348,7 +348,7 @@ namespace RegressionTest2
 
         static ITranslationPairTable_Old CreateTranslationPairTable(
             IClear30ServiceAPI service,
-            TreeService treeService,
+            ITreeService treeService,
             Corpus targetCorpus,
             Versification versification)
         {
@@ -372,7 +372,7 @@ namespace RegressionTest2
         static ITranslationPairTable_Old WithSourceLemmasAndContentWords(
             IClear30ServiceAPI service,
             ITranslationPairTable_Old inputTable,
-            TreeService treeService,
+            ITreeService treeService,
             HashSet<string> targetFunctionWords,
             HashSet<string> sourceFunctionWords)
         {
@@ -423,7 +423,7 @@ namespace RegressionTest2
 
         async static Task<AutoAlignmentResult> PerformAutoAlignment(
             IClear30ServiceAPI service,
-            TreeService treeService,
+            ITreeService treeService,
             ITranslationPairTable_Old translationPairTable,
             IPhraseTranslationModel smtTransModel,
             PlaceAlignmentModel smtAlignModel,
@@ -464,7 +464,7 @@ namespace RegressionTest2
             ITranslationPairTable_Old translationPairTable,
             Corpus targetCorpus,
             PlaceAlignmentModel autoAlignmentModel,
-            TreeService treeService,
+            ITreeService treeService,
             Dictionary<string, string> gloss1,
             Dictionary<string, string> gloss2)
         {

@@ -41,6 +41,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.Data", "src\Impl_Data\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.AutoAlign", "src\Impl.AutoAlign\Impl.AutoAlign.csproj", "{47A1731E-B487-4192-AA9C-2BEC479F8BBE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.TreeService", "src\Impl.TreeService\Impl.TreeService.csproj", "{7E751983-72AC-426D-A34F-FB0F69C32B24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -291,5 +293,17 @@ Global
 		{47A1731E-B487-4192-AA9C-2BEC479F8BBE}.Debug|x64.Build.0 = Debug|Any CPU
 		{47A1731E-B487-4192-AA9C-2BEC479F8BBE}.Release|x64.ActiveCfg = Release|Any CPU
 		{47A1731E-B487-4192-AA9C-2BEC479F8BBE}.Release|x64.Build.0 = Release|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Debug|x86.Build.0 = Debug|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Release|x86.ActiveCfg = Release|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Release|x86.Build.0 = Release|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Debug|x64.Build.0 = Debug|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Release|x64.ActiveCfg = Release|Any CPU
+		{7E751983-72AC-426D-A34F-FB0F69C32B24}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
