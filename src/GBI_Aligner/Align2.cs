@@ -600,52 +600,32 @@ namespace GBI_Aligner
             List<CrossingLinks> crossingLinks = IdentifyCrossingLinks(uniqueLemmaLinks);
             SwapTargets(crossingLinks, links);
         }
+        
 
+        // lemma => list of MappedGroup
+        // where the MappedGroup has just one source and target node
         static Dictionary<string, List<MappedGroup>> GetUniqueLemmaLinks(List<MappedGroup> links)
         {
-            Dictionary<string, List<MappedGroup>> uniqueLemmaLinks =
-                new Dictionary<string, List<MappedGroup>>();
-
-            foreach(MappedGroup link in links)
-            {
-                if (link.SourceNodes.Count == 1 && link.TargetNodes.Count == 1)
-                {
-                    SourceNode sNode = link.SourceNodes[0];
-                    string lemma = sNode.Lemma;
-                    if (uniqueLemmaLinks.ContainsKey(lemma))
-                    {
-                        List<MappedGroup> linkedNodes = uniqueLemmaLinks[lemma];
-                        linkedNodes.Add(link);
-                    }
-                    else
-                    {
-                        List<MappedGroup> linkedNodes = new List<MappedGroup>();
-                        linkedNodes.Add(link);
-                        uniqueLemmaLinks.Add(lemma, linkedNodes);
-                    }
-                }
-            }
-
-            return uniqueLemmaLinks;
+            return links
+                .Where(link =>
+                    link.SourceNodes.Count == 1 && link.TargetNodes.Count == 1)
+                .GroupBy(link =>
+                    link.SourceNodes[0].Lemma)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.ToList());
         }
 
         static List<CrossingLinks> IdentifyCrossingLinks(Dictionary<string, List<MappedGroup>> uniqueLemmaLinks)
         {
-            List<CrossingLinks> crossingLinks = new List<CrossingLinks>();
-
-            foreach (var lemmaEnum in uniqueLemmaLinks)
-            {
-                List<MappedGroup> links = lemmaEnum.Value;
-                if (links.Count == 2 && Crossing(links))
+            return uniqueLemmaLinks.Values
+                .Where(links => links.Count == 2 && Crossing(links))
+                .Select(links => new CrossingLinks()
                 {
-                    CrossingLinks cl = new CrossingLinks();
-                    cl.Link1 = links[0];
-                    cl.Link2 = links[1];
-                    crossingLinks.Add(cl);
-                }
-            }
-
-            return crossingLinks;
+                    Link1 = links[0],
+                    Link2 = links[1]
+                })
+                .ToList();
         }
 
         static bool Crossing(List<MappedGroup> links)
