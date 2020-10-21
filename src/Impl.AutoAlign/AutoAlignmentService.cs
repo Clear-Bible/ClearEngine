@@ -17,11 +17,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Data;
+    using ClearBible.Clear3.Impl.TreeService;
 
     public class AutoAlignmentService : IAutoAlignmentService
     {
         public Task<AutoAlignmentResult> LaunchAutoAlignmentAsync(
-            TreeService treeService,
+            ITreeService treeService,
             ITranslationPairTable_Old translationPairTable,
             IPhraseTranslationModel smtTransModel,
             PlaceAlignmentModel smtAlignModel,
@@ -81,6 +82,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             int i = 0;
 
+            TreeService treeService = new TreeService();
+
             foreach (var entry in translationPairTable.Entries)
             {
                 string chapterID = entry.SourceSegments.First().ID.Substring(0, 5);
@@ -89,13 +92,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     trees.Clear();
                     // Get the trees for the current chapter; a verse can cross chapter boundaries
-                    VerseTrees.GetChapterTree(chapterID, treeFolder, trees, bookNames);
+                    treeService.GetChapterTree(chapterID, treeFolder, trees, bookNames);
                     string book = chapterID.Substring(0, 2);
                     string chapter = chapterID.Substring(2, 3);
                     string prevChapterID = book + Utils.Pad3((Int32.Parse(chapter) - 1).ToString());
-                    VerseTrees.GetChapterTree(prevChapterID, treeFolder, trees, bookNames);
+                    treeService.GetChapterTree(prevChapterID, treeFolder, trees, bookNames);
                     string nextChapterID = book + Utils.Pad3((Int32.Parse(chapter) + 1).ToString());
-                    VerseTrees.GetChapterTree(nextChapterID, treeFolder, trees, bookNames);
+                    treeService.GetChapterTree(nextChapterID, treeFolder, trees, bookNames);
                     prevChapter = chapterID;
                 }
 
@@ -215,7 +218,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             FixCrossingLinksWip(linksWip);
 
-
             SegBridgeTable segBridgeTable = new SegBridgeTable();
             foreach (MappedWords mw in linksWip)
             {
@@ -224,6 +226,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     mw.TargetNode.Word.ID,
                     Math.Exp(mw.TargetNode.Prob));
             }
+
+
 
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
@@ -235,15 +239,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // filesystem; it puts its result in align[i].
 
             Line line2 = MakeLineWip(segBridgeTable, sWords, tWords, glossTable);
-
-            //string json1 = JsonConvert.SerializeObject(align.Lines[i], Newtonsoft.Json.Formatting.Indented);
-            //string json2 = JsonConvert.SerializeObject(line2, Newtonsoft.Json.Formatting.Indented);
-            //if (json1 != json2)
-            //{
-            //    Console.WriteLine($"unequal {i}");
-            //    File.WriteAllText($"one_{i}", json1);
-            //    File.WriteAllText($"two_{i}", json2);
-            //}
  
         }
 

@@ -17,7 +17,7 @@ namespace ClearBible.Clear3.API
         Segmenter CreateSegmenter(Uri segmenterAlgorithmUri);
         // can throw ClearException
 
-        TreeService GetTreeService(Uri treeResourceUri);
+        ITreeService GetTreeService(Uri treeResourceUri);
         // can throw ClearException
 
         HashSet<string> GetStringSet(Uri stringSetUri);

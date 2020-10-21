@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
-    public interface TreeService
+    public interface ITreeService
     {
         Uri IdUri { get; }
 
