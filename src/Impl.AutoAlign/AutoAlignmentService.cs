@@ -205,16 +205,25 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords,
                 targetFuncWords, contentWordsOnly);
 
-            
+            List<MappedWords> linksWip = links
+                .Where(link => !link.TargetNode.Word.IsFake)
+                .Select(link => new MappedWords()
+                {
+                    SourceNode = link.SourceNode,
+                    TargetNode = link.TargetNode
+                }).ToList();
+
+            FixCrossingLinksWip(linksWip);
+
+
             SegBridgeTable segBridgeTable = new SegBridgeTable();
-            foreach (MappedWords mw in
-                links.Where(x => !x.TargetNode.Word.IsFake))
+            foreach (MappedWords mw in linksWip)
             {
                 segBridgeTable.AddEntry(
                     mw.SourceNode.MorphID,
                     mw.TargetNode.Word.ID,
                     Math.Exp(mw.TargetNode.Prob));
-            }           
+            }
 
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
@@ -227,16 +236,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Line line2 = MakeLineWip(segBridgeTable, sWords, tWords, glossTable);
 
-            string json1 = JsonConvert.SerializeObject(align.Lines[i], Newtonsoft.Json.Formatting.Indented);
-            string json2 = JsonConvert.SerializeObject(line2, Newtonsoft.Json.Formatting.Indented);
-            bool wellNow = json1 == json2;
-            if (i == 1)
-            {
-                Console.WriteLine($"{wellNow}");
-                File.WriteAllText("one", json1);
-                File.WriteAllText("two", json2);
-                Console.WriteLine("OK");
-            }
+            //string json1 = JsonConvert.SerializeObject(align.Lines[i], Newtonsoft.Json.Formatting.Indented);
+            //string json2 = JsonConvert.SerializeObject(line2, Newtonsoft.Json.Formatting.Indented);
+            //if (json1 != json2)
+            //{
+            //    Console.WriteLine($"unequal {i}");
+            //    File.WriteAllText($"one_{i}", json1);
+            //    File.WriteAllText($"two_{i}", json2);
+            //}
+ 
         }
 
 
@@ -301,6 +309,43 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             
             return targetSegments.Select(makeTargetWord).ToList();
         }
+
+
+        public static void FixCrossingLinksWip(
+            List<MappedWords> links)
+        {
+            foreach (MappedWords[] cross in links
+                .GroupBy(link => link.SourceNode.Lemma)
+                .Where(group => group.Count() == 2 && CrossingWip(group))
+                .Select(group => group.ToArray()))
+            {
+                swap(ref cross[0].TargetNode, ref cross[1].TargetNode);
+            }
+
+            void swap (ref LinkedWord w1, ref LinkedWord w2)
+            {
+                LinkedWord temp = w1;
+                w1 = w2;
+                w2 = temp;
+            }           
+        }
+
+
+        public static bool CrossingWip(IEnumerable<MappedWords> mappedWords)
+        {
+            int[] sourcePos =
+                mappedWords.Select(mw => mw.SourceNode.Position).ToArray();
+
+            int[] targetPos =
+                mappedWords.Select(mw => mw.TargetNode.Word.Position).ToArray();
+
+            if (targetPos.Any(i => i < 0)) return false;
+
+            return
+                (sourcePos[0] < sourcePos[1] && targetPos[0] > targetPos[1]) ||
+                (sourcePos[0] > sourcePos[1] && targetPos[0] < targetPos[1]);
+        }
+
 
 
         public static Line MakeLineWip(
