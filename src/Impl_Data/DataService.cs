@@ -18,7 +18,7 @@ namespace ClearBible.Clear3.Impl.Data
         public PlaceAlignmentModel EmptyPlaceAlignmentModel =>
             throw new NotImplementedException();
 
-        public SegmentInstance SegmentInstance(string Text, Place place) =>
+        public SegmentInstance SegmentInstance(string Text, IPlace place) =>
             throw new NotImplementedException();
 
         public ITranslationModel CreateEmptyTranslationModel() =>

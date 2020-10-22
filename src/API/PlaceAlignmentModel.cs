@@ -12,9 +12,9 @@ namespace ClearBible.Clear3.API
     {
         string Key { get; }
 
-        PlaceSet FindSourcePlaceSet(IEnumerable<Place> someOfTheMembers);
+        PlaceSet FindSourcePlaceSet(IEnumerable<IPlace> someOfTheMembers);
 
-        PlaceSet FindTargetPlaceSet(IEnumerable<Place> someOfTheMembers);
+        PlaceSet FindTargetPlaceSet(IEnumerable<IPlace> someOfTheMembers);
 
         IEnumerable<PlaceSet> SourcePlaceSets { get; }
 

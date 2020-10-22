@@ -9,14 +9,14 @@ namespace ClearBible.Clear3.API
 
         Corpus Corpus { get; }
 
-        string GetLemma(Place place);
+        string GetLemma(IPlace place);
 
-        string GetStrong(Place place);
+        string GetStrong(IPlace place);
 
-        string GetPartOfSpeech(Place place);
+        string GetPartOfSpeech(IPlace place);
 
-        string GetMorphology(Place place);
+        string GetMorphology(IPlace place);
 
-        long GetLegacyID(Place place);
+        long GetLegacyID(IPlace place);
     }
 }

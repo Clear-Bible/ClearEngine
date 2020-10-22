@@ -362,18 +362,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 manuscript = new Manuscript()
                 {
                     words = sourceWords
-                        .Select(sw => new ManuscriptWord()
-                        {
-                            id = long.Parse(sw.ID),
-                            altId = sw.AltID,
-                            text = sw.Text,
-                            strong = sw.Strong,
-                            gloss = glossTable[sw.ID].Gloss1,
-                            gloss2 = glossTable[sw.ID].Gloss2,
-                            lemma = sw.Lemma,
-                            pos = sw.Cat,
-                            morph = sw.Morph
-                        }).ToArray()
+                        .Select(sw => sw.CreateManuscriptWord(glossTable[sw.ID]))
+                        .ToArray()
                 },
                 translation = new Translation()
                 {

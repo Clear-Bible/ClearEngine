@@ -1114,18 +1114,34 @@ namespace GBI_Aligner
 
     public class SourceWord
     {
-        public string ID;
-        public string AltID;
-        public string Text;
-        public string Lemma;
-        public string Gloss;
-        public int Position;
-        public string Category;
-        public bool IsFunctionWord;
-        public double RelativePos;
-        public string Morph;
-        public string Strong;
-        public string Cat;
+        public string ID { get; set; }
+        public string AltID { get; set; }
+        public string Text { get; set; }
+        public string Lemma { get; set; }
+        public string Gloss { private get; set; }
+        public int Position { private get; set; }
+        public string Category { private get; set; }
+        public bool IsFunctionWord { private get; set; }
+        public double RelativePos { private get; set; }
+        public string Morph { private get; set; }
+        public string Strong { get; set; }
+        public string Cat { private get; set; }
+
+        public ManuscriptWord CreateManuscriptWord(Gloss gloss)
+        {
+            return new ManuscriptWord()
+            {
+                id = long.Parse(ID),
+                altId = AltID,
+                text = Text,
+                lemma = Lemma,
+                strong = Strong,
+                pos = Cat,
+                morph = Morph,
+                gloss = gloss.Gloss1,
+                gloss2 = gloss.Gloss2
+            };
+        }
     }
 
     public class TargetWord

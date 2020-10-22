@@ -36,19 +36,21 @@ namespace GBI_Aligner
             for (int i = 0; i < sourceWords.Count; i++)
             {
                 SourceWord sourceWord = (SourceWord)sourceWords[i];
-                ManuscriptWord mWord = new ManuscriptWord();
+                //ManuscriptWord mWord = new ManuscriptWord();
                 string id = sourceWord.ID;
-                mWord.id = long.Parse(id);
-                mWord.altId = sourceWord.AltID;
-                mWord.text = sourceWord.Text;
-                mWord.lemma = sourceWord.Lemma;
-                mWord.strong = sourceWord.Strong;
-                mWord.pos = sourceWord.Cat;
-                mWord.morph = sourceWord.Morph;
-                Gloss g = glossTable[id];
-                mWord.gloss = g.Gloss1;
-                mWord.gloss2 = g.Gloss2;
-                line.manuscript.words[i] = mWord;
+                //mWord.id = long.Parse(id);
+                //mWord.altId = sourceWord.AltID;
+                //mWord.text = sourceWord.Text;
+                //mWord.lemma = sourceWord.Lemma;
+                //mWord.strong = sourceWord.Strong;
+                //mWord.pos = sourceWord.Cat;
+                //mWord.morph = sourceWord.Morph;
+                //Gloss g = glossTable[id];
+                //mWord.gloss = g.Gloss1;
+                //mWord.gloss2 = g.Gloss2;
+                //line.manuscript.words[i] = mWord;
+                line.manuscript.words[i] =
+                    sourceWord.CreateManuscriptWord(glossTable[id]);
             }
 
             // Create the target/translation element

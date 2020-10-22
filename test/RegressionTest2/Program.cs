@@ -239,16 +239,16 @@ namespace RegressionTest2
 
             ZoneService zoneService = service.ZoneService;
 
-            Zone superscription = zoneService.ZoneX(
+            IZone superscription = zoneService.ZoneX(
                 Psalm60Superscription);
 
-            Zone verse(int verseNumber)
+            IZone verse(int verseNumber)
             {
                 return zoneService.Zone(
                     Psalms, Sixty, verseNumber);
             }
 
-            void addZone(Zone zone, string text)
+            void addZone(IZone zone, string text)
             {
                 targetCorpus = targetCorpus.AddZone(
                     zone,
@@ -355,7 +355,7 @@ namespace RegressionTest2
             ITranslationPairTable_Old table =
                 service.Data.EmptyTranslationPairTable;
 
-            foreach (Zone zone in targetCorpus.AllZones())
+            foreach (IZone zone in targetCorpus.AllZones())
             {
                 IEnumerable<SegmentInstance> targetSegments =
                     targetCorpus.SegmentsForZone(zone);
@@ -474,7 +474,7 @@ namespace RegressionTest2
                 return result;
             }
 
-            string renderAltId(Place place, Corpus corpus)
+            string renderAltId(IPlace place, Corpus corpus)
             {
                 RelativePlace relativePlace = corpus.RelativePlace(place);
                 return $"{relativePlace.Text}-{relativePlace.Occurrence}";
@@ -516,7 +516,7 @@ namespace RegressionTest2
                 foreach (SegmentInstance si in segmentInstances)
                 {
                     PlaceSet candidate = autoAlignmentModel.FindTargetPlaceSet(
-                        new Place[] { si.Place });
+                        new IPlace[] { si.Place });
                     if (candidate != null)
                     {
                         if (placeSetIndicesForKey.TryGetValue(

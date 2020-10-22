@@ -12,7 +12,7 @@ namespace ClearBible.Clear3.API
 
         PlaceAlignmentModel EmptyPlaceAlignmentModel { get; }
 
-        SegmentInstance SegmentInstance(string Text, Place place);
+        SegmentInstance SegmentInstance(string Text, IPlace place);
 
         ITranslationModel CreateEmptyTranslationModel();
 

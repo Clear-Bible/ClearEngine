@@ -7,14 +7,14 @@ namespace ClearBible.Clear3.API
     {
         string Key { get; }
 
-        PlaceSet Apply(Zone targetZone);
+        PlaceSet Apply(IZone targetZone);
 
         Versification Override(
-            Zone targetZone,
+            IZone targetZone,
             PlaceSet placeSet);
 
         Versification OverrideWithFunction(
-            Func<Zone, PlaceSet> maybeOverride);
+            Func<IZone, PlaceSet> maybeOverride);
 
         Versification OverrideWithVerseOffset(
             int book, int chapter, int verseOffset);
