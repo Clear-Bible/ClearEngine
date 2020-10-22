@@ -184,7 +184,7 @@ namespace GBI_Aligner
 
             Groups.AlignGroups(links2, sWords, tWords, groups, terminals);
             Align2.FixCrossingLinks(ref links2);
-            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups);
+            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups, wordInfoTable);
         }
 
         public static void AlignNodes(
@@ -1127,8 +1127,12 @@ namespace GBI_Aligner
         public string Strong { get; set; }
         public string Cat { private get; set; }
 
-        public ManuscriptWord CreateManuscriptWord(Gloss gloss)
+        public ManuscriptWord CreateManuscriptWord(
+            Gloss gloss,
+            Dictionary<string, WordInfo> wordInfoTable)
         {
+            WordInfo wordInfo = wordInfoTable[ID];
+
             return new ManuscriptWord()
             {
                 id = long.Parse(ID),
@@ -1136,13 +1140,23 @@ namespace GBI_Aligner
                 text = Text,
                 lemma = Lemma,
                 strong = Strong,
-                pos = Cat,
-                morph = Morph,
+                pos = wordInfo.Cat,
+                morph = wordInfo.Morph,
                 gloss = gloss.Gloss1,
                 gloss2 = gloss.Gloss2
             };
         }
     }
+
+    //public class WordInfo
+    //{
+    //    public string Lang;
+    //    public string Strong;
+    //    public string Surface;
+    //    public string Lemma;
+    //    public string Cat;
+    //    public string Morph;
+    //}
 
     public class TargetWord
     {
