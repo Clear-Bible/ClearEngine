@@ -50,7 +50,6 @@ namespace GBI_Aligner
                 {
                     ;
                 }
-                sWord.Category = Utils.GetAttribValue(terminalNode, "Cat");
                 if (sWord.ID.Length == 11)
                 {
                     sWord.ID += "1";
@@ -60,7 +59,6 @@ namespace GBI_Aligner
                 sWord.Text = Utils.GetAttribValue(terminalNode, "Unicode");
                 sWord.Lemma = Utils.GetAttribValue(terminalNode, "UnicodeLemma");
                 sWord.Strong = Utils.GetAttribValue(terminalNode, "Language") + Utils.GetAttribValue(terminalNode, "StrongNumberX");
-                sWord.Morph = Utils.GetAttribValue(terminalNode, "Analysis");
                 if (sWord.Lemma == null) continue;
  //               if (contentWordsOnly && sourceFuncWords.Contains(sWord.Lemma)) continue;
 

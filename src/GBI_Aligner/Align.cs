@@ -853,8 +853,6 @@ namespace GBI_Aligner
                 WordInfo wi = (WordInfo)wordInfoTable[w.ID];
                 w.Text = wi.Surface;
                 w.Lemma = wi.Lemma;
-                w.Morph = wi.Morph;
-                w.Cat = wi.Cat;
                 w.Strong = wi.Lang + wi.Strong;
                 
                 if (wordCount.ContainsKey(w.Text))
@@ -869,7 +867,6 @@ namespace GBI_Aligner
                     w.AltID = w.Text + "-" + 1;
                     wordCount.Add(w.Text, 1);
                 }
-                w.Position = i;
                 wordList.Add(w);
             }
 
@@ -1112,20 +1109,14 @@ namespace GBI_Aligner
         }
     }
 
+
     public class SourceWord
     {
         public string ID { get; set; }
         public string AltID { get; set; }
         public string Text { get; set; }
         public string Lemma { get; set; }
-        public string Gloss { private get; set; }
-        public int Position { private get; set; }
-        public string Category { private get; set; }
-        public bool IsFunctionWord { private get; set; }
-        public double RelativePos { private get; set; }
-        public string Morph { private get; set; }
         public string Strong { get; set; }
-        public string Cat { private get; set; }
 
         public ManuscriptWord CreateManuscriptWord(
             Gloss gloss,
@@ -1148,15 +1139,6 @@ namespace GBI_Aligner
         }
     }
 
-    //public class WordInfo
-    //{
-    //    public string Lang;
-    //    public string Strong;
-    //    public string Surface;
-    //    public string Lemma;
-    //    public string Cat;
-    //    public string Morph;
-    //}
 
     public class TargetWord
     {
