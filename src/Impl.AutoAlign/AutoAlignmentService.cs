@@ -234,11 +234,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Groups.AlignGroups(links2, sWords, tWords, groups, terminals);
             Align2.FixCrossingLinks(ref links2);
 
-            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups);
+            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups, wordInfoTable);
             // In spite of its name, Output.WriteAlignment does not touch the
             // filesystem; it puts its result in align[i].
 
-            Line line2 = MakeLineWip(segBridgeTable, sWords, tWords, glossTable);
+            Line line2 = MakeLineWip(segBridgeTable, sWords, tWords, glossTable, wordInfoTable);
  
         }
 
@@ -347,7 +347,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             SegBridgeTable segBridgeTable,
             List<SourceWord> sourceWords,
             List<TargetWord> targetWords,
-            Dictionary<string, Gloss> glossTable)
+            Dictionary<string, Gloss> glossTable,
+            Dictionary<string, WordInfo> wordInfoTable)
         {
             Dictionary<string, int> bySourceID = sourceWords
                 .Select((sw, n) => new { sw.ID, n })
@@ -362,7 +363,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 manuscript = new Manuscript()
                 {
                     words = sourceWords
-                        .Select(sw => sw.CreateManuscriptWord(glossTable[sw.ID]))
+                        .Select(sw => sw.CreateManuscriptWord(glossTable[sw.ID], wordInfoTable))
                         .ToArray()
                 },
                 translation = new Translation()

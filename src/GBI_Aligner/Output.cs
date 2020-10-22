@@ -23,7 +23,8 @@ namespace GBI_Aligner
             ref Alignment2 align, 
             int k, 
             Dictionary<string, Gloss> glossTable, 
-            GroupTranslationsTable groups
+            GroupTranslationsTable groups,
+            Dictionary<string, WordInfo> wordInfoTable
             )
         {
 
@@ -50,7 +51,7 @@ namespace GBI_Aligner
                 //mWord.gloss2 = g.Gloss2;
                 //line.manuscript.words[i] = mWord;
                 line.manuscript.words[i] =
-                    sourceWord.CreateManuscriptWord(glossTable[id]);
+                    sourceWord.CreateManuscriptWord(glossTable[id], wordInfoTable);
             }
 
             // Create the target/translation element
