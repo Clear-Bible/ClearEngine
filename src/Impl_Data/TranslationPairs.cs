@@ -7,6 +7,38 @@ using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.Data
 {
+    public class SegmentID : IComparable<SegmentID>
+    {
+        // BBCCCVVVWWWS
+        public readonly string String;
+
+        public SegmentID(string s)
+        {
+            if (s.Any(c => !Char.IsDigit(c)))
+            {
+                throw new ArgumentException(
+                    "Segment ID must be a string of digits.");
+            }
+
+            switch (s.Length)
+            {
+                case 12: String = s + "1"; break;
+                case 13: String = s;       break;
+                default:
+                    throw new ArgumentException(
+                        "Segment ID must be 12 or 13 characters long.");
+            }
+        }
+
+        public int CompareTo(SegmentID other) =>
+            String.CompareTo(other.String);
+
+        public string ChapterIDString => String.Substring(0, 5);
+
+        public string VerseIDString => String.Substring(0, 8);
+    }
+
+
     public class TargetSegment
     {
         public TargetSegment(string text, string id)

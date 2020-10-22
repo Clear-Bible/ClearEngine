@@ -7,19 +7,19 @@ namespace ClearBible.Clear3.API
     {
         string Key { get; }
 
-        IEnumerable<SegmentInstance> SegmentsForZone(Zone zone);
+        IEnumerable<SegmentInstance> SegmentsForZone(IZone zone);
 
-        SegmentInstance SegmentsForPlace(Place place);
+        SegmentInstance SegmentsForPlace(IPlace place);
 
         IEnumerable<SegmentInstance> SegmentsForPlaceSet(PlaceSet placeSet);
 
-        RelativePlace RelativePlace(Place place);
+        RelativePlace RelativePlace(IPlace place);
 
-        long LegacyTargetId(Place place);
+        long LegacyTargetId(IPlace place);
 
-        IEnumerable<Zone> AllZones();
+        IEnumerable<IZone> AllZones();
 
-        Corpus AddZone(Zone zone, IEnumerable<string> segments);
+        Corpus AddZone(IZone zone, IEnumerable<string> segments);
     }
 
 
@@ -32,7 +32,7 @@ namespace ClearBible.Clear3.API
     {
         string Key { get; }
 
-        Zone Zone { get; }
+        IZone Zone { get; }
 
         string Text { get; }
 
@@ -46,6 +46,6 @@ namespace ClearBible.Clear3.API
 
         string Text { get; }
 
-        Place Place { get; }
+        IPlace Place { get; }
     }
 }

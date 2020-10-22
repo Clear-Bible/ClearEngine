@@ -10,7 +10,7 @@ namespace ClearBible.Clear3.API
     /// that is chosen by the client.
     /// </summary>
     /// 
-    public interface Zone
+    public interface IZone
     {
         string Key { get; }
 
@@ -31,11 +31,11 @@ namespace ClearBible.Clear3.API
     /// holes between places.)  A Place consists of a Zone plus an index.
     /// </summary>
     /// 
-    public interface Place
+    public interface IPlace
     {
         string Key { get; }
 
-        Zone Zone { get; }
+        IZone Zone { get; }
 
         int Index { get; }
     }
@@ -45,19 +45,19 @@ namespace ClearBible.Clear3.API
     {
         string Key { get; }
 
-        IEnumerable<Place> Members { get; }
+        IEnumerable<IPlace> Members { get; }
     }
 
 
     public interface ZoneService
     {
-        Zone Zone(int book, int chapter, int verse);
+        IZone Zone(int book, int chapter, int verse);
 
-        Zone ZoneX(string nonStandardName);
+        IZone ZoneX(string nonStandardName);
 
-        Zone ZoneByKey(string key);
+        IZone ZoneByKey(string key);
 
-        Place Place(Zone zone, int index);
+        IPlace Place(IZone zone, int index);
 
         PlaceSetBuilder PlaceSetBuilder();
     }
@@ -75,9 +75,9 @@ namespace ClearBible.Clear3.API
 
         PlaceSetBuilder SubrangeInclusive(int start, int end);
 
-        PlaceSetBuilder Place(Place place);
+        PlaceSetBuilder Place(IPlace place);
 
-        PlaceSetBuilder PlaceRangeInclusive(Place start, Place end);
+        PlaceSetBuilder PlaceRangeInclusive(IPlace start, IPlace end);
 
         PlaceSet End();
     }

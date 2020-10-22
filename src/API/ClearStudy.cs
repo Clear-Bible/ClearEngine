@@ -27,22 +27,22 @@ namespace ClearBible.Clear3.API
 
         string ClientMetadata { get; set; }
 
-        void AddTargetZone(Zone targetZone);
+        void AddTargetZone(IZone targetZone);
         // throws ArgumentException if zone already present
 
-        void RemoveTargetZone(Zone targetZone);
+        void RemoveTargetZone(IZone targetZone);
         // throws ArgumentException if zone is not present
 
-        IEnumerable<Zone> TargetZones();
+        IEnumerable<IZone> TargetZones();
 
         void SetAlignment(
-            Zone targetZone,
+            IZone targetZone,
             SourceKind kind,
             Guid AlignmentId);
         // throws ArgumentException if zone is not present
 
         void ClearAlignment(
-            Zone targetZone,
+            IZone targetZone,
             SourceKind kind);
         // throws ArgumentException if zone is not present
 
