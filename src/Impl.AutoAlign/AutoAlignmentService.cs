@@ -265,11 +265,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     ID = id,
                     Text = wi.Surface,
                     Lemma = wi.Lemma,
-                    Morph = wi.Morph,
-                    Cat = wi.Cat,
                     Strong = wi.Lang + wi.Strong,
                     AltID = $"{wi.Surface}-{occurrence(wi.Surface)}",
-                    Position = i
                 };
             }
 
