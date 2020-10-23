@@ -69,21 +69,48 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
             IClear30ServiceAPI clearService,
             string filePath)
         {
+            //ITranslationModel model =
+            //    clearService.Data.CreateEmptyTranslationModel();
+
+            //foreach (string line in File.ReadAllLines(filePath))
+            //{
+            //    string[] fields =
+            //        line.Split(' ').Select(s => s.Trim()).ToArray();
+            //    if (fields.Length == 3)
+            //    {
+            //        model.AddEntry(
+            //            sourceLemma: fields[0],
+            //            targetMorph: fields[1],
+            //            score: Double.Parse(fields[2]));
+            //    }
+            //}
+
+            //return model;
+
+            IDataService data = clearService.Data;
+
+            var x = File.ReadLines(filePath)
+                .Select(line => line.Split(' ').ToArray())
+                .Where(fields => fields.Length == 3)
+                .Select(fields => new
+                {
+                    lemma = data.ILemma(fields[0].Trim()),
+                    morph = data.IMorph(fields[1].Trim()),
+                    score = Double.Parse(fields[2].Trim())
+                })
+                .GroupBy(row => row.lemma)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.ToDictionary(
+                        row => row.morph,
+                        row => row.score));
+
             ITranslationModel model =
                 clearService.Data.CreateEmptyTranslationModel();
 
-            foreach (string line in File.ReadAllLines(filePath))
-            {
-                string[] fields =
-                    line.Split(' ').Select(s => s.Trim()).ToArray();
-                if (fields.Length == 3)
-                {
-                    model.AddEntry(
-                        sourceLemma: fields[0],
-                        targetMorph: fields[1],
-                        score: Double.Parse(fields[2]));
-                }
-            }
+            foreach (var kvp in x)
+                foreach (var kvp2 in kvp.Value)
+                    model.AddEntry(kvp.Key.Text, kvp2.Key.Text, kvp2.Value);
 
             return model;
         }
