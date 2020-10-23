@@ -2,7 +2,7 @@
 
 namespace ClearBible.Clear3.API
 {
-    public interface IDataService
+    public interface IDataService : ITextService
     {
         Corpus EmptyCorpus { get; }
 
