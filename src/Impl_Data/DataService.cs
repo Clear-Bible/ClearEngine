@@ -29,5 +29,9 @@ namespace ClearBible.Clear3.Impl.Data
 
         public ITranslationPairTable CreateEmptyTranslationPairTable() =>
             new TranslationPairTable();
+
+        public ILemma ILemma(string text) => new Lemma(text);
+
+        public IMorph IMorph(string text) => new Morph(text);
     }
 }
