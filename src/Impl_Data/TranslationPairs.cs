@@ -82,18 +82,18 @@ namespace ClearBible.Clear3.Impl.Data
         private List<TargetSegment> _targetSegments;
     }
 
-    public class TranslationPairTable : ITranslationPairTable
+    public class TranslationPairTable_Old : ITranslationPairTable
     {
         private List<TranslationPair> _table;
 
         public IEnumerable<TranslationPair> Entries => _table;
 
-        public TranslationPairTable()
+        public TranslationPairTable_Old()
         {
             _table = new List<TranslationPair>();
         }
 
-        public TranslationPairTable(
+        public TranslationPairTable_Old(
             IEnumerable<TranslationPair> pairs)
         {
             _table = pairs.ToList();

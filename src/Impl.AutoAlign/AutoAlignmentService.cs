@@ -65,7 +65,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             )
         {
             // Go from abstract to concrete data types:
-            TranslationPairTable translationPairTable = (TranslationPairTable)iTranslationPairTable;
+            TranslationPairTable_Old translationPairTable = (TranslationPairTable_Old)iTranslationPairTable;
             TranslationModel translationModel = (TranslationModel)iTranslationModel;
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 (Dictionary<string, Dictionary<string, Stats>>)iManTransModel;

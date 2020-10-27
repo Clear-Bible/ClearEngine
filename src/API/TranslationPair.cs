@@ -57,4 +57,25 @@ namespace ClearBible.Clear3.API
         public string Morph { get; }
         public string LegacyTargetId { get; }
     }
+
+
+    public class TranslationPairTable
+    {
+        public
+            List<
+                Tuple<
+                    List<Tuple<SourceID, Lemma>>,
+                    List<Tuple<TargetID, TargetMorph>>>>
+            Inner { get; }
+
+        public TranslationPairTable(
+            List<
+                Tuple<
+                    List<Tuple<SourceID, Lemma>>,
+                    List<Tuple<TargetID, TargetMorph>>>>
+            inner)
+        {
+            Inner = inner;
+        }
+    }
 }

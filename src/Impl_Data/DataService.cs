@@ -28,10 +28,10 @@ namespace ClearBible.Clear3.Impl.Data
             new GroupTranslationsTable();
 
         public ITranslationPairTable CreateEmptyTranslationPairTable() =>
-            new TranslationPairTable();
+            new TranslationPairTable_Old();
 
-        public ILemma ILemma(string text) => new Lemma(text);
+        public ILemma ILemma(string text) => new Lemma_Bak(text);
 
-        public IMorph IMorph(string text) => new Morph(text);
+        public IMorph IMorph(string text) => new Morph_Bak(text);
     }
 }
