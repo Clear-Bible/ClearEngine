@@ -7,12 +7,12 @@ using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.Data
 {
-    public readonly struct Lemma: ILemma,
+    public readonly struct Lemma_Bak: ILemma,
         IEquatable<ILemma>, IComparable<ILemma>
     {
         public string Text { get; }
 
-        public Lemma(string text) { Text = text; }
+        public Lemma_Bak(string text) { Text = text; }
 
         public bool Equals(ILemma x) => Text.Equals(x.Text);
 
@@ -20,12 +20,12 @@ namespace ClearBible.Clear3.Impl.Data
     }
 
 
-    public readonly struct Morph: IMorph,
+    public readonly struct Morph_Bak: IMorph,
         IEquatable<IMorph>, IComparable<IMorph>
     {
         public string Text { get; }
 
-        public Morph(string text) { Text = text; }
+        public Morph_Bak(string text) { Text = text; }
 
         public bool Equals(IMorph x) => Text.Equals(x.Text);
 

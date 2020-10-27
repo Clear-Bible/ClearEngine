@@ -65,6 +65,49 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
         }
 
 
+        public TranslationPairTable ImportTranslationPairTableFromLegacy2(
+            string parallelSourceIdLemmaPath,
+            string parallelTargetIdPath)
+        {
+            string[] sourceLines = File.ReadAllLines(parallelSourceIdLemmaPath);
+            string[] targetLines = File.ReadAllLines(parallelTargetIdPath);
+
+            if (sourceLines.Length != targetLines.Length)
+            {
+                throw new InvalidDataException(
+                    "Parallel files must have same number of lines.");
+            }
+
+            return new TranslationPairTable(
+                sourceLines
+                .Select(line => line
+                    .Split(' ')
+                    .Where(s => !String.IsNullOrWhiteSpace(s))
+                    .Select(s => Tuple.Create(
+                        new SourceID(getAfterLastUnderscore(s)),
+                        new Lemma(getBeforeLastUnderscore(s))))
+                    .ToList())
+                .Zip(
+                    targetLines
+                    .Select(line => line
+                        .Split(' ')
+                        .Where(s => !String.IsNullOrWhiteSpace(s))
+                        .Select(s => Tuple.Create(
+                            new TargetID(getAfterLastUnderscore(s)),
+                            new TargetMorph(getBeforeLastUnderscore(s))))
+                        .ToList()),
+                    Tuple.Create)
+                .ToList());
+
+            // Local functions:
+            string getBeforeLastUnderscore(string s) =>
+                s.Substring(0, s.LastIndexOf("_"));
+
+            string getAfterLastUnderscore(string s) =>
+                s.Substring(s.LastIndexOf("_") + 1);
+        }
+
+
         public ITranslationModel ImportTranslationModel(
             IClear30ServiceAPI clearService,
             string filePath)

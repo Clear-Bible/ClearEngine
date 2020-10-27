@@ -59,6 +59,11 @@ namespace RegressionTest3
                     parallelSourceIdLemmaPath,
                     parallelTargetIdPath);
 
+            TranslationPairTable translationPairTable =
+                importExportService.ImportTranslationPairTableFromLegacy2(
+                    parallelSourceIdLemmaPath,
+                    parallelTargetIdPath);
+
             ITranslationModel iTransModel =
                 importExportService.ImportTranslationModel(clearService, transModelPath);
 
