@@ -46,5 +46,49 @@ namespace ClearBible.Clear3.Impl.TreeService
                 }
             }
         }
+
+
+        // FIXME would prefer to use newer Linq-to-XML library
+        //
+        private Dictionary<string, XmlNode> _trees =
+            new Dictionary<string, XmlNode>();
+
+        private ChapterID _currentChapterID = ChapterID.None;
+
+        private string _treeFolder;
+
+        // FIXME would prefer Dictionary<int, string>
+        //
+        private Dictionary<string, string> _bookNames;
+
+
+        public TreeService(
+            string treeFolder,
+            Dictionary<string, string> bookNames)
+        {
+            _treeFolder = treeFolder;
+            _bookNames = bookNames;
+        }
+
+
+        public void PreloadTreesForChapter(ChapterID chapterID)
+        {
+            if (!chapterID.Equals(_currentChapterID))
+            {
+                _trees.Clear();
+                // Get the trees for the current chapter; a verse can cross chapter boundaries
+
+                GetChapterTree(chapterID, _treeFolder, _trees, _bookNames);
+                int book = chapterID.Book;
+                int chapter = chapterID.Chapter;
+                ChapterID prevChapterID = new ChapterID(book, chapter - 1);
+                GetChapterTree(prevChapterID, _treeFolder, _trees, _bookNames);
+                ChapterID nextChapterID = new ChapterID(book, chapter + 1);
+                GetChapterTree(nextChapterID, _treeFolder, _trees, _bookNames);
+                _currentChapterID = chapterID;
+            }
+        }
+
+        public Dictionary<string, XmlNode> Legacy => _trees;
     }
 }
