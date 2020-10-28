@@ -17,17 +17,17 @@ namespace ClearBible.Clear3.Impl.TreeService
     public class TreeService
     {
         public void GetChapterTree(
-            string chapterID,
+            ChapterID chapterID,
             string treeFolder,
             Dictionary<string, XmlNode> trees,
             Dictionary<string, string> bookNames)
         {
-            string bookNumber = chapterID.Substring(0, 2);           
-            string chapterNumber = chapterID.Substring(2, 3);
+            int bookNumber = chapterID.Book;           
+            int chapterNumber = chapterID.Chapter;
 
-            string bookName = (string)bookNames[bookNumber];
+            string bookName = (string)bookNames[$"{bookNumber:D2}"];
 
-            string treeFile = Path.Combine(treeFolder, $"{bookName}{chapterNumber}.trees.xml");
+            string treeFile = Path.Combine(treeFolder, $"{bookName}{chapterNumber:D3}.trees.xml");
 
             if (File.Exists(treeFile))
             {
