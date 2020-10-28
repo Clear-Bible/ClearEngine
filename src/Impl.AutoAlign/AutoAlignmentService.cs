@@ -41,7 +41,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public void AutoAlign(
             TranslationPairTable translationPairTable,
             string jsonOutput,
-            ITranslationModel iTranslationModel,
+            TranslationModel translationModel,
             object iManTransModel,
             string treeFolder,
             Dictionary<string, string> bookNames,
@@ -65,7 +65,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             )
         {
             // Go from abstract to concrete data types:
-            TranslationModel_Old translationModel = (TranslationModel_Old)iTranslationModel;
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 (Dictionary<string, Dictionary<string, Stats>>)iManTransModel;
             GroupTranslationsTable groups = (GroupTranslationsTable)iGroups;
@@ -117,7 +116,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static void AlignVerse_WorkInProgress(
             TranslationPair entry,
-            TranslationModel_Old model, // translation model, (source => (target => probability))
+            TranslationModel model, // translation model, (source => (target => probability))
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                                                     // (source => (target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
@@ -179,10 +178,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 existingLinks = oldLinks[verseID];
             }
 
+            TranslationModel_Old modelPrime =
+                new TranslationModel_Old();
+            foreach (var kvp in model.Inner)
+                foreach (var kvp2 in kvp.Value)
+                    modelPrime.AddEntry(kvp.Key.Text, kvp2.Key.Text, kvp2.Value.Double);
+
             AlternativesForTerminals terminalCandidates =
                 new AlternativesForTerminals();
             TerminalCandidates.GetTerminalCandidates(
-                terminalCandidates, treeNode, tWords, model, manModel,
+                terminalCandidates, treeNode, tWords, modelPrime, manModel,
                 alignProbs, useAlignModel, tWords.Count, verseID, puncs, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 existingLinks, idMap, sourceFuncWords, contentWordsOnly,
@@ -199,7 +204,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode);
             List<MappedWords> links = Align2.AlignTheRest(
-                topCandidate, terminals, sWords.Count, tWords, model,
+                topCandidate, terminals, sWords.Count, tWords, modelPrime,
                 preAlignment, useAlignModel, puncs, stopWords, goodLinks,
                 goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords,
                 targetFuncWords, contentWordsOnly);
