@@ -109,7 +109,7 @@ namespace RegressionTest3
             clearService.AutoAlignmentService.AutoAlign(
                 translationPairTable,
                 jsonOutput,
-                iTransModel,
+                transModel,
                 manTransModel,
                 treeFolder,
                 bookNames,

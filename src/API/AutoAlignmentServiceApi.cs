@@ -25,7 +25,7 @@ namespace ClearBible.Clear3.API
         void AutoAlign(
             TranslationPairTable translationPairTable,
             string jsonOutput,
-            ITranslationModel iTranslationModel,
+            TranslationModel translationModel,
             object manTransModel,
             string treeFolder,
             Dictionary<string, string> bookNames,
