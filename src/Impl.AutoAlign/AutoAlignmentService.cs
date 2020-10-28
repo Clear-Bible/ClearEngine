@@ -81,7 +81,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             int i = 0;
 
-            TreeService treeService = new TreeService();
+            TreeService treeService = new TreeService(treeFolder, bookNames);
 
             foreach (
                 Tuple<
@@ -90,20 +90,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 entry in translationPairTable.Inner)
             {
                 ChapterID chapterID = entry.Item1.First().Item1.ChapterID;
-
-                if (!chapterID.Equals(prevChapter))
-                {
-                    trees.Clear();
-                    // Get the trees for the current chapter; a verse can cross chapter boundaries
-                    treeService.GetChapterTree(chapterID, treeFolder, trees, bookNames);
-                    int book = chapterID.Book;
-                    int chapter = chapterID.Chapter;
-                    ChapterID prevChapterID = new ChapterID(book, chapter - 1);
-                    treeService.GetChapterTree(prevChapterID, treeFolder, trees, bookNames);
-                    ChapterID nextChapterID = new ChapterID(book, chapter + 1);
-                    treeService.GetChapterTree(nextChapterID, treeFolder, trees, bookNames);
-                    prevChapter = chapterID;
-                }
+                treeService.PreloadTreesForChapter(chapterID);
 
                 TranslationPair entryPrime = new TranslationPair(
                     entry.Item1.Select(src =>
@@ -115,7 +102,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 AlignVerse_WorkInProgress(
                     entryPrime,
                     translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
-                    groups, trees, ref align, i, maxPaths, puncs, stopWords,
+                    groups, treeService.Legacy, ref align, i, maxPaths, puncs, stopWords,
                     goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                     glossTable, oldLinks, sourceFuncWords, targetFuncWords,
                     contentWordsOnly, strongs);
