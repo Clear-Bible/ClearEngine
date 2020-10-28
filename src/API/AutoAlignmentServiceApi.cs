@@ -26,7 +26,7 @@ namespace ClearBible.Clear3.API
             TranslationPairTable translationPairTable,
             string jsonOutput,
             TranslationModel translationModel,
-            object manTransModel,
+            TranslationModel manTransModel,
             string treeFolder,
             Dictionary<string, string> bookNames,
             Dictionary<string, double> alignProbs,

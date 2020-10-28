@@ -58,14 +58,19 @@ namespace RegressionTest3
                     parallelSourceIdLemmaPath,
                     parallelTargetIdPath);
 
-            ITranslationModel iTransModel =
-                importExportService.ImportTranslationModel_Old(clearService, transModelPath);
-
             TranslationModel transModel =
                 importExportService.ImportTranslationModel(transModelPath);
 
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);
+
+            TranslationModel manTransModel2 =
+                new TranslationModel(
+                    manTransModel.ToDictionary(
+                        kvp => new Lemma(kvp.Key),
+                        kvp => kvp.Value.ToDictionary(
+                            kvp2 => new TargetMorph(kvp2.Key),
+                            kvp2 => new Score(kvp2.Value.Prob))));
 
             Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
@@ -110,7 +115,7 @@ namespace RegressionTest3
                 translationPairTable,
                 jsonOutput,
                 transModel,
-                manTransModel,
+                manTransModel2,
                 treeFolder,
                 bookNames,
                 alignProbs, preAlignment, useAlignModel,

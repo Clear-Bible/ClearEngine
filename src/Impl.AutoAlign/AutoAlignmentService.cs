@@ -42,7 +42,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             TranslationPairTable translationPairTable,
             string jsonOutput,
             TranslationModel translationModel,
-            object iManTransModel,
+            TranslationModel manTransModel,
             string treeFolder,
             Dictionary<string, string> bookNames,
             Dictionary<string, double> alignProbs,
@@ -65,8 +65,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             )
         {
             // Go from abstract to concrete data types:
-            Dictionary<string, Dictionary<string, Stats>> manTransModel =
-                (Dictionary<string, Dictionary<string, Stats>>)iManTransModel;
             GroupTranslationsTable groups = (GroupTranslationsTable)iGroups;
             Dictionary<string, Gloss> glossTable = (Dictionary<string, Gloss>)iGlossTable;
 
@@ -116,9 +114,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static void AlignVerse_WorkInProgress(
             TranslationPair entry,
-            TranslationModel model, // translation model, (source => (target => probability))
-            Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
-                                                                    // (source => (target => Stats{ count, probability})
+            TranslationModel model, // translation model
+            TranslationModel manModel, // manually checked alignments
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
@@ -184,10 +181,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 foreach (var kvp2 in kvp.Value)
                     modelPrime.AddEntry(kvp.Key.Text, kvp2.Key.Text, kvp2.Value.Double);
 
+            Dictionary<string, Dictionary<string, Stats>> manModelPrime =
+                manModel.Inner
+                .ToDictionary(
+                    kvp => kvp.Key.Text,
+                    kvp => kvp.Value.ToDictionary(
+                        kvp2 => kvp2.Key.Text,
+                        kvp2 => new Stats() { Prob = kvp2.Value.Double, Count = 1 }));
+
             AlternativesForTerminals terminalCandidates =
                 new AlternativesForTerminals();
             TerminalCandidates.GetTerminalCandidates(
-                terminalCandidates, treeNode, tWords, modelPrime, manModel,
+                terminalCandidates, treeNode, tWords, modelPrime, manModelPrime,
                 alignProbs, useAlignModel, tWords.Count, verseID, puncs, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 existingLinks, idMap, sourceFuncWords, contentWordsOnly,
