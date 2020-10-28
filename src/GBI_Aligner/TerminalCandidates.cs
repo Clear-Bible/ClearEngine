@@ -19,7 +19,7 @@ namespace GBI_Aligner
             AlternativesForTerminals candidateTable,  // the output goes here
             XmlNode treeNode, // syntax tree for current verse
             List<TargetWord> tWords, // ArrayList(TargetWord)
-            TranslationModel model,
+            TranslationModel_Old model,
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                 // (source => (target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)

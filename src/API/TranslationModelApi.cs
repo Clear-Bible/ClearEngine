@@ -10,4 +10,16 @@ namespace ClearBible.Clear3.API
             string targetMorph,
             double score);
     }
+
+    public class TranslationModel
+    {
+        public Dictionary<Lemma, Dictionary<TargetMorph, Score>>
+            Inner { get; }
+
+        public TranslationModel(
+            Dictionary<Lemma, Dictionary<TargetMorph, Score>> inner)
+        {
+            Inner = inner;
+        }
+    }
 }

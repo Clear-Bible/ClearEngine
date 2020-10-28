@@ -23,7 +23,7 @@ namespace GBI_Aligner
             List<XmlNode> terminals, 
             int numberSourceWords,
             List<TargetWord> targetWords,
-            TranslationModel model, 
+            TranslationModel_Old model, 
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             List<string> puncs,
@@ -115,7 +115,7 @@ namespace GBI_Aligner
             List<TargetWord> targetWords,
             Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
             List<string> linkedTargets, // target word IDs from non-fake words
-            TranslationModel model, // translation model, (source => (target => probability))
+            TranslationModel_Old model, // translation model, (source => (target => probability))
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             List<string> puncs,
@@ -533,7 +533,7 @@ namespace GBI_Aligner
         static LinkedWord GetTopCandidate(
             SourceNode sWord, 
             List<TargetWord> tWords, 
-            TranslationModel model, 
+            TranslationModel_Old model, 
             List<string> linkedTargets, 
             List<string> puncs, 
             List<string> stopWords, 

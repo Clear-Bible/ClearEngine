@@ -31,7 +31,7 @@ namespace ClearBible.Clear3.Impl.Data
     }
 
 
-    public class TranslationModel : ITranslationModel
+    public class TranslationModel_Old : ITranslationModel
     {
         private Dictionary<string, Translations> _inner =
             new Dictionary<string, Translations>();

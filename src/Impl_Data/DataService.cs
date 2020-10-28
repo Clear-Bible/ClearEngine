@@ -22,7 +22,7 @@ namespace ClearBible.Clear3.Impl.Data
             throw new NotImplementedException();
 
         public ITranslationModel CreateEmptyTranslationModel() =>
-            new TranslationModel();
+            new TranslationModel_Old();
 
         public IGroupTranslationsTable CreateEmptyGroupTranslationsTable() =>
             new GroupTranslationsTable();

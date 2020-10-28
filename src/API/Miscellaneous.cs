@@ -140,11 +140,18 @@ namespace ClearBible.Clear3.API
     }
 
 
-
     public readonly struct Lemma
     {
         public readonly string Text;
 
         public Lemma(string text) { Text = text; }
+    }
+
+
+    public readonly struct Score
+    {
+        public readonly double Double;
+
+        public Score(double d) { Double = d; }
     }
 }

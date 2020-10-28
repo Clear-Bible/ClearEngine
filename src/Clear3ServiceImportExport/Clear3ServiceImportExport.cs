@@ -108,7 +108,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
         }
 
 
-        public ITranslationModel ImportTranslationModel(
+        public ITranslationModel ImportTranslationModel_Old(
             IClear30ServiceAPI clearService,
             string filePath)
         {
@@ -156,6 +156,29 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
                     model.AddEntry(kvp.Key.Text, kvp2.Key.Text, kvp2.Value);
 
             return model;
+        }
+
+
+
+        public TranslationModel ImportTranslationModel(
+            string filePath)
+        {
+            return new TranslationModel(
+                File.ReadLines(filePath)
+                .Select(line => line.Split(' ').ToList())
+                .Where(fields => fields.Count == 3)
+                .Select(fields => new
+                {
+                    lemma = new Lemma(fields[0].Trim()),
+                    targetMorph = new TargetMorph(fields[1].Trim()),
+                    score = new Score(Double.Parse(fields[2].Trim()))
+                })
+                .GroupBy(row => row.lemma)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.ToDictionary(
+                        row => row.targetMorph,
+                        row => row.score)));
         }
 
 

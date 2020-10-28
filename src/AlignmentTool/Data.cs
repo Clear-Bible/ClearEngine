@@ -61,9 +61,9 @@ namespace AlignmentTool
         // Reading the data file produces a data structure of the form
         //   Hashtable(source => Hashtable(target => probability))
         //
-        public static TranslationModel GetTranslationModel(string file)
+        public static TranslationModel_Old GetTranslationModel(string file)
         {
-            TranslationModel transModel = new TranslationModel();
+            TranslationModel_Old transModel = new TranslationModel_Old();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)

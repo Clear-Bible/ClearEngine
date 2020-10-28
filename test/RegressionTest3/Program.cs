@@ -53,19 +53,16 @@ namespace RegressionTest3
             IClear30ServiceAPIImportExport importExportService =
                 Clear30ServiceImportExport.Create();
 
-            //ITranslationPairTable iTranslationPairTable =
-            //    importExportService.ImportTranslationPairTableFromLegacy1(
-            //        clearService,
-            //        parallelSourceIdLemmaPath,
-            //        parallelTargetIdPath);
-
             TranslationPairTable translationPairTable =
                 importExportService.ImportTranslationPairTableFromLegacy2(
                     parallelSourceIdLemmaPath,
                     parallelTargetIdPath);
 
             ITranslationModel iTransModel =
-                importExportService.ImportTranslationModel(clearService, transModelPath);
+                importExportService.ImportTranslationModel_Old(clearService, transModelPath);
+
+            TranslationModel transModel =
+                importExportService.ImportTranslationModel(transModelPath);
 
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(manTransModelPath);
@@ -109,7 +106,7 @@ namespace RegressionTest3
 
             Console.WriteLine("Calling Auto Aligner.");
 
-            clearService.AutoAlignmentService.AutoAlign_WorkInProgress(
+            clearService.AutoAlignmentService.AutoAlign(
                 translationPairTable,
                 jsonOutput,
                 iTransModel,
