@@ -442,7 +442,7 @@ namespace RegressionTest2
                     smtProgress.PercentComplete,
                     smtProgress.Message));
 
-            return await service.AutoAlignmentService.LaunchAutoAlignmentAsync(
+            return await service.AutoAlignmentService.LaunchAutoAlignmentAsync_Idea1(
                 treeService,
                 translationPairTable,
                 smtTransModel,

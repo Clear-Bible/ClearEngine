@@ -7,7 +7,7 @@ namespace ClearBible.Clear3.API
 {
     public interface IAutoAlignmentService
     {
-        Task<AutoAlignmentResult> LaunchAutoAlignmentAsync(
+        Task<AutoAlignmentResult> LaunchAutoAlignmentAsync_Idea1(
             ITreeService treeService,
             ITranslationPairTable_Old translationPairTable,
             IPhraseTranslationModel smtTransModel,
@@ -22,7 +22,7 @@ namespace ClearBible.Clear3.API
             IProgress<ProgressReport> progress,
             CancellationToken cancellationToken);
 
-        void AutoAlign_WorkInProgress(
+        void AutoAlign(
             TranslationPairTable translationPairTable,
             string jsonOutput,
             ITranslationModel iTranslationModel,

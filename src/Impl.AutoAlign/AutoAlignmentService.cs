@@ -21,7 +21,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class AutoAlignmentService : IAutoAlignmentService
     {
-        public Task<AutoAlignmentResult> LaunchAutoAlignmentAsync(
+        public Task<AutoAlignmentResult> LaunchAutoAlignmentAsync_Idea1(
             ITreeService treeService,
             ITranslationPairTable_Old translationPairTable,
             IPhraseTranslationModel smtTransModel,
@@ -38,7 +38,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 throw new NotImplementedException();
 
 
-        public void AutoAlign_WorkInProgress(
+        public void AutoAlign(
             TranslationPairTable translationPairTable,
             string jsonOutput,
             ITranslationModel iTranslationModel,
@@ -65,7 +65,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             )
         {
             // Go from abstract to concrete data types:
-            TranslationModel translationModel = (TranslationModel)iTranslationModel;
+            TranslationModel_Old translationModel = (TranslationModel_Old)iTranslationModel;
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 (Dictionary<string, Dictionary<string, Stats>>)iManTransModel;
             GroupTranslationsTable groups = (GroupTranslationsTable)iGroups;
@@ -117,7 +117,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static void AlignVerse_WorkInProgress(
             TranslationPair entry,
-            TranslationModel model, // translation model, (source => (target => probability))
+            TranslationModel_Old model, // translation model, (source => (target => probability))
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                                                     // (source => (target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)

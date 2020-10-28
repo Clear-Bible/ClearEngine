@@ -22,7 +22,7 @@ namespace GBI_Aligner
             string source,  // name of file with source IDs
             string sourceLemma,  // name of file with source lemma IDs
             string target, // name of tokens.txt file, after alignment
-            TranslationModel model,  
+            TranslationModel_Old model,  
             Dictionary<string, Dictionary<string, Stats>> manModel, 
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
@@ -96,7 +96,7 @@ namespace GBI_Aligner
             string sourceVerse2, // morphs (text_ID)
             string targetVerse,  // tokens, lowercase (text_ID)
             string targetVerse2, // tokens, original_case (text_ID)
-            TranslationModel model, // translation model, (source => (target => probability))
+            TranslationModel_Old model, // translation model, (source => (target => probability))
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                 // (source => (target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
@@ -274,7 +274,7 @@ namespace GBI_Aligner
         public static AlternativeCandidates GetTopCandidates(
             SourceWord sWord,
             List<TargetWord> tWords,
-            TranslationModel model,
+            TranslationModel_Old model,
             Dictionary<string, Dictionary<string, Stats>> manModel,
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,

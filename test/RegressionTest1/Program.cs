@@ -133,7 +133,7 @@ namespace RegressionTest1
 
             string jsonOutput = output("alignment.json");
 
-            TranslationModel transModel =
+            TranslationModel_Old transModel =
                 Data.GetTranslationModel(transModelPath);
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(common("manTransModel.txt"));

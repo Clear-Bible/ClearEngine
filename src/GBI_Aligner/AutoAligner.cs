@@ -29,7 +29,7 @@ namespace GBI_Aligner
             string sourceLemma,  // name of file with source lemma IDs
             string target, // name of tokens.txt file, after alignment
             string jsonOutput, // output of aligner, alignment.json file
-            TranslationModel transModel, // source => target => probability
+            TranslationModel_Old transModel, // source => target => probability
             Dictionary<string, Dictionary<string, Stats>> manTransModel, // translation model from manually checked alignments
                                      // comes from Data.GetTranslationModel2(manTransModelFile)
                                      // of the form: (source => (target => Stats{ count, probability})

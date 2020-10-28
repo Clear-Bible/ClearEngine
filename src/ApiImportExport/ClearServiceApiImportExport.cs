@@ -7,7 +7,10 @@ namespace ClearBible.Clear3.APIImportExport
 {
     public interface IClear30ServiceAPIImportExport
     {
-        ITranslationModel ImportTranslationModel(
+        TranslationModel ImportTranslationModel(
+            string filePath);
+
+        ITranslationModel ImportTranslationModel_Old(
             IClear30ServiceAPI clearService,
             string filePath);
 
