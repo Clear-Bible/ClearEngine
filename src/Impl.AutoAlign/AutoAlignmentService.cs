@@ -39,7 +39,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public void AutoAlign_WorkInProgress(
-            ITranslationPairTable iTranslationPairTable,
+            TranslationPairTable translationPairTable,
             string jsonOutput,
             ITranslationModel iTranslationModel,
             object iManTransModel,
@@ -65,46 +65,51 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             )
         {
             // Go from abstract to concrete data types:
-            TranslationPairTable_Old translationPairTable = (TranslationPairTable_Old)iTranslationPairTable;
             TranslationModel translationModel = (TranslationModel)iTranslationModel;
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 (Dictionary<string, Dictionary<string, Stats>>)iManTransModel;
             GroupTranslationsTable groups = (GroupTranslationsTable)iGroups;
             Dictionary<string, Gloss> glossTable = (Dictionary<string, Gloss>)iGlossTable;
 
-            string prevChapter = string.Empty;
+            ChapterID prevChapter = ChapterID.None;
 
             Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();
 
             Alignment2 align = new Alignment2();  // The output goes here.
 
-            align.Lines = new Line[translationPairTable.Entries.Count()];
+            align.Lines = new Line[translationPairTable.Inner.Count];
 
             int i = 0;
 
             TreeService treeService = new TreeService();
 
-            foreach (var entry in translationPairTable.Entries)
+            foreach (var entry in translationPairTable.Inner)
             {
-                string chapterID = entry.SourceSegments.First().ID.Substring(0, 5);
+                ChapterID chapterID = entry.Item1.First().Item1.ChapterID;
 
-                if (chapterID != prevChapter)
+                if (!chapterID.Equals(prevChapter))
                 {
                     trees.Clear();
                     // Get the trees for the current chapter; a verse can cross chapter boundaries
                     treeService.GetChapterTree(chapterID, treeFolder, trees, bookNames);
-                    string book = chapterID.Substring(0, 2);
-                    string chapter = chapterID.Substring(2, 3);
-                    string prevChapterID = book + Utils.Pad3((Int32.Parse(chapter) - 1).ToString());
+                    int book = chapterID.Book;
+                    int chapter = chapterID.Chapter;
+                    ChapterID prevChapterID = new ChapterID(book, chapter - 1);
                     treeService.GetChapterTree(prevChapterID, treeFolder, trees, bookNames);
-                    string nextChapterID = book + Utils.Pad3((Int32.Parse(chapter) + 1).ToString());
+                    ChapterID nextChapterID = new ChapterID(book, chapter + 1);
                     treeService.GetChapterTree(nextChapterID, treeFolder, trees, bookNames);
                     prevChapter = chapterID;
                 }
 
+                TranslationPair entryPrime = new TranslationPair(
+                    entry.Item1.Select(src =>
+                        new SourceSegment(src.Item2.Text, src.Item1.Legacy)),
+                    entry.Item2.Select(targ =>
+                        new TargetSegment(targ.Item2.Text, targ.Item1.Legacy)));
+
                 // Align a single verse
                 AlignVerse_WorkInProgress(
-                    entry,
+                    entryPrime,
                     translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
                     groups, trees, ref align, i, maxPaths, puncs, stopWords,
                     goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,

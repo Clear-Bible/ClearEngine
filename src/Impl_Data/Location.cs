@@ -24,19 +24,19 @@ namespace ClearBible.Clear3.Impl.Data
                 throw new NotImplementedException();
 
         public IVerseID IVerseID(string tag) =>
-            new VerseID(tag);
+            new VerseID_Old(tag);
 
         public IVerseID IVerseID(int book, int chapter, int verse) =>
             throw new NotImplementedException();
 
         public IChapterID IChapterID(string tag) =>
-            new ChapterID(tag);
+            new ChapterID_Old(tag);
 
         public IChapterID IChapterID(int book, int chapter) =>
             throw new NotImplementedException();
 
         public IBookID IBookID(string tag) =>
-            new BookID(tag);
+            new BookID_Old(tag);
 
         public IBookID IBookID(int book) =>
             throw new NotImplementedException();
@@ -64,7 +64,7 @@ namespace ClearBible.Clear3.Impl.Data
             Tag = LocationService.CheckedTag(tag, 12);
         }
 
-        public IVerseID Verse => new VerseID(Tag.Substring(0, 8));
+        public IVerseID Verse => new VerseID_Old(Tag.Substring(0, 8));
 
         public bool Equals(ISourceID x) => Tag.Equals(x.Tag);
 
@@ -82,7 +82,7 @@ namespace ClearBible.Clear3.Impl.Data
             Tag = LocationService.CheckedTag(tag, 11);
         }
 
-        public IVerseID Verse => new VerseID(Tag.Substring(0, 8));
+        public IVerseID Verse => new VerseID_Old(Tag.Substring(0, 8));
 
         public bool Equals(ITargetID x) => Tag.Equals(x.Tag);
 
@@ -90,17 +90,17 @@ namespace ClearBible.Clear3.Impl.Data
     }
 
 
-    public struct VerseID : IVerseID,
+    public struct VerseID_Old : IVerseID,
         IEquatable<IVerseID>, IComparable<IVerseID>
     {
         public string Tag { get; }  // BBCCCVVV
 
-        public VerseID(string tag)
+        public VerseID_Old(string tag)
         {
             Tag = LocationService.CheckedTag(tag, 8);
         }
 
-        public IChapterID Chapter => new ChapterID(Tag.Substring(0, 5));
+        public IChapterID Chapter => new ChapterID_Old(Tag.Substring(0, 5));
 
         public bool Equals(IVerseID x) => Tag.Equals(x.Tag);
 
@@ -108,17 +108,17 @@ namespace ClearBible.Clear3.Impl.Data
     }
 
 
-    public struct ChapterID : IChapterID,
+    public struct ChapterID_Old : IChapterID,
         IEquatable<IChapterID>, IComparable<IChapterID>
     {
         public string Tag { get; } // BBCCC
 
-        public ChapterID(string tag)
+        public ChapterID_Old(string tag)
         {
             Tag = LocationService.CheckedTag(tag, 5);
         }
 
-        public IBookID Book => new BookID(Tag.Substring(0, 2));
+        public IBookID Book => new BookID_Old(Tag.Substring(0, 2));
 
         public bool Equals(IChapterID x) => Tag.Equals(x.Tag);
 
@@ -126,12 +126,12 @@ namespace ClearBible.Clear3.Impl.Data
     }
 
 
-    public struct BookID : IBookID,
+    public struct BookID_Old : IBookID,
         IEquatable<IBookID>, IComparable<IBookID>
     {
         public string Tag { get; }  // BB
 
-        public BookID(string tag)
+        public BookID_Old(string tag)
         {
             Tag = LocationService.CheckedTag(tag, 2);
         }
