@@ -83,7 +83,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             TreeService treeService = new TreeService();
 
-            foreach (var entry in translationPairTable.Inner)
+            foreach (
+                Tuple<
+                    List<Tuple<SourceID, Lemma>>,
+                    List<Tuple<TargetID, TargetMorph>>>
+                entry in translationPairTable.Inner)
             {
                 ChapterID chapterID = entry.Item1.First().Item1.ChapterID;
 

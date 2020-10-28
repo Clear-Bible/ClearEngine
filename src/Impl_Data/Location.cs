@@ -10,14 +10,14 @@ namespace ClearBible.Clear3.Impl.Data
     public class LocationService : ILocationService
     {
         public ISourceID ISourceID(string tag) =>
-            new SourceID(tag);
+            new SourceID_Old(tag);
 
         public ISourceID ISourceID(
             int book, int chapter, int verse, int word, int subSegment) =>
                 throw new NotImplementedException();
 
         public ITargetID ITargetID(string tag) =>
-            new TargetID(tag);
+            new TargetID_Old(tag);
 
         public ITargetID ITargetID(
             int book, int chapter, int verse, int word) =>
@@ -54,12 +54,12 @@ namespace ClearBible.Clear3.Impl.Data
     }
 
 
-    public readonly struct SourceID : ISourceID,
+    public readonly struct SourceID_Old : ISourceID,
         IEquatable<ISourceID>, IComparable<ISourceID>
     {
         public string Tag { get; }  // BBCCCVVVWWWS
 
-        public SourceID(string tag)
+        public SourceID_Old(string tag)
         {
             Tag = LocationService.CheckedTag(tag, 12);
         }
@@ -72,12 +72,12 @@ namespace ClearBible.Clear3.Impl.Data
     }
 
 
-    public struct TargetID : ITargetID,
+    public struct TargetID_Old : ITargetID,
         IEquatable<ITargetID>, IComparable<ITargetID>
     {
         public string Tag { get; }  // BBCCCVVVWWW
 
-        public TargetID(string tag)
+        public TargetID_Old(string tag)
         {
             Tag = LocationService.CheckedTag(tag, 11);
         }
