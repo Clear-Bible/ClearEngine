@@ -10,11 +10,14 @@ namespace ClearBible.Clear3.APIImportExport
         TranslationModel ImportTranslationModel(
             string filePath);
 
+        GroupTranslationsTable ImportGroupTranslationsTable(
+            string filePath);
+
         ITranslationModel ImportTranslationModel_Old(
             IClear30ServiceAPI clearService,
             string filePath);
 
-        IGroupTranslationsTable ImportGroupTranslationsTable(
+        IGroupTranslationsTable ImportGroupTranslationsTable_Old(
             IClear30ServiceAPI clearService,
             string filePath);
 

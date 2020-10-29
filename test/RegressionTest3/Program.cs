@@ -82,10 +82,16 @@ namespace RegressionTest3
 
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
 
-            IGroupTranslationsTable groups =
-                importExportService.ImportGroupTranslationsTable(
+            IGroupTranslationsTable groups_old =
+                importExportService.ImportGroupTranslationsTable_Old(
                     clearService,
                     InPath("groups.txt"));
+
+            GroupTranslationsTable groups =
+                importExportService.ImportGroupTranslationsTable(
+                    InPath("groups.txt"));
+
+            var groups2 = groups.Inner.Take(10);
 
             List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
@@ -99,7 +105,7 @@ namespace RegressionTest3
             Dictionary<string, Dictionary<string, string>> oldLinks =
                 Data.GetOldLinks(
                     InPath("oldAlignment.json"),
-                    groups as GroupTranslationsTable);
+                    groups_old as GroupTranslationsTable_Old);
 
             List<string> sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
             List<string> targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));
@@ -120,7 +126,7 @@ namespace RegressionTest3
                 bookNames,
                 alignProbs, preAlignment, useAlignModel,
                 maxPaths,
-                puncs, groups, stopWords,
+                puncs, groups_old, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 glossTable,
                 oldLinks,

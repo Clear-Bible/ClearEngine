@@ -18,7 +18,7 @@ namespace GBI_Aligner
             List<MappedGroup> links,
             List<SourceWord> sourceWords,
             List<TargetWord> targetWords,
-            GroupTranslationsTable groups,
+            GroupTranslationsTable_Old groups,
             List<XmlNode> terminals 
             )
         {
@@ -36,7 +36,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, GroupTranslationsTable groups)
+        static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, GroupTranslationsTable_Old groups)
         {
             List<string[][]> mappedGroups = new List<string[][]>();
 
@@ -56,7 +56,7 @@ namespace GBI_Aligner
                     string trigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID + " " + sourceWords[i + 2].ID;
                     if (groups.ContainsSourceGroupKey(trigram))
                     {
-                        GroupTranslations targetGroups = groups.TranslationsForSourceGroup(trigram);
+                        GroupTranslations_Old targetGroups = groups.TranslationsForSourceGroup(trigram);
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -75,7 +75,7 @@ namespace GBI_Aligner
                     string bigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID;
                     if (groups.ContainsSourceGroupKey(bigram))
                     {
-                        GroupTranslations targetGroups = groups.TranslationsForSourceGroup(bigram);
+                        GroupTranslations_Old targetGroups = groups.TranslationsForSourceGroup(bigram);
                         string match = FindTargetMatch(targetWords, targetGroups, 1);
                         if (match != string.Empty)
                         {
@@ -94,7 +94,7 @@ namespace GBI_Aligner
                     string unigramIDs = sourceWords[i].ID;
                     if (groups.ContainsSourceGroupKey(unigram))
                     {
-                        GroupTranslations targetGroups = groups.TranslationsForSourceGroup(unigram);
+                        GroupTranslations_Old targetGroups = groups.TranslationsForSourceGroup(unigram);
                         string match = FindTargetMatch(targetWords, targetGroups, 2);
                         if (match != string.Empty)
                         {
@@ -111,13 +111,13 @@ namespace GBI_Aligner
             return mappedGroups;
         }
 
-        static string FindTargetMatch(TargetWord[] targetWords, GroupTranslations targetGroups, int minLength)
+        static string FindTargetMatch(TargetWord[] targetWords, GroupTranslations_Old targetGroups, int minLength)
         {
             string match = string.Empty;
 
             bool isSplit = false;
             int maxRange;
-            foreach (GroupTranslation targetGroup in targetGroups.AllTranslations)
+            foreach (GroupTranslation_Old targetGroup in targetGroups.AllTranslations)
             {
                 if (targetGroup.TargetGroupAsText.Contains("~"))
                 {

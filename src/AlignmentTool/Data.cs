@@ -167,9 +167,9 @@ namespace AlignmentTool
         // Output datum is of the form
         //   Hashtable(...source... => ArrayList(TargetGroup{...text..., primaryPosition}))
         //
-        public static GroupTranslationsTable LoadGroups(string file)
+        public static GroupTranslationsTable_Old LoadGroups(string file)
         {
-            GroupTranslationsTable table = new GroupTranslationsTable();
+            GroupTranslationsTable_Old table = new GroupTranslationsTable_Old();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -178,18 +178,18 @@ namespace AlignmentTool
                 if (groups.Length == 3)
                 {
                     string source = groups[0].Trim();
-                    GroupTranslation tg = new GroupTranslation();
+                    GroupTranslation_Old tg = new GroupTranslation_Old();
                     tg.TargetGroupAsText = groups[1].Trim().ToLower();
                     tg.PrimaryPosition = Int32.Parse(groups[2].Trim());
 
                     if (table.ContainsSourceGroupKey(source))
                     {
-                        GroupTranslations targets = table.TranslationsForSourceGroup(source);
+                        GroupTranslations_Old targets = table.TranslationsForSourceGroup(source);
                         targets.Add(tg);
                     }
                     else
                     {
-                        GroupTranslations targets = new GroupTranslations();
+                        GroupTranslations_Old targets = new GroupTranslations_Old();
                         targets.Add(tg);
                         table.Add(source, targets);
                     }
@@ -403,14 +403,14 @@ namespace AlignmentTool
             return strongTable;
         }
 
-        public static void UpdateGroups(GroupTranslationsTable groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
+        public static void UpdateGroups(GroupTranslationsTable_Old groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
         {
             string sourceText = GetSourceText(sourceLinks, manuscript);
-            GroupTranslation targetGroup = GetTargetText(targetLinks, translation);
+            GroupTranslation_Old targetGroup = GetTargetText(targetLinks, translation);
 
             if (groups.ContainsSourceGroupKey(sourceText))
             {
-                GroupTranslations translations = groups.TranslationsForSourceGroup(sourceText);
+                GroupTranslations_Old translations = groups.TranslationsForSourceGroup(sourceText);
                 if (!HasGroup(translations, targetGroup))
                 {
                     translations.Add(targetGroup);
@@ -418,17 +418,17 @@ namespace AlignmentTool
             }
             else
             {
-                GroupTranslations translations = new GroupTranslations();
+                GroupTranslations_Old translations = new GroupTranslations_Old();
                 translations.Add(targetGroup);
                 groups.Add(sourceText, translations);
             }
         }
 
-        public static bool HasGroup(GroupTranslations translations, GroupTranslation targetGroup)
+        public static bool HasGroup(GroupTranslations_Old translations, GroupTranslation_Old targetGroup)
         {
             bool hasGroup = false;
 
-            foreach (GroupTranslation tg in translations.AllTranslations)
+            foreach (GroupTranslation_Old tg in translations.AllTranslations)
             {
                 if (tg.TargetGroupAsText == targetGroup.TargetGroupAsText)
                 {
@@ -458,13 +458,13 @@ namespace AlignmentTool
             return text.Trim();
         }
 
-        static GroupTranslation GetTargetText(int[] targetLinks, Translation translation)
+        static GroupTranslation_Old GetTargetText(int[] targetLinks, Translation translation)
         {
             string text = string.Empty;
             int primaryIndex = targetLinks[0];
             Array.Sort(targetLinks);
 
-            GroupTranslation tg = new GroupTranslation();
+            GroupTranslation_Old tg = new GroupTranslation_Old();
             tg.PrimaryPosition = GetPrimaryPosition(primaryIndex, targetLinks);
 
             int prevIndex = -1;
@@ -558,7 +558,7 @@ namespace AlignmentTool
         // In addition, this routine calls UpdateGroups() whenever it encounters
         // a link that is not one-to-one.
         //
-        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, GroupTranslationsTable groups)
+        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, GroupTranslationsTable_Old groups)
         {
             Dictionary<string, Dictionary<string, string>> oldLinks =
                 new Dictionary<string, Dictionary<string, string>>();
