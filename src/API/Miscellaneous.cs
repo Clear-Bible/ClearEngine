@@ -154,4 +154,11 @@ namespace ClearBible.Clear3.API
 
         public Score(double d) { Double = d; }
     }
+
+    // FIXME
+    public class Gloss
+    {
+        public string Gloss1;
+        public string Gloss2;
+    }
 }

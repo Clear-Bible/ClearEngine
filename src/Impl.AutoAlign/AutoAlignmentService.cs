@@ -56,7 +56,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
-            object iGlossTable,
+            Dictionary<string, Gloss> glossTable,
             Dictionary<string, Dictionary<string, string>> oldLinks,
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
@@ -66,7 +66,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             // Go from abstract to concrete data types:
             GroupTranslationsTable groups = (GroupTranslationsTable)iGroups;
-            Dictionary<string, Gloss> glossTable = (Dictionary<string, Gloss>)iGlossTable;
 
             ChapterID prevChapter = ChapterID.None;
 

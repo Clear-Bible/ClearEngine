@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 
 using Data = AlignmentTool.Data;
-using Gloss = GBI_Aligner.Gloss;
+using Gloss = ClearBible.Clear3.API.Gloss;
 using BookTables = Utilities.BookTables;
 
 
