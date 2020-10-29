@@ -166,9 +166,9 @@ namespace GBI_Aligner
         public string Morph;
     }
 
-    public class Gloss
-    {
-        public string Gloss1;
-        public string Gloss2;
-    }
+    //public class Gloss
+    //{
+    //    public string Gloss1;
+    //    public string Gloss2;
+    //}
 }

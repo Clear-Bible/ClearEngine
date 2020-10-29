@@ -40,7 +40,7 @@ namespace ClearBible.Clear3.API
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
-            object glossTable,
+            Dictionary<string, Gloss> glossTable,
             Dictionary<string, Dictionary<string, string>> oldLinks,
             List<string> sourceFuncWords,
             List<string> targetFuncWords,

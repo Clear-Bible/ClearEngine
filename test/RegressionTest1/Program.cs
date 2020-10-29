@@ -10,7 +10,7 @@ using TransModels;
 using Utilities;
 
 using Data = AlignmentTool.Data;
-using Gloss = GBI_Aligner.Gloss;
+using Gloss = ClearBible.Clear3.API.Gloss;
 using Line = GBI_Aligner.Line;
 
 using ClearBible.Clear3.Impl.Data;
