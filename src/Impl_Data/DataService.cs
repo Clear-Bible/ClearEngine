@@ -25,7 +25,7 @@ namespace ClearBible.Clear3.Impl.Data
             new TranslationModel_Old();
 
         public IGroupTranslationsTable CreateEmptyGroupTranslationsTable() =>
-            new GroupTranslationsTable();
+            new GroupTranslationsTable_Old();
 
         public ITranslationPairTable CreateEmptyTranslationPairTable() =>
             new TranslationPairTable_Old();

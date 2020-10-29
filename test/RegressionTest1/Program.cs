@@ -141,7 +141,7 @@ namespace RegressionTest1
             Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
             bool useAlignModel = true;
             int maxPaths = 1000000;
-            GroupTranslationsTable groups = Data.LoadGroups(common("groups.txt"));
+            GroupTranslationsTable_Old groups = Data.LoadGroups(common("groups.txt"));
             List<string> stopWords = Data.GetStopWords(common("stopWords.txt"));
             Dictionary<string, int> goodLinks = Data.GetXLinks(common("goodLinks.txt"));
             int goodLinkMinCount = 3;

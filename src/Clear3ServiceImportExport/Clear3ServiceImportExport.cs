@@ -182,7 +182,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
         }
 
 
-        public IGroupTranslationsTable ImportGroupTranslationsTable(
+        public IGroupTranslationsTable ImportGroupTranslationsTable_Old(
             IClear30ServiceAPI clearService,
             string filePath)
         {
@@ -203,6 +203,34 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
             }
 
             return table;
+        }
+
+        public GroupTranslationsTable ImportGroupTranslationsTable(
+            string filePath)
+        {
+            Dictionary<
+                SourceLemmasAsText,
+                List<Tuple<TargetGroupAsText, PrimaryPosition>>>
+                inner =
+                    File.ReadLines(filePath)
+                    .Select(line =>
+                        line.Split('#').Select(s => s.Trim()).ToList())
+                    .Where(fields => fields.Count == 3)
+                    .Select(fields => new
+                    {
+                        src = new SourceLemmasAsText(fields[0]),
+                        targ = new TargetGroupAsText(fields[1].ToLower()),
+                        pos = new PrimaryPosition(Int32.Parse(fields[2]))
+                    })
+                    .GroupBy(record => record.src)
+                    .ToDictionary(
+                        group => group.Key,
+                        group => group
+                            .Select(record =>
+                                Tuple.Create(record.targ, record.pos))
+                            .ToList());
+
+            return new GroupTranslationsTable(inner);
         }
     }
 }

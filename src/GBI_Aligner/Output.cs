@@ -24,7 +24,7 @@ namespace GBI_Aligner
             ref Alignment2 align, 
             int k, 
             Dictionary<string, Gloss> glossTable, 
-            GroupTranslationsTable groups,
+            GroupTranslationsTable_Old groups,
             Dictionary<string, WordInfo> wordInfoTable
             )
         {
@@ -190,14 +190,14 @@ namespace GBI_Aligner
             }
         }
 
-        static Dictionary<string, int> BuildPrimaryTable(GroupTranslationsTable groups)
+        static Dictionary<string, int> BuildPrimaryTable(GroupTranslationsTable_Old groups)
         {
             Dictionary<string, int> primaryTable = new Dictionary<string, int>();
 
-            foreach (GroupTranslations groupTranslations in
+            foreach (GroupTranslations_Old groupTranslations in
                 groups.AllEntries.Select(kvp => kvp.Value))
             {
-                foreach (GroupTranslation tg in groupTranslations.AllTranslations)
+                foreach (GroupTranslation_Old tg in groupTranslations.AllTranslations)
                 {
                     string tgText = tg.TargetGroupAsText;
                     tgText = tgText.Replace(" ~ ", " ");

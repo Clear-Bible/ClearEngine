@@ -7,12 +7,12 @@ using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.Data
 {
-    public class GroupTranslation
+    public class GroupTranslation_Old
     {
         public string TargetGroupAsText;
         public int PrimaryPosition;
 
-        public GroupTranslation(
+        public GroupTranslation_Old(
             string targetGroupAsText,
             int primaryPosition)
         {
@@ -20,44 +20,44 @@ namespace ClearBible.Clear3.Impl.Data
             PrimaryPosition = primaryPosition;
         }
 
-        public GroupTranslation() { }
+        public GroupTranslation_Old() { }
     }
 
 
-    public class GroupTranslations
+    public class GroupTranslations_Old
     {
-        private List<GroupTranslation> _inner =
-            new List<GroupTranslation>();
+        private List<GroupTranslation_Old> _inner =
+            new List<GroupTranslation_Old>();
 
-        public IEnumerable<GroupTranslation> AllTranslations =>
+        public IEnumerable<GroupTranslation_Old> AllTranslations =>
             _inner;
 
-        public void Add(GroupTranslation targetGroupTranslation)
+        public void Add(GroupTranslation_Old targetGroupTranslation)
         {
             _inner.Add(targetGroupTranslation);
         }
     }
 
 
-    public class GroupTranslationsTable : IGroupTranslationsTable
+    public class GroupTranslationsTable_Old : IGroupTranslationsTable
     {
-        private Dictionary<string, GroupTranslations> _inner =
-            new Dictionary<string, GroupTranslations>();
+        private Dictionary<string, GroupTranslations_Old> _inner =
+            new Dictionary<string, GroupTranslations_Old>();
 
         public bool ContainsSourceGroupKey(string sourceGroupLemmas) =>
             _inner.ContainsKey(sourceGroupLemmas);
 
-        public GroupTranslations TranslationsForSourceGroup(
+        public GroupTranslations_Old TranslationsForSourceGroup(
             string sourceGroupLemmas) =>
                 _inner[sourceGroupLemmas];
 
-        public IEnumerable<KeyValuePair<string, GroupTranslations>>
+        public IEnumerable<KeyValuePair<string, GroupTranslations_Old>>
             AllEntries =>
                 _inner;
 
         public void Add(
             string sourceGroupLemmas,
-            GroupTranslations translations)
+            GroupTranslations_Old translations)
         {
             _inner.Add(sourceGroupLemmas, translations);
         }
@@ -68,14 +68,16 @@ namespace ClearBible.Clear3.Impl.Data
             int primaryPosition)
         {
             if (!_inner.TryGetValue(sourceGroupLemmas,
-                out GroupTranslations groupTranslations))
+                out GroupTranslations_Old groupTranslations))
             {
-                groupTranslations = new GroupTranslations();
+                groupTranslations = new GroupTranslations_Old();
                 _inner.Add(sourceGroupLemmas, groupTranslations);
             }
-            groupTranslations.Add(new GroupTranslation(
+            groupTranslations.Add(new GroupTranslation_Old(
                 targetGroupAsText,
                 primaryPosition));
         }
     }
+
+    // Dictionary<SourceLemmasAsText, List<Tuple<TargetGroupAsText, PrimaryPosition>>>
 }

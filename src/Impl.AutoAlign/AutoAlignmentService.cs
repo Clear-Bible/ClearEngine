@@ -65,7 +65,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             )
         {
             // Go from abstract to concrete data types:
-            GroupTranslationsTable groups = (GroupTranslationsTable)iGroups;
+            GroupTranslationsTable_Old groups = (GroupTranslationsTable_Old)iGroups;
 
             ChapterID prevChapter = ChapterID.None;
 
@@ -118,7 +118,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            GroupTranslationsTable groups, // comes from Data.LoadGroups("groups.txt")
+            GroupTranslationsTable_Old groups, // comes from Data.LoadGroups("groups.txt")
                                            //   of the form (...source... => (TargetGroup{...text..., primaryPosition}))
             Dictionary<string, XmlNode> trees, // verseID => XmlNode
             ref Alignment2 align,  // Output goes here.
