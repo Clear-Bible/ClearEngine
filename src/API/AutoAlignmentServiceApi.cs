@@ -34,7 +34,7 @@ namespace ClearBible.Clear3.API
             bool useAlignModel,
             int maxPaths,
             List<string> puncs,
-            IGroupTranslationsTable groups,
+            GroupTranslationsTable groups,
             List<string> stopWords,
             Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
