@@ -24,7 +24,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlternativesForTerminals candidateTable,  // the output goes here
             XmlNode treeNode, // syntax tree for current verse
             List<TargetWord> tWords, // ArrayList(TargetWord)
-            TranslationModel_Old model,
+            TranslationModel model,
             Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
                                                                     // (source => (target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
@@ -93,7 +93,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static AlternativeCandidates GetTopCandidates(
             SourceWord sWord,
             List<TargetWord> tWords,
-            TranslationModel_Old model,
+            TranslationModel model,
             Dictionary<string, Dictionary<string, Stats>> manModel,
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
@@ -158,10 +158,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     }
                 }
             }
-            else if (model.ContainsSourceLemma(sWord.Lemma))
+            else if (model.Inner.TryGetValue(new Lemma(sWord.Lemma),
+                out Dictionary<TargetMorph, Score> translations))
             {
-                Translations translations = model.TranslationsForSourceLemma(sWord.Lemma);
-
                 for (int i = 0; i < tWords.Count; i++)
                 {
                     TargetWord tWord = tWords[i];
@@ -174,9 +173,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     if (stopWords.Contains(sWord.Lemma)) continue;
                     if (stopWords.Contains(tWord.Text)) continue;
 
-                    if (translations.ContainsTargetText(tWord.Text))
+                    if (translations.TryGetValue(new TargetMorph(tWord.Text),
+                        out Score score))
                     {
-                        double prob = translations.ScoreForTargetText(tWord.Text);
+                        double prob = score.Double;
                         string idKey = sWord.ID + "-" + tWord.ID;
                         double adjustedProb;
                         if (useAlignModel)
