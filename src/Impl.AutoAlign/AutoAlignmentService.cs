@@ -114,7 +114,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         new TargetSegment(targ.Item2.Text, targ.Item1.Legacy)));
 
                 // Align a single verse
-                AlignVerse_WorkInProgress(
+                AlignZone(
                     entryPrime,
                     translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
                     groups, treeService.Legacy, ref align, i, maxPaths, puncs, stopWords,
@@ -130,7 +130,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static void AlignVerse_WorkInProgress(
+        public static void AlignZone(
             TranslationPair entry,
             TranslationModel model, // translation model
             TranslationModel manModel, // manually checked alignments
