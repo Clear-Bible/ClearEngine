@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Tokenizer;
 using TransModels;
 using Utilities;
@@ -13,7 +14,12 @@ using Data = AlignmentTool.Data;
 using Gloss = ClearBible.Clear3.API.Gloss;
 using Line = GBI_Aligner.Line;
 
+using TranslationPairTable = ClearBible.Clear3.API.TranslationPairTable;
 using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
+using TranslationModel = ClearBible.Clear3.API.TranslationModel;
+using Lemma = ClearBible.Clear3.API.Lemma;
+using TargetMorph = ClearBible.Clear3.API.TargetMorph;
+using Score = ClearBible.Clear3.API.Score;
 
 using ClearBible.Clear3.Impl.Data;
 
@@ -171,47 +177,78 @@ namespace RegressionTest1
             Dictionary<string, Dictionary<string, int>> strongs = Data.BuildStrongTable(common("strongs.txt"));
 
             Console.WriteLine("Auto Alignment");
-            GBI_Aligner.AutoAligner.AutoAlign(
-                parallelSourceIdPath, parallelSourceIdLemmaPath,
-                parallelTargetIdPath,
+            //GBI_Aligner.AutoAligner.AutoAlign(
+            //    parallelSourceIdPath, parallelSourceIdLemmaPath,
+            //    parallelTargetIdPath,
+            //    jsonOutput,
+            //    transModel, manTransModel,
+            //    treeFolder,
+            //    bookNames,
+            //    alignProbs, preAlignment, useAlignModel,
+            //    maxPaths,
+            //    puncs, groups_old, stopWords,
+            //    goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
+            //    glossTable,
+            //    oldLinks,
+            //    sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
+
+            TranslationPairTable translationPairTable =
+                importExportService.ImportTranslationPairTableFromLegacy2(
+                    parallelSourceIdLemmaPath,
+                    parallelTargetIdPath);
+
+            TranslationModel transModel2 =
+                importExportService.ImportTranslationModel(transModelPath);
+
+            TranslationModel manTransModel2 =
+                new TranslationModel(
+                    manTransModel.ToDictionary(
+                        kvp => new Lemma(kvp.Key),
+                        kvp => kvp.Value.ToDictionary(
+                            kvp2 => new TargetMorph(kvp2.Key),
+                            kvp2 => new Score(kvp2.Value.Prob))));
+
+            clearService.AutoAlignmentService.AutoAlign(
+                translationPairTable,
                 jsonOutput,
-                transModel, manTransModel,
+                transModel2,
+                manTransModel2,
                 treeFolder,
                 bookNames,
                 alignProbs, preAlignment, useAlignModel,
                 maxPaths,
-                puncs, groups_old, stopWords,
+                puncs, groups, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 glossTable,
                 oldLinks,
                 sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
 
-            string jsonOutputRef = reference("alignment.json");
+            //string jsonOutputRef = reference("alignment.json");
 
-            string jsonText = File.ReadAllText(output("alignment.json"));
-            Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
-            string jsonTextR = File.ReadAllText(reference("alignment.json"));
-            Line[] linesR = JsonConvert.DeserializeObject<Line[]>(jsonTextR);
-            int n = lines.Length;
-            int nR = linesR.Length;
-            if (n != nR)
-            {
-                Console.WriteLine("Unequal numbers of lines.");
-                return;
-            }
-            int differentLines = 0;
-            for (int i = 0; i < n; i++)
-            {
-                Line line = lines[i];
-                Line lineR = linesR[i];
-                if (line.links.Count != lineR.links.Count)
-                {
-                    Console.WriteLine($"Line {i} links {line.links.Count} ref {lineR.links.Count}");
-                    differentLines++;
-                }
-            }
-            Console.WriteLine($"Different lines: {differentLines}");
-            ;
+            //string jsonText = File.ReadAllText(output("alignment.json"));
+            //Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
+            //string jsonTextR = File.ReadAllText(reference("alignment.json"));
+            //Line[] linesR = JsonConvert.DeserializeObject<Line[]>(jsonTextR);
+            //int n = lines.Length;
+            //int nR = linesR.Length;
+            //if (n != nR)
+            //{
+            //    Console.WriteLine("Unequal numbers of lines.");
+            //    return;
+            //}
+            //int differentLines = 0;
+            //for (int i = 0; i < n; i++)
+            //{
+            //    Line line = lines[i];
+            //    Line lineR = linesR[i];
+            //    if (line.links.Count != lineR.links.Count)
+            //    {
+            //        Console.WriteLine($"Line {i} links {line.links.Count} ref {lineR.links.Count}");
+            //        differentLines++;
+            //    }
+            //}
+            //Console.WriteLine($"Different lines: {differentLines}");
+            //;
             
 
 
