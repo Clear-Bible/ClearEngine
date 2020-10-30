@@ -82,6 +82,7 @@ namespace RegressionTest3
 
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
 
+            // FIXME
             IGroupTranslationsTable groups_old =
                 importExportService.ImportGroupTranslationsTable_Old(
                     clearService,
@@ -105,7 +106,7 @@ namespace RegressionTest3
             Dictionary<string, Dictionary<string, string>> oldLinks =
                 Data.GetOldLinks(
                     InPath("oldAlignment.json"),
-                    groups_old as GroupTranslationsTable_Old);
+                    groups);
 
             List<string> sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
             List<string> targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));

@@ -20,13 +20,13 @@ namespace ClearBible.Clear3.API
         public
             Dictionary<
                 SourceLemmasAsText,
-                List<Tuple<TargetGroupAsText, PrimaryPosition>>>
+                HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
             Inner { get; }
 
         public GroupTranslationsTable(
             Dictionary<
                 SourceLemmasAsText,
-                List<Tuple<TargetGroupAsText, PrimaryPosition>>>
+                HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
             inner)
         {
             Inner = inner;
