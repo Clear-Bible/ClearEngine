@@ -13,7 +13,14 @@ using Data = AlignmentTool.Data;
 using Gloss = ClearBible.Clear3.API.Gloss;
 using Line = GBI_Aligner.Line;
 
+using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
+
 using ClearBible.Clear3.Impl.Data;
+
+using IClear30ServiceAPI = ClearBible.Clear3.API.IClear30ServiceAPI;
+using Clear30Service = ClearBible.Clear3.Service.Clear30Service;
+using IClear30ServiceAPIImportExport = ClearBible.Clear3.APIImportExport.IClear30ServiceAPIImportExport;
+using Clear30ServiceImportExport = ClearBible.Clear3.ServiceImportExport.Clear30ServiceImportExport;
 
 namespace RegressionTest1
 {
@@ -32,6 +39,12 @@ namespace RegressionTest1
         static void Main(string[] args)
         {
             Console.WriteLine("Regression Test 1");
+
+            IClear30ServiceAPI clearService =
+                Clear30Service.FindOrCreate();
+
+            IClear30ServiceAPIImportExport importExportService =
+                Clear30ServiceImportExport.Create();
 
             // Check that current directory is reasonable.
             DirectoryInfo dir = new DirectoryInfo(".");
@@ -141,7 +154,12 @@ namespace RegressionTest1
             Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
             bool useAlignModel = true;
             int maxPaths = 1000000;
-            GroupTranslationsTable_Old groups = Data.LoadGroups(common("groups.txt"));
+
+            GroupTranslationsTable_Old groups_old = Data.LoadGroups(common("groups.txt"));
+            GroupTranslationsTable groups = 
+                importExportService.ImportGroupTranslationsTable(
+                    common("groups.txt"));
+
             List<string> stopWords = Data.GetStopWords(common("stopWords.txt"));
             Dictionary<string, int> goodLinks = Data.GetXLinks(common("goodLinks.txt"));
             int goodLinkMinCount = 3;
@@ -162,7 +180,7 @@ namespace RegressionTest1
                 bookNames,
                 alignProbs, preAlignment, useAlignModel,
                 maxPaths,
-                puncs, groups, stopWords,
+                puncs, groups_old, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 glossTable,
                 oldLinks,

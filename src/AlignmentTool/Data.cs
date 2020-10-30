@@ -403,107 +403,67 @@ namespace AlignmentTool
             return strongTable;
         }
 
-        public static void UpdateGroups(GroupTranslationsTable_Old groups, int[] sourceLinks, int[] targetLinks, Manuscript manuscript, Translation translation)
+
+        public static void UpdateGroups(
+            GroupTranslationsTable groups,
+            int[] sourceLinks,
+            int[] targetLinks,
+            Manuscript manuscript,
+            Translation translation)
         {
-            string sourceText = GetSourceText(sourceLinks, manuscript);
-            GroupTranslation_Old targetGroup = GetTargetText(targetLinks, translation);
+            SourceLemmasAsText source = new SourceLemmasAsText(
+                String.Join(
+                    " ",
+                    sourceLinks.Select(link => manuscript.words[link].lemma))
+                .Trim());
 
-            if (groups.ContainsSourceGroupKey(sourceText))
+            int firstTargetLink = targetLinks[0];
+
+            int[] sortedTargetLinks = targetLinks.OrderBy(x => x).ToArray();
+
+            PrimaryPosition primaryPosition = new PrimaryPosition(
+                sortedTargetLinks
+                .Select((link, newIndex) => Tuple.Create(link, newIndex))
+                .First(x => x.Item1 == firstTargetLink)
+                .Item2);
+
+            TargetGroupAsText targetGroupAsText = new TargetGroupAsText(
+                sortedTargetLinks
+                .Aggregate(
+                    Tuple.Create(-1, string.Empty),
+                    (state, targetLink) =>
+                    {
+                        int prevIndex = state.Item1;
+                        string text = state.Item2;
+                        string sep =
+                          (prevIndex >= 0 && (targetLink - prevIndex) > 1)
+                              ? " ~ "
+                              : " ";
+                        return Tuple.Create(
+                            targetLink,
+                            text + sep + translation.words[targetLink].text);
+                    })
+                .Item2
+                .Trim()
+                .ToLower());
+
+            Dictionary<
+                SourceLemmasAsText,
+                HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
+                inner = groups.Inner;
+
+            if (!inner.TryGetValue(source, out var targets))
             {
-                GroupTranslations_Old translations = groups.TranslationsForSourceGroup(sourceText);
-                if (!HasGroup(translations, targetGroup))
-                {
-                    translations.Add(targetGroup);
-                }
+                targets = new HashSet<
+                    Tuple<TargetGroupAsText, PrimaryPosition>> ();
+                inner[source] = targets;
             }
-            else
-            {
-                GroupTranslations_Old translations = new GroupTranslations_Old();
-                translations.Add(targetGroup);
-                groups.Add(sourceText, translations);
-            }
+
+            targets.Add(Tuple.Create(targetGroupAsText, primaryPosition));            
         }
+         
 
-        public static bool HasGroup(GroupTranslations_Old translations, GroupTranslation_Old targetGroup)
-        {
-            bool hasGroup = false;
-
-            foreach (GroupTranslation_Old tg in translations.AllTranslations)
-            {
-                if (tg.TargetGroupAsText == targetGroup.TargetGroupAsText)
-                {
-                    hasGroup = true;
-                    break;
-                }
-            }
-
-            return hasGroup;
-        }
-
-        /// <summary>
-        /// Returns a list of the space-separated lemmas packed into a string.
-        /// </summary>
-        /// 
-        static string GetSourceText(int[] sourceLinks, Manuscript manuscript)
-        {
-            string text = string.Empty;
-
-            for (int i = 0; i < sourceLinks.Length; i++)
-            {
-                int sourceLink = sourceLinks[i];
-                string lemma = manuscript.words[sourceLink].lemma;
-                text += lemma + " ";
-            }
-
-            return text.Trim();
-        }
-
-        static GroupTranslation_Old GetTargetText(int[] targetLinks, Translation translation)
-        {
-            string text = string.Empty;
-            int primaryIndex = targetLinks[0];
-            Array.Sort(targetLinks);
-
-            GroupTranslation_Old tg = new GroupTranslation_Old();
-            tg.PrimaryPosition = GetPrimaryPosition(primaryIndex, targetLinks);
-
-            int prevIndex = -1;
-            for (int i = 0; i < targetLinks.Length; i++)
-            {
-                int targetLink = targetLinks[i];
-                string word = string.Empty;
-                if (prevIndex >= 0 && (targetLink - prevIndex) > 1)
-                {
-                    word = "~ " + translation.words[targetLink].text;
-                }
-                else
-                {
-                    word = translation.words[targetLink].text;
-                }
-                tg.TargetGroupAsText += word + " ";
-                prevIndex = targetLink;
-            }
-
-            tg.TargetGroupAsText = tg.TargetGroupAsText.Trim().ToLower();
-
-            return tg;
-        }
-
-        static int GetPrimaryPosition(int primaryIndex, int[] targetLinks)
-        {
-            int primaryPosition = 0;
-
-            for (int i = 0; i < targetLinks.Length; i++)
-            {
-                if (primaryIndex == targetLinks[i])
-                {
-                    primaryPosition = i;
-                    break;
-                }
-            }
-
-            return primaryPosition;
-        }
+        
 
         // public class Line
         //{
@@ -558,7 +518,7 @@ namespace AlignmentTool
         // In addition, this routine calls UpdateGroups() whenever it encounters
         // a link that is not one-to-one.
         //
-        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, GroupTranslationsTable_Old groups)
+        public static Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, GroupTranslationsTable groups)
         {
             Dictionary<string, Dictionary<string, string>> oldLinks =
                 new Dictionary<string, Dictionary<string, string>>();
