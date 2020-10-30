@@ -77,7 +77,7 @@ namespace GBI_Aligner
             FillGaps(candidateTable);
         }
 
-        static void FillGaps(AlternativesForTerminals candidateTable)
+        public static void FillGaps(AlternativesForTerminals candidateTable)
         {
             List<string> gaps = FindGaps(candidateTable);
 
@@ -106,7 +106,7 @@ namespace GBI_Aligner
             return gaps;
         }
 
-        static void ResolveConflicts(AlternativesForTerminals candidateTable)
+        public static void ResolveConflicts(AlternativesForTerminals candidateTable)
         {
             Dictionary<string, List<string>> conflicts = FindConflicts(candidateTable);
 

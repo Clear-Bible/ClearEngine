@@ -400,7 +400,7 @@ namespace GBI_Aligner
             => !sourceFuncWords.Contains(lemma);
  
 
-        static double FindBestProb(Dictionary<TargetWord, double> probs)
+        public static double FindBestProb(Dictionary<TargetWord, double> probs)
         {
             return probs
                 .Select(kvp => kvp.Value)
@@ -410,7 +410,7 @@ namespace GBI_Aligner
 
 
 
-        static List<Candidate> GetCandidatesWithSpecifiedProbability(double bestProb, Dictionary<TargetWord, double> probs)
+        public static List<Candidate> GetCandidatesWithSpecifiedProbability(double bestProb, Dictionary<TargetWord, double> probs)
         {
             return probs
                 .Where(kvp => kvp.Value == bestProb)
@@ -1086,7 +1086,7 @@ namespace GBI_Aligner
             }
         }
 
-        static List<TargetWord> GetMatchingTwords(Dictionary<string, int> wordIds, List<TargetWord> tWords)
+        public static List<TargetWord> GetMatchingTwords(Dictionary<string, int> wordIds, List<TargetWord> tWords)
         {
             List<TargetWord> matchingTwords = new List<TargetWord>();
 
