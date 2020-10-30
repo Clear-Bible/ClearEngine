@@ -127,7 +127,7 @@ namespace RegressionTest3
                 bookNames,
                 alignProbs, preAlignment, useAlignModel,
                 maxPaths,
-                puncs, groups_old, stopWords,
+                puncs, groups, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 glossTable,
                 oldLinks,

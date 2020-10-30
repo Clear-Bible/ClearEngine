@@ -50,7 +50,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             bool useAlignModel,
             int maxPaths,
             List<string> puncs,
-            IGroupTranslationsTable iGroups,
+            GroupTranslationsTable groups,
             List<string> stopWords,
             Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
@@ -64,8 +64,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            // Go from abstract to concrete data types:
-            GroupTranslationsTable_Old groups = (GroupTranslationsTable_Old)iGroups;
 
             ChapterID prevChapter = ChapterID.None;
 
@@ -118,8 +116,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
-            GroupTranslationsTable_Old groups, // comes from Data.LoadGroups("groups.txt")
-                                           //   of the form (...source... => (TargetGroup{...text..., primaryPosition}))
+            GroupTranslationsTable groups,
             Dictionary<string, XmlNode> trees, // verseID => XmlNode
             ref Alignment2 align,  // Output goes here.
             int i,
@@ -234,17 +231,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
+
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
-            Groups.AlignGroups(links2, sWords, tWords, groups, terminals);
+            GroupTranslationsTable_Old groups_old =
+                new GroupTranslationsTable_Old();
+            foreach (var kvp in groups.Inner)
+                foreach (var x in kvp.Value)
+                    groups_old.AddEntry(
+                        kvp.Key.Text,
+                        x.Item1.Text,
+                        x.Item2.Int);
+
+            Groups.AlignGroups(links2, sWords, tWords, groups_old, terminals);
             Align2.FixCrossingLinks(ref links2);
 
-            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups, wordInfoTable);
+            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
             // In spite of its name, Output.WriteAlignment does not touch the
             // filesystem; it puts its result in align[i].
 
             Line line2 = MakeLineWip(segBridgeTable, sWords, tWords, glossTable, wordInfoTable);
- 
         }
 
 
