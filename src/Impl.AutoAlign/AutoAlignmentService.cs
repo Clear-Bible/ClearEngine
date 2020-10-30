@@ -208,8 +208,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             AlternativesForTerminals terminalCandidates =
                 new AlternativesForTerminals();
-            TerminalCandidates.GetTerminalCandidates(
-                terminalCandidates, treeNode, tWords, modelPrime, manModelPrime,
+            TerminalCandidates2.GetTerminalCandidates(
+                terminalCandidates, treeNode, tWords, model, manModelPrime,
                 alignProbs, useAlignModel, tWords.Count, verseID, puncs, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 existingLinks, idMap, sourceFuncWords, contentWordsOnly,
