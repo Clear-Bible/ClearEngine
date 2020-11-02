@@ -25,7 +25,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             XmlNode treeNode, // syntax tree for current verse
             List<TargetWord> tWords, // ArrayList(TargetWord)
             TranslationModel model,
-            Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
+            TranslationModel manModel, // manually checked alignments
                                                                     // (source => (target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
@@ -94,7 +94,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             SourceWord sWord,
             List<TargetWord> tWords,
             TranslationModel model,
-            Dictionary<string, Dictionary<string, Stats>> manModel,
+            TranslationModel manModel,
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
             int n, // number of target tokens (not actually used)
@@ -143,18 +143,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 return topCandidates;
             }
 
-            if (manModel.ContainsKey(sWord.Lemma))
+            if (manModel.Inner.TryGetValue(new Lemma(sWord.Lemma),
+                out Dictionary<TargetMorph, Score> manTranslations))
             {
-                Dictionary<string, Stats> translations = manModel[sWord.Lemma];
-
                 for (int i = 0; i < tWords.Count; i++)
                 {
                     TargetWord tWord = tWords[i];
-                    if (translations.ContainsKey(tWord.Text))
+                    if (manTranslations.TryGetValue(new TargetMorph(tWord.Text),
+                        out Score manScore))
                     {
-                        Stats s = translations[tWord.Text];
-                        if (s.Prob < 0.2) s.Prob = 0.2;
-                        probs.Add(tWord, Math.Log(s.Prob));
+                        double prob = manScore.Double;
+                        if (prob < 0.2) prob = 0.2;
+                        probs.Add(tWord, Math.Log(prob));
                     }
                 }
             }

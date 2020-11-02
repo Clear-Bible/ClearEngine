@@ -194,18 +194,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 existingLinks = oldLinks[verseID];
             }
 
-            Dictionary<string, Dictionary<string, Stats>> manModelPrime =
-                manModel.Inner
-                .ToDictionary(
-                    kvp => kvp.Key.Text,
-                    kvp => kvp.Value.ToDictionary(
-                        kvp2 => kvp2.Key.Text,
-                        kvp2 => new Stats() { Prob = kvp2.Value.Double, Count = 1 }));
-
             AlternativesForTerminals terminalCandidates =
                 new AlternativesForTerminals();
             TerminalCandidates2.GetTerminalCandidates(
-                terminalCandidates, treeNode, tWords, model, manModelPrime,
+                terminalCandidates, treeNode, tWords, model, manModel,
                 alignProbs, useAlignModel, tWords.Count, verseID, puncs, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 existingLinks, idMap, sourceFuncWords, contentWordsOnly,
