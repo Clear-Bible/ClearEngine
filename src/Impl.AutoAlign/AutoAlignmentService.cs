@@ -68,7 +68,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             TranslationModel manTransModel,
             string treeFolder,
             Dictionary<string, string> bookNames,
-            Dictionary<string, double> alignProbs,
+            AlignmentModel alignProbs,
             Dictionary<string, string> preAlignment,
             bool useAlignModel,
             int maxPaths,
@@ -136,7 +136,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             TranslationPair entry,
             TranslationModel model, // translation model
             TranslationModel manModel, // manually checked alignments
-            Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            AlignmentModel alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             GroupTranslationsTable groups,
