@@ -153,10 +153,24 @@ namespace RegressionTest1
 
             string jsonOutput = output("alignment.json");
 
-            TranslationModel_Old transModel =
-                Data.GetTranslationModel(transModelPath);
+            TranslationPairTable translationPairTable =
+                importExportService.ImportTranslationPairTableFromLegacy2(
+                    parallelSourceIdLemmaPath,
+                    parallelTargetIdPath);
+
+            TranslationModel transModel2 =
+                importExportService.ImportTranslationModel(transModelPath);
+
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(common("manTransModel.txt"));
+
+            TranslationModel manTransModel2 =
+                new TranslationModel(
+                    manTransModel.ToDictionary(
+                        kvp => new Lemma(kvp.Key),
+                        kvp => kvp.Value.ToDictionary(
+                            kvp2 => new TargetMorph(kvp2.Key),
+                            kvp2 => new Score(kvp2.Value.Prob))));
 
 
             AlignmentModel alignProbs2 =
@@ -181,37 +195,7 @@ namespace RegressionTest1
             Dictionary<string, Dictionary<string, int>> strongs = Data.BuildStrongTable(common("strongs.txt"));
 
             Console.WriteLine("Auto Alignment");
-            //GBI_Aligner.AutoAligner.AutoAlign(
-            //    parallelSourceIdPath, parallelSourceIdLemmaPath,
-            //    parallelTargetIdPath,
-            //    jsonOutput,
-            //    transModel, manTransModel,
-            //    treeFolder,
-            //    bookNames,
-            //    alignProbs, preAlignment, useAlignModel,
-            //    maxPaths,
-            //    puncs, groups_old, stopWords,
-            //    goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
-            //    glossTable,
-            //    oldLinks,
-            //    sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
-
-            TranslationPairTable translationPairTable =
-                importExportService.ImportTranslationPairTableFromLegacy2(
-                    parallelSourceIdLemmaPath,
-                    parallelTargetIdPath);
-
-            TranslationModel transModel2 =
-                importExportService.ImportTranslationModel(transModelPath);
-
-            TranslationModel manTransModel2 =
-                new TranslationModel(
-                    manTransModel.ToDictionary(
-                        kvp => new Lemma(kvp.Key),
-                        kvp => kvp.Value.ToDictionary(
-                            kvp2 => new TargetMorph(kvp2.Key),
-                            kvp2 => new Score(kvp2.Value.Prob))));
-
+           
             clearService.AutoAlignmentService.AutoAlign(
                 translationPairTable,
                 jsonOutput,

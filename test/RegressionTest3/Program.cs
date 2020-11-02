@@ -61,12 +61,12 @@ namespace RegressionTest3
             TranslationModel transModel =
                 importExportService.ImportTranslationModel(transModelPath);
 
-            Dictionary<string, Dictionary<string, Stats>> manTransModel =
+            Dictionary<string, Dictionary<string, Stats>> manTransModelOrig =
                 Data.GetTranslationModel2(manTransModelPath);
 
-            TranslationModel manTransModel2 =
+            TranslationModel manTransModel =
                 new TranslationModel(
-                    manTransModel.ToDictionary(
+                    manTransModelOrig.ToDictionary(
                         kvp => new Lemma(kvp.Key),
                         kvp => kvp.Value.ToDictionary(
                             kvp2 => new TargetMorph(kvp2.Key),
@@ -82,17 +82,9 @@ namespace RegressionTest3
 
             List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
 
-            // FIXME
-            IGroupTranslationsTable groups_old =
-                importExportService.ImportGroupTranslationsTable_Old(
-                    clearService,
-                    InPath("groups.txt"));
-
             GroupTranslationsTable groups =
                 importExportService.ImportGroupTranslationsTable(
                     InPath("groups.txt"));
-
-            var groups2 = groups.Inner.Take(10);
 
             List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
@@ -122,7 +114,7 @@ namespace RegressionTest3
                 translationPairTable,
                 jsonOutput,
                 transModel,
-                manTransModel2,
+                manTransModel,
                 treeFolder,
                 bookNames,
                 alignmentModel, useAlignModel,
