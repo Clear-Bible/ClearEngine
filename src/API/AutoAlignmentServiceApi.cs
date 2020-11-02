@@ -30,7 +30,6 @@ namespace ClearBible.Clear3.API
             string treeFolder,
             Dictionary<string, string> bookNames,
             AlignmentModel alignProbs,
-            Dictionary<string, string> preAlignment,
             bool useAlignModel,
             int maxPaths,
             List<string> puncs,

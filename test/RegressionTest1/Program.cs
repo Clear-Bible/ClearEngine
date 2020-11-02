@@ -157,8 +157,7 @@ namespace RegressionTest1
                 Data.GetTranslationModel(transModelPath);
             Dictionary<string, Dictionary<string, Stats>> manTransModel =
                 Data.GetTranslationModel2(common("manTransModel.txt"));
-            Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
-            Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
+
 
             AlignmentModel alignProbs2 =
                 importExportService.ImportAlignmentModel(alignModelPath);
@@ -220,7 +219,7 @@ namespace RegressionTest1
                 manTransModel2,
                 treeFolder,
                 bookNames,
-                alignProbs2, preAlignment, useAlignModel,
+                alignProbs2, useAlignModel,
                 maxPaths,
                 puncs, groups, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,

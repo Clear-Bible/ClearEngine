@@ -74,16 +74,8 @@ namespace RegressionTest3
 
             Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
-            Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
-            Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
-
             AlignmentModel alignmentModel = importExportService.ImportAlignmentModel(
                 alignModelPath);
-
-            Dictionary<string, double> alignProbs2 =
-                alignmentModel.Inner.ToDictionary(
-                    kvp => $"{kvp.Key.Item1.Legacy}-{kvp.Key.Item2.Legacy}",
-                    kvp => kvp.Value.Double);
 
             bool useAlignModel = true;
             int maxPaths = 1000000;
@@ -133,7 +125,7 @@ namespace RegressionTest3
                 manTransModel2,
                 treeFolder,
                 bookNames,
-                alignmentModel, preAlignment, useAlignModel,
+                alignmentModel, useAlignModel,
                 maxPaths,
                 puncs, groups, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
