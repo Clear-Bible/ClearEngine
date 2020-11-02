@@ -69,7 +69,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string treeFolder,
             Dictionary<string, string> bookNames,
             AlignmentModel alignProbs,
-            Dictionary<string, string> preAlignment,
             bool useAlignModel,
             int maxPaths,
             List<string> puncs,
@@ -99,6 +98,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int i = 0;
 
             TreeService treeService = new TreeService(treeFolder, bookNames);
+
+            Dictionary<string, string> preAlignment =
+                alignProbs.Inner.Keys
+                .GroupBy(pair => pair.Item1)
+                .Where(group => group.Any())
+                .ToDictionary(
+                    group => group.Key.Legacy,
+                    group => group.First().Item2.Legacy);
 
             foreach (
                 Tuple<
