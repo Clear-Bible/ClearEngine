@@ -29,7 +29,7 @@ namespace ClearBible.Clear3.API
             TranslationModel manTransModel,
             string treeFolder,
             Dictionary<string, string> bookNames,
-            Dictionary<string, double> alignProbs,
+            AlignmentModel alignProbs,
             Dictionary<string, string> preAlignment,
             bool useAlignModel,
             int maxPaths,

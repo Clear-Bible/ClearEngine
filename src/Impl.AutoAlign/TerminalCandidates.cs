@@ -27,7 +27,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             TranslationModel model,
             TranslationModel manModel, // manually checked alignments
                                                                     // (source => (target => Stats{ count, probability})
-            Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            AlignmentModel alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
             int n,  // number of target tokens
             string verseID, // from the syntax tree
@@ -95,7 +95,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<TargetWord> tWords,
             TranslationModel model,
             TranslationModel manModel,
-            Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
+            AlignmentModel alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
             int n, // number of target tokens (not actually used)
             List<string> puncs,
@@ -177,13 +177,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         out Score score))
                     {
                         double prob = score.Double;
-                        string idKey = sWord.ID + "-" + tWord.ID;
+
+                        Tuple<SourceID, TargetID> key = Tuple.Create(
+                            new SourceID(sWord.ID),
+                            new TargetID(tWord.ID));
+
                         double adjustedProb;
+
                         if (useAlignModel)
                         {
-                            if (alignProbs.ContainsKey(idKey))
+                            if (alignProbs.Inner.TryGetValue(key,
+                                out Score score2))
                             {
-                                double aProb = (double)alignProbs[idKey];
+                                double aProb = score2.Double;
                                 adjustedProb = prob + ((1.0 - prob) * aProb);
                             }
                             else

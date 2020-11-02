@@ -20,6 +20,7 @@ using TranslationModel = ClearBible.Clear3.API.TranslationModel;
 using Lemma = ClearBible.Clear3.API.Lemma;
 using TargetMorph = ClearBible.Clear3.API.TargetMorph;
 using Score = ClearBible.Clear3.API.Score;
+using AlignmentModel = ClearBible.Clear3.API.AlignmentModel;
 
 using ClearBible.Clear3.Impl.Data;
 
@@ -158,6 +159,10 @@ namespace RegressionTest1
                 Data.GetTranslationModel2(common("manTransModel.txt"));
             Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
             Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
+
+            AlignmentModel alignProbs2 =
+                importExportService.ImportAlignmentModel(alignModelPath);
+
             bool useAlignModel = true;
             int maxPaths = 1000000;
 
@@ -215,7 +220,7 @@ namespace RegressionTest1
                 manTransModel2,
                 treeFolder,
                 bookNames,
-                alignProbs, preAlignment, useAlignModel,
+                alignProbs2, preAlignment, useAlignModel,
                 maxPaths,
                 puncs, groups, stopWords,
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
