@@ -110,7 +110,7 @@ namespace GBI_Aligner
         }
 
 
-        static void AlignWord(
+        public static void AlignWord(
             ref MappedWords link, // (target word is fake)
             List<TargetWord> targetWords,
             Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
@@ -416,7 +416,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<string> GetLinkedTargets(List<MappedWords> links)
+        public static List<string> GetLinkedTargets(List<MappedWords> links)
         {
             return links
                 .Where(mw => !mw.TargetNode.Word.IsFake)
@@ -425,7 +425,7 @@ namespace GBI_Aligner
         }
 
 
-        static void GetLinkedWords(ArrayList path, List<LinkedWord> links, double prob)
+        public static void GetLinkedWords(ArrayList path, List<LinkedWord> links, double prob)
         {
             ArrayList words = new ArrayList();
 
@@ -517,7 +517,7 @@ namespace GBI_Aligner
         }
 
 
-        static Dictionary<string, MappedWords> CreateLinksTable(List<MappedWords> links)
+        public static Dictionary<string, MappedWords> CreateLinksTable(List<MappedWords> links)
         {
             return links
                 .Where(mw => !mw.TargetNode.Word.IsFake)
