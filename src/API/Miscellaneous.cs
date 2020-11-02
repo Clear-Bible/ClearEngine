@@ -12,6 +12,14 @@ namespace ClearBible.Clear3.API
             StatusCode = statusCode;
         }
 
+        public ClearException(
+            string message,
+            StatusCode statusCode)
+            : base(message)
+        {
+
+        }
+
         public StatusCode StatusCode { get; private set; }
     }
 
@@ -19,6 +27,7 @@ namespace ClearBible.Clear3.API
     public enum StatusCode
     {
         OK,
+        InvalidInput,
         SetLocalResourceFolderFailed,
         QueryLocalResourcesFailed,
         NullOrBlankKey,

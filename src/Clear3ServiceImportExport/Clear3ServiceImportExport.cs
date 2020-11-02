@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 
 
@@ -181,6 +182,49 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
                         row => row.score)));
         }
 
+
+        public AlignmentModel ImportAlignmentModel(
+            string filePath)
+        {
+            Regex regex = new Regex(
+                @"^\s*(\d+)\s*-\s*(\d+)\s+(\S+)\s*$",
+                RegexOptions.Compiled);
+
+            Dictionary<Tuple<SourceID, TargetID>, Score>
+                inner =
+                File.ReadLines(filePath)
+                .Select(interpretLine)
+                .ToDictionary(item => item.Item1, item => item.Item2);
+
+            return new AlignmentModel(inner);
+
+            Tuple<Tuple<SourceID, TargetID>, Score> interpretLine(
+                string line, int index)
+            {
+                Match m = regex.Match(line);
+                if (!m.Success)
+                    error(index, "invalid input syntax");
+                if (m.Groups[1].Length != 12)
+                    error(index, "source ID must have 12 digits");
+                if (m.Groups[2].Length != 11)
+                    error(index, "target ID must have 11 digits");
+                if (!double.TryParse(m.Groups[3].Value, out double score))
+                    error(index, "third field must be a number");
+                return Tuple.Create(
+                    Tuple.Create(
+                        new SourceID(m.Groups[1].Value),
+                        new TargetID(m.Groups[2].Value)),
+                    new Score(score));
+            }
+
+            void error(int index, string msg)
+            {
+                throw new ClearException(
+                    $"{filePath} line {index + 1}: {msg}",
+                    StatusCode.InvalidInput);
+            }
+        }
+               
 
         public IGroupTranslationsTable ImportGroupTranslationsTable_Old(
             IClear30ServiceAPI clearService,

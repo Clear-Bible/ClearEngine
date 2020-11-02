@@ -10,6 +10,9 @@ namespace ClearBible.Clear3.APIImportExport
         TranslationModel ImportTranslationModel(
             string filePath);
 
+        AlignmentModel ImportAlignmentModel(
+            string filePath);
+
         GroupTranslationsTable ImportGroupTranslationsTable(
             string filePath);
 
