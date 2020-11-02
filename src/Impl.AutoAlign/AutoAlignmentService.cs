@@ -32,6 +32,7 @@ using Translation = GBI_Aligner.Translation;
 using TranslationWord = GBI_Aligner.TranslationWord;
 using Link = GBI_Aligner.Link;
 using SourceNode = GBI_Aligner.SourceNode;
+using GBI_Aligner_Data = GBI_Aligner.Data;
 
 
 
@@ -193,12 +194,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 existingLinks = oldLinks[verseID];
             }
 
-            TranslationModel_Old modelPrime =
-                new TranslationModel_Old();
-            foreach (var kvp in model.Inner)
-                foreach (var kvp2 in kvp.Value)
-                    modelPrime.AddEntry(kvp.Key.Text, kvp2.Key.Text, kvp2.Value.Double);
-
             Dictionary<string, Dictionary<string, Stats>> manModelPrime =
                 manModel.Inner
                 .ToDictionary(
@@ -226,8 +221,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Candidate topCandidate = verseAlignment[0];
 
             List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode);
-            List<MappedWords> links = Align2.AlignTheRest(
-                topCandidate, terminals, sWords.Count, tWords, modelPrime,
+            List<MappedWords> links = AlignTheRest(
+                topCandidate, terminals, sWords.Count, tWords, model,
                 preAlignment, useAlignModel, puncs, stopWords, goodLinks,
                 goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords,
                 targetFuncWords, contentWordsOnly);
@@ -282,7 +277,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<XmlNode> terminals,
             int numberSourceWords,
             List<TargetWord> targetWords,
-            TranslationModel_Old model,
+            TranslationModel model,
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             List<string> puncs,
@@ -350,7 +345,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 if (link.TargetNode.Word.IsFake)
                 {
-                    Align2.AlignWord(ref link, targetWords, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
+                    AlignWord(ref link, targetWords, linksTable,
+                        linkedTargets, model, preAlignment, useAlignModel,
+                        puncs, stopWords, goodLinks, goodLinkMinCount,
+                        badLinks, badLinkMinCount, sourceFuncWords,
+                        targetFuncWords, contentWordsOnly);
                 }
             }
 
@@ -366,6 +365,173 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
             return links;
+        }
+
+
+
+        public static void AlignWord(
+            ref MappedWords link, // (target word is fake)
+            List<TargetWord> targetWords,
+            Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
+            List<string> linkedTargets, // target word IDs from non-fake words
+            TranslationModel model, // translation model, (source => (target => probability))
+            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
+            bool useAlignModel,
+            List<string> puncs,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
+            int goodLinkMinCount,
+            Dictionary<string, int> badLinks,
+            int badLinkMinCount,
+            List<string> sourceFuncWords,
+            List<string> targetFuncWords,
+            bool contentWordsOnly
+            )
+        {
+            if (stopWords.Contains(link.SourceNode.Lemma)) return;
+            if (contentWordsOnly && sourceFuncWords.Contains(link.SourceNode.Lemma)) return;
+            if (useAlignModel && preAlignment.ContainsKey(link.SourceNode.MorphID))
+            {
+                string targetID = (string)preAlignment[link.SourceNode.MorphID];
+                if (linkedTargets.Contains(targetID))
+                {
+                    return;
+                }
+                string targetWord = Align2.GetTargetWordTextFromID(targetID, targetWords);
+                string pair = link.SourceNode.Lemma + "#" + targetWord;
+                if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.ContainsKey(pair))
+                {
+                    return;
+                }
+                if (!(badLinks.ContainsKey(pair) || puncs.Contains(targetWord) || stopWords.Contains(targetWord)))
+                {
+                    link.TargetNode.Text = targetWord;
+                    link.TargetNode.Prob = 0;
+                    link.TargetNode.Word.ID = targetID;
+                    link.TargetNode.Word.IsFake = false;
+                    link.TargetNode.Word.Text = targetWord;
+                    link.TargetNode.Word.Position = Align2.GetTargetPositionFromID(targetID, targetWords);
+                    return;
+                }
+            }
+
+            bool stopped = false;
+            List<MappedWords> linkedSiblings = Align2.GetLinkedSiblings(link.SourceNode.TreeNode, linksTable, ref stopped);
+
+            if (linkedSiblings.Count > 0)
+            {
+                MappedWords preNeighbor = Align2.GetPreNeighbor(link, linkedSiblings);
+                MappedWords postNeighbor = Align2.GetPostNeighbor(link, linkedSiblings);
+                List<TargetWord> targetCandidates = new List<TargetWord>();
+                bool foundTarget = false;
+                if (!(preNeighbor == null || postNeighbor == null))
+                {
+                    targetCandidates = Align2.GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    if (targetCandidates.Count > 0)
+                    {
+                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
+                        if (newTarget != null)
+                        {
+                            link.TargetNode = newTarget;
+                            foundTarget = true;
+                        }
+                    }
+                }
+                else if (preNeighbor != null && !foundTarget)
+                {
+                    targetCandidates = Align2.GetTargetCandidates(preNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    if (targetCandidates.Count > 0)
+                    {
+                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
+                        if (newTarget != null)
+                        {
+                            link.TargetNode = newTarget;
+                            foundTarget = true;
+                        }
+                    }
+                }
+                else if (postNeighbor != null && !foundTarget)
+                {
+                    targetCandidates = Align2.GetTargetCandidates(postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    if (targetCandidates.Count > 0)
+                    {
+                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
+                        if (newTarget != null)
+                        {
+                            link.TargetNode = newTarget;
+                        }
+                    }
+                }
+
+            }
+        }
+
+
+
+        public static LinkedWord GetTopCandidate(
+            SourceNode sWord,
+            List<TargetWord> tWords,
+            TranslationModel model,
+            List<string> linkedTargets,
+            List<string> puncs,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
+            int goodLinkMinCount,
+            Dictionary<string, int> badLinks,
+            int badLinkMinCount
+            )
+        {
+            Dictionary<TargetWord, double> probs = new Dictionary<TargetWord, double>();
+
+            for (int i = 0; i < tWords.Count; i++)
+            {
+                TargetWord tWord = (TargetWord)tWords[i];
+                string link = sWord.Lemma + "#" + tWord.Text;
+                if (badLinks.ContainsKey(link) && (int)badLinks[link] >= badLinkMinCount)
+                {
+                    continue;
+                }
+                if (puncs.Contains(tWord.Text)) continue;
+                if (stopWords.Contains(tWord.Text)) continue;
+                if (stopWords.Contains(sWord.Lemma) && !(goodLinks.ContainsKey(link) && (int)goodLinks[link] >= goodLinkMinCount))
+                {
+                    continue;
+                }
+
+                if (linkedTargets.Contains(tWord.ID)) continue;
+
+                //if (model.Inner.ContainsKey(new Lemma(sWord.Lemma)))
+                if (model.Inner.TryGetValue(new Lemma(sWord.Lemma),
+                    out Dictionary<TargetMorph, Score> translations))
+                {
+                    // if (translations.ContainsKey(new TargetMorph(tWord.Text)))
+                    if (translations.TryGetValue(new TargetMorph(tWord.Text),
+                        out Score score))
+                    {
+                        double prob = score.Double;
+                        if (prob >= 0.17)
+                        {
+                            probs.Add(tWord, Math.Log(prob));
+                        }
+                    }
+                }
+            }
+
+            if (probs.Count > 0)
+            {
+                List<TargetWord> candidates = GBI_Aligner_Data.SortWordCandidates(probs);
+
+                TargetWord topCandidate = candidates[0];
+                topCandidate.IsFake = false;
+
+                LinkedWord linkedWord = new LinkedWord();
+                linkedWord.Prob = probs[topCandidate];
+                linkedWord.Text = topCandidate.Text;
+                linkedWord.Word = topCandidate;
+                return linkedWord;
+            }
+
+            return null;
         }
 
 

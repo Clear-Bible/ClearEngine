@@ -208,7 +208,7 @@ namespace GBI_Aligner
         }
 
 
-        static string GetTargetWordTextFromID(string targetID, List<TargetWord> targetWords)
+        public static string GetTargetWordTextFromID(string targetID, List<TargetWord> targetWords)
         {
             return targetWords
                 .Where(tw => targetID == tw.ID)
@@ -218,7 +218,7 @@ namespace GBI_Aligner
         }
 
 
-        static int GetTargetPositionFromID(string targetID, List<TargetWord> targetWords)
+        public static int GetTargetPositionFromID(string targetID, List<TargetWord> targetWords)
         {
             return targetWords
                 .Where(tw => targetID == tw.ID)
@@ -228,7 +228,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<TargetWord> GetTargetCandidates(MappedWords postNeighbor, List<TargetWord> targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
+        public static List<TargetWord> GetTargetCandidates(MappedWords postNeighbor, List<TargetWord> targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
         {
             List<TargetWord> candidates = new List<TargetWord>();
 
@@ -267,7 +267,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<TargetWord> GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, List<TargetWord> targetWords, List<string> linkedTargets, List<string> puncBounds, List<string> targetFuncWords, bool contentWordsOnly)
+        public static List<TargetWord> GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, List<TargetWord> targetWords, List<string> linkedTargets, List<string> puncBounds, List<string> targetFuncWords, bool contentWordsOnly)
         {
             List<TargetWord> candidates = new List<TargetWord>();
 
@@ -295,7 +295,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<MappedWords> GetLinkedSiblings(
+        public static List<MappedWords> GetLinkedSiblings(
             XmlNode treeNode,
             Dictionary<string, MappedWords> linksTable, // key is source morphId
             ref bool stopped)
@@ -335,7 +335,7 @@ namespace GBI_Aligner
         }
 
 
-        static MappedWords GetPreNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
+        public static MappedWords GetPreNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
             MappedWords preNeighbor = null;
 
@@ -363,7 +363,7 @@ namespace GBI_Aligner
         }
 
 
-        static MappedWords GetPostNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
+        public static MappedWords GetPostNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
             MappedWords postNeighbor = null;
 
@@ -482,7 +482,7 @@ namespace GBI_Aligner
 
  
   
-        static List<MappedWords> FindWinners(List<MappedWords> conflict, int pass)
+        public static List<MappedWords> FindWinners(List<MappedWords> conflict, int pass)
         {
             double prob(MappedWords mw) => mw.TargetNode.Prob;
 
@@ -530,7 +530,7 @@ namespace GBI_Aligner
             return target.Substring(target.LastIndexOf("_") + 1);
         }
 
-        static LinkedWord GetTopCandidate(
+        public static LinkedWord GetTopCandidate(
             SourceNode sWord, 
             List<TargetWord> tWords, 
             TranslationModel_Old model, 
@@ -604,7 +604,7 @@ namespace GBI_Aligner
 
         // lemma => list of MappedGroup
         // where the MappedGroup has just one source and target node
-        static Dictionary<string, List<MappedGroup>> GetUniqueLemmaLinks(List<MappedGroup> links)
+        public static Dictionary<string, List<MappedGroup>> GetUniqueLemmaLinks(List<MappedGroup> links)
         {
             return links
                 .Where(link =>
@@ -616,7 +616,7 @@ namespace GBI_Aligner
                     g => g.ToList());
         }
 
-        static List<CrossingLinks> IdentifyCrossingLinks(Dictionary<string, List<MappedGroup>> uniqueLemmaLinks)
+        public static List<CrossingLinks> IdentifyCrossingLinks(Dictionary<string, List<MappedGroup>> uniqueLemmaLinks)
         {
             return uniqueLemmaLinks.Values
                 .Where(links => links.Count == 2 && Crossing(links))
@@ -628,7 +628,7 @@ namespace GBI_Aligner
                 .ToList();
         }
 
-        static bool Crossing(List<MappedGroup> links)
+        public static bool Crossing(List<MappedGroup> links)
         {
             MappedGroup link1 = links[0];
             MappedGroup link2 = links[1];
@@ -647,7 +647,7 @@ namespace GBI_Aligner
             return false;
         }
 
-        static void SwapTargets(List<CrossingLinks> crossingLinks, List<MappedGroup> links)
+        public static void SwapTargets(List<CrossingLinks> crossingLinks, List<MappedGroup> links)
         {
             for (int i = 0; i < crossingLinks.Count; i++)
             {
