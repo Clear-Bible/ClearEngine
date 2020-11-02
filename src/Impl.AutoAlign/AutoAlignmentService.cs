@@ -31,6 +31,7 @@ using Manuscript = GBI_Aligner.Manuscript;
 using Translation = GBI_Aligner.Translation;
 using TranslationWord = GBI_Aligner.TranslationWord;
 using Link = GBI_Aligner.Link;
+using SourceNode = GBI_Aligner.SourceNode;
 
 
 
@@ -273,6 +274,103 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Line line2 = MakeLineWip(segBridgeTable, sWords, tWords, glossTable, wordInfoTable);
         }
+
+
+
+        public static List<MappedWords> AlignTheRest(
+            Candidate topCandidate,
+            List<XmlNode> terminals,
+            int numberSourceWords,
+            List<TargetWord> targetWords,
+            TranslationModel_Old model,
+            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
+            bool useAlignModel,
+            List<string> puncs,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
+            int goodLinkMinCount,
+            Dictionary<string, int> badLinks,
+            int badLinkMinCount,
+            List<string> sourceFuncWords,
+            List<string> targetFuncWords,
+            bool contentWordsOnly
+            )
+        {
+            //Console.WriteLine("\nAlignTheRest\n\n");
+
+            List<LinkedWord> linkedWords = new List<LinkedWord>();
+            Align2.GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
+
+            // linkedWords has a LinkedWord for each target word found in
+            // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
+            // TargetWord for zero-length sub-paths in topCandidate.sequence.
+
+            List<MappedWords> links = new List<MappedWords>();
+            for (int i = 0; i < terminals.Count; i++)
+            {
+                XmlNode terminal = (XmlNode)terminals[i];
+                SourceNode sourceLink = new SourceNode();
+                sourceLink.MorphID = Utils.GetAttribValue(terminal, "morphId");
+                sourceLink.English = Utils.GetAttribValue(terminal, "English");
+                sourceLink.Lemma = Utils.GetAttribValue(terminal, "UnicodeLemma");
+                sourceLink.Category = Utils.GetAttribValue(terminal, "Cat");
+                sourceLink.Position = Int32.Parse(Utils.GetAttribValue(terminal, "Start"));
+                sourceLink.RelativePos = (double)sourceLink.Position / (double)numberSourceWords;
+                if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
+                sourceLink.TreeNode = terminal;
+                LinkedWord targetLink = linkedWords[i];
+                // (looks like linkedWords and terminals are expected to be
+                // in 1-to-1 correspondence.)
+                MappedWords link = new MappedWords();
+                link.SourceNode = sourceLink;
+                link.TargetNode = targetLink;
+                links.Add(link);
+            }
+
+
+            List<List<MappedWords>> conflicts = Align2.FindConflictingLinks(links);
+
+            if (conflicts.Count > 0)
+            {
+                Align2.ResolveConflicts(conflicts, links, 1);
+            }
+
+
+
+            #region Andi does not use this part anymore.
+
+            List<string> linkedTargets = Align2.GetLinkedTargets(links);
+
+
+            Dictionary<string, MappedWords> linksTable = Align2.CreateLinksTable(links);
+
+            for (int i = 0; i < links.Count; i++)
+            {
+                MappedWords link = (MappedWords)links[i];
+
+                if (link.TargetNode.Word.IsFake)
+                {
+                    Align2.AlignWord(ref link, targetWords, linksTable, linkedTargets, model, preAlignment, useAlignModel, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords, targetFuncWords, contentWordsOnly);
+                }
+            }
+
+            conflicts = Align2.FindConflictingLinks(links);
+
+            if (conflicts.Count > 0)
+            {
+                Align2.ResolveConflicts(conflicts, links, 2);
+            }
+
+            #endregion
+
+
+
+            return links;
+        }
+
+
+
+
 
 
         public static List<SourceWord> MakeSourceWordList(
