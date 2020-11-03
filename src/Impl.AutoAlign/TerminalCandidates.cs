@@ -33,8 +33,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string verseID, // from the syntax tree
             List<string> puncs,
             List<string> stopWords,
-            Dictionary<string, int> goodLinks,  // (link => count)
-            int goodLinkMinCount,
             Dictionary<string, int> badLinks,  // (link => count)
             int badLinkMinCount,
             Dictionary<string, string> existingLinks, // (mWord.altId => tWord.altId)
@@ -70,7 +68,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 AlternativeCandidates topCandidates =
                     GetTopCandidates(sWord, tWords, model, manModel,
                         alignProbs, useAlignModel, n, puncs, stopWords,
-                        goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
+                        badLinks, badLinkMinCount,
                         existingLinks, sourceFuncWords, contentWordsOnly,
                         strongs);
 
@@ -100,8 +98,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int n, // number of target tokens (not actually used)
             List<string> puncs,
             List<string> stopWords,
-            Dictionary<string, int> goodLinks, // (not actually used)
-            int goodLinkMinCount, // (not actually used)
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
             Dictionary<string, string> existingLinks, // (mWord.altId => tWord.altId)
