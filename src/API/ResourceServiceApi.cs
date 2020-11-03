@@ -24,16 +24,34 @@ namespace ClearBible.Clear3.API
     }
 
 
-    public interface LocalResource
+    public class LocalResource
     {
-        Uri Id { get; }
+        public Uri Id { get; }
 
-        DateTime DownloadMoment { get; }
+        public DateTime DownloadMoment { get; }
 
-        bool Ok { get; }
+        public bool Ok { get; }
 
-        string Status { get; }
+        public bool BuiltIn { get; }
 
-        string Description { get; }
+        public string Status { get; }
+
+        public string Description { get; }
+
+        public LocalResource(
+            Uri id,
+            DateTime downloadMoment,
+            bool ok,
+            bool builtIn,
+            string status,
+            string description)
+        {
+            Id = id;
+            DownloadMoment = downloadMoment;
+            Ok = ok;
+            BuiltIn = builtIn;
+            Status = status;
+            Description = description;
+        }
     }
 }
