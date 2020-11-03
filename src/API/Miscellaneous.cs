@@ -165,6 +165,29 @@ namespace ClearBible.Clear3.API
         public Score(double d) { Double = d; }
     }
 
+
+    public readonly struct Count
+    {
+        public readonly int Int;
+
+        public Count(int count)
+        {
+            Int = count;
+        }
+    }
+
+
+    public readonly struct CountThreshold
+    {
+        public readonly int Int;
+
+        public CountThreshold(int countThreshold)
+        {
+            Int = countThreshold;
+        }
+    }
+
+
     // FIXME
     public class Gloss
     {

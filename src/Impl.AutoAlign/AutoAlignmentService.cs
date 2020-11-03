@@ -205,7 +205,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             TerminalCandidates2.GetTerminalCandidates(
                 terminalCandidates, treeNode, tWords, model, manModel,
                 alignProbs, useAlignModel, tWords.Count, verseID, puncs, stopWords,
-                goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
+                badLinks, badLinkMinCount,
                 existingLinks, idMap, sourceFuncWords, contentWordsOnly,
                 strongs);
 
