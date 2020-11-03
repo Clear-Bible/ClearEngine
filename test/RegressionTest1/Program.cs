@@ -21,6 +21,8 @@ using Lemma = ClearBible.Clear3.API.Lemma;
 using TargetMorph = ClearBible.Clear3.API.TargetMorph;
 using Score = ClearBible.Clear3.API.Score;
 using AlignmentModel = ClearBible.Clear3.API.AlignmentModel;
+using IResourceService = ClearBible.Clear3.API.IResourceService;
+using ITreeService = ClearBible.Clear3.API.ITreeService;
 
 using ClearBible.Clear3.Impl.Data;
 
@@ -52,6 +54,21 @@ namespace RegressionTest1
 
             IClear30ServiceAPIImportExport importExportService =
                 Clear30ServiceImportExport.Create();
+
+            IResourceService resourceService = clearService.ResourceService;
+            resourceService.SetLocalResourceFolder("Resources");
+
+            Uri treebankUri =
+                new Uri("https://id.clear.bible/treebank/Clear3Dev");
+
+            if (!resourceService.QueryLocalResources()
+                .Any(r => r.Id.Equals(treebankUri)))
+            {
+                resourceService.DownloadResource(treebankUri);
+            }
+
+            ITreeService treeService =
+                resourceService.GetTreeService(treebankUri);
 
             // Check that current directory is reasonable.
             DirectoryInfo dir = new DirectoryInfo(".");
@@ -85,7 +102,6 @@ namespace RegressionTest1
             string outputFolder = outputFolders[option];
             string referenceFolder = referenceFolders[option];
             string commonFolder = "InputCommon";
-            string treeFolder = "SyntaxTrees";
 
             Func<string,Func<string, string>> prefix =
                 pre => s => Path.Combine(pre, s);
@@ -201,8 +217,7 @@ namespace RegressionTest1
                 jsonOutput,
                 transModel2,
                 manTransModel2,
-                treeFolder,
-                bookNames,
+                treeService,
                 alignProbs2, useAlignModel,
                 maxPaths,
                 puncs, groups, stopWords,
