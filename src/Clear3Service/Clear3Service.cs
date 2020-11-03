@@ -28,8 +28,8 @@ namespace ClearBible.Clear3.Impl.Service
 {
     internal class Clear30ServiceAPI : IClear30ServiceAPI
     {
-        public ResourceService ResourceService =>
-            throw new NotImplementedException();
+        public IResourceService ResourceService { get; } =
+            new ResourceService.ResourceService();
 
         public SMTService SMTService =>
             throw new NotImplementedException();
