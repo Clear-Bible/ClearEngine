@@ -9,7 +9,7 @@ namespace ClearBible.Clear3.API
     /// 
     public interface IClear30ServiceAPI
     {
-        ResourceService ResourceService { get; }
+        IResourceService ResourceService { get; }
 
         SMTService SMTService { get; }
 

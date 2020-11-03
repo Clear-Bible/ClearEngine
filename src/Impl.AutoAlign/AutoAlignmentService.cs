@@ -45,7 +45,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     public class AutoAlignmentService : IAutoAlignmentService
     {
         public Task<AutoAlignmentResult> LaunchAutoAlignmentAsync_Idea1(
-            ITreeService treeService,
+            ITreeService_Old treeService,
             ITranslationPairTable_Old translationPairTable,
             IPhraseTranslationModel smtTransModel,
             PlaceAlignmentModel smtAlignModel,

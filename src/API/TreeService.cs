@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
-    public interface ITreeService
+    public interface ITreeService_Old
     {
         Uri IdUri { get; }
 
@@ -18,5 +18,10 @@ namespace ClearBible.Clear3.API
         string GetMorphology(IPlace place);
 
         long GetLegacyID(IPlace place);
+    }
+
+    public interface ITreeService
+    {
+
     }
 }

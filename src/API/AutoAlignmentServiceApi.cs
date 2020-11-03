@@ -8,7 +8,7 @@ namespace ClearBible.Clear3.API
     public interface IAutoAlignmentService
     {
         Task<AutoAlignmentResult> LaunchAutoAlignmentAsync_Idea1(
-            ITreeService treeService,
+            ITreeService_Old treeService,
             ITranslationPairTable_Old translationPairTable,
             IPhraseTranslationModel smtTransModel,
             PlaceAlignmentModel smtAlignModel,

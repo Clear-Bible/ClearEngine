@@ -14,7 +14,7 @@ namespace ClearBible.Clear3.Impl.TreeService
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Data;
 
-    public class TreeService
+    public class TreeService : ITreeService
     {
         public void GetChapterTree(
             ChapterID chapterID,
