@@ -53,6 +53,29 @@ namespace RegressionTest3
             IClear30ServiceAPIImportExport importExportService =
                 Clear30ServiceImportExport.Create();
 
+            IResourceService resourceService = clearService.ResourceService;
+            resourceService.SetLocalResourceFolder("Resources");
+
+            Uri treebankUri =
+                new Uri("https://id.clear.bible/treebank/Clear3Dev");
+
+            //if (!resourceService.QueryLocalResources()
+            //    .Any(r => r.Id.Equals(treebankUri)))
+            //{
+            //    resourceService.DownloadResource(treebankUri);
+            //}
+
+            resourceService.DownloadResource(treebankUri);
+
+            ITreeService treeService =
+                resourceService.GetTreeService(treebankUri);
+
+            // Proposal: URIs of the form http://id.clear.bible/... serve
+            // metadata about the resource, either as RDF or HTML.
+            // See also: https://www.w3.org/TR/cooluris/
+            // The metadata also points to a location in Github with
+            // the gzipped data for the resource.
+
             TranslationPairTable translationPairTable =
                 importExportService.ImportTranslationPairTableFromLegacy2(
                     parallelSourceIdLemmaPath,

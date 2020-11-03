@@ -1,0 +1,1772 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Sentences>
+<Sentence ID = "2Tm4:1">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040010010211" Length="21" Start="0" End="20">
+  <Node Id="3.1" Cat="CL" Rule="V-ADV" Head="0" Language="G" nodeId="550040010010210" Length="21" Start="0" End="20">
+    <Node Id="3.2" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040010010012" Length="1" Start="0" End="0">
+      <Node Id="3.3" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040010010011" Length="1" Start="0" End="0">
+        <Node Id="3.4" Cat="verb" Lemma="διαμαρτύρομαι" Language="G" UnicodeLemma="διαμαρτύρομαι" morphId="55004001001" StrongNumberX="1263" English="I solemnly charge (you)" Unicode="Διαμαρτύρομαι" nodeId="550040010010010" Start="0" End="0" Analysis="v- 1-s--pni">Διαμαρτύρομαι</Node>
+      </Node>
+    </Node>
+    <Node Id="3.5" Cat="ADV" Rule="ADVaADV" Head="0" Language="G" nodeId="550040010020200" Length="20" Start="1" End="20">
+      <Node Id="3.6" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040010020121" Length="12" Start="1" End="12">
+        <Node Id="3.7" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040010020120" Length="12" Start="1" End="12">
+          <Node Id="3.8" Cat="prep" Lemma="ἐνώπιον" UnicodeLemma="ἐνώπιον" English="before" morphId="55004001002" StrongNumberX="1799" Language="G" Unicode="ἐνώπιον" nodeId="550040010020010" Start="1" End="1" Analysis="p- -----">ἐνώπιον</Node>
+          <Node Id="3.9" Cat="np" Rule="NpaNp" Head="0" Language="G" nodeId="550040010030110" Length="11" Start="2" End="12">
+            <Node Id="3.10" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040010030020" Length="2" Start="2" End="3">
+              <Node Id="3.11" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004001003" StrongNumberX="3588" English="-" Unicode="τοῦ" nodeId="550040010030010" Start="2" End="2" Analysis="ra -gsm-">τοῦ</Node>
+              <Node Id="3.12" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040010040011" Length="1" Start="3" End="3">
+                <Node Id="3.13" Cat="noun" Lemma="θεός" UnicodeLemma="θεός" English="God" morphId="55004001004" StrongNumberX="2316" Language="G" Unicode="θεοῦ" nodeId="550040010040010" Start="3" End="3" Analysis="n- -gsm-">θεοῦ</Node>
+              </Node>
+            </Node>
+            <Node Id="3.14" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004001005" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040010050010" Start="4" End="4" Analysis="c- -----">καὶ</Node>
+            <Node Id="3.15" Cat="np" Rule="Np-Appos" Head="0" Language="G" nodeId="550040010060080" Length="8" Start="5" End="12">
+              <Node Id="3.16" Cat="np" Rule="Np-Appos" Head="0" Language="G" nodeId="550040010060020" Length="2" Start="5" End="6">
+                <Node Id="3.17" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040010060011" Length="1" Start="5" End="5">
+                  <Node Id="3.18" Cat="noun" Lemma="Χριστός" Language="G" UnicodeLemma="Χριστός" morphId="55004001006" StrongNumberX="5547" English="Christ" Unicode="Χριστοῦ" nodeId="550040010060010" Start="5" End="5" Analysis="nr -gsm-">Χριστοῦ</Node>
+                </Node>
+                <Node Id="3.19" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040010070011" Length="1" Start="6" End="6">
+                  <Node Id="3.20" Cat="noun" Lemma="Ἰησοῦς" Language="G" UnicodeLemma="Ἰησοῦς" morphId="55004001007" StrongNumberX="2424" English="Jesus" Unicode="Ἰησοῦ" nodeId="550040010070010" Start="6" End="6" Analysis="nr -gsm-">Ἰησοῦ</Node>
+                </Node>
+              </Node>
+              <Node Id="3.21" Cat="np" Rule="DetCL" Head="1" Language="G" nodeId="550040010080060" Length="6" Start="7" End="12">
+                <Node Id="3.22" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004001008" StrongNumberX="3588" English="the one" Unicode="τοῦ" nodeId="550040010080010" Start="7" End="7" Analysis="ra -gsm-">τοῦ</Node>
+                <Node Id="3.23" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040010090050" Length="5" Start="8" End="12">
+                  <Node Id="3.24" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040010090012" Length="1" Start="8" End="8">
+                    <Node Id="3.25" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040010090011" Length="1" Start="8" End="8">
+                      <Node Id="3.26" Cat="verb" Lemma="μέλλω" Language="G" UnicodeLemma="μέλλω" morphId="55004001009" StrongNumberX="3195" English="being about" Unicode="μέλλοντος" nodeId="550040010090010" Start="8" End="8" Analysis="v- -gsm-pap">μέλλοντος</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="3.27" Cat="O" Rule="CL2Ox" Head="0" Language="G" nodeId="550040010100041" Length="4" Start="9" End="12">
+                    <Node Id="3.28" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040010100040" Length="4" Start="9" End="12">
+                      <Node Id="3.29" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040010100012" Length="1" Start="9" End="9">
+                        <Node Id="3.30" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040010100011" Length="1" Start="9" End="9">
+                          <Node Id="3.31" Cat="verb" Lemma="κρίνω" UnicodeLemma="κρίνω" English="to judge" morphId="55004001010" StrongNumberX="2919" Language="G" Unicode="κρίνειν" nodeId="550040010100010" Start="9" End="9" Analysis="v- -----pan">κρίνειν</Node>
+                        </Node>
+                      </Node>
+                      <Node Id="3.32" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040010110031" Length="3" Start="10" End="12">
+                        <Node Id="3.33" Cat="np" Rule="NpaNp" Head="0" Language="G" nodeId="550040010110030" Length="3" Start="10" End="12">
+                          <Node Id="3.34" Cat="np" Rule="CL2NP" Head="0" Language="G" nodeId="550040010110014" Length="1" Start="10" End="10">
+                            <Node Id="3.35" Cat="CL" Rule="V2CL" Head="0" Language="G" nodeId="550040010110013" Length="1" Start="10" End="10">
+                              <Node Id="3.36" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040010110012" Length="1" Start="10" End="10">
+                                <Node Id="3.37" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040010110011" Length="1" Start="10" End="10">
+                                  <Node Id="3.38" Cat="verb" Lemma="ζάω" Language="G" UnicodeLemma="ζάω" morphId="55004001011" StrongNumberX="2198" English="(the) living" Unicode="ζῶντας" nodeId="550040010110010" Start="10" End="10" Analysis="v- -apm-pap">ζῶντας</Node>
+                                </Node>
+                              </Node>
+                            </Node>
+                          </Node>
+                          <Node Id="3.39" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004001012" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040010120010" Start="11" End="11" Analysis="c- -----">καὶ</Node>
+                          <Node Id="3.40" Cat="np" Rule="Adj2NP" Head="0" Language="G" nodeId="550040010130012" Length="1" Start="12" End="12">
+                            <Node Id="3.41" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040010130011" Length="1" Start="12" End="12">
+                              <Node Id="3.42" Cat="adj" Lemma="νεκρός" Language="G" UnicodeLemma="νεκρός" morphId="55004001013" StrongNumberX="3498" English="dead" Unicode="νεκρούς," nodeId="550040010130010" Start="12" End="12" Analysis="a- -apm-">νεκρούς,</Node>
+                            </Node>
+                          </Node>
+                        </Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="3.43" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004001014" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040010140010" Start="13" End="13" Analysis="c- -----">καὶ</Node>
+      <Node Id="3.44" Cat="ADV" Rule="Np2ADV" Head="0" Language="G" nodeId="550040010150071" Length="7" Start="14" End="20">
+        <Node Id="3.45" Cat="np" Rule="NpaNp" Head="0" Language="G" nodeId="550040010150070" Length="7" Start="14" End="20">
+          <Node Id="3.46" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040010150030" Length="3" Start="14" End="16">
+            <Node Id="3.47" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004001015" StrongNumberX="3588" English="(by) the" Unicode="τὴν" nodeId="550040010150010" Start="14" End="14" Analysis="ra -asf-">τὴν</Node>
+            <Node Id="3.48" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040010160020" Length="2" Start="15" End="16">
+              <Node Id="3.49" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040010160011" Length="1" Start="15" End="15">
+                <Node Id="3.50" Cat="noun" Lemma="ἐπιφάνεια" UnicodeLemma="ἐπιφάνεια" English="appearing" morphId="55004001016" StrongNumberX="2015" Language="G" Unicode="ἐπιφάνειαν" nodeId="550040010160010" Start="15" End="15" Analysis="n- -asf-">ἐπιφάνειαν</Node>
+              </Node>
+              <Node Id="3.51" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040010170011" Length="1" Start="16" End="16">
+                <Node Id="3.52" Cat="pron" Lemma="αὐτός" Language="G" UnicodeLemma="αὐτός" morphId="55004001017" StrongNumberX="0846" English="of Him" Unicode="αὐτοῦ" nodeId="550040010170010" Start="16" End="16" Analysis="rp -gsm-">αὐτοῦ</Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="3.53" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004001018" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040010180010" Start="17" End="17" Analysis="c- -----">καὶ</Node>
+          <Node Id="3.54" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040010190030" Length="3" Start="18" End="20">
+            <Node Id="3.55" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004001019" StrongNumberX="3588" English="the" Unicode="τὴν" nodeId="550040010190010" Start="18" End="18" Analysis="ra -asf-">τὴν</Node>
+            <Node Id="3.56" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040010200020" Length="2" Start="19" End="20">
+              <Node Id="3.57" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040010200011" Length="1" Start="19" End="19">
+                <Node Id="3.58" Cat="noun" Lemma="βασιλεία" Language="G" UnicodeLemma="βασιλεία" morphId="55004001020" StrongNumberX="0932" English="kingdom" Unicode="βασιλείαν" nodeId="550040010200010" Start="19" End="19" Analysis="n- -asf-">βασιλείαν</Node>
+              </Node>
+              <Node Id="3.59" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040010210011" Length="1" Start="20" End="20">
+                <Node Id="3.60" Cat="pron" Lemma="αὐτός" Language="G" UnicodeLemma="αὐτός" morphId="55004001021" StrongNumberX="0846" English="of him" Unicode="αὐτοῦ·" nodeId="550040010210010" Start="20" End="20" Analysis="rp -gsm-">αὐτοῦ·</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:2">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040020010141" Length="14" Start="0" End="13">
+  <Node Id="1.1" Cat="CL" Rule="ClClCl" Head="0" Language="G" nodeId="550040020010140" Length="14" Start="0" End="13">
+    <Node Id="1.2" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040020010030" Length="3" Start="0" End="2">
+      <Node Id="1.3" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040020010012" Length="1" Start="0" End="0">
+        <Node Id="1.4" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040020010011" Length="1" Start="0" End="0">
+          <Node Id="1.5" Cat="verb" Lemma="κηρύσσω" Language="G" UnicodeLemma="κηρύσσω" morphId="55004002001" StrongNumberX="2784" English="preach" Unicode="κήρυξον" nodeId="550040020010010" Start="0" End="0" Analysis="v- 2-s--aad">κήρυξον</Node>
+        </Node>
+      </Node>
+      <Node Id="1.6" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040020020021" Length="2" Start="1" End="2">
+        <Node Id="1.7" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040020020020" Length="2" Start="1" End="2">
+          <Node Id="1.8" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004002002" StrongNumberX="3588" English="the" Unicode="τὸν" nodeId="550040020020010" Start="1" End="1" Analysis="ra -asm-">τὸν</Node>
+          <Node Id="1.9" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040020030011" Length="1" Start="2" End="2">
+            <Node Id="1.10" Cat="noun" Lemma="λόγος" Language="G" UnicodeLemma="λόγος" morphId="55004002003" StrongNumberX="3056" English="word" Unicode="λόγον," nodeId="550040020030010" Start="2" End="2" Analysis="n- -asm-">λόγον,</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.11" Cat="CL" Rule="V-ADV" Head="0" Language="G" nodeId="550040020040030" Length="3" Start="3" End="5">
+      <Node Id="1.12" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040020040012" Length="1" Start="3" End="3">
+        <Node Id="1.13" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040020040011" Length="1" Start="3" End="3">
+          <Node Id="1.14" Cat="verb" Lemma="ἐφίστημι" Language="G" UnicodeLemma="ἐφίστημι" morphId="55004002004" StrongNumberX="2186" English="be ready" Unicode="ἐπίστηθι" nodeId="550040020040010" Start="3" End="3" Analysis="v- 2-s--aad">ἐπίστηθι</Node>
+        </Node>
+      </Node>
+      <Node Id="1.15" Cat="ADV" Rule="Advp2ADV" Head="0" Language="G" nodeId="550040020050021" Length="2" Start="4" End="5">
+        <Node Id="1.16" Cat="advp" Rule="2Advp_h1" Head="0" Language="G" nodeId="550040020050020" Length="2" Start="4" End="5">
+          <Node Id="1.17" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040020050011" Length="1" Start="4" End="4">
+            <Node Id="1.18" Cat="adv" Lemma="εὐκαίρως" UnicodeLemma="εὐκαίρως" English="in season" morphId="55004002005" StrongNumberX="2122" Language="G" Unicode="εὐκαίρως" nodeId="550040020050010" Start="4" End="4" Analysis="d- -----">εὐκαίρως</Node>
+          </Node>
+          <Node Id="1.19" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040020060011" Length="1" Start="5" End="5">
+            <Node Id="1.20" Cat="adv" Lemma="ἀκαίρως" UnicodeLemma="ἀκαίρως" English="out of season" morphId="55004002006" StrongNumberX="0171" Language="G" Unicode="ἀκαίρως," nodeId="550040020060010" Start="5" End="5" Analysis="d- -----">ἀκαίρως,</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.21" Cat="CL" Rule="V-ADV" Head="0" Language="G" nodeId="550040020070080" Length="8" Start="6" End="13">
+      <Node Id="1.22" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040020070032" Length="3" Start="6" End="8">
+        <Node Id="1.23" Cat="vp" Rule="CL2VP" Head="0" Language="G" nodeId="550040020070031" Length="3" Start="6" End="8">
+          <Node Id="1.24" Cat="CL" Rule="ClClCl" Head="0" Language="G" nodeId="550040020070030" Length="3" Start="6" End="8">
+            <Node Id="1.25" Cat="CL" Rule="V2CL" Head="0" Language="G" nodeId="550040020070013" Length="1" Start="6" End="6">
+              <Node Id="1.26" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040020070012" Length="1" Start="6" End="6">
+                <Node Id="1.27" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040020070011" Length="1" Start="6" End="6">
+                  <Node Id="1.28" Cat="verb" Lemma="ἐλέγχω" Language="G" UnicodeLemma="ἐλέγχω" morphId="55004002007" StrongNumberX="1651" English="expose" Unicode="ἔλεγξον," nodeId="550040020070010" Start="6" End="6" Analysis="v- 2-s--aad">ἔλεγξον,</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.29" Cat="CL" Rule="V2CL" Head="0" Language="G" nodeId="550040020080013" Length="1" Start="7" End="7">
+              <Node Id="1.30" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040020080012" Length="1" Start="7" End="7">
+                <Node Id="1.31" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040020080011" Length="1" Start="7" End="7">
+                  <Node Id="1.32" Cat="verb" Lemma="ἐπιτιμάω" Language="G" UnicodeLemma="ἐπιτιμάω" morphId="55004002008" StrongNumberX="2008" English="rebuke" Unicode="ἐπιτίμησον," nodeId="550040020080010" Start="7" End="7" Analysis="v- 2-s--aad">ἐπιτίμησον,</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.33" Cat="CL" Rule="V2CL" Head="0" Language="G" nodeId="550040020090013" Length="1" Start="8" End="8">
+              <Node Id="1.34" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040020090012" Length="1" Start="8" End="8">
+                <Node Id="1.35" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040020090011" Length="1" Start="8" End="8">
+                  <Node Id="1.36" Cat="verb" Lemma="παρακαλέω" Language="G" UnicodeLemma="παρακαλέω" morphId="55004002009" StrongNumberX="3870" English="encourage" Unicode="παρακάλεσον," nodeId="550040020090010" Start="8" End="8" Analysis="v- 2-s--aad">παρακάλεσον,</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.37" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040020100051" Length="5" Start="9" End="13">
+        <Node Id="1.38" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040020100050" Length="5" Start="9" End="13">
+          <Node Id="1.39" Cat="prep" Lemma="ἐν" UnicodeLemma="ἐν" English="with" morphId="55004002010" StrongNumberX="1722" Language="G" Unicode="ἐν" nodeId="550040020100010" Start="9" End="9" Analysis="p- -----">ἐν</Node>
+          <Node Id="1.40" Cat="np" Rule="All-NP" Head="1" Language="G" nodeId="550040020110040" Length="4" Start="10" End="13">
+            <Node Id="1.41" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040020110011" Length="1" Start="10" End="10">
+              <Node Id="1.42" Cat="adj" Lemma="πᾶς" Language="G" UnicodeLemma="πᾶς" morphId="55004002011" StrongNumberX="3956" English="all" Unicode="πάσῃ" nodeId="550040020110010" Start="10" End="10" Analysis="a- -dsf-">πάσῃ</Node>
+            </Node>
+            <Node Id="1.43" Cat="np" Rule="NpaNp" Head="0" Language="G" nodeId="550040020120030" Length="3" Start="11" End="13">
+              <Node Id="1.44" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040020120011" Length="1" Start="11" End="11">
+                <Node Id="1.45" Cat="noun" Lemma="μακροθυμία" UnicodeLemma="μακροθυμία" English="longsuffering" morphId="55004002012" StrongNumberX="3115" Language="G" Unicode="μακροθυμίᾳ" nodeId="550040020120010" Start="11" End="11" Analysis="n- -dsf-">μακροθυμίᾳ</Node>
+              </Node>
+              <Node Id="1.46" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004002013" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040020130010" Start="12" End="12" Analysis="c- -----">καὶ</Node>
+              <Node Id="1.47" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040020140011" Length="1" Start="13" End="13">
+                <Node Id="1.48" Cat="noun" Lemma="διδαχή" Language="G" UnicodeLemma="διδαχή" morphId="55004002014" StrongNumberX="1322" English="teaching" Unicode="διδαχῇ." nodeId="550040020140010" Start="13" End="13" Analysis="n- -dsf-">διδαχῇ.</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:3">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040030020201" Length="20" Start="0" End="19">
+  <Node Id="1.1" Cat="CL" Rule="Conj-CL" Head="1" Language="G" nodeId="550040030020200" Length="20" Start="0" End="19">
+    <Node Id="1.2" Cat="conj" Lemma="γάρ" UnicodeLemma="γάρ" English="For" morphId="55004003002" StrongNumberX="1063" Language="G" Unicode="γὰρ" nodeId="550040030020010" Start="0" End="0" Analysis="c- -----">γὰρ</Node>
+    <Node Id="1.3" Cat="CL" Rule="ClCl" Head="0" Language="G" nodeId="550040030010190" Length="19" Start="1" End="19">
+      <Node Id="1.4" Cat="CL" Rule="V-S" Head="0" Language="G" nodeId="550040030010020" Length="2" Start="1" End="2">
+        <Node Id="1.5" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040030010012" Length="1" Start="1" End="1">
+          <Node Id="1.6" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040030010011" Length="1" Start="1" End="1">
+            <Node Id="1.7" Cat="verb" Lemma="εἰμί" Language="G" UnicodeLemma="εἰμί" morphId="55004003001" StrongNumberX="2071" English="there will be" Unicode="Ἔσται" nodeId="550040030010010" Start="1" End="1" Analysis="v- 3-s--fmi">Ἔσται</Node>
+          </Node>
+        </Node>
+        <Node Id="1.8" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040030030012" Length="1" Start="2" End="2">
+          <Node Id="1.9" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040030030011" Length="1" Start="2" End="2">
+            <Node Id="1.10" Cat="noun" Lemma="καιρός" Language="G" UnicodeLemma="καιρός" morphId="55004003003" StrongNumberX="2540" English="a time" Unicode="καιρὸς" nodeId="550040030030010" Start="2" End="2" Analysis="n- -nsm-">καιρὸς</Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.11" Cat="CL" Rule="sub-CL" Head="1" Language="G" nodeId="550040030040170" Length="17" Start="3" End="19">
+        <Node Id="1.12" Cat="conj" Rule="Adv2Conj" Head="0" Language="G" nodeId="550040030040011" Length="1" Start="3" End="3">
+          <Node Id="1.13" Cat="adv" Lemma="ὅτε" UnicodeLemma="ὅτε" English="when" morphId="55004003004" StrongNumberX="3753" Language="G" Unicode="ὅτε" nodeId="550040030040010" Start="3" End="3" Analysis="d- -----">ὅτε</Node>
+        </Node>
+        <Node Id="1.14" Cat="CL" Rule="CL2CL" Head="0" Language="G" nodeId="550040030080161" Length="16" Start="4" End="19">
+          <Node Id="1.15" Cat="CL" Rule="notCLbutCL2CL" Head="3" Language="G" nodeId="550040030080160" Length="16" Start="4" End="19">
+            <Node Id="1.16" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040030080011" Length="1" Start="4" End="4">
+              <Node Id="1.17" Cat="adv" Lemma="οὐ" Language="G" UnicodeLemma="οὐ" morphId="55004003008" StrongNumberX="3756" English="not" Unicode="οὐκ" nodeId="550040030080010" Start="4" End="4" Analysis="d- -----">οὐκ</Node>
+            </Node>
+            <Node Id="1.18" Cat="CL" Rule="O-V" Head="1" Language="G" nodeId="550040030050040" Length="4" Start="5" End="8">
+              <Node Id="1.19" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040030050031" Length="3" Start="5" End="7">
+                <Node Id="1.20" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040030050030" Length="3" Start="5" End="7">
+                  <Node Id="1.21" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004003005" StrongNumberX="3588" English="-" Unicode="τῆς" nodeId="550040030050010" Start="5" End="5" Analysis="ra -gsf-">τῆς</Node>
+                  <Node Id="1.22" Cat="np" Rule="AdjpNp" Head="1" Language="G" nodeId="550040030060020" Length="2" Start="6" End="7">
+                    <Node Id="1.23" Cat="adjp" Rule="CL2Adjp" Head="0" Language="G" nodeId="550040030060014" Length="1" Start="6" End="6">
+                      <Node Id="1.24" Cat="CL" Rule="V2CL" Head="0" Language="G" nodeId="550040030060013" Length="1" Start="6" End="6">
+                        <Node Id="1.25" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040030060012" Length="1" Start="6" End="6">
+                          <Node Id="1.26" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040030060011" Length="1" Start="6" End="6">
+                            <Node Id="1.27" Cat="verb" Lemma="ὑγιαίνω" Language="G" UnicodeLemma="ὑγιαίνω" morphId="55004003006" StrongNumberX="5198" English="healthy" Unicode="ὑγιαινούσης" nodeId="550040030060010" Start="6" End="6" Analysis="v- -gsf-pap">ὑγιαινούσης</Node>
+                          </Node>
+                        </Node>
+                      </Node>
+                    </Node>
+                    <Node Id="1.28" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040030070011" Length="1" Start="7" End="7">
+                      <Node Id="1.29" Cat="noun" Lemma="διδασκαλία" Language="G" UnicodeLemma="διδασκαλία" morphId="55004003007" StrongNumberX="1319" English="teaching" Unicode="διδασκαλίας" nodeId="550040030070010" Start="7" End="7" Analysis="n- -gsf-">διδασκαλίας</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.30" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040030090012" Length="1" Start="8" End="8">
+                <Node Id="1.31" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040030090011" Length="1" Start="8" End="8">
+                  <Node Id="1.32" Cat="verb" Lemma="ἀνέχω" Language="G" UnicodeLemma="ἀνέχω" morphId="55004003009" StrongNumberX="0430" English="they will bear" Unicode="ἀνέξονται" nodeId="550040030090010" Start="8" End="8" Analysis="v- 3-p--fmi">ἀνέξονται</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.33" Cat="conj" Lemma="ἀλλά" Language="G" UnicodeLemma="ἀλλά" morphId="55004003010" StrongNumberX="0235" English="but" Unicode="ἀλλὰ" nodeId="550040030100010" Start="9" End="9" Analysis="c- -----">ἀλλὰ</Node>
+            <Node Id="1.34" Cat="CL" Rule="ADV-IO-V-O-ADV" Head="2" Language="G" nodeId="550040030110100" Length="10" Start="10" End="19">
+              <Node Id="1.35" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040030110041" Length="4" Start="10" End="13">
+                <Node Id="1.36" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040030110040" Length="4" Start="10" End="13">
+                  <Node Id="1.37" Cat="prep" Lemma="κατά" UnicodeLemma="κατά" English="according to" morphId="55004003011" StrongNumberX="2596" Language="G" Unicode="κατὰ" nodeId="550040030110010" Start="10" End="10" Analysis="p- -----">κατὰ</Node>
+                  <Node Id="1.38" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040030120030" Length="3" Start="11" End="13">
+                    <Node Id="1.39" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004003012" StrongNumberX="3588" English="the" Unicode="τὰς" nodeId="550040030120010" Start="11" End="11" Analysis="ra -apf-">τὰς</Node>
+                    <Node Id="1.40" Cat="np" Rule="AdjpNp" Head="1" Language="G" nodeId="550040030130020" Length="2" Start="12" End="13">
+                      <Node Id="1.41" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040030130011" Length="1" Start="12" End="12">
+                        <Node Id="1.42" Cat="adj" Lemma="ἴδιος" Language="G" UnicodeLemma="ἴδιος" morphId="55004003013" StrongNumberX="2398" English="own" Unicode="ἰδίας" nodeId="550040030130010" Start="12" End="12" Analysis="a- -apf-">ἰδίας</Node>
+                      </Node>
+                      <Node Id="1.43" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040030140011" Length="1" Start="13" End="13">
+                        <Node Id="1.44" Cat="noun" Lemma="ἐπιθυμία" UnicodeLemma="ἐπιθυμία" English="lusts" morphId="55004003014" StrongNumberX="1939" Language="G" Unicode="ἐπιθυμίας" nodeId="550040030140010" Start="13" End="13" Analysis="n- -apf-">ἐπιθυμίας</Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.45" Cat="IO" Rule="Np2IO" Head="0" Language="G" nodeId="550040030150012" Length="1" Start="14" End="14">
+                <Node Id="1.46" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040030150011" Length="1" Start="14" End="14">
+                  <Node Id="1.47" Cat="pron" Lemma="ἑαυτοῦ" Language="G" UnicodeLemma="ἑαυτοῦ" morphId="55004003015" StrongNumberX="1438" English="of themselves" Unicode="ἑαυτοῖς" nodeId="550040030150010" Start="14" End="14" Analysis="rp 3dpm-">ἑαυτοῖς</Node>
+                </Node>
+              </Node>
+              <Node Id="1.48" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040030160012" Length="1" Start="15" End="15">
+                <Node Id="1.49" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040030160011" Length="1" Start="15" End="15">
+                  <Node Id="1.50" Cat="verb" Lemma="ἐπισωρεύω" Language="G" UnicodeLemma="ἐπισωρεύω" morphId="55004003016" StrongNumberX="2002" English="will accumulate" Unicode="ἐπισωρεύσουσιν" nodeId="550040030160010" Start="15" End="15" Analysis="v- 3-p--fai">ἐπισωρεύσουσιν</Node>
+                </Node>
+              </Node>
+              <Node Id="1.51" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040030170012" Length="1" Start="16" End="16">
+                <Node Id="1.52" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040030170011" Length="1" Start="16" End="16">
+                  <Node Id="1.53" Cat="noun" Lemma="διδάσκαλος" Language="G" UnicodeLemma="διδάσκαλος" morphId="55004003017" StrongNumberX="1320" English="teachers" Unicode="διδασκάλους" nodeId="550040030170010" Start="16" End="16" Analysis="n- -apm-">διδασκάλους</Node>
+                </Node>
+              </Node>
+              <Node Id="1.54" Cat="ADV" Rule="CL2ADV" Head="0" Language="G" nodeId="550040030180031" Length="3" Start="17" End="19">
+                <Node Id="1.55" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040030180030" Length="3" Start="17" End="19">
+                  <Node Id="1.56" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040030180012" Length="1" Start="17" End="17">
+                    <Node Id="1.57" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040030180011" Length="1" Start="17" End="17">
+                      <Node Id="1.58" Cat="verb" Lemma="κνήθω" UnicodeLemma="κνήθω" English="tickling" morphId="55004003018" StrongNumberX="2833" Language="G" Unicode="κνηθόμενοι" nodeId="550040030180010" Start="17" End="17" Analysis="v- -npm-ppp">κνηθόμενοι</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="1.59" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040030190021" Length="2" Start="18" End="19">
+                    <Node Id="1.60" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040030190020" Length="2" Start="18" End="19">
+                      <Node Id="1.61" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004003019" StrongNumberX="3588" English="the" Unicode="τὴν" nodeId="550040030190010" Start="18" End="18" Analysis="ra -asf-">τὴν</Node>
+                      <Node Id="1.62" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040030200011" Length="1" Start="19" End="19">
+                        <Node Id="1.63" Cat="noun" Lemma="ἀκοή" Language="G" UnicodeLemma="ἀκοή" morphId="55004003020" StrongNumberX="0189" English="ear" Unicode="ἀκοὴν" nodeId="550040030200010" Start="19" End="19" Analysis="n- -asf-">ἀκοὴν</Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:4">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040040010132" Length="13" Start="0" End="12">
+  <Node Id="1.11" Cat="CL" Rule="CL2CL" Head="0" Language="G" nodeId="550040040010131" Length="13" Start="0" End="12">
+    <Node Id="1.14" Cat="CL" Rule="that-VP" Head="1" Language="G" nodeId="550040040010130" Length="13" Start="0" End="12">
+      <Node Id="1.64" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004004001" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040040010010" Start="0" End="0" Analysis="c- -----">καὶ</Node>
+      <Node Id="1.65" Cat="CL" Rule="aCLaCL" Head="1" Language="G" nodeId="550040040030120" Length="12" Start="1" End="12">
+        <Node Id="1.66" Cat="conj" Lemma="μέν" Language="G" UnicodeLemma="μέν" morphId="55004004003" StrongNumberX="3303" English="-" Unicode="μὲν" nodeId="550040040030010" Start="1" End="1" Analysis="c- -----">μὲν</Node>
+        <Node Id="1.67" Cat="CL" Rule="ADV-O-V" Head="2" Language="G" nodeId="550040040020060" Length="6" Start="2" End="7">
+          <Node Id="1.68" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040040020031" Length="3" Start="2" End="4">
+            <Node Id="1.69" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040040020030" Length="3" Start="2" End="4">
+              <Node Id="1.70" Cat="prep" Lemma="ἀπό" UnicodeLemma="ἀπό" English="from" morphId="55004004002" StrongNumberX="0575" Language="G" Unicode="ἀπὸ" nodeId="550040040020010" Start="2" End="2" Analysis="p- -----">ἀπὸ</Node>
+              <Node Id="1.71" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040040040020" Length="2" Start="3" End="4">
+                <Node Id="1.72" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004004004" StrongNumberX="3588" English="the" Unicode="τῆς" nodeId="550040040040010" Start="3" End="3" Analysis="ra -gsf-">τῆς</Node>
+                <Node Id="1.73" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040040050011" Length="1" Start="4" End="4">
+                  <Node Id="1.74" Cat="noun" Lemma="ἀλήθεια" UnicodeLemma="ἀλήθεια" English="truth" morphId="55004004005" StrongNumberX="0225" Language="G" Unicode="ἀληθείας" nodeId="550040040050010" Start="4" End="4" Analysis="n- -gsf-">ἀληθείας</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="1.75" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040040060021" Length="2" Start="5" End="6">
+            <Node Id="1.76" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040040060020" Length="2" Start="5" End="6">
+              <Node Id="1.77" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004004006" StrongNumberX="3588" English="the(ir)" Unicode="τὴν" nodeId="550040040060010" Start="5" End="5" Analysis="ra -asf-">τὴν</Node>
+              <Node Id="1.78" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040040070011" Length="1" Start="6" End="6">
+                <Node Id="1.79" Cat="noun" Lemma="ἀκοή" Language="G" UnicodeLemma="ἀκοή" morphId="55004004007" StrongNumberX="0189" English="ear" Unicode="ἀκοὴν" nodeId="550040040070010" Start="6" End="6" Analysis="n- -asf-">ἀκοὴν</Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="1.80" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040040080012" Length="1" Start="7" End="7">
+            <Node Id="1.81" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040040080011" Length="1" Start="7" End="7">
+              <Node Id="1.82" Cat="verb" Lemma="ἀποστρέφω" Language="G" UnicodeLemma="ἀποστρέφω" morphId="55004004008" StrongNumberX="0654" English="they will  turn away" Unicode="ἀποστρέψουσιν," nodeId="550040040080010" Start="7" End="7" Analysis="v- 3-p--fai">ἀποστρέψουσιν,</Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.83" Cat="conj" Lemma="δέ" Language="G" UnicodeLemma="δέ" morphId="55004004010" StrongNumberX="1161" English="and" Unicode="δὲ" nodeId="550040040100010" Start="8" End="8" Analysis="c- -----">δὲ</Node>
+        <Node Id="1.84" Cat="CL" Rule="ADV-V" Head="1" Language="G" nodeId="550040040090040" Length="4" Start="9" End="12">
+          <Node Id="1.85" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040040090031" Length="3" Start="9" End="11">
+            <Node Id="1.86" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040040090030" Length="3" Start="9" End="11">
+              <Node Id="1.87" Cat="prep" Lemma="ἐπί" UnicodeLemma="ἐπί" English="to" morphId="55004004009" StrongNumberX="1909" Language="G" Unicode="ἐπὶ" nodeId="550040040090010" Start="9" End="9" Analysis="p- -----">ἐπὶ</Node>
+              <Node Id="1.88" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040040110020" Length="2" Start="10" End="11">
+                <Node Id="1.89" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004004011" StrongNumberX="3588" English="-" Unicode="τοὺς" nodeId="550040040110010" Start="10" End="10" Analysis="ra -apm-">τοὺς</Node>
+                <Node Id="1.90" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040040120011" Length="1" Start="11" End="11">
+                  <Node Id="1.91" Cat="noun" Lemma="μῦθος" UnicodeLemma="μῦθος" English="myths" morphId="55004004012" StrongNumberX="3454" Language="G" Unicode="μύθους" nodeId="550040040120010" Start="11" End="11" Analysis="n- -apm-">μύθους</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="1.92" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040040130012" Length="1" Start="12" End="12">
+            <Node Id="1.93" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040040130011" Length="1" Start="12" End="12">
+              <Node Id="1.94" Cat="verb" Lemma="ἐκτρέπω" Language="G" UnicodeLemma="ἐκτρέπω" morphId="55004004013" StrongNumberX="1624" English="will be turned aside" Unicode="ἐκτραπήσονται." nodeId="550040040130010" Start="12" End="12" Analysis="v- 3-p--fpi">ἐκτραπήσονται.</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:5">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040050020131" Length="13" Start="0" End="12">
+  <Node Id="1.1" Cat="CL" Rule="Conj-CL" Head="1" Language="G" nodeId="550040050020130" Length="13" Start="0" End="12">
+    <Node Id="1.2" Cat="conj" Lemma="δέ" Language="G" UnicodeLemma="δέ" morphId="55004005002" StrongNumberX="1161" English="But" Unicode="δὲ" nodeId="550040050020010" Start="0" End="0" Analysis="c- -----">δὲ</Node>
+    <Node Id="1.3" Cat="CL" Rule="ClClClCl" Head="0" Language="G" nodeId="550040050010120" Length="12" Start="1" End="12">
+      <Node Id="1.4" Cat="CL" Rule="S-V-ADV" Head="1" Language="G" nodeId="550040050010040" Length="4" Start="1" End="4">
+        <Node Id="1.5" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040050010012" Length="1" Start="1" End="1">
+          <Node Id="1.6" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040050010011" Length="1" Start="1" End="1">
+            <Node Id="1.7" Cat="pron" Lemma="σύ" Language="G" UnicodeLemma="σύ" morphId="55004005001" StrongNumberX="4771" English="you" Unicode="Σὺ" nodeId="550040050010010" Start="1" End="1" Analysis="rp 2ns--">Σὺ</Node>
+          </Node>
+        </Node>
+        <Node Id="1.8" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040050030012" Length="1" Start="2" End="2">
+          <Node Id="1.9" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040050030011" Length="1" Start="2" End="2">
+            <Node Id="1.10" Cat="verb" Lemma="νήφω" Language="G" UnicodeLemma="νήφω" morphId="55004005003" StrongNumberX="3525" English="be self-controlled" Unicode="νῆφε" nodeId="550040050030010" Start="2" End="2" Analysis="v- 2-s--pad">νῆφε</Node>
+          </Node>
+        </Node>
+        <Node Id="1.11" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040050040021" Length="2" Start="3" End="4">
+          <Node Id="1.12" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040050040020" Length="2" Start="3" End="4">
+            <Node Id="1.13" Cat="prep" Lemma="ἐν" UnicodeLemma="ἐν" English="in" morphId="55004005004" StrongNumberX="1722" Language="G" Unicode="ἐν" nodeId="550040050040010" Start="3" End="3" Analysis="p- -----">ἐν</Node>
+            <Node Id="1.14" Cat="np" Rule="Adj2NP" Head="0" Language="G" nodeId="550040050050012" Length="1" Start="4" End="4">
+              <Node Id="1.15" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040050050011" Length="1" Start="4" End="4">
+                <Node Id="1.16" Cat="adj" Lemma="πᾶς" UnicodeLemma="πᾶς" English="all things" morphId="55004005005" StrongNumberX="3956" Language="G" Unicode="πᾶσιν," nodeId="550040050050010" Start="4" End="4" Analysis="a- -dpn-">πᾶσιν,</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.17" Cat="CL" Rule="V2CL" Head="0" Language="G" nodeId="550040050060013" Length="1" Start="5" End="5">
+        <Node Id="1.18" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040050060012" Length="1" Start="5" End="5">
+          <Node Id="1.19" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040050060011" Length="1" Start="5" End="5">
+            <Node Id="1.20" Cat="verb" Lemma="κακοπαθέω" Language="G" UnicodeLemma="κακοπαθέω" morphId="55004005006" StrongNumberX="2553" English="suffer hardships" Unicode="κακοπάθησον," nodeId="550040050060010" Start="5" End="5" Analysis="v- 2-s--aad">κακοπάθησον,</Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.21" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040050080030" Length="3" Start="6" End="8">
+        <Node Id="1.22" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040050080012" Length="1" Start="6" End="6">
+          <Node Id="1.23" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040050080011" Length="1" Start="6" End="6">
+            <Node Id="1.24" Cat="verb" Lemma="ποιέω" Language="G" UnicodeLemma="ποιέω" morphId="55004005008" StrongNumberX="4160" English="do" Unicode="ποίησον" nodeId="550040050080010" Start="6" End="6" Analysis="v- 2-s--aad">ποίησον</Node>
+          </Node>
+        </Node>
+        <Node Id="1.25" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040050070021" Length="2" Start="7" End="8">
+          <Node Id="1.26" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040050070020" Length="2" Start="7" End="8">
+            <Node Id="1.27" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040050070011" Length="1" Start="7" End="7">
+              <Node Id="1.28" Cat="noun" Lemma="ἔργον" Language="G" UnicodeLemma="ἔργον" morphId="55004005007" StrongNumberX="2041" English="(the) work" Unicode="ἔργον" nodeId="550040050070010" Start="7" End="7" Analysis="n- -asn-">ἔργον</Node>
+            </Node>
+            <Node Id="1.29" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040050090011" Length="1" Start="8" End="8">
+              <Node Id="1.30" Cat="noun" Lemma="εὐαγγελιστής" Language="G" UnicodeLemma="εὐαγγελιστής" morphId="55004005009" StrongNumberX="2099" English="of an evangelist" Unicode="εὐαγγελιστοῦ," nodeId="550040050090010" Start="8" End="8" Analysis="n- -gsm-">εὐαγγελιστοῦ,</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.31" Cat="CL" Rule="O-V" Head="1" Language="G" nodeId="550040050100040" Length="4" Start="9" End="12">
+        <Node Id="1.32" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040050100031" Length="3" Start="9" End="11">
+          <Node Id="1.33" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040050100030" Length="3" Start="9" End="11">
+            <Node Id="1.34" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004005010" StrongNumberX="3588" English="the" Unicode="τὴν" nodeId="550040050100010" Start="9" End="9" Analysis="ra -asf-">τὴν</Node>
+            <Node Id="1.35" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040050110020" Length="2" Start="10" End="11">
+              <Node Id="1.36" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040050110011" Length="1" Start="10" End="10">
+                <Node Id="1.37" Cat="noun" Lemma="διακονία" Language="G" UnicodeLemma="διακονία" morphId="55004005011" StrongNumberX="1248" English="ministry" Unicode="διακονίαν" nodeId="550040050110010" Start="10" End="10" Analysis="n- -asf-">διακονίαν</Node>
+              </Node>
+              <Node Id="1.38" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040050120011" Length="1" Start="11" End="11">
+                <Node Id="1.39" Cat="pron" Lemma="σύ" Language="G" UnicodeLemma="σύ" morphId="55004005012" StrongNumberX="4675" English="of you" Unicode="σου" nodeId="550040050120010" Start="11" End="11" Analysis="rp 2gs--">σου</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.40" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040050130012" Length="1" Start="12" End="12">
+          <Node Id="1.41" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040050130011" Length="1" Start="12" End="12">
+            <Node Id="1.42" Cat="verb" Lemma="πληροφορέω" Language="G" UnicodeLemma="πληροφορέω" morphId="55004005013" StrongNumberX="4135" English="fully carry out" Unicode="πληροφόρησον." nodeId="550040050130010" Start="12" End="12" Analysis="v- 2-s--aad">πληροφόρησον.</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:6">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040060020111" Length="11" Start="0" End="10">
+  <Node Id="1.1" Cat="CL" Rule="Conj-CL" Head="1" Language="G" nodeId="550040060020110" Length="11" Start="0" End="10">
+    <Node Id="1.2" Cat="conj" Lemma="γάρ" UnicodeLemma="γάρ" English="For" morphId="55004006002" StrongNumberX="1063" Language="G" Unicode="γὰρ" nodeId="550040060020010" Start="0" End="0" Analysis="c- -----">γὰρ</Node>
+    <Node Id="1.3" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040060010100" Length="10" Start="1" End="10">
+      <Node Id="1.4" Cat="CL" Rule="S-ADV-V" Head="2" Language="G" nodeId="550040060010030" Length="3" Start="1" End="3">
+        <Node Id="1.5" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040060010012" Length="1" Start="1" End="1">
+          <Node Id="1.6" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040060010011" Length="1" Start="1" End="1">
+            <Node Id="1.7" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004006001" StrongNumberX="1473" English="I" Unicode="Ἐγὼ" nodeId="550040060010010" Start="1" End="1" Analysis="rp 1ns--">Ἐγὼ</Node>
+          </Node>
+        </Node>
+        <Node Id="1.8" Cat="ADV" Rule="Advp2ADV" Head="0" Language="G" nodeId="550040060030012" Length="1" Start="2" End="2">
+          <Node Id="1.9" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040060030011" Length="1" Start="2" End="2">
+            <Node Id="1.10" Cat="adv" Lemma="ἤδη" UnicodeLemma="ἤδη" English="already" morphId="55004006003" StrongNumberX="2235" Language="G" Unicode="ἤδη" nodeId="550040060030010" Start="2" End="2" Analysis="d- -----">ἤδη</Node>
+          </Node>
+        </Node>
+        <Node Id="1.11" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040060040012" Length="1" Start="3" End="3">
+          <Node Id="1.12" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040060040011" Length="1" Start="3" End="3">
+            <Node Id="1.13" Cat="verb" Lemma="σπένδω" Language="G" UnicodeLemma="σπένδω" morphId="55004006004" StrongNumberX="4689" English="am being poured out" Unicode="σπένδομαι," nodeId="550040060040010" Start="3" End="3" Analysis="v- 1-s--ppi">σπένδομαι,</Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.14" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004006005" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040060050010" Start="4" End="4" Analysis="c- -----">καὶ</Node>
+      <Node Id="1.15" Cat="CL" Rule="S-V" Head="1" Language="G" nodeId="550040060060060" Length="6" Start="5" End="10">
+        <Node Id="1.16" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040060060051" Length="5" Start="5" End="9">
+          <Node Id="1.17" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040060060050" Length="5" Start="5" End="9">
+            <Node Id="1.18" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004006006" StrongNumberX="3588" English="the" Unicode="ὁ" nodeId="550040060060010" Start="5" End="5" Analysis="ra -nsm-">ὁ</Node>
+            <Node Id="1.19" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040060070040" Length="4" Start="6" End="9">
+              <Node Id="1.20" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040060070011" Length="1" Start="6" End="6">
+                <Node Id="1.21" Cat="noun" Lemma="καιρός" Language="G" UnicodeLemma="καιρός" morphId="55004006007" StrongNumberX="2540" English="time" Unicode="καιρὸς" nodeId="550040060070010" Start="6" End="6" Analysis="n- -nsm-">καιρὸς</Node>
+              </Node>
+              <Node Id="1.22" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040060080030" Length="3" Start="7" End="9">
+                <Node Id="1.23" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004006008" StrongNumberX="3588" English="of the" Unicode="τῆς" nodeId="550040060080010" Start="7" End="7" Analysis="ra -gsf-">τῆς</Node>
+                <Node Id="1.24" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040060090020" Length="2" Start="8" End="9">
+                  <Node Id="1.25" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040060090011" Length="1" Start="8" End="8">
+                    <Node Id="1.26" Cat="noun" Lemma="ἀνάλυσις" Language="G" UnicodeLemma="ἀνάλυσις" morphId="55004006009" StrongNumberX="0359" English="departure" Unicode="ἀναλύσεώς" nodeId="550040060090010" Start="8" End="8" Analysis="n- -gsf-">ἀναλύσεώς</Node>
+                  </Node>
+                  <Node Id="1.27" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040060100011" Length="1" Start="9" End="9">
+                    <Node Id="1.28" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004006010" StrongNumberX="3450" English="of me" Unicode="μου" nodeId="550040060100010" Start="9" End="9" Analysis="rp 1gs--">μου</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.29" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040060110012" Length="1" Start="10" End="10">
+          <Node Id="1.30" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040060110011" Length="1" Start="10" End="10">
+            <Node Id="1.31" Cat="verb" Lemma="ἐφίστημι" Language="G" UnicodeLemma="ἐφίστημι" morphId="55004006011" StrongNumberX="2186" English="has come" Unicode="ἐφέστηκεν." nodeId="550040060110010" Start="10" End="10" Analysis="v- 3-s--xai">ἐφέστηκεν.</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:7">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040070010101" Length="10" Start="0" End="9">
+  <Node Id="1.1" Cat="CL" Rule="ClClCl" Head="0" Language="G" nodeId="550040070010100" Length="10" Start="0" End="9">
+    <Node Id="1.2" Cat="CL" Rule="O-V" Head="1" Language="G" nodeId="550040070010040" Length="4" Start="0" End="3">
+      <Node Id="1.3" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040070010031" Length="3" Start="0" End="2">
+        <Node Id="1.4" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040070010030" Length="3" Start="0" End="2">
+          <Node Id="1.5" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004007001" StrongNumberX="3588" English="The" Unicode="τὸν" nodeId="550040070010010" Start="0" End="0" Analysis="ra -asm-">τὸν</Node>
+          <Node Id="1.6" Cat="np" Rule="AdjpNp" Head="1" Language="G" nodeId="550040070020020" Length="2" Start="1" End="2">
+            <Node Id="1.7" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040070020011" Length="1" Start="1" End="1">
+              <Node Id="1.8" Cat="adj" Lemma="καλός" Language="G" UnicodeLemma="καλός" morphId="55004007002" StrongNumberX="2570" English="good" Unicode="καλὸν" nodeId="550040070020010" Start="1" End="1" Analysis="a- -asm-">καλὸν</Node>
+            </Node>
+            <Node Id="1.9" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040070030011" Length="1" Start="2" End="2">
+              <Node Id="1.10" Cat="noun" Lemma="ἀγών" Language="G" UnicodeLemma="ἀγών" morphId="55004007003" StrongNumberX="0073" English="fight" Unicode="ἀγῶνα" nodeId="550040070030010" Start="2" End="2" Analysis="n- -asm-">ἀγῶνα</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.11" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040070040012" Length="1" Start="3" End="3">
+        <Node Id="1.12" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040070040011" Length="1" Start="3" End="3">
+          <Node Id="1.13" Cat="verb" Lemma="ἀγωνίζομαι" Language="G" UnicodeLemma="ἀγωνίζομαι" morphId="55004007004" StrongNumberX="0075" English="I have fought" Unicode="ἠγώνισμαι," nodeId="550040070040010" Start="3" End="3" Analysis="v- 1-s--xni">ἠγώνισμαι,</Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.14" Cat="CL" Rule="O-V" Head="1" Language="G" nodeId="550040070050030" Length="3" Start="4" End="6">
+      <Node Id="1.15" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040070050021" Length="2" Start="4" End="5">
+        <Node Id="1.16" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040070050020" Length="2" Start="4" End="5">
+          <Node Id="1.17" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004007005" StrongNumberX="3588" English="the" Unicode="τὸν" nodeId="550040070050010" Start="4" End="4" Analysis="ra -asm-">τὸν</Node>
+          <Node Id="1.18" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040070060011" Length="1" Start="5" End="5">
+            <Node Id="1.19" Cat="noun" Lemma="δρόμος" Language="G" UnicodeLemma="δρόμος" morphId="55004007006" StrongNumberX="1408" English="course" Unicode="δρόμον" nodeId="550040070060010" Start="5" End="5" Analysis="n- -asm-">δρόμον</Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.20" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040070070012" Length="1" Start="6" End="6">
+        <Node Id="1.21" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040070070011" Length="1" Start="6" End="6">
+          <Node Id="1.22" Cat="verb" Lemma="τελέω" Language="G" UnicodeLemma="τελέω" morphId="55004007007" StrongNumberX="5055" English="I have finished" Unicode="τετέλεκα," nodeId="550040070070010" Start="6" End="6" Analysis="v- 1-s--xai">τετέλεκα,</Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.23" Cat="CL" Rule="O-V" Head="1" Language="G" nodeId="550040070080030" Length="3" Start="7" End="9">
+      <Node Id="1.24" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040070080021" Length="2" Start="7" End="8">
+        <Node Id="1.25" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040070080020" Length="2" Start="7" End="8">
+          <Node Id="1.26" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004007008" StrongNumberX="3588" English="the" Unicode="τὴν" nodeId="550040070080010" Start="7" End="7" Analysis="ra -asf-">τὴν</Node>
+          <Node Id="1.27" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040070090011" Length="1" Start="8" End="8">
+            <Node Id="1.28" Cat="noun" Lemma="πίστις" Language="G" UnicodeLemma="πίστις" morphId="55004007009" StrongNumberX="4102" English="faith" Unicode="πίστιν" nodeId="550040070090010" Start="8" End="8" Analysis="n- -asf-">πίστιν</Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.29" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040070100012" Length="1" Start="9" End="9">
+        <Node Id="1.30" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040070100011" Length="1" Start="9" End="9">
+          <Node Id="1.31" Cat="verb" Lemma="τηρέω" Language="G" UnicodeLemma="τηρέω" morphId="55004007010" StrongNumberX="5083" English="I have kept" Unicode="τετήρηκα·" nodeId="550040070100010" Start="9" End="9" Analysis="v- 1-s--xai">τετήρηκα·</Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:8">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040080010311" Length="31" Start="0" End="30">
+  <Node Id="1.1" Cat="CL" Rule="ADV-V-ADV-S" Head="1" Language="G" nodeId="550040080010310" Length="31" Start="0" End="30">
+    <Node Id="1.2" Cat="ADV" Rule="adjp2ADV" Head="0" Language="G" nodeId="550040080010012" Length="1" Start="0" End="0">
+      <Node Id="1.3" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040080010011" Length="1" Start="0" End="0">
+        <Node Id="1.4" Cat="adj" Lemma="λοιπός" UnicodeLemma="λοιπός" English="henceforth" morphId="55004008001" StrongNumberX="3063" Language="G" Unicode="λοιπὸν" nodeId="550040080010010" Start="0" End="0" Analysis="a- -asn-">λοιπὸν</Node>
+      </Node>
+    </Node>
+    <Node Id="1.5" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040080020012" Length="1" Start="1" End="1">
+      <Node Id="1.6" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040080020011" Length="1" Start="1" End="1">
+        <Node Id="1.7" Cat="verb" Lemma="ἀπόκειμαι" Language="G" UnicodeLemma="ἀπόκειμαι" morphId="55004008002" StrongNumberX="0606" English="there is laid up" Unicode="ἀπόκειταί" nodeId="550040080020010" Start="1" End="1" Analysis="v- 3-s--pni">ἀπόκειταί</Node>
+      </Node>
+    </Node>
+    <Node Id="1.8" Cat="ADV" Rule="Np2ADV" Head="0" Language="G" nodeId="550040080030012" Length="1" Start="2" End="2">
+      <Node Id="1.9" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040080030011" Length="1" Start="2" End="2">
+        <Node Id="1.10" Cat="pron" Lemma="ἐγώ" UnicodeLemma="ἐγώ" English="for me" morphId="55004008003" StrongNumberX="3427" Language="G" Unicode="μοι" nodeId="550040080030010" Start="2" End="2" Analysis="rp 1ds--">μοι</Node>
+      </Node>
+    </Node>
+    <Node Id="1.11" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040080040281" Length="28" Start="3" End="30">
+      <Node Id="1.12" Cat="np" Rule="NP-CL" Head="0" Language="G" nodeId="550040080040280" Length="28" Start="3" End="30">
+        <Node Id="1.13" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040080040040" Length="4" Start="3" End="6">
+          <Node Id="1.14" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004008004" StrongNumberX="3588" English="the" Unicode="ὁ" nodeId="550040080040010" Start="3" End="3" Analysis="ra -nsm-">ὁ</Node>
+          <Node Id="1.15" Cat="np" Rule="ofNPNP" Head="1" Language="G" nodeId="550040080050030" Length="3" Start="4" End="6">
+            <Node Id="1.16" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040080050020" Length="2" Start="4" End="5">
+              <Node Id="1.17" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004008005" StrongNumberX="3588" English="-" Unicode="τῆς" nodeId="550040080050010" Start="4" End="4" Analysis="ra -gsf-">τῆς</Node>
+              <Node Id="1.18" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040080060011" Length="1" Start="5" End="5">
+                <Node Id="1.19" Cat="noun" Lemma="δικαιοσύνη" Language="G" UnicodeLemma="δικαιοσύνη" morphId="55004008006" StrongNumberX="1343" English="of righteousness" Unicode="δικαιοσύνης" nodeId="550040080060010" Start="5" End="5" Analysis="n- -gsf-">δικαιοσύνης</Node>
+              </Node>
+            </Node>
+            <Node Id="1.20" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040080070011" Length="1" Start="6" End="6">
+              <Node Id="1.21" Cat="noun" Lemma="στέφανος" Language="G" UnicodeLemma="στέφανος" morphId="55004008007" StrongNumberX="4735" English="crown(wreath)" Unicode="στέφανος," nodeId="550040080070010" Start="6" End="6" Analysis="n- -nsm-">στέφανος,</Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.22" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040080080240" Length="24" Start="7" End="30">
+          <Node Id="1.23" Cat="CL" Rule="O-V-IO-S-ADV" Head="1" Language="G" nodeId="550040080080120" Length="12" Start="7" End="18">
+            <Node Id="1.24" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040080080012" Length="1" Start="7" End="7">
+              <Node Id="1.25" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040080080011" Length="1" Start="7" End="7">
+                <Node Id="1.26" Cat="pron" Lemma="ὅς" Language="G" UnicodeLemma="ὅς" morphId="55004008008" StrongNumberX="3739" English="which" Unicode="ὃν" nodeId="550040080080010" Start="7" End="7" Analysis="rr -asm-">ὃν</Node>
+              </Node>
+            </Node>
+            <Node Id="1.27" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040080090012" Length="1" Start="8" End="8">
+              <Node Id="1.28" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040080090011" Length="1" Start="8" End="8">
+                <Node Id="1.29" Cat="verb" Lemma="ἀποδίδωμι" Language="G" UnicodeLemma="ἀποδίδωμι" morphId="55004008009" StrongNumberX="0591" English="will give" Unicode="ἀποδώσει" nodeId="550040080090010" Start="8" End="8" Analysis="v- 3-s--fai">ἀποδώσει</Node>
+              </Node>
+            </Node>
+            <Node Id="1.30" Cat="IO" Rule="Np2IO" Head="0" Language="G" nodeId="550040080100012" Length="1" Start="9" End="9">
+              <Node Id="1.31" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040080100011" Length="1" Start="9" End="9">
+                <Node Id="1.32" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004008010" StrongNumberX="3427" English="to me" Unicode="μοι" nodeId="550040080100010" Start="9" End="9" Analysis="rp 1ds--">μοι</Node>
+              </Node>
+            </Node>
+            <Node Id="1.33" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040080110051" Length="5" Start="10" End="14">
+              <Node Id="1.34" Cat="np" Rule="Np-Appos" Head="0" Language="G" nodeId="550040080110050" Length="5" Start="10" End="14">
+                <Node Id="1.35" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040080110020" Length="2" Start="10" End="11">
+                  <Node Id="1.36" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004008011" StrongNumberX="3588" English="the" Unicode="ὁ" nodeId="550040080110010" Start="10" End="10" Analysis="ra -nsm-">ὁ</Node>
+                  <Node Id="1.37" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040080120011" Length="1" Start="11" End="11">
+                    <Node Id="1.38" Cat="noun" Lemma="κύριος" Language="G" UnicodeLemma="κύριος" morphId="55004008012" StrongNumberX="2962" English="Lord" Unicode="κύριος" nodeId="550040080120010" Start="11" End="11" Analysis="n- -nsm-">κύριος</Node>
+                  </Node>
+                </Node>
+                <Node Id="1.39" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040080170030" Length="3" Start="12" End="14">
+                  <Node Id="1.40" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004008017" StrongNumberX="3588" English="the" Unicode="ὁ" nodeId="550040080170010" Start="12" End="12" Analysis="ra -nsm-">ὁ</Node>
+                  <Node Id="1.41" Cat="np" Rule="AdjpNp" Head="1" Language="G" nodeId="550040080180020" Length="2" Start="13" End="14">
+                    <Node Id="1.42" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040080180011" Length="1" Start="13" End="13">
+                      <Node Id="1.43" Cat="adj" Lemma="δίκαιος" Language="G" UnicodeLemma="δίκαιος" morphId="55004008018" StrongNumberX="1342" English="righteous" Unicode="δίκαιος" nodeId="550040080180010" Start="13" End="13" Analysis="a- -nsm-">δίκαιος</Node>
+                    </Node>
+                    <Node Id="1.44" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040080190011" Length="1" Start="14" End="14">
+                      <Node Id="1.45" Cat="noun" Lemma="κριτής" Language="G" UnicodeLemma="κριτής" morphId="55004008019" StrongNumberX="2923" English="judge" Unicode="κριτής," nodeId="550040080190010" Start="14" End="14" Analysis="n- -nsm-">κριτής,</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.46" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040080130041" Length="4" Start="15" End="18">
+              <Node Id="1.47" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040080130040" Length="4" Start="15" End="18">
+                <Node Id="1.48" Cat="prep" Lemma="ἐν" UnicodeLemma="ἐν" English="in" morphId="55004008013" StrongNumberX="1722" Language="G" Unicode="ἐν" nodeId="550040080130010" Start="15" End="15" Analysis="p- -----">ἐν</Node>
+                <Node Id="1.49" Cat="np" Rule="Demo-NP" Head="1" Language="G" nodeId="550040080140030" Length="3" Start="16" End="18">
+                  <Node Id="1.50" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040080140011" Length="1" Start="16" End="16">
+                    <Node Id="1.51" Cat="pron" Lemma="ἐκεῖνος" Language="G" UnicodeLemma="ἐκεῖνος" morphId="55004008014" StrongNumberX="1565" English="that" Unicode="ἐκείνῃ" nodeId="550040080140010" Start="16" End="16" Analysis="rd -dsf-">ἐκείνῃ</Node>
+                  </Node>
+                  <Node Id="1.52" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040080150020" Length="2" Start="17" End="18">
+                    <Node Id="1.53" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004008015" StrongNumberX="3588" English="-" Unicode="τῇ" nodeId="550040080150010" Start="17" End="17" Analysis="ra -dsf-">τῇ</Node>
+                    <Node Id="1.54" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040080160011" Length="1" Start="18" End="18">
+                      <Node Id="1.55" Cat="noun" Lemma="ἡμέρα" UnicodeLemma="ἡμέρα" English="day" morphId="55004008016" StrongNumberX="2250" Language="G" Unicode="ἡμέρᾳ," nodeId="550040080160010" Start="18" End="18" Analysis="n- -dsf-">ἡμέρᾳ,</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="1.56" Cat="conj" Lemma="δέ" Language="G" UnicodeLemma="δέ" morphId="55004008022" StrongNumberX="1161" English="and" Unicode="δὲ" nodeId="550040080220010" Start="19" End="19" Analysis="c- -----">δὲ</Node>
+          <Node Id="1.57" Cat="CL" Rule="IO2CL" Head="0" Language="G" nodeId="550040080200112" Length="11" Start="20" End="30">
+            <Node Id="1.58" Cat="IO" Rule="Np2IO" Head="0" Language="G" nodeId="550040080200111" Length="11" Start="20" End="30">
+              <Node Id="1.59" Cat="np" Rule="notNPbutNP" Head="3" Language="G" nodeId="550040080200110" Length="11" Start="20" End="30">
+                <Node Id="1.60" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040080200011" Length="1" Start="20" End="20">
+                  <Node Id="1.61" Cat="adv" Lemma="οὐ" Language="G" UnicodeLemma="οὐ" morphId="55004008020" StrongNumberX="3756" English="not" Unicode="οὐ" nodeId="550040080200010" Start="20" End="20" Analysis="d- -----">οὐ</Node>
+                </Node>
+                <Node Id="1.62" Cat="np" Rule="AdvpNp" Head="1" Language="G" nodeId="550040080210020" Length="2" Start="21" End="22">
+                  <Node Id="1.63" Cat="advp" Rule="adjp2advp" Head="0" Language="G" nodeId="550040080210012" Length="1" Start="21" End="21">
+                    <Node Id="1.64" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040080210011" Length="1" Start="21" End="21">
+                      <Node Id="1.65" Cat="adj" Lemma="μόνος" UnicodeLemma="μόνος" English="only" morphId="55004008021" StrongNumberX="3440" Language="G" Unicode="μόνον" nodeId="550040080210010" Start="21" End="21" Analysis="a- -asn-">μόνον</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="1.66" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040080230011" Length="1" Start="22" End="22">
+                    <Node Id="1.67" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004008023" StrongNumberX="1698" English="to me" Unicode="ἐμοὶ" nodeId="550040080230010" Start="22" End="22" Analysis="rp 1ds--">ἐμοὶ</Node>
+                  </Node>
+                </Node>
+                <Node Id="1.68" Cat="conj" Lemma="ἀλλά" Language="G" UnicodeLemma="ἀλλά" morphId="55004008024" StrongNumberX="0235" English="but" Unicode="ἀλλὰ" nodeId="550040080240010" Start="23" End="23" Analysis="c- -----">ἀλλὰ</Node>
+                <Node Id="1.69" Cat="np" Rule="AdvpNp" Head="1" Language="G" nodeId="550040080250070" Length="7" Start="24" End="30">
+                  <Node Id="1.70" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040080250011" Length="1" Start="24" End="24">
+                    <Node Id="1.71" Cat="adv" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004008025" StrongNumberX="2532" English="also" Unicode="καὶ" nodeId="550040080250010" Start="24" End="24" Analysis="d- -----">καὶ</Node>
+                  </Node>
+                  <Node Id="1.72" Cat="np" Rule="All-NP" Head="1" Language="G" nodeId="550040080260060" Length="6" Start="25" End="30">
+                    <Node Id="1.73" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040080260011" Length="1" Start="25" End="25">
+                      <Node Id="1.74" Cat="adj" Lemma="πᾶς" Language="G" UnicodeLemma="πᾶς" morphId="55004008026" StrongNumberX="3956" English="to all" Unicode="πᾶσιν" nodeId="550040080260010" Start="25" End="25" Analysis="a- -dpm-">πᾶσιν</Node>
+                    </Node>
+                    <Node Id="1.75" Cat="np" Rule="DetCL" Head="1" Language="G" nodeId="550040080270050" Length="5" Start="26" End="30">
+                      <Node Id="1.76" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004008027" StrongNumberX="3588" English="the  ones" Unicode="τοῖς" nodeId="550040080270010" Start="26" End="26" Analysis="ra -dpm-">τοῖς</Node>
+                      <Node Id="1.77" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040080280040" Length="4" Start="27" End="30">
+                        <Node Id="1.78" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040080280012" Length="1" Start="27" End="27">
+                          <Node Id="1.79" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040080280011" Length="1" Start="27" End="27">
+                            <Node Id="1.80" Cat="verb" Lemma="ἀγαπάω" Language="G" UnicodeLemma="ἀγαπάω" morphId="55004008028" StrongNumberX="0025" English="having loved" Unicode="ἠγαπηκόσιν" nodeId="550040080280010" Start="27" End="27" Analysis="v- -dpm-xap">ἠγαπηκόσιν</Node>
+                          </Node>
+                        </Node>
+                        <Node Id="1.81" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040080290031" Length="3" Start="28" End="30">
+                          <Node Id="1.82" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040080290030" Length="3" Start="28" End="30">
+                            <Node Id="1.83" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004008029" StrongNumberX="3588" English="the" Unicode="τὴν" nodeId="550040080290010" Start="28" End="28" Analysis="ra -asf-">τὴν</Node>
+                            <Node Id="1.84" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040080300020" Length="2" Start="29" End="30">
+                              <Node Id="1.85" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040080300011" Length="1" Start="29" End="29">
+                                <Node Id="1.86" Cat="noun" Lemma="ἐπιφάνεια" Language="G" UnicodeLemma="ἐπιφάνεια" morphId="55004008030" StrongNumberX="2015" English="appearing" Unicode="ἐπιφάνειαν" nodeId="550040080300010" Start="29" End="29" Analysis="n- -asf-">ἐπιφάνειαν</Node>
+                              </Node>
+                              <Node Id="1.87" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040080310011" Length="1" Start="30" End="30">
+                                <Node Id="1.88" Cat="pron" Lemma="αὐτός" Language="G" UnicodeLemma="αὐτός" morphId="55004008031" StrongNumberX="0846" English="of him" Unicode="αὐτοῦ." nodeId="550040080310010" Start="30" End="30" Analysis="rp -gsm-">αὐτοῦ.</Node>
+                              </Node>
+                            </Node>
+                          </Node>
+                        </Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:9">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040090010051" Length="5" Start="0" End="4">
+  <Node Id="1.1" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040090010050" Length="5" Start="0" End="4">
+    <Node Id="1.2" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040090010012" Length="1" Start="0" End="0">
+      <Node Id="1.3" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040090010011" Length="1" Start="0" End="0">
+        <Node Id="1.4" Cat="verb" Lemma="σπουδάζω" Language="G" UnicodeLemma="σπουδάζω" morphId="55004009001" StrongNumberX="4704" English="be diligent" Unicode="Σπούδασον" nodeId="550040090010010" Start="0" End="0" Analysis="v- 2-s--aad">Σπούδασον</Node>
+      </Node>
+    </Node>
+    <Node Id="1.5" Cat="O" Rule="CL2Ox" Head="0" Language="G" nodeId="550040090020041" Length="4" Start="1" End="4">
+      <Node Id="1.6" Cat="CL" Rule="V-ADV-ADV" Head="0" Language="G" nodeId="550040090020040" Length="4" Start="1" End="4">
+        <Node Id="1.7" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040090020012" Length="1" Start="1" End="1">
+          <Node Id="1.8" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040090020011" Length="1" Start="1" End="1">
+            <Node Id="1.9" Cat="verb" Lemma="ἔρχομαι" UnicodeLemma="ἔρχομαι" English="to come" morphId="55004009002" StrongNumberX="2064" Language="G" Unicode="ἐλθεῖν" nodeId="550040090020010" Start="1" End="1" Analysis="v- -----aan">ἐλθεῖν</Node>
+          </Node>
+        </Node>
+        <Node Id="1.10" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040090030021" Length="2" Start="2" End="3">
+          <Node Id="1.11" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040090030020" Length="2" Start="2" End="3">
+            <Node Id="1.12" Cat="prep" Lemma="πρός" UnicodeLemma="πρός" English="to" morphId="55004009003" StrongNumberX="4314" Language="G" Unicode="πρός" nodeId="550040090030010" Start="2" End="2" Analysis="p- -----">πρός</Node>
+            <Node Id="1.13" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040090040011" Length="1" Start="3" End="3">
+              <Node Id="1.14" Cat="pron" Lemma="ἐγώ" UnicodeLemma="ἐγώ" English="me" morphId="55004009004" StrongNumberX="3165" Language="G" Unicode="με" nodeId="550040090040010" Start="3" End="3" Analysis="rp 1as--">με</Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.15" Cat="ADV" Rule="Advp2ADV" Head="0" Language="G" nodeId="550040090050012" Length="1" Start="4" End="4">
+          <Node Id="1.16" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040090050011" Length="1" Start="4" End="4">
+            <Node Id="1.17" Cat="adv" Lemma="ταχέως" UnicodeLemma="ταχέως" English="quickly" morphId="55004009005" StrongNumberX="5030" Language="G" Unicode="ταχέως·" nodeId="550040090050010" Start="4" End="4" Analysis="d- -----">ταχέως·</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:10">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040100020181" Length="18" Start="0" End="17">
+  <Node Id="1.1" Cat="CL" Rule="Conj-CL" Head="1" Language="G" nodeId="550040100020180" Length="18" Start="0" End="17">
+    <Node Id="1.2" Cat="conj" Lemma="γάρ" UnicodeLemma="γάρ" English="For" morphId="55004010002" StrongNumberX="1063" Language="G" Unicode="γάρ" nodeId="550040100020010" Start="0" End="0" Analysis="c- -----">γάρ</Node>
+    <Node Id="1.3" Cat="CL" Rule="CL2CL" Head="0" Language="G" nodeId="550040100010171" Length="17" Start="1" End="17">
+      <Node Id="1.4" Cat="CL" Rule="ClClCl" Head="0" Language="G" nodeId="550040100010170" Length="17" Start="1" End="17">
+        <Node Id="1.5" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040100010110" Length="11" Start="1" End="11">
+          <Node Id="1.6" Cat="CL" Rule="S-O-V-ADV" Head="2" Language="G" nodeId="550040100010070" Length="7" Start="1" End="7">
+            <Node Id="1.7" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040100010012" Length="1" Start="1" End="1">
+              <Node Id="1.8" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040100010011" Length="1" Start="1" End="1">
+                <Node Id="1.9" Cat="noun" Lemma="Δημᾶς" Language="G" UnicodeLemma="Δημᾶς" morphId="55004010001" StrongNumberX="1214" English="Demas" Unicode="Δημᾶς" nodeId="550040100010010" Start="1" End="1" Analysis="nr -nsm-">Δημᾶς</Node>
+              </Node>
+            </Node>
+            <Node Id="1.10" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040100030012" Length="1" Start="2" End="2">
+              <Node Id="1.11" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040100030011" Length="1" Start="2" End="2">
+                <Node Id="1.12" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004010003" StrongNumberX="3165" English="me" Unicode="με" nodeId="550040100030010" Start="2" End="2" Analysis="rp 1as--">με</Node>
+              </Node>
+            </Node>
+            <Node Id="1.13" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040100040012" Length="1" Start="3" End="3">
+              <Node Id="1.14" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040100040011" Length="1" Start="3" End="3">
+                <Node Id="1.15" Cat="verb" Lemma="ἐγκαταλείπω" Language="G" UnicodeLemma="ἐγκαταλείπω" morphId="55004010004" StrongNumberX="1459" English="forsook" Unicode="ἐγκατέλιπεν" nodeId="550040100040010" Start="3" End="3" Analysis="v- 3-s--aai">ἐγκατέλιπεν</Node>
+              </Node>
+            </Node>
+            <Node Id="1.16" Cat="ADV" Rule="CL2ADV" Head="0" Language="G" nodeId="550040100050041" Length="4" Start="4" End="7">
+              <Node Id="1.17" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040100050040" Length="4" Start="4" End="7">
+                <Node Id="1.18" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040100050012" Length="1" Start="4" End="4">
+                  <Node Id="1.19" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040100050011" Length="1" Start="4" End="4">
+                    <Node Id="1.20" Cat="verb" Lemma="ἀγαπάω" UnicodeLemma="ἀγαπάω" English="having loved" morphId="55004010005" StrongNumberX="0025" Language="G" Unicode="ἀγαπήσας" nodeId="550040100050010" Start="4" End="4" Analysis="v- -nsm-aap">ἀγαπήσας</Node>
+                  </Node>
+                </Node>
+                <Node Id="1.21" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040100060031" Length="3" Start="5" End="7">
+                  <Node Id="1.22" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040100060030" Length="3" Start="5" End="7">
+                    <Node Id="1.23" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004010006" StrongNumberX="3588" English="the" Unicode="τὸν" nodeId="550040100060010" Start="5" End="5" Analysis="ra -asm-">τὸν</Node>
+                    <Node Id="1.24" Cat="np" Rule="AdjpNp" Head="1" Language="G" nodeId="550040100070020" Length="2" Start="6" End="7">
+                      <Node Id="1.25" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040100070012" Length="1" Start="6" End="6">
+                        <Node Id="1.26" Cat="adj" Rule="Adv2Adj" Head="0" Language="G" nodeId="550040100070011" Length="1" Start="6" End="6">
+                          <Node Id="1.27" Cat="adv" Lemma="νῦν" UnicodeLemma="νῦν" English="now(present)" morphId="55004010007" StrongNumberX="3568" Language="G" Unicode="νῦν" nodeId="550040100070010" Start="6" End="6" Analysis="d- -----">νῦν</Node>
+                        </Node>
+                      </Node>
+                      <Node Id="1.28" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040100080011" Length="1" Start="7" End="7">
+                        <Node Id="1.29" Cat="noun" Lemma="αἰών" Language="G" UnicodeLemma="αἰών" morphId="55004010008" StrongNumberX="0165" English="age" Unicode="αἰῶνα" nodeId="550040100080010" Start="7" End="7" Analysis="n- -asm-">αἰῶνα</Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="1.30" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004010009" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040100090010" Start="8" End="8" Analysis="c- -----">καὶ</Node>
+          <Node Id="1.31" Cat="CL" Rule="V-ADV" Head="0" Language="G" nodeId="550040100100030" Length="3" Start="9" End="11">
+            <Node Id="1.32" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040100100012" Length="1" Start="9" End="9">
+              <Node Id="1.33" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040100100011" Length="1" Start="9" End="9">
+                <Node Id="1.34" Cat="verb" Lemma="πορεύομαι" Language="G" UnicodeLemma="πορεύομαι" morphId="55004010010" StrongNumberX="4198" English="went" Unicode="ἐπορεύθη" nodeId="550040100100010" Start="9" End="9" Analysis="v- 3-s--api">ἐπορεύθη</Node>
+              </Node>
+            </Node>
+            <Node Id="1.35" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040100110021" Length="2" Start="10" End="11">
+              <Node Id="1.36" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040100110020" Length="2" Start="10" End="11">
+                <Node Id="1.37" Cat="prep" Lemma="εἰς" UnicodeLemma="εἰς" English="to" morphId="55004010011" StrongNumberX="1519" Language="G" Unicode="εἰς" nodeId="550040100110010" Start="10" End="10" Analysis="p- -----">εἰς</Node>
+                <Node Id="1.38" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040100120011" Length="1" Start="11" End="11">
+                  <Node Id="1.39" Cat="noun" Lemma="Θεσσαλονίκη" UnicodeLemma="Θεσσαλονίκη" English="Thessalonica" morphId="55004010012" StrongNumberX="2332" Language="G" Unicode="Θεσσαλονίκην," nodeId="550040100120010" Start="11" End="11" Analysis="nr -asf-">Θεσσαλονίκην,</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.40" Cat="CL" Rule="S-ADV" Head="0" Language="G" nodeId="550040100130030" Length="3" Start="12" End="14">
+          <Node Id="1.41" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040100130012" Length="1" Start="12" End="12">
+            <Node Id="1.42" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040100130011" Length="1" Start="12" End="12">
+              <Node Id="1.43" Cat="noun" Lemma="Κρήσκης" Language="G" UnicodeLemma="Κρήσκης" morphId="55004010013" StrongNumberX="2913" English="Crescens" Unicode="Κρήσκης" nodeId="550040100130010" Start="12" End="12" Analysis="nr -nsm-">Κρήσκης</Node>
+            </Node>
+          </Node>
+          <Node Id="1.44" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040100140021" Length="2" Start="13" End="14">
+            <Node Id="1.45" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040100140020" Length="2" Start="13" End="14">
+              <Node Id="1.46" Cat="prep" Lemma="εἰς" UnicodeLemma="εἰς" English="to" morphId="55004010014" StrongNumberX="1519" Language="G" Unicode="εἰς" nodeId="550040100140010" Start="13" End="13" Analysis="p- -----">εἰς</Node>
+              <Node Id="1.47" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040100150011" Length="1" Start="14" End="14">
+                <Node Id="1.48" Cat="noun" Lemma="Γαλατία" UnicodeLemma="Γαλατία" English="Galatia" morphId="55004010015" StrongNumberX="1053" Language="G" Unicode="Γαλατίαν," nodeId="550040100150010" Start="14" End="14" Analysis="nr -asf-">Γαλατίαν,</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.49" Cat="CL" Rule="S-ADV" Head="0" Language="G" nodeId="550040100160030" Length="3" Start="15" End="17">
+          <Node Id="1.50" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040100160012" Length="1" Start="15" End="15">
+            <Node Id="1.51" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040100160011" Length="1" Start="15" End="15">
+              <Node Id="1.52" Cat="noun" Lemma="Τίτος" Language="G" UnicodeLemma="Τίτος" morphId="55004010016" StrongNumberX="5103" English="Titus" Unicode="Τίτος" nodeId="550040100160010" Start="15" End="15" Analysis="nr -nsm-">Τίτος</Node>
+            </Node>
+          </Node>
+          <Node Id="1.53" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040100170021" Length="2" Start="16" End="17">
+            <Node Id="1.54" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040100170020" Length="2" Start="16" End="17">
+              <Node Id="1.55" Cat="prep" Lemma="εἰς" UnicodeLemma="εἰς" English="to" morphId="55004010017" StrongNumberX="1519" Language="G" Unicode="εἰς" nodeId="550040100170010" Start="16" End="16" Analysis="p- -----">εἰς</Node>
+              <Node Id="1.56" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040100180011" Length="1" Start="17" End="17">
+                <Node Id="1.57" Cat="noun" Lemma="Δαλματία" UnicodeLemma="Δαλματία" English="Dalmatia" morphId="55004010018" StrongNumberX="1149" Language="G" Unicode="Δαλματίαν·" nodeId="550040100180010" Start="17" End="17" Analysis="nr -asf-">Δαλματίαν·</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:11">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040110010160" Length="16" Start="0" End="15">
+  <Node Id="1.58" Cat="CL" Rule="S-VC-ADV-P" Head="3" Language="G" nodeId="550040110010050" Length="5" Start="0" End="4">
+    <Node Id="1.59" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040110010012" Length="1" Start="0" End="0">
+      <Node Id="1.60" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040110010011" Length="1" Start="0" End="0">
+        <Node Id="1.61" Cat="noun" Lemma="Λουκᾶς" Language="G" UnicodeLemma="Λουκᾶς" morphId="55004011001" StrongNumberX="3065" English="Luke" Unicode="Λουκᾶς" nodeId="550040110010010" Start="0" End="0" Analysis="nr -nsm-">Λουκᾶς</Node>
+      </Node>
+    </Node>
+    <Node Id="1.62" Cat="VC" Rule="vp2VC" Head="0" Language="G" nodeId="550040110020012" Length="1" Start="1" End="1">
+      <Node Id="1.63" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040110020011" Length="1" Start="1" End="1">
+        <Node Id="1.64" Cat="verb" Lemma="εἰμί" Language="G" UnicodeLemma="εἰμί" morphId="55004011002" StrongNumberX="2076" English="is" Unicode="ἐστιν" nodeId="550040110020010" Start="1" End="1" Analysis="v- 3-s--pai">ἐστιν</Node>
+      </Node>
+    </Node>
+    <Node Id="1.65" Cat="ADV" Rule="adjp2ADV" Head="0" Language="G" nodeId="550040110030012" Length="1" Start="2" End="2">
+      <Node Id="1.66" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040110030011" Length="1" Start="2" End="2">
+        <Node Id="1.67" Cat="adj" Lemma="μόνος" UnicodeLemma="μόνος" English="alone" morphId="55004011003" StrongNumberX="3441" Language="G" Unicode="μόνος" nodeId="550040110030010" Start="2" End="2" Analysis="a- -nsm-">μόνος</Node>
+      </Node>
+    </Node>
+    <Node Id="1.68" Cat="P" Rule="pp2P" Head="0" Language="G" nodeId="550040110040021" Length="2" Start="3" End="4">
+      <Node Id="1.69" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040110040020" Length="2" Start="3" End="4">
+        <Node Id="1.70" Cat="prep" Lemma="μετά" UnicodeLemma="μετά" English="with" morphId="55004011004" StrongNumberX="3326" Language="G" Unicode="μετ’" nodeId="550040110040010" Start="3" End="3" Analysis="p- -----">μετ’</Node>
+        <Node Id="1.71" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040110050011" Length="1" Start="4" End="4">
+          <Node Id="1.72" Cat="pron" Lemma="ἐγώ" UnicodeLemma="ἐγώ" English="me" morphId="55004011005" StrongNumberX="1473" Language="G" Unicode="ἐμοῦ." nodeId="550040110050010" Start="4" End="4" Analysis="rp 1gs--">ἐμοῦ.</Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+  <Node Id="1.1" Cat="CL" Rule="ClCl" Head="0" Language="G" nodeId="550040110060110" Length="11" Start="5" End="15">
+    <Node Id="1.2" Cat="CL" Rule="ADV-V-ADV" Head="1" Language="G" nodeId="550040110060050" Length="5" Start="5" End="9">
+      <Node Id="1.3" Cat="ADV" Rule="CL2ADV" Head="0" Language="G" nodeId="550040110060021" Length="2" Start="5" End="6">
+        <Node Id="1.4" Cat="CL" Rule="O-V" Head="1" Language="G" nodeId="550040110060020" Length="2" Start="5" End="6">
+          <Node Id="1.5" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040110060012" Length="1" Start="5" End="5">
+            <Node Id="1.6" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040110060011" Length="1" Start="5" End="5">
+              <Node Id="1.7" Cat="noun" Lemma="Μᾶρκος" Language="G" UnicodeLemma="Μᾶρκος" morphId="55004011006" StrongNumberX="3138" English="Mark" Unicode="Μᾶρκον" nodeId="550040110060010" Start="5" End="5" Analysis="nr -asm-">Μᾶρκον</Node>
+            </Node>
+          </Node>
+          <Node Id="1.8" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040110070012" Length="1" Start="6" End="6">
+            <Node Id="1.9" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040110070011" Length="1" Start="6" End="6">
+              <Node Id="1.10" Cat="verb" Lemma="ἀναλαμβάνω" UnicodeLemma="ἀναλαμβάνω" English="having taken" morphId="55004011007" StrongNumberX="0353" Language="G" Unicode="ἀναλαβὼν" nodeId="550040110070010" Start="6" End="6" Analysis="v- -nsm-aap">ἀναλαβὼν</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.11" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040110080012" Length="1" Start="7" End="7">
+        <Node Id="1.12" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040110080011" Length="1" Start="7" End="7">
+          <Node Id="1.13" Cat="verb" Lemma="ἄγω" Language="G" UnicodeLemma="ἄγω" morphId="55004011008" StrongNumberX="0071" English="bring" Unicode="ἄγε" nodeId="550040110080010" Start="7" End="7" Analysis="v- 2-s--pad">ἄγε</Node>
+        </Node>
+      </Node>
+      <Node Id="1.14" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040110090021" Length="2" Start="8" End="9">
+        <Node Id="1.15" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040110090020" Length="2" Start="8" End="9">
+          <Node Id="1.16" Cat="prep" Lemma="μετά" UnicodeLemma="μετά" English="with" morphId="55004011009" StrongNumberX="3326" Language="G" Unicode="μετὰ" nodeId="550040110090010" Start="8" End="8" Analysis="p- -----">μετὰ</Node>
+          <Node Id="1.17" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040110100011" Length="1" Start="9" End="9">
+            <Node Id="1.18" Cat="pron" Lemma="σεαυτοῦ" UnicodeLemma="σεαυτοῦ" English="yourself" morphId="55004011010" StrongNumberX="4572" Language="G" Unicode="σεαυτοῦ," nodeId="550040110100010" Start="9" End="9" Analysis="rp 2gsm-">σεαυτοῦ,</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.19" Cat="CL" Rule="sub-CL" Head="1" Language="G" nodeId="550040110120060" Length="6" Start="10" End="15">
+      <Node Id="1.20" Cat="conj" Lemma="γάρ" UnicodeLemma="γάρ" English="for" morphId="55004011012" StrongNumberX="1063" Language="G" Unicode="γάρ" nodeId="550040110120010" Start="10" End="10" Analysis="c- -----">γάρ</Node>
+      <Node Id="1.21" Cat="CL" Rule="VC-ADV-P-ADV" Head="2" Language="G" nodeId="550040110110050" Length="5" Start="11" End="15">
+        <Node Id="1.22" Cat="VC" Rule="vp2VC" Head="0" Language="G" nodeId="550040110110012" Length="1" Start="11" End="11">
+          <Node Id="1.23" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040110110011" Length="1" Start="11" End="11">
+            <Node Id="1.24" Cat="verb" Lemma="εἰμί" Language="G" UnicodeLemma="εἰμί" morphId="55004011011" StrongNumberX="2076" English="he is" Unicode="ἔστιν" nodeId="550040110110010" Start="11" End="11" Analysis="v- 3-s--pai">ἔστιν</Node>
+          </Node>
+        </Node>
+        <Node Id="1.25" Cat="ADV" Rule="Np2ADV" Head="0" Language="G" nodeId="550040110130012" Length="1" Start="12" End="12">
+          <Node Id="1.26" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040110130011" Length="1" Start="12" End="12">
+            <Node Id="1.27" Cat="pron" Lemma="ἐγώ" UnicodeLemma="ἐγώ" English="to me" morphId="55004011013" StrongNumberX="3427" Language="G" Unicode="μοι" nodeId="550040110130010" Start="12" End="12" Analysis="rp 1ds--">μοι</Node>
+          </Node>
+        </Node>
+        <Node Id="1.28" Cat="P" Rule="Adjp2P" Head="0" Language="G" nodeId="550040110140012" Length="1" Start="13" End="13">
+          <Node Id="1.29" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040110140011" Length="1" Start="13" End="13">
+            <Node Id="1.30" Cat="adj" Lemma="εὔχρηστος" Language="G" UnicodeLemma="εὔχρηστος" morphId="55004011014" StrongNumberX="2173" English="useful" Unicode="εὔχρηστος" nodeId="550040110140010" Start="13" End="13" Analysis="a- -nsm-">εὔχρηστος</Node>
+          </Node>
+        </Node>
+        <Node Id="1.31" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040110150021" Length="2" Start="14" End="15">
+          <Node Id="1.32" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040110150020" Length="2" Start="14" End="15">
+            <Node Id="1.33" Cat="prep" Lemma="εἰς" UnicodeLemma="εἰς" English="for" morphId="55004011015" StrongNumberX="1519" Language="G" Unicode="εἰς" nodeId="550040110150010" Start="14" End="14" Analysis="p- -----">εἰς</Node>
+            <Node Id="1.34" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040110160011" Length="1" Start="15" End="15">
+              <Node Id="1.35" Cat="noun" Lemma="διακονία" UnicodeLemma="διακονία" English="service" morphId="55004011016" StrongNumberX="1248" Language="G" Unicode="διακονίαν." nodeId="550040110160010" Start="15" End="15" Analysis="n- -asf-">διακονίαν.</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:12">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040120020051" Length="5" Start="0" End="4">
+  <Node Id="1.1" Cat="CL" Rule="Conj-CL" Head="1" Language="G" nodeId="550040120020050" Length="5" Start="0" End="4">
+    <Node Id="1.2" Cat="conj" Lemma="δέ" Language="G" UnicodeLemma="δέ" morphId="55004012002" StrongNumberX="1161" English="now" Unicode="δὲ" nodeId="550040120020010" Start="0" End="0" Analysis="c- -----">δὲ</Node>
+    <Node Id="1.3" Cat="CL" Rule="O-V-ADV" Head="1" Language="G" nodeId="550040120010040" Length="4" Start="1" End="4">
+      <Node Id="1.4" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040120010012" Length="1" Start="1" End="1">
+        <Node Id="1.5" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040120010011" Length="1" Start="1" End="1">
+          <Node Id="1.6" Cat="noun" Lemma="Τυχικός" Language="G" UnicodeLemma="Τυχικός" morphId="55004012001" StrongNumberX="5190" English="Tychicus" Unicode="Τύχικον" nodeId="550040120010010" Start="1" End="1" Analysis="nr -asm-">Τύχικον</Node>
+        </Node>
+      </Node>
+      <Node Id="1.7" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040120030012" Length="1" Start="2" End="2">
+        <Node Id="1.8" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040120030011" Length="1" Start="2" End="2">
+          <Node Id="1.9" Cat="verb" Lemma="ἀποστέλλω" Language="G" UnicodeLemma="ἀποστέλλω" morphId="55004012003" StrongNumberX="0649" English="I sent" Unicode="ἀπέστειλα" nodeId="550040120030010" Start="2" End="2" Analysis="v- 1-s--aai">ἀπέστειλα</Node>
+        </Node>
+      </Node>
+      <Node Id="1.10" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040120040021" Length="2" Start="3" End="4">
+        <Node Id="1.11" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040120040020" Length="2" Start="3" End="4">
+          <Node Id="1.12" Cat="prep" Lemma="εἰς" UnicodeLemma="εἰς" English="to" morphId="55004012004" StrongNumberX="1519" Language="G" Unicode="εἰς" nodeId="550040120040010" Start="3" End="3" Analysis="p- -----">εἰς</Node>
+          <Node Id="1.13" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040120050011" Length="1" Start="4" End="4">
+            <Node Id="1.14" Cat="noun" Lemma="Ἔφεσος" UnicodeLemma="Ἔφεσος" English="Ephesus" morphId="55004012005" StrongNumberX="2181" Language="G" Unicode="Ἔφεσον." nodeId="550040120050010" Start="4" End="4" Analysis="nr -asf-">Ἔφεσον.</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:13">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040130010161" Length="16" Start="0" End="15">
+  <Node Id="1.1" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040130010160" Length="16" Start="0" End="15">
+    <Node Id="1.2" Cat="CL" Rule="O-ADV-V" Head="2" Language="G" nodeId="550040130010100" Length="10" Start="0" End="9">
+      <Node Id="1.3" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040130010081" Length="8" Start="0" End="7">
+        <Node Id="1.4" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040130010080" Length="8" Start="0" End="7">
+          <Node Id="1.5" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004013001" StrongNumberX="3588" English="The" Unicode="τὸν" nodeId="550040130010010" Start="0" End="0" Analysis="ra -asm-">τὸν</Node>
+          <Node Id="1.6" Cat="np" Rule="NP-CL" Head="0" Language="G" nodeId="550040130020070" Length="7" Start="1" End="7">
+            <Node Id="1.7" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040130020011" Length="1" Start="1" End="1">
+              <Node Id="1.8" Cat="noun" Lemma="φαιλόνης" Language="G" UnicodeLemma="φαιλόνης" morphId="55004013002" StrongNumberX="5341a" English="cloak" Unicode="φαιλόνην" nodeId="550040130020010" Start="1" End="1" Analysis="n- -asm-">φαιλόνην</Node>
+            </Node>
+            <Node Id="1.9" Cat="CL" Rule="O-V-ADV-ADV" Head="1" Language="G" nodeId="550040130030060" Length="6" Start="2" End="7">
+              <Node Id="1.10" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040130030012" Length="1" Start="2" End="2">
+                <Node Id="1.11" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040130030011" Length="1" Start="2" End="2">
+                  <Node Id="1.12" Cat="pron" Lemma="ὅς" Language="G" UnicodeLemma="ὅς" morphId="55004013003" StrongNumberX="3739" English="which" Unicode="ὃν" nodeId="550040130030010" Start="2" End="2" Analysis="rr -asm-">ὃν</Node>
+                </Node>
+              </Node>
+              <Node Id="1.13" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040130040012" Length="1" Start="3" End="3">
+                <Node Id="1.14" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040130040011" Length="1" Start="3" End="3">
+                  <Node Id="1.15" Cat="verb" Lemma="ἀπολείπω" Language="G" UnicodeLemma="ἀπολείπω" morphId="55004013004" StrongNumberX="0620" English="I left behind" Unicode="ἀπέλιπον" nodeId="550040130040010" Start="3" End="3" Analysis="v- 1-s--aai">ἀπέλιπον</Node>
+                </Node>
+              </Node>
+              <Node Id="1.16" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040130050021" Length="2" Start="4" End="5">
+                <Node Id="1.17" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040130050020" Length="2" Start="4" End="5">
+                  <Node Id="1.18" Cat="prep" Lemma="ἐν" UnicodeLemma="ἐν" English="in" morphId="55004013005" StrongNumberX="1722" Language="G" Unicode="ἐν" nodeId="550040130050010" Start="4" End="4" Analysis="p- -----">ἐν</Node>
+                  <Node Id="1.19" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040130060011" Length="1" Start="5" End="5">
+                    <Node Id="1.20" Cat="noun" Lemma="Τρῳάς" UnicodeLemma="Τρῳάς" English="Troas" morphId="55004013006" StrongNumberX="5174" Language="G" Unicode="Τρῳάδι" nodeId="550040130060010" Start="5" End="5" Analysis="nr -dsf-">Τρῳάδι</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.21" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040130070021" Length="2" Start="6" End="7">
+                <Node Id="1.22" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040130070020" Length="2" Start="6" End="7">
+                  <Node Id="1.23" Cat="prep" Lemma="παρά" UnicodeLemma="παρά" English="with" morphId="55004013007" StrongNumberX="3844" Language="G" Unicode="παρὰ" nodeId="550040130070010" Start="6" End="6" Analysis="p- -----">παρὰ</Node>
+                  <Node Id="1.24" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040130080011" Length="1" Start="7" End="7">
+                    <Node Id="1.25" Cat="noun" Lemma="Κάρπος" UnicodeLemma="Κάρπος" English="Carpus" morphId="55004013008" StrongNumberX="2591" Language="G" Unicode="Κάρπῳ" nodeId="550040130080010" Start="7" End="7" Analysis="nr -dsm-">Κάρπῳ</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.26" Cat="ADV" Rule="CL2ADV" Head="0" Language="G" nodeId="550040130090014" Length="1" Start="8" End="8">
+        <Node Id="1.27" Cat="CL" Rule="V2CL" Head="0" Language="G" nodeId="550040130090013" Length="1" Start="8" End="8">
+          <Node Id="1.28" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040130090012" Length="1" Start="8" End="8">
+            <Node Id="1.29" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040130090011" Length="1" Start="8" End="8">
+              <Node Id="1.30" Cat="verb" Lemma="ἔρχομαι" UnicodeLemma="ἔρχομαι" English="(when) coming" morphId="55004013009" StrongNumberX="2064" Language="G" Unicode="ἐρχόμενος" nodeId="550040130090010" Start="8" End="8" Analysis="v- -nsm-pnp">ἐρχόμενος</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.31" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040130100012" Length="1" Start="9" End="9">
+        <Node Id="1.32" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040130100011" Length="1" Start="9" End="9">
+          <Node Id="1.33" Cat="verb" Lemma="φέρω" Language="G" UnicodeLemma="φέρω" morphId="55004013010" StrongNumberX="5342" English="bring" Unicode="φέρε," nodeId="550040130100010" Start="9" End="9" Analysis="v- 2-s--pad">φέρε,</Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.34" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004013011" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040130110010" Start="10" End="10" Analysis="c- -----">καὶ</Node>
+    <Node Id="1.35" Cat="CL" Rule="O2CL" Head="0" Language="G" nodeId="550040130120052" Length="5" Start="11" End="15">
+      <Node Id="1.36" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040130120051" Length="5" Start="11" End="15">
+        <Node Id="1.37" Cat="np" Rule="2Np" Head="0" Language="G" nodeId="550040130120050" Length="5" Start="11" End="15">
+          <Node Id="1.38" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040130120020" Length="2" Start="11" End="12">
+            <Node Id="1.39" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004013012" StrongNumberX="3588" English="the" Unicode="τὰ" nodeId="550040130120010" Start="11" End="11" Analysis="ra -apn-">τὰ</Node>
+            <Node Id="1.40" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040130130011" Length="1" Start="12" End="12">
+              <Node Id="1.41" Cat="noun" Lemma="βιβλίον" Language="G" UnicodeLemma="βιβλίον" morphId="55004013013" StrongNumberX="0975" English="scrolls" Unicode="βιβλία" nodeId="550040130130010" Start="12" End="12" Analysis="n- -apn-">βιβλία</Node>
+            </Node>
+          </Node>
+          <Node Id="1.42" Cat="np" Rule="AdvpNp" Head="1" Language="G" nodeId="550040130140030" Length="3" Start="13" End="15">
+            <Node Id="1.43" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040130140011" Length="1" Start="13" End="13">
+              <Node Id="1.44" Cat="adv" Lemma="μάλιστα" UnicodeLemma="μάλιστα" English="especially" morphId="55004013014" StrongNumberX="3122" Language="G" Unicode="μάλιστα" nodeId="550040130140010" Start="13" End="13" Analysis="d- -----">μάλιστα</Node>
+            </Node>
+            <Node Id="1.45" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040130150020" Length="2" Start="14" End="15">
+              <Node Id="1.46" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004013015" StrongNumberX="3588" English="the" Unicode="τὰς" nodeId="550040130150010" Start="14" End="14" Analysis="ra -apf-">τὰς</Node>
+              <Node Id="1.47" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040130160011" Length="1" Start="15" End="15">
+                <Node Id="1.48" Cat="noun" Lemma="μεμβράνα" Language="G" UnicodeLemma="μεμβράνα" morphId="55004013016" StrongNumberX="3200" English="parchments" Unicode="μεμβράνας." nodeId="550040130160010" Start="15" End="15" Analysis="n- -apf-">μεμβράνας.</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:14">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040140010150" Length="15" Start="0" End="14">
+  <Node Id="1.1" Cat="CL" Rule="S-O-IO-V" Head="3" Language="G" nodeId="550040140010070" Length="7" Start="0" End="6">
+    <Node Id="1.2" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040140010031" Length="3" Start="0" End="2">
+      <Node Id="1.3" Cat="np" Rule="Np-Appos" Head="0" Language="G" nodeId="550040140010030" Length="3" Start="0" End="2">
+        <Node Id="1.4" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040140010011" Length="1" Start="0" End="0">
+          <Node Id="1.5" Cat="noun" Lemma="Ἀλέξανδρος" Language="G" UnicodeLemma="Ἀλέξανδρος" morphId="55004014001" StrongNumberX="0223" English="Alexander" Unicode="Ἀλέξανδρος" nodeId="550040140010010" Start="0" End="0" Analysis="nr -nsm-">Ἀλέξανδρος</Node>
+        </Node>
+        <Node Id="1.6" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040140020020" Length="2" Start="1" End="2">
+          <Node Id="1.7" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004014002" StrongNumberX="3588" English="the" Unicode="ὁ" nodeId="550040140020010" Start="1" End="1" Analysis="ra -nsm-">ὁ</Node>
+          <Node Id="1.8" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040140030011" Length="1" Start="2" End="2">
+            <Node Id="1.9" Cat="noun" Lemma="χαλκεύς" Language="G" UnicodeLemma="χαλκεύς" morphId="55004014003" StrongNumberX="5471" English="coppersmith" Unicode="χαλκεὺς" nodeId="550040140030010" Start="2" End="2" Analysis="n- -nsm-">χαλκεὺς</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.10" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040140040021" Length="2" Start="3" End="4">
+      <Node Id="1.11" Cat="np" Rule="AdjpNp" Head="1" Language="G" nodeId="550040140040020" Length="2" Start="3" End="4">
+        <Node Id="1.12" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040140040011" Length="1" Start="3" End="3">
+          <Node Id="1.13" Cat="adj" Lemma="πολύς" Language="G" UnicodeLemma="πολύς" morphId="55004014004" StrongNumberX="4183" English="many" Unicode="πολλά" nodeId="550040140040010" Start="3" End="3" Analysis="a- -apn-">πολλά</Node>
+        </Node>
+        <Node Id="1.14" Cat="np" Rule="Adj2NP" Head="0" Language="G" nodeId="550040140060012" Length="1" Start="4" End="4">
+          <Node Id="1.15" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040140060011" Length="1" Start="4" End="4">
+            <Node Id="1.16" Cat="adj" Lemma="κακός" Language="G" UnicodeLemma="κακός" morphId="55004014006" StrongNumberX="2556" English="evil things" Unicode="κακὰ" nodeId="550040140060010" Start="4" End="4" Analysis="a- -apn-">κακὰ</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.17" Cat="IO" Rule="Np2IO" Head="0" Language="G" nodeId="550040140050012" Length="1" Start="5" End="5">
+      <Node Id="1.18" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040140050011" Length="1" Start="5" End="5">
+        <Node Id="1.19" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004014005" StrongNumberX="3427" English="to me" Unicode="μοι" nodeId="550040140050010" Start="5" End="5" Analysis="rp 1ds--">μοι</Node>
+      </Node>
+    </Node>
+    <Node Id="1.20" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040140070012" Length="1" Start="6" End="6">
+      <Node Id="1.21" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040140070011" Length="1" Start="6" End="6">
+        <Node Id="1.22" Cat="verb" Lemma="ἐνδείκνυμι" Language="G" UnicodeLemma="ἐνδείκνυμι" morphId="55004014007" StrongNumberX="1731" English="did" Unicode="ἐνεδείξατο·" nodeId="550040140070010" Start="6" End="6" Analysis="v- 3-s--ami">ἐνεδείξατο·</Node>
+      </Node>
+    </Node>
+  </Node>
+  <Node Id="1.2" Cat="CL" Rule="V-IO-S-ADV" Head="0" Language="G" nodeId="550040140080080" Length="8" Start="7" End="14">
+    <Node Id="1.3" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040140080012" Length="1" Start="7" End="7">
+      <Node Id="1.4" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040140080011" Length="1" Start="7" End="7">
+        <Node Id="1.5" Cat="verb" Lemma="ἀποδίδωμι" Language="G" UnicodeLemma="ἀποδίδωμι" morphId="55004014008" StrongNumberX="0591" English="will repay" Unicode="ἀποδώσει" nodeId="550040140080010" Start="7" End="7" Analysis="v- 3-s--fai">ἀποδώσει</Node>
+      </Node>
+    </Node>
+    <Node Id="1.6" Cat="IO" Rule="Np2IO" Head="0" Language="G" nodeId="550040140090012" Length="1" Start="8" End="8">
+      <Node Id="1.7" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040140090011" Length="1" Start="8" End="8">
+        <Node Id="1.8" Cat="pron" Lemma="αὐτός" Language="G" UnicodeLemma="αὐτός" morphId="55004014009" StrongNumberX="0846" English="him" Unicode="αὐτῷ" nodeId="550040140090010" Start="8" End="8" Analysis="rp -dsm-">αὐτῷ</Node>
+      </Node>
+    </Node>
+    <Node Id="1.9" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040140100021" Length="2" Start="9" End="10">
+      <Node Id="1.10" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040140100020" Length="2" Start="9" End="10">
+        <Node Id="1.11" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004014010" StrongNumberX="3588" English="the" Unicode="ὁ" nodeId="550040140100010" Start="9" End="9" Analysis="ra -nsm-">ὁ</Node>
+        <Node Id="1.12" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040140110011" Length="1" Start="10" End="10">
+          <Node Id="1.13" Cat="noun" Lemma="κύριος" Language="G" UnicodeLemma="κύριος" morphId="55004014011" StrongNumberX="2962" English="Lord" Unicode="κύριος" nodeId="550040140110010" Start="10" End="10" Analysis="n- -nsm-">κύριος</Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.14" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040140120041" Length="4" Start="11" End="14">
+      <Node Id="1.15" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040140120040" Length="4" Start="11" End="14">
+        <Node Id="1.16" Cat="prep" Lemma="κατά" UnicodeLemma="κατά" English="according to" morphId="55004014012" StrongNumberX="2596" Language="G" Unicode="κατὰ" nodeId="550040140120010" Start="11" End="11" Analysis="p- -----">κατὰ</Node>
+        <Node Id="1.17" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040140130030" Length="3" Start="12" End="14">
+          <Node Id="1.18" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004014013" StrongNumberX="3588" English="the" Unicode="τὰ" nodeId="550040140130010" Start="12" End="12" Analysis="ra -apn-">τὰ</Node>
+          <Node Id="1.19" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040140140020" Length="2" Start="13" End="14">
+            <Node Id="1.20" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040140140011" Length="1" Start="13" End="13">
+              <Node Id="1.21" Cat="noun" Lemma="ἔργον" UnicodeLemma="ἔργον" English="works" morphId="55004014014" StrongNumberX="2041" Language="G" Unicode="ἔργα" nodeId="550040140140010" Start="13" End="13" Analysis="n- -apn-">ἔργα</Node>
+            </Node>
+            <Node Id="1.22" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040140150011" Length="1" Start="14" End="14">
+              <Node Id="1.23" Cat="pron" Lemma="αὐτός" Language="G" UnicodeLemma="αὐτός" morphId="55004014015" StrongNumberX="0846" English="of him" Unicode="αὐτοῦ·" nodeId="550040140150010" Start="14" End="14" Analysis="rp -gsm-">αὐτοῦ·</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:15">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040150010100" Length="10" Start="0" End="9">
+  <Node Id="1.24" Cat="CL" Rule="O-S-V" Head="2" Language="G" nodeId="550040150010040" Length="4" Start="0" End="3">
+    <Node Id="1.25" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040150010012" Length="1" Start="0" End="0">
+      <Node Id="1.26" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040150010011" Length="1" Start="0" End="0">
+        <Node Id="1.27" Cat="pron" Lemma="ὅς" Language="G" UnicodeLemma="ὅς" morphId="55004015001" StrongNumberX="3739" English="whom" Unicode="ὃν" nodeId="550040150010010" Start="0" End="0" Analysis="rr -asm-">ὃν</Node>
+      </Node>
+    </Node>
+    <Node Id="1.28" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040150020021" Length="2" Start="1" End="2">
+      <Node Id="1.29" Cat="np" Rule="AdvpNp" Head="1" Language="G" nodeId="550040150020020" Length="2" Start="1" End="2">
+        <Node Id="1.30" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040150020011" Length="1" Start="1" End="1">
+          <Node Id="1.31" Cat="adv" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004015002" StrongNumberX="2532" English="also" Unicode="καὶ" nodeId="550040150020010" Start="1" End="1" Analysis="d- -----">καὶ</Node>
+        </Node>
+        <Node Id="1.32" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040150030011" Length="1" Start="2" End="2">
+          <Node Id="1.33" Cat="pron" Lemma="σύ" Language="G" UnicodeLemma="σύ" morphId="55004015003" StrongNumberX="4771" English="you" Unicode="σὺ" nodeId="550040150030010" Start="2" End="2" Analysis="rp 2ns--">σὺ</Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.34" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040150040012" Length="1" Start="3" End="3">
+      <Node Id="1.35" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040150040011" Length="1" Start="3" End="3">
+        <Node Id="1.36" Cat="verb" Lemma="φυλάσσω" Language="G" UnicodeLemma="φυλάσσω" morphId="55004015004" StrongNumberX="5442" English="watch (out for)" Unicode="φυλάσσου," nodeId="550040150040010" Start="3" End="3" Analysis="v- 2-s--pmd">φυλάσσου,</Node>
+      </Node>
+    </Node>
+  </Node>
+  <Node Id="1.1" Cat="CL" Rule="Conj-CL" Head="1" Language="G" nodeId="550040150060060" Length="6" Start="4" End="9">
+    <Node Id="1.2" Cat="conj" Lemma="γάρ" UnicodeLemma="γάρ" English="for" morphId="55004015006" StrongNumberX="1063" Language="G" Unicode="γὰρ" nodeId="550040150060010" Start="4" End="4" Analysis="c- -----">γὰρ</Node>
+    <Node Id="1.3" Cat="CL" Rule="ADV-V-O" Head="1" Language="G" nodeId="550040150050050" Length="5" Start="5" End="9">
+      <Node Id="1.4" Cat="ADV" Rule="Advp2ADV" Head="0" Language="G" nodeId="550040150050012" Length="1" Start="5" End="5">
+        <Node Id="1.5" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040150050011" Length="1" Start="5" End="5">
+          <Node Id="1.6" Cat="adv" Lemma="λίαν" UnicodeLemma="λίαν" English="greatly" morphId="55004015005" StrongNumberX="3029" Language="G" Unicode="λίαν" nodeId="550040150050010" Start="5" End="5" Analysis="d- -----">λίαν</Node>
+        </Node>
+      </Node>
+      <Node Id="1.7" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040150070012" Length="1" Start="6" End="6">
+        <Node Id="1.8" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040150070011" Length="1" Start="6" End="6">
+          <Node Id="1.9" Cat="verb" Lemma="ἀνθίστημι" Language="G" UnicodeLemma="ἀνθίστημι" morphId="55004015007" StrongNumberX="0436" English="he opposed" Unicode="ἀντέστη" nodeId="550040150070010" Start="6" End="6" Analysis="v- 3-s--aai">ἀντέστη</Node>
+        </Node>
+      </Node>
+      <Node Id="1.10" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040150080031" Length="3" Start="7" End="9">
+        <Node Id="1.11" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040150080030" Length="3" Start="7" End="9">
+          <Node Id="1.12" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004015008" StrongNumberX="3588" English="-" Unicode="τοῖς" nodeId="550040150080010" Start="7" End="7" Analysis="ra -dpm-">τοῖς</Node>
+          <Node Id="1.13" Cat="np" Rule="AdjpNp" Head="1" Language="G" nodeId="550040150090020" Length="2" Start="8" End="9">
+            <Node Id="1.14" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040150090011" Length="1" Start="8" End="8">
+              <Node Id="1.15" Cat="adj" Lemma="ἡμέτερος" Language="G" UnicodeLemma="ἡμέτερος" morphId="55004015009" StrongNumberX="2251" English="our" Unicode="ἡμετέροις" nodeId="550040150090010" Start="8" End="8" Analysis="a- 1dpm-">ἡμετέροις</Node>
+            </Node>
+            <Node Id="1.16" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040150100011" Length="1" Start="9" End="9">
+              <Node Id="1.17" Cat="noun" Lemma="λόγος" Language="G" UnicodeLemma="λόγος" morphId="55004015010" StrongNumberX="3056" English="words" Unicode="λόγοις." nodeId="550040150100010" Start="9" End="9" Analysis="n- -dpm-">λόγοις.</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:16">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040160010150" Length="15" Start="0" End="14">
+  <Node Id="1.1" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040160010120" Length="12" Start="0" End="11">
+    <Node Id="1.2" Cat="CL" Rule="ADV-S-ADV-V" Head="3" Language="G" nodeId="550040160010080" Length="8" Start="0" End="7">
+      <Node Id="1.3" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040160010051" Length="5" Start="0" End="4">
+        <Node Id="1.4" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040160010050" Length="5" Start="0" End="4">
+          <Node Id="1.5" Cat="prep" Lemma="ἐν" UnicodeLemma="ἐν" English="in" morphId="55004016001" StrongNumberX="1722" Language="G" Unicode="Ἐν" nodeId="550040160010010" Start="0" End="0" Analysis="p- -----">Ἐν</Node>
+          <Node Id="1.6" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040160020040" Length="4" Start="1" End="4">
+            <Node Id="1.7" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004016002" StrongNumberX="3588" English="the" Unicode="τῇ" nodeId="550040160020010" Start="1" End="1" Analysis="ra -dsf-">τῇ</Node>
+            <Node Id="1.8" Cat="np" Rule="AdjpNp" Head="1" Language="G" nodeId="550040160030030" Length="3" Start="2" End="4">
+              <Node Id="1.9" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040160030011" Length="1" Start="2" End="2">
+                <Node Id="1.10" Cat="adj" Lemma="πρῶτος" UnicodeLemma="πρῶτος" English="first" morphId="55004016003" StrongNumberX="4413" Language="G" Unicode="πρώτῃ" nodeId="550040160030010" Start="2" End="2" Analysis="a- -dsf-">πρώτῃ</Node>
+              </Node>
+              <Node Id="1.11" Cat="np" Rule="ofNPNP" Head="1" Language="G" nodeId="550040160040020" Length="2" Start="3" End="4">
+                <Node Id="1.12" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040160040011" Length="1" Start="3" End="3">
+                  <Node Id="1.13" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004016004" StrongNumberX="3450" English="of me" Unicode="μου" nodeId="550040160040010" Start="3" End="3" Analysis="rp 1gs--">μου</Node>
+                </Node>
+                <Node Id="1.14" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040160050011" Length="1" Start="4" End="4">
+                  <Node Id="1.15" Cat="noun" Lemma="ἀπολογία" UnicodeLemma="ἀπολογία" English="defense" morphId="55004016005" StrongNumberX="0627" Language="G" Unicode="ἀπολογίᾳ" nodeId="550040160050010" Start="4" End="4" Analysis="n- -dsf-">ἀπολογίᾳ</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.16" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040160060013" Length="1" Start="5" End="5">
+        <Node Id="1.17" Cat="np" Rule="Adj2NP" Head="0" Language="G" nodeId="550040160060012" Length="1" Start="5" End="5">
+          <Node Id="1.18" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040160060011" Length="1" Start="5" End="5">
+            <Node Id="1.19" Cat="adj" Lemma="οὐδείς" Language="G" UnicodeLemma="οὐδείς" morphId="55004016006" StrongNumberX="3762" English="no one" Unicode="οὐδείς" nodeId="550040160060010" Start="5" End="5" Analysis="a- -nsm-">οὐδείς</Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.20" Cat="ADV" Rule="Np2ADV" Head="0" Language="G" nodeId="550040160070012" Length="1" Start="6" End="6">
+        <Node Id="1.21" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040160070011" Length="1" Start="6" End="6">
+          <Node Id="1.22" Cat="pron" Lemma="ἐγώ" UnicodeLemma="ἐγώ" English="with me" morphId="55004016007" StrongNumberX="3427" Language="G" Unicode="μοι" nodeId="550040160070010" Start="6" End="6" Analysis="rp 1ds--">μοι</Node>
+        </Node>
+      </Node>
+      <Node Id="1.23" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040160080012" Length="1" Start="7" End="7">
+        <Node Id="1.24" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040160080011" Length="1" Start="7" End="7">
+          <Node Id="1.25" Cat="verb" Lemma="παραγίνομαι" Language="G" UnicodeLemma="παραγίνομαι" morphId="55004016008" StrongNumberX="3854" English="came to be" Unicode="παρεγένετο," nodeId="550040160080010" Start="7" End="7" Analysis="v- 3-s--ami">παρεγένετο,</Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.26" Cat="conj" Lemma="ἀλλά" Language="G" UnicodeLemma="ἀλλά" morphId="55004016009" StrongNumberX="0235" English="but" Unicode="ἀλλὰ" nodeId="550040160090010" Start="8" End="8" Analysis="c- -----">ἀλλὰ</Node>
+    <Node Id="1.27" Cat="CL" Rule="S-O-V" Head="2" Language="G" nodeId="550040160100030" Length="3" Start="9" End="11">
+      <Node Id="1.28" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040160100013" Length="1" Start="9" End="9">
+        <Node Id="1.29" Cat="np" Rule="Adj2NP" Head="0" Language="G" nodeId="550040160100012" Length="1" Start="9" End="9">
+          <Node Id="1.30" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040160100011" Length="1" Start="9" End="9">
+            <Node Id="1.31" Cat="adj" Lemma="πᾶς" Language="G" UnicodeLemma="πᾶς" morphId="55004016010" StrongNumberX="3956" English="all" Unicode="πάντες" nodeId="550040160100010" Start="9" End="9" Analysis="a- -npm-">πάντες</Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.32" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040160110012" Length="1" Start="10" End="10">
+        <Node Id="1.33" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040160110011" Length="1" Start="10" End="10">
+          <Node Id="1.34" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004016011" StrongNumberX="3165" English="me" Unicode="με" nodeId="550040160110010" Start="10" End="10" Analysis="rp 1as--">με</Node>
+        </Node>
+      </Node>
+      <Node Id="1.35" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040160120012" Length="1" Start="11" End="11">
+        <Node Id="1.36" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040160120011" Length="1" Start="11" End="11">
+          <Node Id="1.37" Cat="verb" Lemma="ἐγκαταλείπω" Language="G" UnicodeLemma="ἐγκαταλείπω" morphId="55004016012" StrongNumberX="1459" English="forsook" Unicode="ἐγκατέλιπον·" nodeId="550040160120010" Start="11" End="11" Analysis="v- 3-p--aai">ἐγκατέλιπον·</Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+  <Node Id="1.1" Cat="CL" Rule="ADV-IO-V" Head="2" Language="G" nodeId="550040160130030" Length="3" Start="12" End="14">
+    <Node Id="1.2" Cat="ADV" Rule="Advp2ADV" Head="0" Language="G" nodeId="550040160130012" Length="1" Start="12" End="12">
+      <Node Id="1.3" Cat="advp" Rule="Adv2Advp" Head="0" Language="G" nodeId="550040160130011" Length="1" Start="12" End="12">
+        <Node Id="1.4" Cat="adv" Lemma="μή" Language="G" UnicodeLemma="μή" morphId="55004016013" StrongNumberX="3361" English="not" Unicode="μὴ" nodeId="550040160130010" Start="12" End="12" Analysis="d- -----">μὴ</Node>
+      </Node>
+    </Node>
+    <Node Id="1.5" Cat="IO" Rule="Np2IO" Head="0" Language="G" nodeId="550040160140012" Length="1" Start="13" End="13">
+      <Node Id="1.6" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040160140011" Length="1" Start="13" End="13">
+        <Node Id="1.7" Cat="pron" Lemma="αὐτός" Language="G" UnicodeLemma="αὐτός" morphId="55004016014" StrongNumberX="0846" English="against them" Unicode="αὐτοῖς" nodeId="550040160140010" Start="13" End="13" Analysis="rp -dpm-">αὐτοῖς</Node>
+      </Node>
+    </Node>
+    <Node Id="1.8" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040160150012" Length="1" Start="14" End="14">
+      <Node Id="1.9" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040160150011" Length="1" Start="14" End="14">
+        <Node Id="1.10" Cat="verb" Lemma="λογίζομαι" Language="G" UnicodeLemma="λογίζομαι" morphId="55004016015" StrongNumberX="3049" English="may it be counted" Unicode="λογισθείη·" nodeId="550040160150010" Start="14" End="14" Analysis="v- 3-s--apo">λογισθείη·</Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:17">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040170020241" Length="24" Start="0" End="23">
+  <Node Id="1.1" Cat="CL" Rule="Conj-CL" Head="1" Language="G" nodeId="550040170020240" Length="24" Start="0" End="23">
+    <Node Id="1.2" Cat="conj" Lemma="δέ" Language="G" UnicodeLemma="δέ" morphId="55004017002" StrongNumberX="1161" English="but" Unicode="δὲ" nodeId="550040170020010" Start="0" End="0" Analysis="c- -----">δὲ</Node>
+    <Node Id="1.3" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040170010230" Length="23" Start="1" End="23">
+      <Node Id="1.4" Cat="CL" Rule="ClCl" Head="0" Language="G" nodeId="550040170010180" Length="18" Start="1" End="18">
+        <Node Id="1.5" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040170010070" Length="7" Start="1" End="7">
+          <Node Id="1.6" Cat="CL" Rule="S-ADV-V" Head="2" Language="G" nodeId="550040170010040" Length="4" Start="1" End="4">
+            <Node Id="1.7" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040170010021" Length="2" Start="1" End="2">
+              <Node Id="1.8" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040170010020" Length="2" Start="1" End="2">
+                <Node Id="1.9" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004017001" StrongNumberX="3588" English="the" Unicode="ὁ" nodeId="550040170010010" Start="1" End="1" Analysis="ra -nsm-">ὁ</Node>
+                <Node Id="1.10" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040170030011" Length="1" Start="2" End="2">
+                  <Node Id="1.11" Cat="noun" Lemma="κύριος" Language="G" UnicodeLemma="κύριος" morphId="55004017003" StrongNumberX="2962" English="Lord" Unicode="κύριός" nodeId="550040170030010" Start="2" End="2" Analysis="n- -nsm-">κύριός</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.12" Cat="ADV" Rule="Np2ADV" Head="0" Language="G" nodeId="550040170040012" Length="1" Start="3" End="3">
+              <Node Id="1.13" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040170040011" Length="1" Start="3" End="3">
+                <Node Id="1.14" Cat="pron" Lemma="ἐγώ" UnicodeLemma="ἐγώ" English="me" morphId="55004017004" StrongNumberX="3427" Language="G" Unicode="μοι" nodeId="550040170040010" Start="3" End="3" Analysis="rp 1ds--">μοι</Node>
+              </Node>
+            </Node>
+            <Node Id="1.15" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040170050012" Length="1" Start="4" End="4">
+              <Node Id="1.16" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040170050011" Length="1" Start="4" End="4">
+                <Node Id="1.17" Cat="verb" Lemma="παρίστημι" Language="G" UnicodeLemma="παρίστημι" morphId="55004017005" StrongNumberX="3936" English="stood with" Unicode="παρέστη" nodeId="550040170050010" Start="4" End="4" Analysis="v- 3-s--aai">παρέστη</Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="1.18" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004017006" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040170060010" Start="5" End="5" Analysis="c- -----">καὶ</Node>
+          <Node Id="1.19" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040170070020" Length="2" Start="6" End="7">
+            <Node Id="1.20" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040170070012" Length="1" Start="6" End="6">
+              <Node Id="1.21" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040170070011" Length="1" Start="6" End="6">
+                <Node Id="1.22" Cat="verb" Lemma="ἐνδυναμόω" Language="G" UnicodeLemma="ἐνδυναμόω" morphId="55004017007" StrongNumberX="1743" English="empowered" Unicode="ἐνεδυνάμωσέν" nodeId="550040170070010" Start="6" End="6" Analysis="v- 3-s--aai">ἐνεδυνάμωσέν</Node>
+              </Node>
+            </Node>
+            <Node Id="1.23" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040170080012" Length="1" Start="7" End="7">
+              <Node Id="1.24" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040170080011" Length="1" Start="7" End="7">
+                <Node Id="1.25" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004017008" StrongNumberX="3165" English="me" Unicode="με," nodeId="550040170080010" Start="7" End="7" Analysis="rp 1as--">με,</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.26" Cat="CL" Rule="sub-CL" Head="1" Language="G" nodeId="550040170090110" Length="11" Start="8" End="18">
+          <Node Id="1.27" Cat="conj" Lemma="ἵνα" UnicodeLemma="ἵνα" English="that" morphId="55004017009" StrongNumberX="2443" Language="G" Unicode="ἵνα" nodeId="550040170090010" Start="8" End="8" Analysis="c- -----">ἵνα</Node>
+          <Node Id="1.28" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040170100100" Length="10" Start="9" End="18">
+            <Node Id="1.29" Cat="CL" Rule="ADV-S-V" Head="2" Language="G" nodeId="550040170100050" Length="5" Start="9" End="13">
+              <Node Id="1.30" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040170100021" Length="2" Start="9" End="10">
+                <Node Id="1.31" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040170100020" Length="2" Start="9" End="10">
+                  <Node Id="1.32" Cat="prep" Lemma="διά" UnicodeLemma="διά" English="through" morphId="55004017010" StrongNumberX="1223" Language="G" Unicode="δι’" nodeId="550040170100010" Start="9" End="9" Analysis="p- -----">δι’</Node>
+                  <Node Id="1.33" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040170110011" Length="1" Start="10" End="10">
+                    <Node Id="1.34" Cat="pron" Lemma="ἐγώ" UnicodeLemma="ἐγώ" English="me" morphId="55004017011" StrongNumberX="1473" Language="G" Unicode="ἐμοῦ" nodeId="550040170110010" Start="10" End="10" Analysis="rp 1gs--">ἐμοῦ</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.35" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040170120021" Length="2" Start="11" End="12">
+                <Node Id="1.36" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040170120020" Length="2" Start="11" End="12">
+                  <Node Id="1.37" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004017012" StrongNumberX="3588" English="the" Unicode="τὸ" nodeId="550040170120010" Start="11" End="11" Analysis="ra -nsn-">τὸ</Node>
+                  <Node Id="1.38" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040170130011" Length="1" Start="12" End="12">
+                    <Node Id="1.39" Cat="noun" Lemma="κήρυγμα" Language="G" UnicodeLemma="κήρυγμα" morphId="55004017013" StrongNumberX="2782" English="proclamation" Unicode="κήρυγμα" nodeId="550040170130010" Start="12" End="12" Analysis="n- -nsn-">κήρυγμα</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.40" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040170140012" Length="1" Start="13" End="13">
+                <Node Id="1.41" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040170140011" Length="1" Start="13" End="13">
+                  <Node Id="1.42" Cat="verb" Lemma="πληροφορέω" Language="G" UnicodeLemma="πληροφορέω" morphId="55004017014" StrongNumberX="4135" English="might be fully made" Unicode="πληροφορηθῇ" nodeId="550040170140010" Start="13" End="13" Analysis="v- 3-s--aps">πληροφορηθῇ</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.43" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004017015" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040170150010" Start="14" End="14" Analysis="c- -----">καὶ</Node>
+            <Node Id="1.44" Cat="CL" Rule="V-S" Head="0" Language="G" nodeId="550040170160040" Length="4" Start="15" End="18">
+              <Node Id="1.45" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040170160012" Length="1" Start="15" End="15">
+                <Node Id="1.46" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040170160011" Length="1" Start="15" End="15">
+                  <Node Id="1.47" Cat="verb" Lemma="ἀκούω" Language="G" UnicodeLemma="ἀκούω" morphId="55004017016" StrongNumberX="0191" English="might hear (it)" Unicode="ἀκούσωσιν" nodeId="550040170160010" Start="15" End="15" Analysis="v- 3-p--aas">ἀκούσωσιν</Node>
+                </Node>
+              </Node>
+              <Node Id="1.48" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040170170031" Length="3" Start="16" End="18">
+                <Node Id="1.49" Cat="np" Rule="All-NP" Head="1" Language="G" nodeId="550040170170030" Length="3" Start="16" End="18">
+                  <Node Id="1.50" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040170170011" Length="1" Start="16" End="16">
+                    <Node Id="1.51" Cat="adj" Lemma="πᾶς" Language="G" UnicodeLemma="πᾶς" morphId="55004017017" StrongNumberX="3956" English="all" Unicode="πάντα" nodeId="550040170170010" Start="16" End="16" Analysis="a- -npn-">πάντα</Node>
+                  </Node>
+                  <Node Id="1.52" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040170180020" Length="2" Start="17" End="18">
+                    <Node Id="1.53" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004017018" StrongNumberX="3588" English="the" Unicode="τὰ" nodeId="550040170180010" Start="17" End="17" Analysis="ra -npn-">τὰ</Node>
+                    <Node Id="1.54" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040170190011" Length="1" Start="18" End="18">
+                      <Node Id="1.55" Cat="noun" Lemma="ἔθνος" Language="G" UnicodeLemma="ἔθνος" morphId="55004017019" StrongNumberX="1484" English="gentiles" Unicode="ἔθνη," nodeId="550040170190010" Start="18" End="18" Analysis="n- -npn-">ἔθνη,</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.56" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004017020" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040170200010" Start="19" End="19" Analysis="c- -----">καὶ</Node>
+      <Node Id="1.57" Cat="CL" Rule="V-ADV" Head="0" Language="G" nodeId="550040170210040" Length="4" Start="20" End="23">
+        <Node Id="1.58" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040170210012" Length="1" Start="20" End="20">
+          <Node Id="1.59" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040170210011" Length="1" Start="20" End="20">
+            <Node Id="1.60" Cat="verb" Lemma="ῥύομαι" Language="G" UnicodeLemma="ῥύομαι" morphId="55004017021" StrongNumberX="4506" English="I was rescued" Unicode="ἐρρύσθην" nodeId="550040170210010" Start="20" End="20" Analysis="v- 1-s--api">ἐρρύσθην</Node>
+          </Node>
+        </Node>
+        <Node Id="1.61" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040170220031" Length="3" Start="21" End="23">
+          <Node Id="1.62" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040170220030" Length="3" Start="21" End="23">
+            <Node Id="1.63" Cat="prep" Lemma="ἐκ" UnicodeLemma="ἐκ" English="out of" morphId="55004017022" StrongNumberX="1537" Language="G" Unicode="ἐκ" nodeId="550040170220010" Start="21" End="21" Analysis="p- -----">ἐκ</Node>
+            <Node Id="1.64" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040170230020" Length="2" Start="22" End="23">
+              <Node Id="1.65" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040170230011" Length="1" Start="22" End="22">
+                <Node Id="1.66" Cat="noun" Lemma="στόμα" UnicodeLemma="στόμα" English="(the) mouth" morphId="55004017023" StrongNumberX="4750" Language="G" Unicode="στόματος" nodeId="550040170230010" Start="22" End="22" Analysis="n- -gsn-">στόματος</Node>
+              </Node>
+              <Node Id="1.67" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040170240011" Length="1" Start="23" End="23">
+                <Node Id="1.68" Cat="noun" Lemma="λέων" Language="G" UnicodeLemma="λέων" morphId="55004017024" StrongNumberX="3023" English="of (the) lion" Unicode="λέοντος." nodeId="550040170240010" Start="23" End="23" Analysis="n- -gsm-">λέοντος.</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:18">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040180010251" Length="25" Start="0" End="24">
+  <Node Id="1.1" Cat="CL" Rule="ClCl" Head="0" Language="G" nodeId="550040180010250" Length="25" Start="0" End="24">
+    <Node Id="1.2" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040180010160" Length="16" Start="0" End="15">
+      <Node Id="1.3" Cat="CL" Rule="V-O-S-ADV" Head="0" Language="G" nodeId="550040180010080" Length="8" Start="0" End="7">
+        <Node Id="1.4" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040180010012" Length="1" Start="0" End="0">
+          <Node Id="1.5" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040180010011" Length="1" Start="0" End="0">
+            <Node Id="1.6" Cat="verb" Lemma="ῥύομαι" Language="G" UnicodeLemma="ῥύομαι" morphId="55004018001" StrongNumberX="4506" English="will  rescue" Unicode="ῥύσεταί" nodeId="550040180010010" Start="0" End="0" Analysis="v- 3-s--fmi">ῥύσεταί</Node>
+          </Node>
+        </Node>
+        <Node Id="1.7" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040180020012" Length="1" Start="1" End="1">
+          <Node Id="1.8" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040180020011" Length="1" Start="1" End="1">
+            <Node Id="1.9" Cat="pron" Lemma="ἐγώ" Language="G" UnicodeLemma="ἐγώ" morphId="55004018002" StrongNumberX="3165" English="me" Unicode="με" nodeId="550040180020010" Start="1" End="1" Analysis="rp 1as--">με</Node>
+          </Node>
+        </Node>
+        <Node Id="1.10" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040180030021" Length="2" Start="2" End="3">
+          <Node Id="1.11" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040180030020" Length="2" Start="2" End="3">
+            <Node Id="1.12" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004018003" StrongNumberX="3588" English="the" Unicode="ὁ" nodeId="550040180030010" Start="2" End="2" Analysis="ra -nsm-">ὁ</Node>
+            <Node Id="1.13" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040180040011" Length="1" Start="3" End="3">
+              <Node Id="1.14" Cat="noun" Lemma="κύριος" Language="G" UnicodeLemma="κύριος" morphId="55004018004" StrongNumberX="2962" English="Lord" Unicode="κύριος" nodeId="550040180040010" Start="3" End="3" Analysis="n- -nsm-">κύριος</Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.15" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040180050041" Length="4" Start="4" End="7">
+          <Node Id="1.16" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040180050040" Length="4" Start="4" End="7">
+            <Node Id="1.17" Cat="prep" Lemma="ἀπό" UnicodeLemma="ἀπό" English="from" morphId="55004018005" StrongNumberX="0575" Language="G" Unicode="ἀπὸ" nodeId="550040180050010" Start="4" End="4" Analysis="p- -----">ἀπὸ</Node>
+            <Node Id="1.18" Cat="np" Rule="All-NP" Head="1" Language="G" nodeId="550040180060030" Length="3" Start="5" End="7">
+              <Node Id="1.19" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040180060011" Length="1" Start="5" End="5">
+                <Node Id="1.20" Cat="adj" Lemma="πᾶς" Language="G" UnicodeLemma="πᾶς" morphId="55004018006" StrongNumberX="3956" English="every" Unicode="παντὸς" nodeId="550040180060010" Start="5" End="5" Analysis="a- -gsn-">παντὸς</Node>
+              </Node>
+              <Node Id="1.21" Cat="np" Rule="NpAdjp" Head="0" Language="G" nodeId="550040180070020" Length="2" Start="6" End="7">
+                <Node Id="1.22" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040180070011" Length="1" Start="6" End="6">
+                  <Node Id="1.23" Cat="noun" Lemma="ἔργον" UnicodeLemma="ἔργον" English="work" morphId="55004018007" StrongNumberX="2041" Language="G" Unicode="ἔργου" nodeId="550040180070010" Start="6" End="6" Analysis="n- -gsn-">ἔργου</Node>
+                </Node>
+                <Node Id="1.24" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040180080011" Length="1" Start="7" End="7">
+                  <Node Id="1.25" Cat="adj" Lemma="πονηρός" Language="G" UnicodeLemma="πονηρός" morphId="55004018008" StrongNumberX="4190" English="evil" Unicode="πονηροῦ" nodeId="550040180080010" Start="7" End="7" Analysis="a- -gsn-">πονηροῦ</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.26" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004018009" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040180090010" Start="8" End="8" Analysis="c- -----">καὶ</Node>
+      <Node Id="1.27" Cat="CL" Rule="V-ADV" Head="0" Language="G" nodeId="550040180100070" Length="7" Start="9" End="15">
+        <Node Id="1.28" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040180100012" Length="1" Start="9" End="9">
+          <Node Id="1.29" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040180100011" Length="1" Start="9" End="9">
+            <Node Id="1.30" Cat="verb" Lemma="σῴζω" Language="G" UnicodeLemma="σῴζω" morphId="55004018010" StrongNumberX="4982" English="will bring (me) safely" Unicode="σώσει" nodeId="550040180100010" Start="9" End="9" Analysis="v- 3-s--fai">σώσει</Node>
+          </Node>
+        </Node>
+        <Node Id="1.31" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040180110061" Length="6" Start="10" End="15">
+          <Node Id="1.32" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040180110060" Length="6" Start="10" End="15">
+            <Node Id="1.33" Cat="prep" Lemma="εἰς" UnicodeLemma="εἰς" English="into" morphId="55004018011" StrongNumberX="1519" Language="G" Unicode="εἰς" nodeId="550040180110010" Start="10" End="10" Analysis="p- -----">εἰς</Node>
+            <Node Id="1.34" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040180120050" Length="5" Start="11" End="15">
+              <Node Id="1.35" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004018012" StrongNumberX="3588" English="the" Unicode="τὴν" nodeId="550040180120010" Start="11" End="11" Analysis="ra -asf-">τὴν</Node>
+              <Node Id="1.36" Cat="np" Rule="NPDetAdj" Head="0" Language="G" nodeId="550040180130040" Length="4" Start="12" End="15">
+                <Node Id="1.37" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040180130020" Length="2" Start="12" End="13">
+                  <Node Id="1.38" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040180130011" Length="1" Start="12" End="12">
+                    <Node Id="1.39" Cat="noun" Lemma="βασιλεία" UnicodeLemma="βασιλεία" English="kingdom" morphId="55004018013" StrongNumberX="0932" Language="G" Unicode="βασιλείαν" nodeId="550040180130010" Start="12" End="12" Analysis="n- -asf-">βασιλείαν</Node>
+                  </Node>
+                  <Node Id="1.40" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040180140011" Length="1" Start="13" End="13">
+                    <Node Id="1.41" Cat="pron" Lemma="αὐτός" Language="G" UnicodeLemma="αὐτός" morphId="55004018014" StrongNumberX="0846" English="of Him" Unicode="αὐτοῦ" nodeId="550040180140010" Start="13" End="13" Analysis="rp -gsm-">αὐτοῦ</Node>
+                  </Node>
+                </Node>
+                <Node Id="1.42" Cat="np" Rule="DetAdj" Head="1" Language="G" nodeId="550040180150020" Length="2" Start="14" End="15">
+                  <Node Id="1.43" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004018015" StrongNumberX="3588" English="-" Unicode="τὴν" nodeId="550040180150010" Start="14" End="14" Analysis="ra -asf-">τὴν</Node>
+                  <Node Id="1.44" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040180160011" Length="1" Start="15" End="15">
+                    <Node Id="1.45" Cat="adj" Lemma="ἐπουράνιος" Language="G" UnicodeLemma="ἐπουράνιος" morphId="55004018016" StrongNumberX="2032" English="heavenly" Unicode="ἐπουράνιον·" nodeId="550040180160010" Start="15" End="15" Analysis="a- -asf-">ἐπουράνιον·</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.46" Cat="CL" Rule="ClCl" Head="0" Language="G" nodeId="550040180170090" Length="9" Start="16" End="24">
+      <Node Id="1.47" Cat="CL" Rule="IO-S-ADV" Head="1" Language="G" nodeId="550040180170080" Length="8" Start="16" End="23">
+        <Node Id="1.48" Cat="IO" Rule="Np2IO" Head="0" Language="G" nodeId="550040180170012" Length="1" Start="16" End="16">
+          <Node Id="1.49" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040180170011" Length="1" Start="16" End="16">
+            <Node Id="1.50" Cat="pron" Lemma="ὅς" Language="G" UnicodeLemma="ὅς" morphId="55004018017" StrongNumberX="3739" English="to whom" Unicode="ᾧ" nodeId="550040180170010" Start="16" End="16" Analysis="rr -dsm-">ᾧ</Node>
+          </Node>
+        </Node>
+        <Node Id="1.51" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040180180021" Length="2" Start="17" End="18">
+          <Node Id="1.52" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040180180020" Length="2" Start="17" End="18">
+            <Node Id="1.53" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004018018" StrongNumberX="3588" English="(be) the" Unicode="ἡ" nodeId="550040180180010" Start="17" End="17" Analysis="ra -nsf-">ἡ</Node>
+            <Node Id="1.54" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040180190011" Length="1" Start="18" End="18">
+              <Node Id="1.55" Cat="noun" Lemma="δόξα" Language="G" UnicodeLemma="δόξα" morphId="55004018019" StrongNumberX="1391" English="glory" Unicode="δόξα" nodeId="550040180190010" Start="18" End="18" Analysis="n- -nsf-">δόξα</Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.56" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040180200051" Length="5" Start="19" End="23">
+          <Node Id="1.57" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040180200050" Length="5" Start="19" End="23">
+            <Node Id="1.58" Cat="prep" Lemma="εἰς" UnicodeLemma="εἰς" English="into" morphId="55004018020" StrongNumberX="1519" Language="G" Unicode="εἰς" nodeId="550040180200010" Start="19" End="19" Analysis="p- -----">εἰς</Node>
+            <Node Id="1.59" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040180210040" Length="4" Start="20" End="23">
+              <Node Id="1.60" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004018021" StrongNumberX="3588" English="the" Unicode="τοὺς" nodeId="550040180210010" Start="20" End="20" Analysis="ra -apm-">τοὺς</Node>
+              <Node Id="1.61" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040180220030" Length="3" Start="21" End="23">
+                <Node Id="1.62" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040180220011" Length="1" Start="21" End="21">
+                  <Node Id="1.63" Cat="noun" Lemma="αἰών" UnicodeLemma="αἰών" English="ages" morphId="55004018022" StrongNumberX="0165" Language="G" Unicode="αἰῶνας" nodeId="550040180220010" Start="21" End="21" Analysis="n- -apm-">αἰῶνας</Node>
+                </Node>
+                <Node Id="1.64" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040180230020" Length="2" Start="22" End="23">
+                  <Node Id="1.65" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004018023" StrongNumberX="3588" English="of the" Unicode="τῶν" nodeId="550040180230010" Start="22" End="22" Analysis="ra -gpm-">τῶν</Node>
+                  <Node Id="1.66" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040180240011" Length="1" Start="23" End="23">
+                    <Node Id="1.67" Cat="noun" Lemma="αἰών" Language="G" UnicodeLemma="αἰών" morphId="55004018024" StrongNumberX="0165" English="ages" Unicode="αἰώνων," nodeId="550040180240010" Start="23" End="23" Analysis="n- -gpm-">αἰώνων,</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.68" Cat="CL" Rule="Intj2CL" Head="0" Language="G" nodeId="550040180250012" Length="1" Start="24" End="24">
+        <Node Id="1.69" Cat="intj" Rule="Ptcl2Intj" Head="0" Language="G" nodeId="550040180250011" Length="1" Start="24" End="24">
+          <Node Id="1.70" Cat="ptcl" Lemma="ἀμήν" Language="G" UnicodeLemma="ἀμήν" morphId="55004018025" StrongNumberX="0281" English="Amen" Unicode="ἀμήν." nodeId="550040180250010" Start="24" End="24" Analysis="x- -----">ἀμήν.</Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:19">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040190010081" Length="8" Start="0" End="7">
+  <Node Id="1.1" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040190010080" Length="8" Start="0" End="7">
+    <Node Id="1.2" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040190010012" Length="1" Start="0" End="0">
+      <Node Id="1.3" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040190010011" Length="1" Start="0" End="0">
+        <Node Id="1.4" Cat="verb" Lemma="ἀσπάζομαι" Language="G" UnicodeLemma="ἀσπάζομαι" morphId="55004019001" StrongNumberX="0782" English="Greet" Unicode="Ἄσπασαι" nodeId="550040190010010" Start="0" End="0" Analysis="v- 2-s--amd">Ἄσπασαι</Node>
+      </Node>
+    </Node>
+    <Node Id="1.5" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040190020071" Length="7" Start="1" End="7">
+      <Node Id="1.6" Cat="np" Rule="Conj3Np" Head="0" Language="G" nodeId="550040190020070" Length="7" Start="1" End="7">
+        <Node Id="1.7" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040190020011" Length="1" Start="1" End="1">
+          <Node Id="1.8" Cat="noun" Lemma="Πρίσκα" Language="G" UnicodeLemma="Πρίσκα" morphId="55004019002" StrongNumberX="4251" English="Prisca" Unicode="Πρίσκαν" nodeId="550040190020010" Start="1" End="1" Analysis="nr -asf-">Πρίσκαν</Node>
+        </Node>
+        <Node Id="1.9" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004019003" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040190030010" Start="2" End="2" Analysis="c- -----">καὶ</Node>
+        <Node Id="1.10" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040190040011" Length="1" Start="3" End="3">
+          <Node Id="1.11" Cat="noun" Lemma="Ἀκύλας" Language="G" UnicodeLemma="Ἀκύλας" morphId="55004019004" StrongNumberX="0207" English="Aquila" Unicode="Ἀκύλαν" nodeId="550040190040010" Start="3" End="3" Analysis="nr -asm-">Ἀκύλαν</Node>
+        </Node>
+        <Node Id="1.12" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004019005" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040190050010" Start="4" End="4" Analysis="c- -----">καὶ</Node>
+        <Node Id="1.13" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040190060030" Length="3" Start="5" End="7">
+          <Node Id="1.14" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004019006" StrongNumberX="3588" English="the" Unicode="τὸν" nodeId="550040190060010" Start="5" End="5" Analysis="ra -asm-">τὸν</Node>
+          <Node Id="1.15" Cat="np" Rule="ofNPNP" Head="1" Language="G" nodeId="550040190070020" Length="2" Start="6" End="7">
+            <Node Id="1.16" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040190070011" Length="1" Start="6" End="6">
+              <Node Id="1.17" Cat="noun" Lemma="Ὀνησίφορος" Language="G" UnicodeLemma="Ὀνησίφορος" morphId="55004019007" StrongNumberX="3683" English="of Onesiphorus" Unicode="Ὀνησιφόρου" nodeId="550040190070010" Start="6" End="6" Analysis="nr -gsm-">Ὀνησιφόρου</Node>
+            </Node>
+            <Node Id="1.18" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040190080011" Length="1" Start="7" End="7">
+              <Node Id="1.19" Cat="noun" Lemma="οἶκος" Language="G" UnicodeLemma="οἶκος" morphId="55004019008" StrongNumberX="3624" English="household" Unicode="οἶκον." nodeId="550040190080010" Start="7" End="7" Analysis="n- -asm-">οἶκον.</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:20">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040200010101" Length="10" Start="0" End="9">
+  <Node Id="1.1" Cat="CL" Rule="CLaCL" Head="0" Language="G" nodeId="550040200010100" Length="10" Start="0" End="9">
+    <Node Id="1.2" Cat="CL" Rule="S-V-ADV" Head="1" Language="G" nodeId="550040200010040" Length="4" Start="0" End="3">
+      <Node Id="1.3" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040200010012" Length="1" Start="0" End="0">
+        <Node Id="1.4" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040200010011" Length="1" Start="0" End="0">
+          <Node Id="1.5" Cat="noun" Lemma="Ἔραστος" Language="G" UnicodeLemma="Ἔραστος" morphId="55004020001" StrongNumberX="2037" English="Erastus" Unicode="Ἔραστος" nodeId="550040200010010" Start="0" End="0" Analysis="nr -nsm-">Ἔραστος</Node>
+        </Node>
+      </Node>
+      <Node Id="1.6" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040200020012" Length="1" Start="1" End="1">
+        <Node Id="1.7" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040200020011" Length="1" Start="1" End="1">
+          <Node Id="1.8" Cat="verb" Lemma="μένω" Language="G" UnicodeLemma="μένω" morphId="55004020002" StrongNumberX="3306" English="remained" Unicode="ἔμεινεν" nodeId="550040200020010" Start="1" End="1" Analysis="v- 3-s--aai">ἔμεινεν</Node>
+        </Node>
+      </Node>
+      <Node Id="1.9" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040200030021" Length="2" Start="2" End="3">
+        <Node Id="1.10" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040200030020" Length="2" Start="2" End="3">
+          <Node Id="1.11" Cat="prep" Lemma="ἐν" UnicodeLemma="ἐν" English="in" morphId="55004020003" StrongNumberX="1722" Language="G" Unicode="ἐν" nodeId="550040200030010" Start="2" End="2" Analysis="p- -----">ἐν</Node>
+          <Node Id="1.12" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040200040011" Length="1" Start="3" End="3">
+            <Node Id="1.13" Cat="noun" Lemma="Κόρινθος" UnicodeLemma="Κόρινθος" English="Corinth" morphId="55004020004" StrongNumberX="2882" Language="G" Unicode="Κορίνθῳ," nodeId="550040200040010" Start="3" End="3" Analysis="nr -dsf-">Κορίνθῳ,</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.14" Cat="conj" Lemma="δέ" Language="G" UnicodeLemma="δέ" morphId="55004020006" StrongNumberX="1161" English="but" Unicode="δὲ" nodeId="550040200060010" Start="4" End="4" Analysis="c- -----">δὲ</Node>
+    <Node Id="1.15" Cat="CL" Rule="O-V-ADV-ADV" Head="1" Language="G" nodeId="550040200050050" Length="5" Start="5" End="9">
+      <Node Id="1.16" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040200050012" Length="1" Start="5" End="5">
+        <Node Id="1.17" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040200050011" Length="1" Start="5" End="5">
+          <Node Id="1.18" Cat="noun" Lemma="Τρόφιμος" Language="G" UnicodeLemma="Τρόφιμος" morphId="55004020005" StrongNumberX="5161" English="Trophimus" Unicode="Τρόφιμον" nodeId="550040200050010" Start="5" End="5" Analysis="nr -asm-">Τρόφιμον</Node>
+        </Node>
+      </Node>
+      <Node Id="1.19" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040200070012" Length="1" Start="6" End="6">
+        <Node Id="1.20" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040200070011" Length="1" Start="6" End="6">
+          <Node Id="1.21" Cat="verb" Lemma="ἀπολείπω" Language="G" UnicodeLemma="ἀπολείπω" morphId="55004020007" StrongNumberX="0620" English="I left behind" Unicode="ἀπέλιπον" nodeId="550040200070010" Start="6" End="6" Analysis="v- 1-s--aai">ἀπέλιπον</Node>
+        </Node>
+      </Node>
+      <Node Id="1.22" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040200080021" Length="2" Start="7" End="8">
+        <Node Id="1.23" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040200080020" Length="2" Start="7" End="8">
+          <Node Id="1.24" Cat="prep" Lemma="ἐν" UnicodeLemma="ἐν" English="in" morphId="55004020008" StrongNumberX="1722" Language="G" Unicode="ἐν" nodeId="550040200080010" Start="7" End="7" Analysis="p- -----">ἐν</Node>
+          <Node Id="1.25" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040200090011" Length="1" Start="8" End="8">
+            <Node Id="1.26" Cat="noun" Lemma="Μίλητος" UnicodeLemma="Μίλητος" English="Miletus" morphId="55004020009" StrongNumberX="3399" Language="G" Unicode="Μιλήτῳ" nodeId="550040200090010" Start="8" End="8" Analysis="nr -dsf-">Μιλήτῳ</Node>
+          </Node>
+        </Node>
+      </Node>
+      <Node Id="1.27" Cat="ADV" Rule="CL2ADV" Head="0" Language="G" nodeId="550040200100014" Length="1" Start="9" End="9">
+        <Node Id="1.28" Cat="CL" Rule="V2CL" Head="0" Language="G" nodeId="550040200100013" Length="1" Start="9" End="9">
+          <Node Id="1.29" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040200100012" Length="1" Start="9" End="9">
+            <Node Id="1.30" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040200100011" Length="1" Start="9" End="9">
+              <Node Id="1.31" Cat="verb" Lemma="ἀσθενέω" UnicodeLemma="ἀσθενέω" English="ailing" morphId="55004020010" StrongNumberX="0770" Language="G" Unicode="ἀσθενοῦντα." nodeId="550040200100010" Start="9" End="9" Analysis="v- -asm-pap">ἀσθενοῦντα.</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:21">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040210010170" Length="17" Start="0" End="16">
+  <Node Id="1.1" Cat="CL" Rule="V-O" Head="0" Language="G" nodeId="550040210010040" Length="4" Start="0" End="3">
+    <Node Id="1.2" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040210010012" Length="1" Start="0" End="0">
+      <Node Id="1.3" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040210010011" Length="1" Start="0" End="0">
+        <Node Id="1.4" Cat="verb" Lemma="σπουδάζω" Language="G" UnicodeLemma="σπουδάζω" morphId="55004021001" StrongNumberX="4704" English="Make haste" Unicode="Σπούδασον" nodeId="550040210010010" Start="0" End="0" Analysis="v- 2-s--aad">Σπούδασον</Node>
+      </Node>
+    </Node>
+    <Node Id="1.5" Cat="O" Rule="CL2Ox" Head="0" Language="G" nodeId="550040210020031" Length="3" Start="1" End="3">
+      <Node Id="1.6" Cat="CL" Rule="ADV-V" Head="1" Language="G" nodeId="550040210020030" Length="3" Start="1" End="3">
+        <Node Id="1.7" Cat="ADV" Rule="pp2ADV" Head="0" Language="G" nodeId="550040210020021" Length="2" Start="1" End="2">
+          <Node Id="1.8" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040210020020" Length="2" Start="1" End="2">
+            <Node Id="1.9" Cat="prep" Lemma="πρό" UnicodeLemma="πρό" English="before" morphId="55004021002" StrongNumberX="4253" Language="G" Unicode="πρὸ" nodeId="550040210020010" Start="1" End="1" Analysis="p- -----">πρὸ</Node>
+            <Node Id="1.10" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040210030011" Length="1" Start="2" End="2">
+              <Node Id="1.11" Cat="noun" Lemma="χειμών" UnicodeLemma="χειμών" English="winter" morphId="55004021003" StrongNumberX="5494" Language="G" Unicode="χειμῶνος" nodeId="550040210030010" Start="2" End="2" Analysis="n- -gsm-">χειμῶνος</Node>
+            </Node>
+          </Node>
+        </Node>
+        <Node Id="1.12" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040210040012" Length="1" Start="3" End="3">
+          <Node Id="1.13" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040210040011" Length="1" Start="3" End="3">
+            <Node Id="1.14" Cat="verb" Lemma="ἔρχομαι" UnicodeLemma="ἔρχομαι" English="to come" morphId="55004021004" StrongNumberX="2064" Language="G" Unicode="ἐλθεῖν." nodeId="550040210040010" Start="3" End="3" Analysis="v- -----aan">ἐλθεῖν.</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+  <Node Id="1.1" Cat="CL" Rule="V-O-S" Head="0" Language="G" nodeId="550040210050130" Length="13" Start="4" End="16">
+    <Node Id="1.2" Cat="V" Rule="Vp2V" Head="0" Language="G" nodeId="550040210050012" Length="1" Start="4" End="4">
+      <Node Id="1.3" Cat="vp" Rule="V2VP" Head="0" Language="G" nodeId="550040210050011" Length="1" Start="4" End="4">
+        <Node Id="1.4" Cat="verb" Lemma="ἀσπάζομαι" Language="G" UnicodeLemma="ἀσπάζομαι" morphId="55004021005" StrongNumberX="0782" English="Greets" Unicode="Ἀσπάζεταί" nodeId="550040210050010" Start="4" End="4" Analysis="v- 3-s--pni">Ἀσπάζεταί</Node>
+      </Node>
+    </Node>
+    <Node Id="1.5" Cat="O" Rule="Np2O" Head="0" Language="G" nodeId="550040210060012" Length="1" Start="5" End="5">
+      <Node Id="1.6" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040210060011" Length="1" Start="5" End="5">
+        <Node Id="1.7" Cat="pron" Lemma="σύ" Language="G" UnicodeLemma="σύ" morphId="55004021006" StrongNumberX="4571" English="you" Unicode="σε" nodeId="550040210060010" Start="5" End="5" Analysis="rp 2as--">σε</Node>
+      </Node>
+    </Node>
+    <Node Id="1.8" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040210070111" Length="11" Start="6" End="16">
+      <Node Id="1.9" Cat="np" Rule="Conj5Np" Head="0" Language="G" nodeId="550040210070110" Length="11" Start="6" End="16">
+        <Node Id="1.10" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040210070011" Length="1" Start="6" End="6">
+          <Node Id="1.11" Cat="noun" Lemma="Εὔβουλος" Language="G" UnicodeLemma="Εὔβουλος" morphId="55004021007" StrongNumberX="2103" English="Eubulus" Unicode="Εὔβουλος" nodeId="550040210070010" Start="6" End="6" Analysis="nr -nsm-">Εὔβουλος</Node>
+        </Node>
+        <Node Id="1.12" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004021008" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040210080010" Start="7" End="7" Analysis="c- -----">καὶ</Node>
+        <Node Id="1.13" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040210090011" Length="1" Start="8" End="8">
+          <Node Id="1.14" Cat="noun" Lemma="Πούδης" Language="G" UnicodeLemma="Πούδης" morphId="55004021009" StrongNumberX="4227" English="Pudens" Unicode="Πούδης" nodeId="550040210090010" Start="8" End="8" Analysis="nr -nsm-">Πούδης</Node>
+        </Node>
+        <Node Id="1.15" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004021010" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040210100010" Start="9" End="9" Analysis="c- -----">καὶ</Node>
+        <Node Id="1.16" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040210110011" Length="1" Start="10" End="10">
+          <Node Id="1.17" Cat="noun" Lemma="Λίνος" Language="G" UnicodeLemma="Λίνος" morphId="55004021011" StrongNumberX="3044" English="Linus" Unicode="Λίνος" nodeId="550040210110010" Start="10" End="10" Analysis="nr -nsm-">Λίνος</Node>
+        </Node>
+        <Node Id="1.18" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004021012" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040210120010" Start="11" End="11" Analysis="c- -----">καὶ</Node>
+        <Node Id="1.19" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040210130011" Length="1" Start="12" End="12">
+          <Node Id="1.20" Cat="noun" Lemma="Κλαυδία" Language="G" UnicodeLemma="Κλαυδία" morphId="55004021013" StrongNumberX="2803" English="Claudia" Unicode="Κλαυδία" nodeId="550040210130010" Start="12" End="12" Analysis="nr -nsf-">Κλαυδία</Node>
+        </Node>
+        <Node Id="1.21" Cat="conj" Lemma="καί" Language="G" UnicodeLemma="καί" morphId="55004021014" StrongNumberX="2532" English="and" Unicode="καὶ" nodeId="550040210140010" Start="13" End="13" Analysis="c- -----">καὶ</Node>
+        <Node Id="1.22" Cat="np" Rule="NP-all" Head="0" Language="G" nodeId="550040210150030" Length="3" Start="14" End="16">
+          <Node Id="1.23" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040210150020" Length="2" Start="14" End="15">
+            <Node Id="1.24" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004021015" StrongNumberX="3588" English="the" Unicode="οἱ" nodeId="550040210150010" Start="14" End="14" Analysis="ra -npm-">οἱ</Node>
+            <Node Id="1.25" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040210160011" Length="1" Start="15" End="15">
+              <Node Id="1.26" Cat="noun" Lemma="ἀδελφός" Language="G" UnicodeLemma="ἀδελφός" morphId="55004021016" StrongNumberX="0080" English="brothers" Unicode="ἀδελφοὶ" nodeId="550040210160010" Start="15" End="15" Analysis="n- -npm-">ἀδελφοὶ</Node>
+            </Node>
+          </Node>
+          <Node Id="1.27" Cat="adjp" Rule="Adj2Adjp" Head="0" Language="G" nodeId="550040210170011" Length="1" Start="16" End="16">
+            <Node Id="1.28" Cat="adj" Lemma="πᾶς" Language="G" UnicodeLemma="πᾶς" morphId="55004021017" StrongNumberX="3956" English="all" Unicode="πάντες." nodeId="550040210170010" Start="16" End="16" Analysis="a- -npm-">πάντες.</Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+<Sentence ID = "2Tm4:22">
+<Trees>
+<Tree>
+<Node Cat="S" Head="0" nodeId="550040220010100" Length="10" Start="0" End="9">
+  <Node Id="1.1" Cat="CL" Rule="S-P" Head="1" Language="G" nodeId="550040220010060" Length="6" Start="0" End="5">
+    <Node Id="1.2" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040220010021" Length="2" Start="0" End="1">
+      <Node Id="1.3" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040220010020" Length="2" Start="0" End="1">
+        <Node Id="1.4" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004022001" StrongNumberX="3588" English="The" Unicode="Ὁ" nodeId="550040220010010" Start="0" End="0" Analysis="ra -nsm-">Ὁ</Node>
+        <Node Id="1.5" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040220020011" Length="1" Start="1" End="1">
+          <Node Id="1.6" Cat="noun" Lemma="κύριος" Language="G" UnicodeLemma="κύριος" morphId="55004022002" StrongNumberX="2962" English="Lord" Unicode="κύριος" nodeId="550040220020010" Start="1" End="1" Analysis="n- -nsm-">κύριος</Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.7" Cat="P" Rule="pp2P" Head="0" Language="G" nodeId="550040220030041" Length="4" Start="2" End="5">
+      <Node Id="1.8" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040220030040" Length="4" Start="2" End="5">
+        <Node Id="1.9" Cat="prep" Lemma="μετά" UnicodeLemma="μετά" English="(be) with" morphId="55004022003" StrongNumberX="3326" Language="G" Unicode="μετὰ" nodeId="550040220030010" Start="2" End="2" Analysis="p- -----">μετὰ</Node>
+        <Node Id="1.10" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040220040030" Length="3" Start="3" End="5">
+          <Node Id="1.11" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004022004" StrongNumberX="3588" English="the" Unicode="τοῦ" nodeId="550040220040010" Start="3" End="3" Analysis="ra -gsn-">τοῦ</Node>
+          <Node Id="1.12" Cat="np" Rule="NPofNP" Head="0" Language="G" nodeId="550040220050020" Length="2" Start="4" End="5">
+            <Node Id="1.13" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040220050011" Length="1" Start="4" End="4">
+              <Node Id="1.14" Cat="noun" Lemma="πνεῦμα" UnicodeLemma="πνεῦμα" English="spirit" morphId="55004022005" StrongNumberX="4151" Language="G" Unicode="πνεύματός" nodeId="550040220050010" Start="4" End="4" Analysis="n- -gsn-">πνεύματός</Node>
+            </Node>
+            <Node Id="1.15" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040220060011" Length="1" Start="5" End="5">
+              <Node Id="1.16" Cat="pron" Lemma="σύ" Language="G" UnicodeLemma="σύ" morphId="55004022006" StrongNumberX="4675" English="of you" Unicode="σου." nodeId="550040220060010" Start="5" End="5" Analysis="rp 2gs--">σου.</Node>
+            </Node>
+          </Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+  <Node Id="1.1" Cat="CL" Rule="S-P" Head="1" Language="G" nodeId="550040220070040" Length="4" Start="6" End="9">
+    <Node Id="1.2" Cat="S" Rule="Np2S" Head="0" Language="G" nodeId="550040220070021" Length="2" Start="6" End="7">
+      <Node Id="1.3" Cat="np" Rule="DetNP" Head="1" Language="G" nodeId="550040220070020" Length="2" Start="6" End="7">
+        <Node Id="1.4" Cat="det" Lemma="ὁ" Language="G" UnicodeLemma="ὁ" morphId="55004022007" StrongNumberX="3588" English="-" Unicode="ἡ" nodeId="550040220070010" Start="6" End="6" Analysis="ra -nsf-">ἡ</Node>
+        <Node Id="1.5" Cat="np" Rule="N2NP" Head="0" Language="G" nodeId="550040220080011" Length="1" Start="7" End="7">
+          <Node Id="1.6" Cat="noun" Lemma="χάρις" Language="G" UnicodeLemma="χάρις" morphId="55004022008" StrongNumberX="5485" English="Grace" Unicode="χάρις" nodeId="550040220080010" Start="7" End="7" Analysis="n- -nsf-">χάρις</Node>
+        </Node>
+      </Node>
+    </Node>
+    <Node Id="1.7" Cat="P" Rule="pp2P" Head="0" Language="G" nodeId="550040220090021" Length="2" Start="8" End="9">
+      <Node Id="1.8" Cat="pp" Rule="PrepNp" Head="1" Language="G" nodeId="550040220090020" Length="2" Start="8" End="9">
+        <Node Id="1.9" Cat="prep" Lemma="μετά" UnicodeLemma="μετά" English="(be) with" morphId="55004022009" StrongNumberX="3326" Language="G" Unicode="μεθ’" nodeId="550040220090010" Start="8" End="8" Analysis="p- -----">μεθ’</Node>
+        <Node Id="1.10" Cat="np" Rule="Pron2NP" Head="0" Language="G" nodeId="550040220100011" Length="1" Start="9" End="9">
+          <Node Id="1.11" Cat="pron" Lemma="σύ" UnicodeLemma="σύ" English="you" morphId="55004022010" StrongNumberX="5216" Language="G" Unicode="ὑμῶν." nodeId="550040220100010" Start="9" End="9" Analysis="rp 2gp--">ὑμῶν.</Node>
+        </Node>
+      </Node>
+    </Node>
+  </Node>
+</Node>
+</Tree>
+</Trees>
+</Sentence>
+</Sentences>

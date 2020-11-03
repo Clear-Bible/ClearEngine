@@ -28,6 +28,7 @@ namespace ClearBible.Clear3.API
     {
         OK,
         InvalidInput,
+        ResourceDirectoryDoesNotExist,
         SetLocalResourceFolderFailed,
         QueryLocalResourcesFailed,
         NullOrBlankKey,
