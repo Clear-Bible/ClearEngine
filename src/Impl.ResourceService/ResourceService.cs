@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -7,10 +8,8 @@ using Newtonsoft.Json;
 
 namespace ClearBible.Clear3.Impl.ResourceService
 {
-    using System.Collections.Generic;
-    using System.Net.Http.Headers;
-    using System.Runtime.Serialization;
     using ClearBible.Clear3.API;
+    using ClearBible.Clear3.Impl.TreeService;
 
     public class ResourceService : IResourceService
     {
@@ -125,10 +124,28 @@ namespace ClearBible.Clear3.Impl.ResourceService
             WriteIndex(index);
         }
 
-
+        /// <summary>
+        /// Implements IResourceService.GetTreeService().
+        /// </summary>
+        ///
+        /// FIXME
+        /// At present this method is only capable of getting
+        /// the tree service for the Clear3Dev treebank.
+        /// 
         public ITreeService GetTreeService(Uri treeResourceUri)
         {
-            throw new NotImplementedException();
+            // Check that the URI is for the Clear3Dev treebank.
+            //
+            if (!treeResourceUri.Equals(
+                "https://id.clear.bible/treebank/Clear3Dev"))
+            {
+                throw new NotImplementedException(
+                    "prototype can only get the Clear3Dev tree service");
+            }
+
+            return new TreeService(
+                Path.Combine(ResourceFolder, "treebank", "Clear3Dev"),
+                BookNames.LoadBookNames3());
         }
 
 
@@ -262,5 +279,90 @@ namespace ClearBible.Clear3.Impl.ResourceService
                 "Clear3 built-in resource",
                 e.Item2))
             .ToList();
+    }
+
+
+    // FIXME
+    // Temporary measure to get the prototype working, just copied from
+    // CLEAR2.
+    // It seems like these book names, which are being used to find the files
+    // in a treebank, need to become part of the metadata associated with
+    // the treebank somehow.
+    //
+    public class BookNames
+    {
+        public static Dictionary<string, string> LoadBookNames3()
+        {
+            Dictionary<string, string> bookNames2 = new Dictionary<string, string>();
+
+            bookNames2.Add("01", "gn");
+            bookNames2.Add("02", "ex");
+            bookNames2.Add("03", "lv");
+            bookNames2.Add("04", "nu");
+            bookNames2.Add("05", "dt");
+            bookNames2.Add("06", "js");
+            bookNames2.Add("07", "ju");
+            bookNames2.Add("08", "ru");
+            bookNames2.Add("09", "1s");
+            bookNames2.Add("10", "2s");
+            bookNames2.Add("11", "1k");
+            bookNames2.Add("12", "2k");
+            bookNames2.Add("13", "1c");
+            bookNames2.Add("14", "2c");
+            bookNames2.Add("15", "er");
+            bookNames2.Add("16", "ne");
+            bookNames2.Add("17", "es");
+            bookNames2.Add("18", "jb");
+            bookNames2.Add("19", "ps");
+            bookNames2.Add("20", "pr");
+            bookNames2.Add("21", "ec");
+            bookNames2.Add("22", "ca");
+            bookNames2.Add("23", "is");
+            bookNames2.Add("24", "je");
+            bookNames2.Add("25", "lm");
+            bookNames2.Add("26", "ek");
+            bookNames2.Add("27", "da");
+            bookNames2.Add("28", "ho");
+            bookNames2.Add("29", "jl");
+            bookNames2.Add("30", "am");
+            bookNames2.Add("31", "ob");
+            bookNames2.Add("32", "jn");
+            bookNames2.Add("33", "mi");
+            bookNames2.Add("34", "na");
+            bookNames2.Add("35", "hb");
+            bookNames2.Add("36", "zp");
+            bookNames2.Add("37", "hg");
+            bookNames2.Add("38", "zc");
+            bookNames2.Add("39", "ma");
+            bookNames2.Add("40", "Mat");
+            bookNames2.Add("41", "Mrk");
+            bookNames2.Add("42", "Luk");
+            bookNames2.Add("43", "Jhn");
+            bookNames2.Add("44", "Act");
+            bookNames2.Add("45", "Rom");
+            bookNames2.Add("46", "1Co");
+            bookNames2.Add("47", "2Co");
+            bookNames2.Add("48", "Gal");
+            bookNames2.Add("49", "Eph");
+            bookNames2.Add("50", "Php");
+            bookNames2.Add("51", "Col");
+            bookNames2.Add("52", "1Th");
+            bookNames2.Add("53", "2Th");
+            bookNames2.Add("54", "1Tm");
+            bookNames2.Add("55", "2Tm");
+            bookNames2.Add("56", "Tit");
+            bookNames2.Add("57", "Phm");
+            bookNames2.Add("58", "Heb");
+            bookNames2.Add("59", "Jms");
+            bookNames2.Add("60", "1Pe");
+            bookNames2.Add("61", "2Pe");
+            bookNames2.Add("62", "1Jn");
+            bookNames2.Add("63", "2Jn");
+            bookNames2.Add("64", "3Jn");
+            bookNames2.Add("65", "Jud");
+            bookNames2.Add("66", "Rev");
+
+            return bookNames2;
+        }
     }
 }

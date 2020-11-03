@@ -66,8 +66,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string jsonOutput,
             TranslationModel translationModel,
             TranslationModel manTransModel,
-            string treeFolder,
-            Dictionary<string, string> bookNames,
+            ITreeService iTreeService,
             AlignmentModel alignProbs,
             bool useAlignModel,
             int maxPaths,
@@ -97,7 +96,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             int i = 0;
 
-            TreeService treeService = new TreeService(treeFolder, bookNames);
+            TreeService treeService = (TreeService)iTreeService;
 
             Dictionary<string, string> preAlignment =
                 alignProbs.Inner.Keys

@@ -59,13 +59,11 @@ namespace RegressionTest3
             Uri treebankUri =
                 new Uri("https://id.clear.bible/treebank/Clear3Dev");
 
-            //if (!resourceService.QueryLocalResources()
-            //    .Any(r => r.Id.Equals(treebankUri)))
-            //{
-            //    resourceService.DownloadResource(treebankUri);
-            //}
-
-            resourceService.DownloadResource(treebankUri);
+            if (!resourceService.QueryLocalResources()
+                .Any(r => r.Id.Equals(treebankUri)))
+            {
+                resourceService.DownloadResource(treebankUri);
+            }
 
             ITreeService treeService =
                 resourceService.GetTreeService(treebankUri);
@@ -75,6 +73,8 @@ namespace RegressionTest3
             // See also: https://www.w3.org/TR/cooluris/
             // The metadata also points to a location in Github with
             // the gzipped data for the resource.
+            // Clear3 uses the machine-readable metadata to download
+            // resources when so requested.
 
             TranslationPairTable translationPairTable =
                 importExportService.ImportTranslationPairTableFromLegacy2(
@@ -138,8 +138,7 @@ namespace RegressionTest3
                 jsonOutput,
                 transModel,
                 manTransModel,
-                treeFolder,
-                bookNames,
+                treeService,
                 alignmentModel, useAlignModel,
                 maxPaths,
                 puncs, groups, stopWords,
