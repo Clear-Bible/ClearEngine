@@ -115,8 +115,7 @@ namespace ClearBible.Clear3.Impl.TreeService
 
             string sEndVerseID = $"{end.Book:D2}{end.Chapter:D3}{end.Verse:D3}";
 
-            List<XElement> subTrees = GetSubTrees(
-                sStartVerseID, sEndVerseID);
+            List<XElement> subTrees = GetSubTrees(start, end);
 
             if (subTrees.Count == 1)
             {
@@ -128,34 +127,34 @@ namespace ClearBible.Clear3.Impl.TreeService
             }
         }
 
-        List<XElement> GetSubTrees(string sStartVerseID, string sEndVerseID)
+        List<XElement> GetSubTrees(VerseID start, VerseID end)
         {
             List<XElement> subTrees = new List<XElement>();
 
-            string book = sStartVerseID.Substring(0, 2);
-            string startChapter = sStartVerseID.Substring(2, 3);
-            string endChapter = sEndVerseID.Substring(2, 3);
+            int book = start.Book;
+            int startChapter = start.Chapter;
+            int endChapter = end.Chapter;
 
             if (startChapter == endChapter)
             {
-                GetSubTreesInSameChapter(sStartVerseID, sEndVerseID, book, startChapter, subTrees);
+                GetSubTreesInSameChapter(start, end, book, startChapter, subTrees);
             }
             else
             {
-                GetSubTreesInDiffChapter(sStartVerseID, sEndVerseID, book, startChapter, endChapter, ref subTrees);
+                GetSubTreesInDiffChapter(start, end, book, startChapter, endChapter, ref subTrees);
             }
 
             return subTrees;
         }
 
-        void GetSubTreesInSameChapter(string sStartVerseID, string sEndVerseID, string book, string chapter, List<XElement> subTrees)
+        void GetSubTreesInSameChapter(VerseID sStartVerseID, VerseID sEndVerseID, int book, int chapter, List<XElement> subTrees)
         {
-            int startVerse = Int32.Parse(sStartVerseID.Substring(5, 3));
-            int endVerse = Int32.Parse(sEndVerseID.Substring(5, 3));
+            int startVerse = sStartVerseID.Verse;
+            int endVerse = sEndVerseID.Verse;
 
             for (int i = startVerse; i <= endVerse; i++)
             {
-                string verseID = book + chapter + Utils.Pad3(i.ToString());
+                string verseID = $"{book:D2}{chapter:D3}{i:D3}";
 
                 if (_trees2.TryGetValue(verseID, out XElement subTree))
                 {
@@ -168,13 +167,15 @@ namespace ClearBible.Clear3.Impl.TreeService
             }
         }
 
-        void GetSubTreesInDiffChapter(string sStartVerseID, string sEndVerseID, string book, string chapter1, string chapter2, ref List<XElement> subTrees)
+        void GetSubTreesInDiffChapter(VerseID sStartVerseID, VerseID sEndVerseID, int book, int chapter1, int chapter2, ref List<XElement> subTrees)
         {
-            string hypotheticalLastVerse = book + chapter1 + "100";
+            VerseID hypotheticalLastVerse = new VerseID(book, chapter1, 100);           
             GetSubTreesInSameChapter(sStartVerseID, hypotheticalLastVerse, book, chapter1, subTrees);
-            string hypotheticalFirstVerse = book + chapter2 + "001";
+
+            VerseID hypotheticalFirstVerse = new VerseID(book, chapter2, 1);
             GetSubTreesInSameChapter(hypotheticalFirstVerse, sEndVerseID, book, chapter2, subTrees);
         }
+
 
         XElement CombineTrees(List<XElement> trees)
         {
