@@ -15,6 +15,7 @@ namespace ClearBible.Clear3.Impl.TreeService
 {
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Data;
+    using ClearBible.Clear3.Miscellaneous;
 
     public class TreeService : ITreeService
     {
@@ -35,12 +36,14 @@ namespace ClearBible.Clear3.Impl.TreeService
             {
                 XElement xml = XElement.Load(treeFile);
 
-                _trees2 = xml
+                foreach (XElement node in xml
                     .Descendants("Sentence")
-                    .Select(s => s.Descendants("Node").First())
-                    .ToDictionary(
-                        n => n.Attribute("nodeId").Value.Substring(0, 8),
-                        n => n);
+                    .Select(s => s.Descendants("Node").First()))
+                {
+                    string verseId =
+                        node.Attribute("nodeId").Value.Substring(0, 8);
+                    _trees2[verseId] = node;
+                }
 
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(treeFile);
@@ -64,7 +67,8 @@ namespace ClearBible.Clear3.Impl.TreeService
         private Dictionary<string, XmlNode> _trees =
             new Dictionary<string, XmlNode>();
 
-        private Dictionary<string, XElement> _trees2;
+        private Dictionary<string, XElement> _trees2 =
+            new Dictionary<string, XElement>();
 
         private ChapterID _currentChapterID = ChapterID.None;
 
@@ -89,6 +93,7 @@ namespace ClearBible.Clear3.Impl.TreeService
             if (!chapterID.Equals(_currentChapterID))
             {
                 _trees.Clear();
+                _trees2.Clear();
                 // Get the trees for the current chapter; a verse can cross chapter boundaries
 
                 GetChapterTree(chapterID, _treeFolder, _trees, _bookNames);
@@ -149,9 +154,10 @@ namespace ClearBible.Clear3.Impl.TreeService
             for (int i = startVerse; i <= endVerse; i++)
             {
                 string verseID = book + chapter + Utils.Pad3(i.ToString());
-                if (_trees.TryGetValue(verseID, out XmlNode subTree))
+
+                if (_trees2.TryGetValue(verseID, out XElement subTree))
                 {
-                    subTrees.Add(subTree);
+                    subTrees.Add(subTree.ToXmlNode());
                 }
                 else
                 {

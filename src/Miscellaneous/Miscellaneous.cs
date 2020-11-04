@@ -20,7 +20,7 @@ namespace ClearBible.Clear3.Miscellaneous
             {
                 XmlDocument xmlDoc = new XmlDocument();
                 xmlDoc.Load(xmlReader);
-                return xmlDoc;
+                return xmlDoc.DocumentElement;
             }
         }
     }
