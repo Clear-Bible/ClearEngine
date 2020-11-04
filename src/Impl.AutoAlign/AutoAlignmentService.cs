@@ -164,12 +164,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            string bookChapterVerseFromId(string s) => s.Substring(0, 8);
+            VerseID verseIdFromLegacySourceIdString(string s) =>
+                (new SourceID(s)).VerseID;
 
-            string sStartVerseID = bookChapterVerseFromId(entry.SourceSegments.First().ID);
-            string sEndVerseID = bookChapterVerseFromId(entry.SourceSegments.Last().ID);
+            VerseID sStartVerseID = verseIdFromLegacySourceIdString(entry.SourceSegments.First().ID);
+            VerseID sEndVerseID = verseIdFromLegacySourceIdString(entry.SourceSegments.Last().ID);
 
-            // XmlNode treeNode = Align.GetTreeNode(sStartVerseID, sEndVerseID, trees);
             XmlNode treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
 
             Dictionary<string, WordInfo> wordInfoTable =
