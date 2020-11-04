@@ -113,22 +113,23 @@ namespace ClearBible.Clear3.Impl.TreeService
         {
             XmlNode treeNode = null;
 
-            List<XmlNode> subTrees = GetSubTrees(sStartVerseID, sEndVerseID);
+            List<XElement> subTrees = GetSubTrees(sStartVerseID, sEndVerseID);
             if (subTrees.Count == 1)
             {
-                treeNode = subTrees[0];
+                treeNode = subTrees[0].ToXmlNode();
             }
             else
             {
-                treeNode = CombineTrees(subTrees);
+                treeNode = CombineTrees(
+                    subTrees.Select(x => x.ToXmlNode()).ToList());
             }
 
             return treeNode;
         }
 
-        List<XmlNode> GetSubTrees(string sStartVerseID, string sEndVerseID)
+        List<XElement> GetSubTrees(string sStartVerseID, string sEndVerseID)
         {
-            List<XmlNode> subTrees = new List<XmlNode>();
+            List<XElement> subTrees = new List<XElement>();
 
             string book = sStartVerseID.Substring(0, 2);
             string startChapter = sStartVerseID.Substring(2, 3);
@@ -146,7 +147,7 @@ namespace ClearBible.Clear3.Impl.TreeService
             return subTrees;
         }
 
-        void GetSubTreesInSameChapter(string sStartVerseID, string sEndVerseID, string book, string chapter, List<XmlNode> subTrees)
+        void GetSubTreesInSameChapter(string sStartVerseID, string sEndVerseID, string book, string chapter, List<XElement> subTrees)
         {
             int startVerse = Int32.Parse(sStartVerseID.Substring(5, 3));
             int endVerse = Int32.Parse(sEndVerseID.Substring(5, 3));
@@ -157,7 +158,7 @@ namespace ClearBible.Clear3.Impl.TreeService
 
                 if (_trees2.TryGetValue(verseID, out XElement subTree))
                 {
-                    subTrees.Add(subTree.ToXmlNode());
+                    subTrees.Add(subTree);
                 }
                 else
                 {
@@ -166,7 +167,7 @@ namespace ClearBible.Clear3.Impl.TreeService
             }
         }
 
-        void GetSubTreesInDiffChapter(string sStartVerseID, string sEndVerseID, string book, string chapter1, string chapter2, ref List<XmlNode> subTrees)
+        void GetSubTreesInDiffChapter(string sStartVerseID, string sEndVerseID, string book, string chapter1, string chapter2, ref List<XElement> subTrees)
         {
             string hypotheticalLastVerse = book + chapter1 + "100";
             GetSubTreesInSameChapter(sStartVerseID, hypotheticalLastVerse, book, chapter1, subTrees);
