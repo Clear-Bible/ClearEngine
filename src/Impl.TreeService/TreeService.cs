@@ -16,18 +16,45 @@ namespace ClearBible.Clear3.Impl.TreeService
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Miscellaneous;
 
+    /// <summary>
+    /// Represents a treebank.
+    /// Implements ClearBible.Clear3.API.ITreeService, and
+    /// supplies additional services to internal Clear3 code. 
+    /// </summary>
+    /// 
     public class TreeService : ITreeService
     {
+        // Maps verse IDs to their trees, for those that
+        // have been preloaded by PreloadTreesForChapter().
+        //
         private Dictionary<VerseID, XElement> _trees2 =
             new Dictionary<VerseID, XElement>();
 
+        // Identifies the chapter for which trees have
+        // currently been preloaded.
+        //
         private ChapterID _currentChapterID = ChapterID.None;
 
+        // Folder where the XML files for the treebank reside.
+        //
         private string _treeFolder;
 
+        // Maps book number to bookname, as used in the
+        // names of the XML files for the treebank.
+        //
         private Dictionary<int, string> _bookNames;
 
-
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="treeFolder">
+        /// Folder where the XML files for the treebank reside.
+        /// </param>
+        /// <param name="bookNames">
+        /// Maps book number to bookname, as used in the names
+        /// of the XML files for the treebank.
+        /// </param>
+        /// 
         public TreeService(
             string treeFolder,
             Dictionary<int, string> bookNames)
@@ -36,18 +63,26 @@ namespace ClearBible.Clear3.Impl.TreeService
             _bookNames = bookNames;
         }
 
-
+        /// <summary>
+        /// Preload trees for the specified chapter.  Also loads
+        /// the trees for the preceding and following chapters, in
+        /// case a verse range spans a chapter boundary.
+        /// </summary>
+        /// <param name="chapterID">
+        /// Chapter for which trees are to be preloaded.
+        /// </param>
+        /// 
         public void PreloadTreesForChapter(ChapterID chapterID)
         {
             if (!chapterID.Equals(_currentChapterID))
             {
-                int bookNumber = chapterID.Book;
-                int chapterNumber = chapterID.Chapter;
+                int book = chapterID.Book;
+                int chapter = chapterID.Chapter;
 
                 _trees2 =
-                    GetVerseTreesForChapter(bookNumber, chapterNumber)
-                    .Concat(GetVerseTreesForChapter(bookNumber, chapterNumber + 1))
-                    .Concat(GetVerseTreesForChapter(bookNumber, chapterNumber - 1))
+                    GetVerseTreesForChapter(book, chapter)
+                    .Concat(GetVerseTreesForChapter(book, chapter + 1))
+                    .Concat(GetVerseTreesForChapter(book, chapter - 1))
                     .ToDictionary(
                         x => new VerseID(
                             x.Attribute("nodeId").Value.Substring(0, 8)),
@@ -58,6 +93,11 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
 
+        /// <summary>
+        /// Get the verse trees for the specified chapter by
+        /// consulting the XML files in _treeFolder.
+        /// </summary>
+        /// 
         public IEnumerable<XElement> GetVerseTreesForChapter(
             int bookNumber,
             int chapterNumber)
@@ -82,6 +122,16 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
 
+        /// <summary>
+        /// Get a tree node that covers a specified verse range.
+        /// The result might be a newly constructed node to cover
+        /// more than one verse.  Assumes that the verse range
+        /// lies in the chapters that have been preloaded by
+        /// PreloadTreesForChapter().
+        /// </summary>
+        /// <param name="start">Starting verse.</param>
+        /// <param name="end">Ending verse.</param>
+        /// 
         public XElement GetTreeNode(VerseID start, VerseID end)
         {
             List<XElement> verseTrees = GetVerseTrees(start, end).ToList();
@@ -97,6 +147,18 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
 
+        /// <summary>
+        /// Get the verse trees associated with a range of verses.
+        /// Assumes that the range is part of what has been preloaded
+        /// by PreloadTreesForChapter().
+        /// </summary>
+        /// <param name="start">Starting verse.</param>
+        /// <param name="end">Ending verse.</param>
+        /// <returns>
+        /// Sequence of all of the verse trees within
+        /// the specified range.
+        /// </returns>
+        /// 
         IEnumerable<XElement> GetVerseTrees(VerseID start, VerseID end)
         {
             int book = start.Book;
@@ -114,6 +176,11 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
 
+        /// <summary>
+        /// Get verse trees for a range that lies within a single
+        /// chapter.
+        /// </summary>
+        /// 
         IEnumerable<XElement> GetChapterSubrange(
             int book,
             int chapter,
@@ -136,6 +203,11 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
 
+        /// <summary>
+        /// Get all of the verse trees from a chapter, starting with
+        /// a specified verse and continuing to the end of the chapter.
+        /// </summary>
+        /// 
         IEnumerable<XElement> GetChapterTail(
             int book,
             int chapter,
@@ -157,6 +229,13 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
 
+        /// <summary>
+        /// Synthesize a new node for a list of verse trees.
+        /// The children of the new node consist of all of the children
+        /// of the verse trees, with the order preserved.  (The verse
+        /// tree nodes themselves do not occur in the synthesized node.)
+        /// </summary>
+        /// 
         XElement CombineTrees(List<XElement> trees)
         {
             List<XElement> subTrees =
