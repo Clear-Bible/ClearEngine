@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using Newtonsoft.Json;
 
@@ -145,7 +146,7 @@ namespace ClearBible.Clear3.Impl.ResourceService
 
             return new TreeService(
                 Path.Combine(ResourceFolder, "treebank", "Clear3Dev"),
-                BookNames.LoadBookNames3());
+                BookNames.LoadBookNames3a());
         }
 
 
@@ -283,86 +284,32 @@ namespace ClearBible.Clear3.Impl.ResourceService
 
 
     // FIXME
-    // Temporary measure to get the prototype working, just copied from
-    // CLEAR2.
+    // Temporary measure to get the prototype working.
     // It seems like these book names, which are being used to find the files
     // in a treebank, need to become part of the metadata associated with
     // the treebank somehow.
     //
     public class BookNames
     {
-        public static Dictionary<int, string> LoadBookNames3()
+        public static Dictionary<int, string> LoadBookNames3a()
         {
-            Dictionary<int, string> bookNames2 = new Dictionary<int, string>();
+            string booknames = @"
+                gn ex lv nu dt
+                js ju ru 1s 2s 1k 2k 1c 2c er ne es
+                jb ps pr ec ca
+                is je lm ek da
+                ho jl am ob jn mi na hb zp hg zc ma
+                Mat Mrk Luk Jhn Act
+                Rom 1Co 2Co Gal Eph Php Col 1Th 2Th 1Tm 2Tm Tit Phm
+                Heb Jms 1Pe 2Pe 1Jn 2Jn 3Jn Jud Rev
+            ";
 
-            bookNames2.Add(1, "gn");
-            bookNames2.Add(2, "ex");
-            bookNames2.Add(3, "lv");
-            bookNames2.Add(4, "nu");
-            bookNames2.Add(5, "dt");
-            bookNames2.Add(6, "js");
-            bookNames2.Add(7, "ju");
-            bookNames2.Add(8, "ru");
-            bookNames2.Add(9, "1s");
-            bookNames2.Add(10, "2s");
-            bookNames2.Add(11, "1k");
-            bookNames2.Add(12, "2k");
-            bookNames2.Add(13, "1c");
-            bookNames2.Add(14, "2c");
-            bookNames2.Add(15, "er");
-            bookNames2.Add(16, "ne");
-            bookNames2.Add(17, "es");
-            bookNames2.Add(18, "jb");
-            bookNames2.Add(19, "ps");
-            bookNames2.Add(20, "pr");
-            bookNames2.Add(21, "ec");
-            bookNames2.Add(22, "ca");
-            bookNames2.Add(23, "is");
-            bookNames2.Add(24, "je");
-            bookNames2.Add(25, "lm");
-            bookNames2.Add(26, "ek");
-            bookNames2.Add(27, "da");
-            bookNames2.Add(28, "ho");
-            bookNames2.Add(29, "jl");
-            bookNames2.Add(30, "am");
-            bookNames2.Add(31, "ob");
-            bookNames2.Add(32, "jn");
-            bookNames2.Add(33, "mi");
-            bookNames2.Add(34, "na");
-            bookNames2.Add(35, "hb");
-            bookNames2.Add(36, "zp");
-            bookNames2.Add(37, "hg");
-            bookNames2.Add(38, "zc");
-            bookNames2.Add(39, "ma");
-            bookNames2.Add(40, "Mat");
-            bookNames2.Add(41, "Mrk");
-            bookNames2.Add(42, "Luk");
-            bookNames2.Add(43, "Jhn");
-            bookNames2.Add(44, "Act");
-            bookNames2.Add(45, "Rom");
-            bookNames2.Add(46, "1Co");
-            bookNames2.Add(47, "2Co");
-            bookNames2.Add(48, "Gal");
-            bookNames2.Add(49, "Eph");
-            bookNames2.Add(50, "Php");
-            bookNames2.Add(51, "Col");
-            bookNames2.Add(52, "1Th");
-            bookNames2.Add(53, "2Th");
-            bookNames2.Add(54, "1Tm");
-            bookNames2.Add(55, "2Tm");
-            bookNames2.Add(56, "Tit");
-            bookNames2.Add(57, "Phm");
-            bookNames2.Add(58, "Heb");
-            bookNames2.Add(59, "Jms");
-            bookNames2.Add(60, "1Pe");
-            bookNames2.Add(61, "2Pe");
-            bookNames2.Add(62, "1Jn");
-            bookNames2.Add(63, "2Jn");
-            bookNames2.Add(64, "3Jn");
-            bookNames2.Add(65, "Jud");
-            bookNames2.Add(66, "Rev");
-
-            return bookNames2;
+            return
+                Regex.Split(booknames.Trim(), @"\s+")
+                .Select((name, n) => Tuple.Create(n + 1, name))
+                .ToDictionary(
+                    x => x.Item1,
+                    x => x.Item2);
         }
     }
 }
