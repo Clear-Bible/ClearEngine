@@ -120,8 +120,7 @@ namespace ClearBible.Clear3.Impl.TreeService
             }
             else
             {
-                treeNode = CombineTrees(
-                    subTrees.Select(x => x.ToXmlNode()).ToList());
+                treeNode = CombineTrees(subTrees).ToXmlNode();
             }
 
             return treeNode;
@@ -175,80 +174,26 @@ namespace ClearBible.Clear3.Impl.TreeService
             GetSubTreesInSameChapter(hypotheticalFirstVerse, sEndVerseID, book, chapter2, subTrees);
         }
 
-        XmlNode CombineTrees(List<XmlNode> trees)
+        XElement CombineTrees(List<XElement> trees)
         {
-            List<XmlNode> topTreeNodes = new List<XmlNode>();
-            foreach (XmlNode tree in trees)
-            {
-                foreach (XmlNode childNode in tree.ChildNodes)
-                {
-                    topTreeNodes.Add(childNode);
-                }
-            }
-            XmlNode toptree = CombineSubtrees(topTreeNodes);
+            List<XElement> subTrees =
+                trees.SelectMany(t => t.Elements()).ToList();
 
-            StringBuilder sb = new StringBuilder();
-            XmlTextWriter xw = new XmlTextWriter(new StringWriter(sb));
-            xw.Formatting = Formatting.Indented;
-            toptree.WriteTo(xw);
+            int totalLength = subTrees
+                .Select(x => Int32.Parse(x.Attribute("Length").Value))
+                .Sum();
 
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(sb.ToString());
-            XmlNode root = doc.DocumentElement;
+            string newNodeId =
+                subTrees[0].Attribute("nodeId").Value.Substring(0, 11) +
+                $"{totalLength:D3}";
 
-            return root;
+            return
+                new XElement("Node",
+                    new XAttribute("Cat", "S"),
+                    new XAttribute("Head", "0"),
+                    new XAttribute("nodeId", newNodeId),
+                    new XAttribute("Length", totalLength.ToString()),
+                    subTrees);
         }
-
-
-        public XmlNode CombineSubtrees(List<XmlNode> subTrees)
-        {
-            int nodeLength = ComputeNodeLength(subTrees);
-            string nodeID = GetNodeID(subTrees, nodeLength);
-            StringBuilder sb = new StringBuilder();
-            XmlTextWriter xw = new XmlTextWriter(new StringWriter(sb));
-            xw.Formatting = Formatting.Indented;
-            xw.WriteStartElement("Node");
-            xw.WriteAttributeString("Cat", "S");
-            xw.WriteAttributeString("Head", "0");
-            xw.WriteAttributeString("nodeId", nodeID);
-            xw.WriteAttributeString("Length", nodeLength.ToString());
-
-            foreach (XmlNode subTree in subTrees)
-            {
-                subTree.WriteTo(xw);
-            }
-
-            xw.WriteEndElement();
-
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(sb.ToString());
-            XmlNode root = doc.DocumentElement;
-
-            return root;
-        }
-
-
-        int ComputeNodeLength(List<XmlNode> subTrees)
-        {
-            int nodeLength = 0;
-
-            foreach (XmlNode subTree in subTrees)
-            {
-                int len = Int32.Parse(Utils.GetAttribValue(subTree, "Length"));
-                nodeLength += len;
-            }
-
-            return nodeLength;
-        }
-
-
-        string GetNodeID(List<XmlNode> subTrees, int nodeLength)
-        {
-            XmlNode firstNode = subTrees[0];
-            string nodeID = Utils.GetAttribValue(firstNode, "nodeId");
-            nodeID = nodeID.Substring(0, 11) + Utils.Pad3(nodeLength.ToString()) + "0";
-            return nodeID;
-        }
-
     }
 }
