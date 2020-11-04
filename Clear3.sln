@@ -43,6 +43,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.TreeService", "src\Imp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.ResourceService", "src\Impl.ResourceService\Impl.ResourceService.csproj", "{FE93C11F-5F41-41C8-869E-9B34A960517C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miscellaneous", "src\Miscellaneous\Miscellaneous.csproj", "{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -305,5 +307,17 @@ Global
 		{FE93C11F-5F41-41C8-869E-9B34A960517C}.Debug|x64.Build.0 = Debug|Any CPU
 		{FE93C11F-5F41-41C8-869E-9B34A960517C}.Release|x64.ActiveCfg = Release|Any CPU
 		{FE93C11F-5F41-41C8-869E-9B34A960517C}.Release|x64.Build.0 = Release|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Debug|x86.Build.0 = Debug|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Release|x86.ActiveCfg = Release|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Release|x86.Build.0 = Release|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Debug|x64.Build.0 = Debug|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Release|x64.ActiveCfg = Release|Any CPU
+		{3F5BBF6A-430B-497D-84B4-38EB3455C0C7}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
