@@ -109,21 +109,23 @@ namespace ClearBible.Clear3.Impl.TreeService
 
         public Dictionary<string, XmlNode> Legacy => _trees;
 
-        public XmlNode GetTreeNode(string sStartVerseID, string sEndVerseID)
+        public XmlNode GetTreeNode(VerseID start, VerseID end)
         {
-            XmlNode treeNode = null;
+            string sStartVerseID = $"{start.Book:D2}{start.Chapter:D3}{start.Verse:D3}";
 
-            List<XElement> subTrees = GetSubTrees(sStartVerseID, sEndVerseID);
+            string sEndVerseID = $"{end.Book:D2}{end.Chapter:D3}{end.Verse:D3}";
+
+            List<XElement> subTrees = GetSubTrees(
+                sStartVerseID, sEndVerseID);
+
             if (subTrees.Count == 1)
             {
-                treeNode = subTrees[0].ToXmlNode();
+                return subTrees[0].ToXmlNode();
             }
             else
             {
-                treeNode = CombineTrees(subTrees).ToXmlNode();
+                return CombineTrees(subTrees).ToXmlNode();
             }
-
-            return treeNode;
         }
 
         List<XElement> GetSubTrees(string sStartVerseID, string sEndVerseID)
