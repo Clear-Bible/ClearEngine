@@ -41,6 +41,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Impl.TreeService;
+    using ClearBible.Clear3.Miscellaneous;
 
     public class AutoAlignmentService : IAutoAlignmentService
     {
@@ -170,7 +171,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             VerseID sStartVerseID = verseIdFromLegacySourceIdString(entry.SourceSegments.First().ID);
             VerseID sEndVerseID = verseIdFromLegacySourceIdString(entry.SourceSegments.Last().ID);
 
-            XmlNode treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
+            XmlNode treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID).ToXmlNode();
 
             Dictionary<string, WordInfo> wordInfoTable =
                 GBI_Aligner.Data.BuildWordInfoTable(treeNode);

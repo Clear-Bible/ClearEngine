@@ -25,14 +25,12 @@ namespace ClearBible.Clear3.Impl.TreeService
 
         private string _treeFolder;
 
-        // FIXME would prefer Dictionary<int, string>
-        //
-        private Dictionary<string, string> _bookNames;
+        private Dictionary<int, string> _bookNames;
 
 
         public TreeService(
             string treeFolder,
-            Dictionary<string, string> bookNames)
+            Dictionary<int, string> bookNames)
         {
             _treeFolder = treeFolder;
             _bookNames = bookNames;
@@ -66,7 +64,7 @@ namespace ClearBible.Clear3.Impl.TreeService
         {
             if (chapterNumber >= 1)
             {
-                string bookName = _bookNames[$"{bookNumber:D2}"];
+                string bookName = _bookNames[bookNumber];
                 string treeFile = Path.Combine(
                     _treeFolder,
                     $"{bookName}{chapterNumber:D3}.trees.xml");
@@ -84,17 +82,17 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
 
-        public XmlNode GetTreeNode(VerseID start, VerseID end)
+        public XElement GetTreeNode(VerseID start, VerseID end)
         {
             List<XElement> verseTrees = GetVerseTrees(start, end).ToList();
 
             if (verseTrees.Count == 1)
             {
-                return verseTrees[0].ToXmlNode();
+                return verseTrees[0];
             }
             else
             {
-                return CombineTrees(verseTrees).ToXmlNode();
+                return CombineTrees(verseTrees);
             }
         }
 
