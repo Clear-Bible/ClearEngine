@@ -125,7 +125,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 AlignZone(
                     entryPrime,
                     translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
-                    groups, treeService.Legacy, ref align, i, maxPaths, puncs, stopWords,
+                    groups, treeService, ref align, i, maxPaths, puncs, stopWords,
                     goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                     glossTable, oldLinks, sourceFuncWords, targetFuncWords,
                     contentWordsOnly, strongs);
@@ -146,7 +146,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
             GroupTranslationsTable groups,
-            Dictionary<string, XmlNode> trees, // verseID => XmlNode
+            TreeService treeService, 
             ref Alignment2 align,  // Output goes here.
             int i,
             int maxPaths,
@@ -169,7 +169,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string sStartVerseID = bookChapterVerseFromId(entry.SourceSegments.First().ID);
             string sEndVerseID = bookChapterVerseFromId(entry.SourceSegments.Last().ID);
 
-            XmlNode treeNode = Align.GetTreeNode(sStartVerseID, sEndVerseID, trees);
+            // XmlNode treeNode = Align.GetTreeNode(sStartVerseID, sEndVerseID, trees);
+            XmlNode treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
 
             Dictionary<string, WordInfo> wordInfoTable =
                 GBI_Aligner.Data.BuildWordInfoTable(treeNode);
