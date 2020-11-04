@@ -14,37 +14,10 @@ using Utilities;
 namespace ClearBible.Clear3.Impl.TreeService
 {
     using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Miscellaneous;
 
     public class TreeService : ITreeService
     {
-        public void GetChapterTree(ChapterID chapterID)
-        {
-            int bookNumber = chapterID.Book;           
-            int chapterNumber = chapterID.Chapter;
-
-            string bookName = _bookNames[$"{bookNumber:D2}"];
-
-            string treeFile = Path.Combine(_treeFolder, $"{bookName}{chapterNumber:D3}.trees.xml");
-
-            if (File.Exists(treeFile))
-            {
-                XElement xml = XElement.Load(treeFile);
-
-                foreach (XElement node in xml
-                    .Descendants("Sentence")
-                    .Select(s => s.Descendants("Node").First()))
-                {
-                    string verseIdString =
-                        node.Attribute("nodeId").Value.Substring(0, 8);
-                    VerseID verseID = new VerseID(verseIdString);
-                    _trees2[verseID] = node;
-                }
-            }
-        }
-
-
         private Dictionary<VerseID, XElement> _trees2 =
             new Dictionary<VerseID, XElement>();
 
@@ -70,18 +43,44 @@ namespace ClearBible.Clear3.Impl.TreeService
         {
             if (!chapterID.Equals(_currentChapterID))
             {
-                _trees2.Clear();
+                int bookNumber = chapterID.Book;
+                int chapterNumber = chapterID.Chapter;
 
-                // Get the trees for the current chapter; a verse can cross chapter boundaries
-                GetChapterTree(chapterID);
-                int book = chapterID.Book;
-                int chapter = chapterID.Chapter;
-                ChapterID prevChapterID = new ChapterID(book, chapter - 1);
-                GetChapterTree(prevChapterID);
-                ChapterID nextChapterID = new ChapterID(book, chapter + 1);
-                GetChapterTree(nextChapterID);
+                _trees2 =
+                    GetVerseTreesForChapter(bookNumber, chapterNumber)
+                    .Concat(GetVerseTreesForChapter(bookNumber, chapterNumber + 1))
+                    .Concat(GetVerseTreesForChapter(bookNumber, chapterNumber - 1))
+                    .ToDictionary(
+                        x => new VerseID(
+                            x.Attribute("nodeId").Value.Substring(0, 8)),
+                        x => x);
+
                 _currentChapterID = chapterID;
             }
+        }
+
+
+        public IEnumerable<XElement> GetVerseTreesForChapter(
+            int bookNumber,
+            int chapterNumber)
+        {
+            if (chapterNumber >= 1)
+            {
+                string bookName = _bookNames[$"{bookNumber:D2}"];
+                string treeFile = Path.Combine(
+                    _treeFolder,
+                    $"{bookName}{chapterNumber:D3}.trees.xml");
+
+                if (File.Exists(treeFile))
+                {
+                    return
+                        XElement.Load(treeFile)
+                        .Descendants("Sentence")
+                        .Select(s => s.Descendants("Node").First());
+                }
+            }
+ 
+            return Enumerable.Empty<XElement>();
         }
 
 
