@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Xml.Linq;
 
 using Newtonsoft.Json;
 
@@ -171,10 +172,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             VerseID sStartVerseID = verseIdFromLegacySourceIdString(entry.SourceSegments.First().ID);
             VerseID sEndVerseID = verseIdFromLegacySourceIdString(entry.SourceSegments.Last().ID);
 
-            XmlNode treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID).ToXmlNode();
+            XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
+            XmlNode treeNode2 = treeNode.ToXmlNode();
 
             Dictionary<string, WordInfo> wordInfoTable =
-                GBI_Aligner.Data.BuildWordInfoTable(treeNode);
+                AutoAlignUtility.BuildWordInfoTable(treeNode2);
 
             List<SourceWord> sWords = MakeSourceWordList(
                 entry.SourceSegments.Select(seg => seg.ID),
@@ -191,7 +193,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // BBCCCVVV is the book, chapter, and verse of the first
             // word in the node.
 
-            string verseNodeID = Utils.GetAttribValue(treeNode, "nodeId");
+            string verseNodeID = Utils.GetAttribValue(treeNode2, "nodeId");
             verseNodeID = verseNodeID.Substring(0, verseNodeID.Length - 1);
 
             string verseID = verseNodeID.Substring(0, 8);
@@ -205,7 +207,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlternativesForTerminals terminalCandidates =
                 new AlternativesForTerminals();
             TerminalCandidates2.GetTerminalCandidates(
-                terminalCandidates, treeNode, tWords, model, manModel,
+                terminalCandidates, treeNode2, tWords, model, manModel,
                 alignProbs, useAlignModel, tWords.Count, verseID, puncs, stopWords,
                 badLinks, badLinkMinCount,
                 existingLinks, idMap, sourceFuncWords, contentWordsOnly,
@@ -214,13 +216,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();
             Align.AlignNodes(
-                treeNode, tWords, alignments, tWords.Count, sWords.Count,
+                treeNode2, tWords, alignments, tWords.Count, sWords.Count,
                 maxPaths, terminalCandidates);
 
             List<Candidate> verseAlignment = alignments[verseNodeID];
             Candidate topCandidate = verseAlignment[0];
 
-            List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode);
+            List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode2);
             List<MappedWords> links = AlignTheRest(
                 topCandidate, terminals, sWords.Count, tWords, model,
                 preAlignment, useAlignModel, puncs, stopWords, goodLinks,
