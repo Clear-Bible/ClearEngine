@@ -176,7 +176,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             XmlNode treeNode2 = treeNode.ToXmlNode();
 
             Dictionary<string, WordInfo> wordInfoTable =
-                AutoAlignUtility.BuildWordInfoTable(treeNode2);
+                AutoAlignUtility.BuildWordInfoTable(treeNode);
 
             List<SourceWord> sWords = MakeSourceWordList(
                 entry.SourceSegments.Select(seg => seg.ID),

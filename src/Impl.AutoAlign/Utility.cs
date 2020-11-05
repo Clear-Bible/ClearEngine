@@ -17,86 +17,51 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class AutoAlignUtility
     {
-        public static Dictionary<string, WordInfo> BuildWordInfoTable(XmlNode tree)
-        {
-            Dictionary<string, WordInfo> morphTable = new Dictionary<string, WordInfo>();
-
-            List<XmlNode> terminalNodes = GetTerminalXmlNodes(tree);
-
-            foreach (XmlNode terminalNode in terminalNodes)
-            {
-                WordInfo wi = new WordInfo();
-                string id = Utils.GetAttribValue(terminalNode, "morphId");
-                if (id.StartsWith("09020042"))
-                {
-                    ;
-                }
-                if (id.Length == 11) id += "1";
-                wi.Surface = Utils.GetAttribValue(terminalNode, "Unicode");
-                wi.Lemma = Utils.GetAttribValue(terminalNode, "UnicodeLemma");
-                wi.Lang = Utils.GetAttribValue(terminalNode, "Language");
-                wi.Morph = Utils.GetAttribValue(terminalNode, "Analysis");
-                wi.Strong = Utils.GetAttribValue(terminalNode, "StrongNumberX");
-                wi.Cat = Utils.GetAttribValue(terminalNode, "Cat");
-                string type = string.Empty;
-                if (wi.Lang == "G")
-                {
-                    type = Utils.GetAttribValue(terminalNode, "Type");
-                }
-                else
-                {
-                    type = Utils.GetAttribValue(terminalNode, "NounType");
-                }
-                if (wi.Cat == "noun" && type == "Proper") wi.Cat = "Name";
-
-                morphTable.Add(id, wi);
-            }
-
-            return morphTable;
+        public static Dictionary<string, WordInfo> BuildWordInfoTable(
+            XElement tree)
+        {           
+            return
+                GetTerminalXmlNodes(tree)
+                .ToDictionary(
+                    node => GetSourceIdFromTerminalXmlNode(node),
+                    node => GetWordInfoFromTerminalXmlNode(node));
         }
 
-        public static List<XmlNode> GetTerminalXmlNodes(XmlNode treeNode)
+        public static List<XElement> GetTerminalXmlNodes(XElement treeNode)
         {
-            List<XmlNode> terminalNodes = new List<XmlNode>();
-            GetTerminalXmlNodes(treeNode, terminalNodes);
-
-            return terminalNodes;
+            return treeNode
+                .Descendants()
+                .Where(e => e.FirstNode is XText)
+                .ToList();
         }
 
-        public static void GetTerminalXmlNodes(XmlNode treeNode, List<XmlNode> terminalNodes)
+        public static string GetSourceIdFromTerminalXmlNode(XElement node)
         {
-            if (treeNode.NodeType.ToString().Equals("Text")) // Terminal node
-            {
-                return;
-            }
-
-            if (!treeNode.HasChildNodes)
-            {
-                return;
-            }
-
-            if (treeNode.FirstChild.NodeType.ToString().Equals("Text")) // terminal ndoe
-            {
-                terminalNodes.Add(treeNode);
-                return;
-            }
-            /*           if (treeNode.Attributes.GetNamedItem("Rule") != null && treeNode.Attributes.GetNamedItem("Rule").Value.EndsWith("X")) // Hebrew suffix as part of the word
-                       {
-                           terminalNodes.Add(treeNode);
-                           return;
-                       } */
-
-            if (treeNode.HasChildNodes)
-            {
-                XmlNodeList subNodes = treeNode.ChildNodes;
-
-                for (int i = 0; i < subNodes.Count; i++)
-                {
-                    GetTerminalXmlNodes(subNodes[i], terminalNodes);
-                }
-            }
+            string sourceId = node.Attribute("morphId").Value;
+            if (sourceId.Length == 11) sourceId += "1";
+            return sourceId;
         }
+
+        public static WordInfo GetWordInfoFromTerminalXmlNode(XElement node)
+        {
+            string language = node.Attribute("Language").Value;
+
+            string type =
+                node.AttrAsString(language == "G" ? "Type" : "NounType");
+
+            string category = node.Attribute("Cat").Value;
+            if (category == "noun" && type == "Proper")
+                category = "Name";
+
+            return new WordInfo()
+            {
+                Lang = language,
+                Strong = node.Attribute("StrongNumberX").Value,
+                Surface = node.Attribute("Unicode").Value,
+                Lemma = node.Attribute("UnicodeLemma").Value,
+                Cat = category,
+                Morph = node.Attribute("Analysis").Value
+            };               
+        }       
     }
-
-
 }
