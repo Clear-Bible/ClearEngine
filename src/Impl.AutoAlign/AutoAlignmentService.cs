@@ -222,8 +222,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();
-            Align.AlignNodes(
-                treeNode2, tWords, alignments, tWords.Count, sWordsFromTranslationPair.Count,
+            AlignNodes(
+                treeNode, tWords, alignments, tWords.Count, sWordsFromTranslationPair.Count,
                 maxPaths, terminalCandidates);
 
             List<Candidate> verseAlignment = alignments[goalNodeId];
@@ -278,6 +278,82 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Line line2 = MakeLineWip(segBridgeTable, sWordsFromTranslationPair, tWords, glossTable, wordInfoTable);
         }
+
+
+
+        public static void AlignNodes(
+            XElement treeNode,
+            List<TargetWord> tWords,
+            Dictionary<string, List<Candidate>> alignments,
+            int n, // number of target tokens
+            int sLength, // number of source words
+            int maxPaths,
+            AlternativesForTerminals terminalCandidates
+            )
+        {
+            // Recursive calls.
+            //
+            foreach (XElement subTree in treeNode.Elements())
+            {
+                AlignNodes(
+                    subTree, tWords, alignments, n, sLength,
+                    maxPaths, terminalCandidates);
+            }
+
+            XmlNode treeNode2 = treeNode.ToXmlNode();
+
+            string nodeID = Utils.GetAttribValue(treeNode2, "nodeId");
+            nodeID = nodeID.Substring(0, nodeID.Length - 1);
+
+            if (treeNode2.FirstChild.NodeType.ToString() == "Text") // terminal node
+            {
+                string morphId = Utils.GetAttribValue(treeNode2, "morphId");
+                if (morphId.Length == 11)
+                {
+                    morphId += "1";
+                }
+
+                alignments.Add(nodeID, terminalCandidates[morphId]);
+            }
+            else if (treeNode2.ChildNodes.Count > 1)  // non-terminal with multiple children
+            {
+                // (John 1:1 first node: nodeId="430010010010171")
+                //
+                string getNodeId(XmlNode node)
+                {
+                    string childNodeID = Utils.GetAttribValue(node, "nodeId");
+                    if (childNodeID.Length == 15)
+                    {
+                        return childNodeID.Substring(0, childNodeID.Length - 1);
+                    }
+                    else
+                    {
+                        return childNodeID.Substring(0, childNodeID.Length - 2);
+                    }
+                }
+
+                List<Candidate> makeNonEmpty(List<Candidate> list) =>
+                    list.Count == 0
+                    ? Align.CreateEmptyCandidate()
+                    : list;
+
+                List<Candidate> candidatesForNode(XmlNode node) =>
+                    makeNonEmpty(alignments[getNodeId(node)]);
+
+                List<List<Candidate>> candidates =
+                    treeNode2
+                    .ChildNodes
+                    .Cast<XmlNode>()
+                    .Select(childNode => candidatesForNode(childNode))
+                    .ToList();
+
+                List<string> sNodes = Align.GetSourceNodes(treeNode2);
+
+                alignments[nodeID] = Align.ComputeTopCandidates(
+                    candidates, n, maxPaths, sNodes, treeNode2);
+            }
+        }
+
 
 
 
