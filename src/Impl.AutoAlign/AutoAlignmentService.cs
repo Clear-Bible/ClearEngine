@@ -302,12 +302,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             XmlNode treeNode2 = treeNode.ToXmlNode();
 
-            string nodeID = Utils.GetAttribValue(treeNode2, "nodeId");
+            string nodeID = treeNode.Attribute("nodeId").Value;
             nodeID = nodeID.Substring(0, nodeID.Length - 1);
 
-            if (treeNode2.FirstChild.NodeType.ToString() == "Text") // terminal node
+            if (treeNode.FirstNode is XText) // terminal node
             {
-                string morphId = Utils.GetAttribValue(treeNode2, "morphId");
+                string morphId = treeNode.Attribute("morphId").Value;
                 if (morphId.Length == 11)
                 {
                     morphId += "1";
@@ -315,21 +315,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 alignments.Add(nodeID, terminalCandidates[morphId]);
             }
-            else if (treeNode2.ChildNodes.Count > 1)  // non-terminal with multiple children
+            else if (treeNode.Descendants().Count() > 1)  // non-terminal with multiple children
             {
                 // (John 1:1 first node: nodeId="430010010010171")
-                //
-                string getNodeId(XmlNode node)
+                
+                string getNodeId(XElement node)
                 {
-                    string childNodeID = Utils.GetAttribValue(node, "nodeId");
-                    if (childNodeID.Length == 15)
-                    {
-                        return childNodeID.Substring(0, childNodeID.Length - 1);
-                    }
-                    else
-                    {
-                        return childNodeID.Substring(0, childNodeID.Length - 2);
-                    }
+                    string id = node.Attribute("nodeId").Value;
+                    int numDigitsToDrop = id.Length == 15 ? 1 : 2;
+                    return id.Substring(0, id.Length - numDigitsToDrop);
                 }
 
                 List<Candidate> makeNonEmpty(List<Candidate> list) =>
@@ -337,14 +331,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     ? Align.CreateEmptyCandidate()
                     : list;
 
-                List<Candidate> candidatesForNode(XmlNode node) =>
+                List<Candidate> candidatesForNode(XElement node) =>
                     makeNonEmpty(alignments[getNodeId(node)]);
 
                 List<List<Candidate>> candidates =
-                    treeNode2
-                    .ChildNodes
-                    .Cast<XmlNode>()
-                    .Select(childNode => candidatesForNode(childNode))
+                    treeNode
+                    .Elements()
+                    .Select(candidatesForNode)
                     .ToList();
 
                 List<string> sNodes = Align.GetSourceNodes(treeNode2);
