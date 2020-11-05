@@ -23,5 +23,15 @@ namespace ClearBible.Clear3.Miscellaneous
                 return xmlDoc.DocumentElement;
             }
         }
+
+        public static string AttrAsString(
+            this XElement element,
+            string attributeName)
+        {
+            XAttribute attribute = element.Attribute(attributeName);
+            return attribute is null
+                ? ""
+                : attribute.Value;
+        }
     }
 }
