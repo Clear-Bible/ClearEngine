@@ -537,38 +537,28 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-
-
-
-
         public static List<SourceWord> MakeSourceWordList(
             IEnumerable<string> sourceSegmentIds,
             Dictionary<string, WordInfo> wordInfoTable
             )
         {
-            Dictionary<string, int> textsSoFar = new Dictionary<string, int>();
-
-            int occurrence(string text)
-            {
-                int n = textsSoFar.GetValueOrDefault(text, 1);
-                textsSoFar[text] = n + 1;
-                return n;
-            }
-
-            SourceWord makeSourceWord(string id, int i)
-            {
-                WordInfo wi = wordInfoTable[id];
-                return new SourceWord()
+            return sourceSegmentIds
+                .Select((string id) => Tuple.Create(id, wordInfoTable[id]))
+                .WithVersionNumber(
+                    (Tuple<string, WordInfo> x) => x.Item2.Surface)
+                .Select((Tuple<Tuple<string, WordInfo>, int> y) =>
                 {
-                    ID = id,
-                    Text = wi.Surface,
-                    Lemma = wi.Lemma,
-                    Strong = wi.Lang + wi.Strong,
-                    AltID = $"{wi.Surface}-{occurrence(wi.Surface)}",
-                };
-            }
-
-            return sourceSegmentIds.Select(makeSourceWord).ToList();
+                    WordInfo wi = y.Item1.Item2;
+                    return new SourceWord()
+                    {
+                        ID = y.Item1.Item1,
+                        Text = wi.Surface,
+                        Lemma = wi.Lemma,
+                        Strong = wi.Lang + wi.Strong,
+                        AltID = $"{wi.Surface}-{y.Item2}"
+                    };
+                })
+                .ToList();
         }
 
 
