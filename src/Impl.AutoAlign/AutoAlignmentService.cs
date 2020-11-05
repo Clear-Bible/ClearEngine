@@ -45,6 +45,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.Impl.TreeService;
     using ClearBible.Clear3.Miscellaneous;
 
+
+
     public class AutoAlignmentService : IAutoAlignmentService
     {
         public Task<AutoAlignmentResult> LaunchAutoAlignmentAsync_Idea1(
@@ -230,9 +232,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<Candidate> verseAlignment = alignments[goalNodeId];
             Candidate topCandidate = verseAlignment[0];
 
-            List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode2);
+            List<XmlNode> terminals2 = Trees.Terminals.GetTerminalXmlNodes(treeNode2);
+            List<XElement> terminals = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
+
+            if (!Enumerable.SequenceEqual(
+                    terminals2.Select(t => Utils.GetAttribValue(t, "nodeId")),
+                    terminals.Select(t => t.Attribute("nodeId").Value)))
+            {
+                ;
+            }
+
             List<MappedWords> links = AlignTheRest(
-                topCandidate, terminals, sWordsFromTranslationPair.Count, tWords, model,
+                topCandidate, terminals2, terminals, sWordsFromTranslationPair.Count, tWords, model,
                 preAlignment, useAlignModel, puncs, stopWords, goodLinks,
                 goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords,
                 targetFuncWords, contentWordsOnly);
@@ -270,7 +281,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         x.Item1.Text,
                         x.Item2.Int);
 
-            Groups.AlignGroups(links2, sWordsFromTranslationPair, tWords, groups_old, terminals);
+            Groups.AlignGroups(links2, sWordsFromTranslationPair, tWords, groups_old, terminals2);
             Align2.FixCrossingLinks(ref links2);
 
             Output.WriteAlignment(links2, sWordsFromTranslationPair, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
@@ -410,6 +421,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static List<MappedWords> AlignTheRest(
             Candidate topCandidate,
             List<XmlNode> terminals,
+            List<XElement> terminals2,
             int numberSourceWords,
             List<TargetWord> targetWords,
             TranslationModel model,
@@ -438,16 +450,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<MappedWords> links = new List<MappedWords>();
             for (int i = 0; i < terminals.Count; i++)
             {
-                XmlNode terminal = (XmlNode)terminals[i];
+                XmlNode terminal = terminals[i];
+                XElement terminal2 = terminals2[i];
+
                 SourceNode sourceLink = new SourceNode();
-                sourceLink.MorphID = Utils.GetAttribValue(terminal, "morphId");
-                sourceLink.English = Utils.GetAttribValue(terminal, "English");
-                sourceLink.Lemma = Utils.GetAttribValue(terminal, "UnicodeLemma");
-                sourceLink.Category = Utils.GetAttribValue(terminal, "Cat");
-                sourceLink.Position = Int32.Parse(Utils.GetAttribValue(terminal, "Start"));
+
+                sourceLink.MorphID = terminal2.Attribute("morphId").Value;
+                sourceLink.English = terminal2.Attribute("English").Value;
+                sourceLink.Lemma = terminal2.Attribute("UnicodeLemma").Value;
+                sourceLink.Category = terminal2.Attribute("Cat").Value;
+                sourceLink.Position = Int32.Parse(terminal2.Attribute("Start").Value);
+
                 sourceLink.RelativePos = (double)sourceLink.Position / (double)numberSourceWords;
                 if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
+
                 sourceLink.TreeNode = terminal;
+
                 LinkedWord targetLink = linkedWords[i];
                 // (looks like linkedWords and terminals are expected to be
                 // in 1-to-1 correspondence.)
