@@ -34,6 +34,7 @@ using TranslationWord = GBI_Aligner.TranslationWord;
 using Link = GBI_Aligner.Link;
 using SourceNode = GBI_Aligner.SourceNode;
 using GBI_Aligner_Data = GBI_Aligner.Data;
+using CandidateChain = GBI_Aligner.CandidateChain;
 
 
 
@@ -300,8 +301,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     maxPaths, terminalCandidates);
             }
 
-            XmlNode treeNode2 = treeNode.ToXmlNode();
-
             string nodeID = treeNode.Attribute("nodeId").Value;
             nodeID = nodeID.Substring(0, nodeID.Length - 1);
 
@@ -340,26 +339,69 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(candidatesForNode)
                     .ToList();
 
-                List<string> sNodes = GetSourceNodes(treeNode);
-
-                alignments[nodeID] = Align.ComputeTopCandidates(
-                    candidates, n, maxPaths, sNodes, treeNode2);
+                alignments[nodeID] = ComputeTopCandidates(
+                    candidates, n, maxPaths);
             }
         }
 
 
 
-        public static List<string> GetSourceNodes(XElement treeNode)
+        public static List<Candidate> ComputeTopCandidates(
+            List<List<Candidate>> childCandidateList,
+            int n,
+            int maxPaths)
         {
-            return
-                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
-                .Select(node =>
+            // I think that childCandidateList is a list of alternatives ...
+
+            Dictionary<CandidateChain, double> pathProbs =
+                new Dictionary<CandidateChain, double>();
+
+            List<CandidateChain> allPaths = Align.CreatePaths(childCandidateList, maxPaths);
+
+            List<CandidateChain> paths = Align.FilterPaths(allPaths);
+            // paths = those where the candidates use different words
+
+            if (paths.Count == 0)
+            {
+                CandidateChain topPath = allPaths[0];
+                paths.Add(topPath);
+            }
+
+            List<Candidate> topCandidates = new List<Candidate>();
+
+            foreach (CandidateChain path in paths)
+            {
+                double jointProb = Align.ComputeJointProb(path); // sum of candidate probabilities in a path
+                try
                 {
-                    string morphId = node.Attribute("morphId").Value;
-                    if (morphId.Length == 11) morphId += "1";
-                    return morphId;
-                })
-                .ToList();
+                    pathProbs.Add(path, jointProb);
+                }
+                catch
+                {
+                    Console.WriteLine("Hashtable out of memory.");
+
+                    List<CandidateChain> sortedCandidates2 =
+                            pathProbs
+                                .OrderByDescending(kvp => (double)kvp.Value)
+                                .Select(kvp => kvp.Key)
+                                .ToList();
+
+                    int topN2 = sortedCandidates2.Count / 10;
+                    if (topN2 < n) topN2 = n;
+
+                    topCandidates = Align.GetTopPaths2(sortedCandidates2, pathProbs);
+                    return topCandidates;
+                }
+            }
+
+            Dictionary<CandidateChain, double> pathProbs2 =
+                Align.AdjustProbsByDistanceAndOrder(pathProbs);
+
+            List<CandidateChain> sortedCandidates = GBI_Aligner_Data.SortPaths(pathProbs2);
+
+            topCandidates = Align.GetTopPaths2(sortedCandidates, pathProbs);
+
+            return topCandidates;
         }
 
 
