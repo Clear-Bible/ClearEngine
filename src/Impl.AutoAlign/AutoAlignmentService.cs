@@ -565,29 +565,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static List<TargetWord> MakeTargetWordList(
             IEnumerable<TargetSegment> targetSegments)
         {
-            Dictionary<string, int> textsSoFar = new Dictionary<string, int>();
-
             double totalWords = targetSegments.Count();
 
-            int occurrence(string text)
-            {
-                int n = textsSoFar.GetValueOrDefault(text, 1);
-                textsSoFar[text] = n + 1;
-                return n;
-            }
-
-            TargetWord makeTargetWord(TargetSegment seg, int i) =>
-                new TargetWord()
+            return targetSegments
+                .WithVersionNumber((TargetSegment s) => s.Text)
+                .Select((Tuple<TargetSegment, int> x, int n) =>
                 {
-                    ID = seg.ID,
-                    Text = seg.Text.ToLower(),
-                    Text2 = seg.Text,
-                    AltID = $"{seg.Text}-{occurrence(seg.Text)}",
-                    Position = i,
-                    RelativePos = i / totalWords
-                };
-            
-            return targetSegments.Select(makeTargetWord).ToList();
+                    TargetSegment seg = x.Item1;
+                    return new TargetWord()
+                    {
+                        ID = seg.ID,
+                        Text = seg.Text.ToLower(),
+                        Text2 = seg.Text,
+                        AltID = $"{seg.Text}-{x.Item2}",
+                        Position = n,
+                        RelativePos = n / totalWords
+                    };
+                })
+                .ToList();
         }
 
 
