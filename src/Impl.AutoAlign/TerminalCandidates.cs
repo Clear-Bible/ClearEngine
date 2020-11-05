@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.Xml.Linq;
 
 using AlternativesForTerminals = GBI_Aligner.AlternativesForTerminals;
 using TargetWord = GBI_Aligner.TargetWord;
@@ -17,12 +18,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Data;
+    using ClearBible.Clear3.Miscellaneous;
 
     public class TerminalCandidates2
     {
         public static void GetTerminalCandidates(
             AlternativesForTerminals candidateTable,  // the output goes here
-            XmlNode treeNode, // syntax tree for current verse
+            XElement treeNode, // syntax tree for current verse
             List<TargetWord> tWords, // ArrayList(TargetWord)
             TranslationModel model,
             TranslationModel manModel, // manually checked alignments
@@ -38,38 +40,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, string> existingLinks, // (mWord.altId => tWord.altId)
             Dictionary<string, string> idMap,
             List<string> sourceFuncWords,
-            bool contentWordsOnly,  // not actually used
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            List<XmlNode> terminalNodes = Terminals.GetTerminalXmlNodes(treeNode);
-            // ArrayList(XmlNode)
+            List<XElement> terminalNodes = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
 
-            foreach (XmlNode terminalNode in terminalNodes)
+            foreach (XElement terminalNode in terminalNodes)
             {
                 SourceWord sWord = new SourceWord();
-                sWord.ID = Utils.GetAttribValue(terminalNode, "morphId");
-                if (sWord.ID == "41002004013")
-                {
-                    ;
-                }
+                sWord.ID = terminalNode.Attribute("morphId").Value;               
                 if (sWord.ID.Length == 11)
                 {
                     sWord.ID += "1";
                 }
+
                 sWord.AltID = (string)idMap[sWord.ID];
-                //               sWord.Lemma = (string)lemmaTable[sWord.ID];
-                sWord.Text = Utils.GetAttribValue(terminalNode, "Unicode");
-                sWord.Lemma = Utils.GetAttribValue(terminalNode, "UnicodeLemma");
-                sWord.Strong = Utils.GetAttribValue(terminalNode, "Language") + Utils.GetAttribValue(terminalNode, "StrongNumberX");
+                sWord.Text = terminalNode.Attribute("Unicode").Value;
+                sWord.Lemma = terminalNode.Attribute("UnicodeLemma").Value;
+                sWord.Strong = terminalNode.Attribute("Language").Value +
+                    terminalNode.Attribute("StrongNumberX").Value;
                 if (sWord.Lemma == null) continue;
-                //               if (contentWordsOnly && sourceFuncWords.Contains(sWord.Lemma)) continue;
 
                 AlternativeCandidates topCandidates =
                     GetTopCandidates(sWord, tWords, model, manModel,
                         alignProbs, useAlignModel, n, puncs, stopWords,
                         badLinks, badLinkMinCount,
-                        existingLinks, sourceFuncWords, contentWordsOnly,
+                        existingLinks, sourceFuncWords,
                         strongs);
 
                 candidateTable.Add(sWord.ID, topCandidates);
@@ -103,7 +99,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, string> existingLinks, // (mWord.altId => tWord.altId)
                                                       // it gets used here
             List<string> sourceFuncWords,
-            bool contentWordsOnly, // (not actually used)
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {

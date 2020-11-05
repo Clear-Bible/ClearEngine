@@ -178,15 +178,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, WordInfo> wordInfoTable =
                 AutoAlignUtility.BuildWordInfoTable(treeNode);
 
-            List<SourceWord> sWords = MakeSourceWordList(
+            List<SourceWord> sWordsFromTranslationPair = MakeSourceWordList(
                 entry.SourceSegments.Select(seg => seg.ID),
                 wordInfoTable);
 
             List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
 
-            Dictionary<string, string> idMap = sWords.ToDictionary(
-                sWord => sWord.ID,
-                sWord => sWord.AltID);
+            Dictionary<string, string> idMap = sWordsFromTranslationPair
+                .ToDictionary(
+                    sWord => sWord.ID,
+                    sWord => sWord.AltID);
 
             // Node IDs are of the form BBCCCVVVPPPSSSL,
             // where P is the 1-based position of the first word in the node,
@@ -210,21 +211,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 existingLinks = new Dictionary<string, string>();
             }
 
-            
-
             AlternativesForTerminals terminalCandidates =
                 new AlternativesForTerminals();
             TerminalCandidates2.GetTerminalCandidates(
-                terminalCandidates, treeNode2, tWords, model, manModel,
+                terminalCandidates, treeNode, tWords, model, manModel,
                 alignProbs, useAlignModel, tWords.Count, verseIDFromTree, puncs, stopWords,
                 badLinks, badLinkMinCount,
-                existingLinks, idMap, sourceFuncWords, contentWordsOnly,
+                existingLinks, idMap, sourceFuncWords,
                 strongs);
 
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();
             Align.AlignNodes(
-                treeNode2, tWords, alignments, tWords.Count, sWords.Count,
+                treeNode2, tWords, alignments, tWords.Count, sWordsFromTranslationPair.Count,
                 maxPaths, terminalCandidates);
 
             List<Candidate> verseAlignment = alignments[goalNodeId];
@@ -232,7 +231,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode2);
             List<MappedWords> links = AlignTheRest(
-                topCandidate, terminals, sWords.Count, tWords, model,
+                topCandidate, terminals, sWordsFromTranslationPair.Count, tWords, model,
                 preAlignment, useAlignModel, puncs, stopWords, goodLinks,
                 goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords,
                 targetFuncWords, contentWordsOnly);
@@ -270,14 +269,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         x.Item1.Text,
                         x.Item2.Int);
 
-            Groups.AlignGroups(links2, sWords, tWords, groups_old, terminals);
+            Groups.AlignGroups(links2, sWordsFromTranslationPair, tWords, groups_old, terminals);
             Align2.FixCrossingLinks(ref links2);
 
-            Output.WriteAlignment(links2, sWords, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
+            Output.WriteAlignment(links2, sWordsFromTranslationPair, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
             // In spite of its name, Output.WriteAlignment does not touch the
             // filesystem; it puts its result in align[i].
 
-            Line line2 = MakeLineWip(segBridgeTable, sWords, tWords, glossTable, wordInfoTable);
+            Line line2 = MakeLineWip(segBridgeTable, sWordsFromTranslationPair, tWords, glossTable, wordInfoTable);
         }
 
 
