@@ -421,7 +421,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<Candidate> ComputeTopCandidates(List<List<Candidate>> childCandidateList, int n, int maxPaths, List<string> sNodes, XmlNode treeNode)
+        public static List<Candidate> ComputeTopCandidates(List<List<Candidate>> childCandidateList, int n, int maxPaths, List<string> sNodes, XmlNode treeNode)
         {
             // I think that childCandidateList is a list of alternatives ...
 
@@ -942,7 +942,7 @@ namespace GBI_Aligner
             return firstWord.Substring(firstWord.LastIndexOf("_") + 1, 5);
         }
 
-        static List<string> GetSourceNodes(XmlNode treeNode)
+        public static List<string> GetSourceNodes(XmlNode treeNode)
         {
             List<string> sourceNodes = new List<string>();
 
