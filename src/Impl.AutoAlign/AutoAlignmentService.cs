@@ -184,7 +184,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
 
-            Dictionary<string, string> idMap = OldLinks.CreateIdMap(sWords);  // (SourceWord.ID => SourceWord.AltID)
+            Dictionary<string, string> idMap = sWords.ToDictionary(
+                sWord => sWord.ID,
+                sWord => sWord.AltID);          
+
 
             // Node IDs are of the form BBCCCVVVPPPSSSL,
             // where P is the 1-based position of the first word in the node,
