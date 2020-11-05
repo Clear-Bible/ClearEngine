@@ -340,11 +340,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(candidatesForNode)
                     .ToList();
 
-                List<string> sNodes = Align.GetSourceNodes(treeNode2);
+                List<string> sNodes = GetSourceNodes(treeNode);
 
                 alignments[nodeID] = Align.ComputeTopCandidates(
                     candidates, n, maxPaths, sNodes, treeNode2);
             }
+        }
+
+
+
+        public static List<string> GetSourceNodes(XElement treeNode)
+        {
+            return
+                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
+                .Select(node =>
+                {
+                    string morphId = node.Attribute("morphId").Value;
+                    if (morphId.Length == 11) morphId += "1";
+                    return morphId;
+                })
+                .ToList();
         }
 
 
