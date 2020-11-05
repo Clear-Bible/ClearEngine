@@ -477,7 +477,7 @@ namespace GBI_Aligner
         }
 
 
-        static Dictionary<CandidateChain, double>
+        public static Dictionary<CandidateChain, double>
             AdjustProbsByDistanceAndOrder(
                 Dictionary<CandidateChain, double> pathProbs)
         {
@@ -554,7 +554,7 @@ namespace GBI_Aligner
         }
 
 
-        static List<CandidateChain> FilterPaths(List<CandidateChain> paths)
+        public static List<CandidateChain> FilterPaths(List<CandidateChain> paths)
         {
             List<CandidateChain> filteredPaths = new List<CandidateChain>();
 
@@ -570,7 +570,7 @@ namespace GBI_Aligner
         }
 
 
-        static bool IsValidPath(CandidateChain path)
+        public static bool IsValidPath(CandidateChain path)
         {
             string wordsInPath = GetWordsInPath(path);
             string[] words = wordsInPath.Split(" ".ToCharArray());
@@ -592,7 +592,7 @@ namespace GBI_Aligner
             return true;
         }
 
-        static double ComputeJointProb(CandidateChain path)
+        public static double ComputeJointProb(CandidateChain path)
         {
             double jointProb = 0.0;
 
@@ -607,7 +607,7 @@ namespace GBI_Aligner
         }
 
 
-        static int ComputeDistance(CandidateChain path)
+        public static int ComputeDistance(CandidateChain path)
         {
             List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
 
@@ -697,7 +697,7 @@ namespace GBI_Aligner
 
 
         
-        static List<CandidateChain> CreatePaths(List<List<Candidate>> childCandidatesList, int maxPaths)
+        public static List<CandidateChain> CreatePaths(List<List<Candidate>> childCandidatesList, int maxPaths)
         {
             int maxArcs = GetMaxArcs(childCandidatesList); // product of all sub-list lengths
             int maxDepth = GetMaxDepth(childCandidatesList); // maximum sub-list length
@@ -722,7 +722,7 @@ namespace GBI_Aligner
 
 
  
-        static List<CandidateChain> Create_Depth_N_paths(List<List<Candidate>> childCandidatesList, int depth)
+        public static List<CandidateChain> Create_Depth_N_paths(List<List<Candidate>> childCandidatesList, int depth)
         {
             List<CandidateChain> paths = new List<CandidateChain>();
 
@@ -779,7 +779,7 @@ namespace GBI_Aligner
             return paths;
         }
 
-        static int GetMaxDepth(List<List<Candidate>> childCandidatesList)
+        public static int GetMaxDepth(List<List<Candidate>> childCandidatesList)
         {
             int max = 0;
 
@@ -791,7 +791,7 @@ namespace GBI_Aligner
             return max;
         }
 
-        static int GetMaxArcs(List<List<Candidate>> childCandidatesList)
+        public static int GetMaxArcs(List<List<Candidate>> childCandidatesList)
         {
             int max = 1;
 
@@ -804,21 +804,21 @@ namespace GBI_Aligner
         }
 
  
-        static CandidateChain Get_Nth_Candidate(List<Candidate> headCandidates, int depth)
+        public static CandidateChain Get_Nth_Candidate(List<Candidate> headCandidates, int depth)
         {
             return new CandidateChain(
                 headCandidates.Cast<Candidate>().Take(depth + 1));
         }
 
         // prepends head to a copy of tail to obtain result
-        static CandidateChain ConsChain(Candidate head, CandidateChain tail)
+        public static CandidateChain ConsChain(Candidate head, CandidateChain tail)
         {
             return new CandidateChain(
                 tail.Cast<Candidate>().Prepend(head));
         }
 
 
-        static List<Candidate> GetTopPaths2(List<CandidateChain> paths, Dictionary<CandidateChain, double> probs)
+        public static List<Candidate> GetTopPaths2(List<CandidateChain> paths, Dictionary<CandidateChain, double> probs)
         {
             List<Candidate> topCandidates = new List<Candidate>();
 
