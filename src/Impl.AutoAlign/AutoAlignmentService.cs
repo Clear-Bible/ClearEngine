@@ -186,8 +186,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Dictionary<string, string> idMap = sWords.ToDictionary(
                 sWord => sWord.ID,
-                sWord => sWord.AltID);          
-
+                sWord => sWord.AltID);
 
             // Node IDs are of the form BBCCCVVVPPPSSSL,
             // where P is the 1-based position of the first word in the node,
@@ -196,22 +195,28 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // BBCCCVVV is the book, chapter, and verse of the first
             // word in the node.
 
-            string verseNodeID = Utils.GetAttribValue(treeNode2, "nodeId");
-            verseNodeID = verseNodeID.Substring(0, verseNodeID.Length - 1);
+            // string topNodeId = Utils.GetAttribValue(treeNode2, "nodeId");
 
-            string verseID = verseNodeID.Substring(0, 8);
+            // The goal node ID is the node ID of the top node in the
+            // tree without the final L digit.
+            string goalNodeId = treeNode.Attribute("nodeId").Value;
+            goalNodeId = goalNodeId.Substring(0, goalNodeId.Length - 1);
 
-            Dictionary<string, string> existingLinks = new Dictionary<string, string>();
-            if (oldLinks.ContainsKey(verseID))  // verseID as obtained from tree
+            string verseIDFromTree = goalNodeId.Substring(0, 8);
+
+            if (!oldLinks.TryGetValue(verseIDFromTree,
+                out Dictionary<string, string> existingLinks))
             {
-                existingLinks = oldLinks[verseID];
+                existingLinks = new Dictionary<string, string>();
             }
+
+            
 
             AlternativesForTerminals terminalCandidates =
                 new AlternativesForTerminals();
             TerminalCandidates2.GetTerminalCandidates(
                 terminalCandidates, treeNode2, tWords, model, manModel,
-                alignProbs, useAlignModel, tWords.Count, verseID, puncs, stopWords,
+                alignProbs, useAlignModel, tWords.Count, verseIDFromTree, puncs, stopWords,
                 badLinks, badLinkMinCount,
                 existingLinks, idMap, sourceFuncWords, contentWordsOnly,
                 strongs);
@@ -222,7 +227,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 treeNode2, tWords, alignments, tWords.Count, sWords.Count,
                 maxPaths, terminalCandidates);
 
-            List<Candidate> verseAlignment = alignments[verseNodeID];
+            List<Candidate> verseAlignment = alignments[goalNodeId];
             Candidate topCandidate = verseAlignment[0];
 
             List<XmlNode> terminals = Trees.Terminals.GetTerminalXmlNodes(treeNode2);
