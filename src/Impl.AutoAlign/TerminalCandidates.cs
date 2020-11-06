@@ -11,7 +11,6 @@ using AlternativeCandidates = GBI_Aligner.AlternativeCandidates;
 using Candidate = GBI_Aligner.Candidate;
 
 
-using TerminalCandidates = GBI_Aligner.TerminalCandidates;
 using Align = GBI_Aligner.Align;
 
 
@@ -71,10 +70,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 candidateTable.Add(sWord.ID, topCandidates);
 
-                TerminalCandidates.ResolveConflicts(candidateTable);
+                ResolveConflicts(candidateTable);
             }
 
-            TerminalCandidates.FillGaps(candidateTable);
+            FillGaps(candidateTable);
         }
 
 
@@ -209,6 +208,166 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 Align.GetCandidatesWithSpecifiedProbability(bestProb, probs));
 
             return topCandidates;
+        }
+
+        public static void ResolveConflicts(AlternativesForTerminals candidateTable)
+        {
+            Dictionary<string, List<string>> conflicts = FindConflicts(candidateTable);
+
+            if (conflicts.Count > 0)
+            {
+                foreach (var conflictEnum in conflicts)
+                {
+                    string target = conflictEnum.Key;
+                    List<string> positions = conflictEnum.Value;
+                    List<Candidate> conflictingCandidates = GetConflictingCandidates(target, positions, candidateTable);
+                    Candidate winningCandidate = Align.GetWinningCandidate(conflictingCandidates);
+                    if (winningCandidate != null)
+                    {
+                        RemoveLosingCandidates(target, positions, winningCandidate, candidateTable);
+                    }
+                }
+            }
+        }
+
+        static Dictionary<string, List<string>> FindConflicts(AlternativesForTerminals candidateTable)
+        {
+            Dictionary<string, List<string>> targets =
+                new Dictionary<string, List<string>>();
+
+            foreach (var tableEnum in candidateTable)
+            {
+                string morphID = tableEnum.Key;
+                List<Candidate> candidates = tableEnum.Value;
+
+                for (int i = 1; i < candidates.Count; i++) // excluding the top candidate
+                {
+                    Candidate c = candidates[i];
+
+                    string linkedWords = Align.GetWords(c);
+                    if (targets.ContainsKey(linkedWords))
+                    {
+                        List<string> positions = targets[linkedWords];
+                        positions.Add(morphID);
+                    }
+                    else
+                    {
+                        List<string> positions = new List<string>();
+                        positions.Add(morphID);
+                        targets.Add(linkedWords, positions);
+                    }
+                }
+            }
+
+            Dictionary<string, List<string>> conflicts =
+                new Dictionary<string, List<string>>();
+
+            foreach (var targetEnum in targets)
+            {
+                string target = targetEnum.Key;
+                List<string> positions = targetEnum.Value;
+                if (positions.Count > 1)
+                {
+                    conflicts.Add(target, positions);
+                }
+            }
+
+            return conflicts;
+        }
+
+
+        static List<Candidate> GetConflictingCandidates(string target, List<string> positions, AlternativesForTerminals candidateTable)
+        {
+            List<Candidate> conflictingCandidates = new List<Candidate>();
+
+            foreach (string morphID in positions)
+            {
+                Candidate c = GetConflictingCandidate(morphID, target, candidateTable);
+                conflictingCandidates.Add(c);
+            }
+
+            return conflictingCandidates;
+        }
+
+        static Candidate GetConflictingCandidate(string morphID, string target, AlternativesForTerminals candidateTable)
+        {
+            Candidate conflictingCandidate = null;
+
+            List<Candidate> candidates = candidateTable[morphID];
+            foreach (Candidate candidate in candidates)
+            {
+                string linkedWords = Align.GetWords(candidate);
+                if (linkedWords == target)
+                {
+                    conflictingCandidate = candidate;
+                    break;
+                }
+            }
+
+            return conflictingCandidate;
+        }
+
+
+        static void RemoveLosingCandidates(string target, List<string> positions, Candidate winningCandidate, AlternativesForTerminals candidateTable)
+        {
+            foreach (string morphID in positions)
+            {
+                List<Candidate> candidates = candidateTable[morphID];
+                for (int i = 0; i < candidates.Count; i++)
+                {
+                    Candidate c = candidates[i];
+                    string targetID = GetTargetID(c);
+                    if (targetID == string.Empty) continue;
+                    string linkedWords = Align.GetWords(c);
+                    if (linkedWords == target && c != winningCandidate && c.Prob < 0.0)
+                    {
+                        candidates.Remove(c);
+                    }
+                }
+            }
+        }
+
+        static string GetTargetID(Candidate c)
+        {
+            if (c.Chain.Count == 0)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                TargetWord tWord = (TargetWord)c.Chain[0];
+                return tWord.ID;
+            }
+        }
+
+
+        public static void FillGaps(AlternativesForTerminals candidateTable)
+        {
+            List<string> gaps = FindGaps(candidateTable);
+
+            foreach (string morphID in gaps)
+            {
+                List<Candidate> emptyCandidate = Align.CreateEmptyCandidate();
+                candidateTable[morphID] = emptyCandidate;
+            }
+        }
+
+        static List<string> FindGaps(AlternativesForTerminals candidateTable)
+        {
+            List<string> gaps = new List<string>();
+
+            foreach (var tableEnum in candidateTable)
+            {
+                string morphID = tableEnum.Key;
+                List<Candidate> candidates = tableEnum.Value;
+
+                if (candidates.Count == 0)
+                {
+                    gaps.Add(morphID);
+                }
+            }
+
+            return gaps;
         }
     }
 }
