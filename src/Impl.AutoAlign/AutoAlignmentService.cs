@@ -562,8 +562,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            bool stopped = false;
-            List<MappedWords> linkedSiblings = AutoAlignUtility.GetLinkedSiblings(link.SourceNode.BetterTreeNode, linksTable, ref stopped);
+            List<MappedWords> linkedSiblings = AutoAlignUtility.GetLinkedSiblings(link.SourceNode.BetterTreeNode, linksTable);
 
             if (linkedSiblings.Count > 0)
             {

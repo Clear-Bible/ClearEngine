@@ -46,6 +46,24 @@ namespace ClearBible.Clear3.Miscellaneous
     }
 
 
+    public static class SyntaxTreeNodeExtensions
+    {
+        /// <summary>
+        /// Return the source ID for a terminal node.  The source ID is
+        /// derived from the "morphId" attribute.  In the OT, the morphId
+        /// has a subsegment number, but in the NT it does not.  So append
+        /// the subsegment digit "1" if it is missing.
+        /// </summary>
+        /// 
+        public static string SourceId(this XElement element)
+        {
+            string morphId = element.Attribute("morphId").Value;
+            if (morphId.Length == 11) morphId += "1";
+            return morphId;
+        }
+    }
+
+
     public static class LinqExtensions
     {
         /// <summary>
