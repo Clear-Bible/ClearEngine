@@ -36,6 +36,13 @@ namespace ClearBible.Clear3.Miscellaneous
                 ? ""
                 : attribute.Value;
         }
+
+        public static int AttrAsInt(
+            this XElement element,
+            string attributeName)
+        {
+            return int.Parse(element.Attribute(attributeName).Value);
+        }
     }
 
 
