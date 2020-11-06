@@ -104,5 +104,53 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return linkedSiblings;
         }
+
+
+        public static MappedWords GetPreNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
+        {
+            MappedWords preNeighbor = null;
+
+            int startPosition = Int32.Parse(unLinked.SourceNode.BetterTreeNode.Attribute("Start").Value);
+            int currDistance = 100;
+
+            foreach (MappedWords map in linkedSiblings)
+            {
+                int position = Int32.Parse(map.SourceNode.BetterTreeNode.Attribute("End").Value);
+                if (position < startPosition)
+                {
+                    if (preNeighbor == null)
+                    {
+                        preNeighbor = map;
+                        currDistance = startPosition - position;
+                    }
+                    else if ((startPosition - position) < currDistance)
+                    {
+                        preNeighbor = map;
+                    }
+                }
+            }
+
+            return preNeighbor;
+        }
+
+
+        public static MappedWords GetPostNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
+        {
+            MappedWords postNeighbor = null;
+
+            int endPosition = Int32.Parse(unLinked.SourceNode.BetterTreeNode.Attribute("End").Value);
+
+            foreach (MappedWords map in linkedSiblings)
+            {
+                int position = Int32.Parse(map.SourceNode.BetterTreeNode.Attribute("End").Value);
+                if (position > endPosition)
+                {
+                    postNeighbor = map;
+                    break;
+                }
+            }
+
+            return postNeighbor;
+        }
     }
 }

@@ -567,8 +567,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             if (linkedSiblings.Count > 0)
             {
-                MappedWords preNeighbor = Align2.GetPreNeighbor(link, linkedSiblings);
-                MappedWords postNeighbor = Align2.GetPostNeighbor(link, linkedSiblings);
+                MappedWords preNeighbor = AutoAlignUtility.GetPreNeighbor(link, linkedSiblings);
+                MappedWords postNeighbor = AutoAlignUtility.GetPostNeighbor(link, linkedSiblings);
                 List<TargetWord> targetCandidates = new List<TargetWord>();
                 bool foundTarget = false;
                 if (!(preNeighbor == null || postNeighbor == null))
