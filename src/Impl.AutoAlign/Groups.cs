@@ -52,7 +52,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<SourceWord> sourceWords,
             List<TargetWord> targetWords,
             GroupTranslationsTable_Old groups,
-            List<XmlNode> terminals
+            List<XElement> terminals
             )
         {
             SourceWord[] sWords = BuildSourceArray(sourceWords);
@@ -296,7 +296,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return inGroup;
         }
 
-        static void AddGroup(string[][] group, List<MappedGroup> links, List<XmlNode> terminals, List<TargetWord> targets)
+        static void AddGroup(string[][] group, List<MappedGroup> links, List<XElement> terminals, List<TargetWord> targets)
         {
             string[] sourceWords = group[0];
             string[] targetWords = group[1];
@@ -306,7 +306,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             links.Add(mg);
         }
 
-        static void AddSourceNodes(string[] sourceWords, List<SourceNode> sourceNodes, List<XmlNode> terminals)
+        static void AddSourceNodes(string[] sourceWords, List<SourceNode> sourceNodes, List<XElement> terminals)
         {
             for (int i = 0; i < sourceWords.Length; i++)
             {
@@ -315,28 +315,30 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
         }
 
-        static SourceNode GetSourceNode(string id, List<XmlNode> terminals)
+        static SourceNode GetSourceNode(string id, List<XElement> terminals)
         {
             SourceNode sNode = new SourceNode();
-            XmlNode treeNode = LocateTreeNode(id, terminals);
+            XElement treeNode = LocateTreeNode(id, terminals);
+            
             sNode.MorphID = id;
-            sNode.English = Utils.GetAttribValue(treeNode, "English");
-            sNode.Lemma = Utils.GetAttribValue(treeNode, "UnicodeLemma");
-            sNode.Position = Int32.Parse(Utils.GetAttribValue(treeNode, "Start"));
+            sNode.English = treeNode.Attribute("English").Value;
+            sNode.Lemma = treeNode.Attribute("UnicodeLemma").Value;
+            sNode.Position = treeNode.AttrAsInt("Start");
             sNode.RelativePos = (double)sNode.Position / (double)terminals.Count;
-            sNode.Category = Utils.GetAttribValue(treeNode, "Cat");
-            sNode.TreeNode = treeNode;
+            sNode.Category = treeNode.Attribute("Cat").Value;
+            sNode.TreeNode = null;
+            sNode.BetterTreeNode = treeNode;
 
             return sNode;
         }
 
-        static XmlNode LocateTreeNode(string id, List<XmlNode> terminals)
+        static XElement LocateTreeNode(string id, List<XElement> terminals)
         {
-            XmlNode treeNode = null;
+            XElement treeNode = null;
 
-            foreach (XmlNode terminal in terminals)
+            foreach (XElement terminal in terminals)
             {
-                if (id.StartsWith(Utils.GetAttribValue(terminal, "morphId")))
+                if (id.StartsWith(terminal.Attribute("morphId").Value))
                 {
                     treeNode = terminal;
                     break;
