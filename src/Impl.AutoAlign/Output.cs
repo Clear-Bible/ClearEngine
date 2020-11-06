@@ -13,28 +13,16 @@ using Newtonsoft.Json;
 
 using Alignment2 = GBI_Aligner.Alignment2;
 using Line = GBI_Aligner.Line;
-using Align = GBI_Aligner.Align;
-using Align2 = GBI_Aligner.Align2;
 using WordInfo = GBI_Aligner.WordInfo;
 using SourceWord = GBI_Aligner.SourceWord;
 using TargetWord = GBI_Aligner.TargetWord;
-using OldLinks = GBI_Aligner.OldLinks;
-using Utils = Utilities.Utils;
-using AlternativesForTerminals = GBI_Aligner.AlternativesForTerminals;
-using TerminalCandidates = GBI_Aligner.TerminalCandidates;
-using Candidate = GBI_Aligner.Candidate;
-using MappedWords = GBI_Aligner.MappedWords;
 using MappedGroup = GBI_Aligner.MappedGroup;
-using Groups = GBI_Aligner.Groups;
-using Output = GBI_Aligner.Output;
 using LinkedWord = GBI_Aligner.LinkedWord;
 using Manuscript = GBI_Aligner.Manuscript;
 using Translation = GBI_Aligner.Translation;
 using TranslationWord = GBI_Aligner.TranslationWord;
 using Link = GBI_Aligner.Link;
 using SourceNode = GBI_Aligner.SourceNode;
-using GBI_Aligner_Data = GBI_Aligner.Data;
-using CandidateChain = GBI_Aligner.CandidateChain;
 using ManuscriptWord = GBI_Aligner.ManuscriptWord;
 
 

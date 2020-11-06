@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
 using AlternativesForTerminals = GBI_Aligner.AlternativesForTerminals;
 using TargetWord = GBI_Aligner.TargetWord;
-using Terminals = Trees.Terminals;
 using SourceWord = GBI_Aligner.SourceWord;
-using Utils = Utilities.Utils;
 using AlternativeCandidates = GBI_Aligner.AlternativeCandidates;
-using TerminalCandidates = GBI_Aligner.TerminalCandidates;
-using OldLinks = GBI_Aligner.OldLinks;
 using Candidate = GBI_Aligner.Candidate;
+
+
+using TerminalCandidates = GBI_Aligner.TerminalCandidates;
 using Align = GBI_Aligner.Align;
+
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
@@ -107,7 +108,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             if (existingLinks.Count > 0 && sWord.AltID != null && existingLinks.ContainsKey(sWord.AltID))
             {
                 string targetAltID = (string)existingLinks[sWord.AltID];
-                TargetWord target = OldLinks.GetTarget(targetAltID, tWords);
+
+                TargetWord target =
+                    tWords.Where(tw => targetAltID == tw.AltID).FirstOrDefault();
+
                 if (target != null)
                 {
                     Candidate c = new Candidate(target, 0.0);

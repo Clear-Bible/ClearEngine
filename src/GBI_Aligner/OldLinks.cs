@@ -26,15 +26,18 @@ namespace GBI_Aligner
 
         public static TargetWord GetTarget(string altID, List<TargetWord> targetWords)
         {
-            foreach(TargetWord targetWord in targetWords)
-            {
-                if (altID == targetWord.AltID)
-                {
-                    return targetWord;
-                }
-            }
+            //foreach(TargetWord targetWord in targetWords)
+            //{
+            //    if (altID == targetWord.AltID)
+            //    {
+            //        return targetWord;
+            //    }
+            //}
 
-            return null;
+            //return null;
+
+            return
+                targetWords.Where(tw => altID == tw.AltID).FirstOrDefault();
         }
     }
 }
