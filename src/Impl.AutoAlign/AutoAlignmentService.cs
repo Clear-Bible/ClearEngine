@@ -25,8 +25,6 @@ using TerminalCandidates = GBI_Aligner.TerminalCandidates;
 using Candidate = GBI_Aligner.Candidate;
 using MappedWords = GBI_Aligner.MappedWords;
 using MappedGroup = GBI_Aligner.MappedGroup;
-using Groups = GBI_Aligner.Groups;
-using Output = GBI_Aligner.Output;
 using LinkedWord = GBI_Aligner.LinkedWord;
 using Manuscript = GBI_Aligner.Manuscript;
 using Translation = GBI_Aligner.Translation;
@@ -274,7 +272,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         x.Item1.Text,
                         x.Item2.Int);
 
-            Groups.AlignGroups(links2, sWordsFromTranslationPair, tWords, groups_old, terminals2);
+            Groups.AlignGroups(links2, sWordsFromTranslationPair, tWords, groups_old, terminals);
             Align2.FixCrossingLinks(ref links2);
 
             Output.WriteAlignment(links2, sWordsFromTranslationPair, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
