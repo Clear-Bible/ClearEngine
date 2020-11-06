@@ -6,6 +6,7 @@ using System.Xml.Linq;
 
 using WordInfo = GBI_Aligner.WordInfo;
 using Utils = Utilities.Utils;
+using MappedWords = GBI_Aligner.MappedWords;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
@@ -62,6 +63,46 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 Cat = category,
                 Morph = node.Attribute("Analysis").Value
             };               
-        }       
+        }
+
+
+        public static List<MappedWords> GetLinkedSiblings(
+            XElement treeNode,
+            Dictionary<string, MappedWords> linksTable, // key is source morphId
+            ref bool stopped)
+        {
+            List<MappedWords> linkedSiblings = new List<MappedWords>();
+
+            if (treeNode.Parent == null || treeNode.Parent.Name.LocalName == "Tree") stopped = true;
+
+            while (!stopped && treeNode.Parent != null && linkedSiblings.Count == 0)
+            {
+                foreach (XElement childNode in treeNode.Parent.Elements())
+                {
+                    if (childNode != treeNode)
+                    {
+                        List<XElement> terminals = GetTerminalXmlNodes(childNode);
+                        foreach (XElement terminal in terminals)
+                        {
+                            string morphID = terminal.Attribute("morphId").Value;
+                            if (morphID.Length == 11) morphID += "1";
+                            if (linksTable.ContainsKey(morphID))
+                            {
+                                MappedWords map = linksTable[morphID];
+                                linkedSiblings.Add(map);
+                            }
+                        }
+                    }
+                }
+
+                if (linkedSiblings.Count == 0)
+                {
+                    linkedSiblings = GetLinkedSiblings(treeNode.Parent, linksTable, ref stopped);
+                }
+
+            }
+
+            return linkedSiblings;
+        }
     }
 }
