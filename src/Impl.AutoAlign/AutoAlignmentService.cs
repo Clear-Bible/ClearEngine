@@ -235,13 +235,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<XmlNode> terminals2 = Trees.Terminals.GetTerminalXmlNodes(treeNode2);
             List<XElement> terminals = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
 
-            if (!Enumerable.SequenceEqual(
-                    terminals2.Select(t => Utils.GetAttribValue(t, "nodeId")),
-                    terminals.Select(t => t.Attribute("nodeId").Value)))
-            {
-                ;
-            }
-
             List<MappedWords> links = AlignTheRest(
                 topCandidate, terminals2, terminals, sWordsFromTranslationPair.Count, tWords, model,
                 preAlignment, useAlignModel, puncs, stopWords, goodLinks,

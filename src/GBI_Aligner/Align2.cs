@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System.IO;
 
 using ClearBible.Clear3.Impl.Data;
+using System.Xml.Linq;
 
 namespace GBI_Aligner
 {
@@ -674,6 +675,7 @@ namespace GBI_Aligner
         public string Lemma;
         public string English;
         public XmlNode TreeNode;
+        public XElement BetterTreeNode;
         public int Position;
         public double RelativePos;
         public string Category;
