@@ -75,7 +75,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             if (treeNode.Parent == null || treeNode.Parent.Name.LocalName == "Tree") stopped = true;
 
-            while (!stopped && treeNode.Parent != null && linkedSiblings.Count == 0)
+            if (!stopped && treeNode.Parent != null && linkedSiblings.Count == 0)
             {
                 foreach (XElement childNode in treeNode.Parent.Elements())
                 {
@@ -108,49 +108,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static MappedWords GetPreNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
-            MappedWords preNeighbor = null;
+            int limit = unLinked.SourceNode.BetterTreeNode.AttrAsInt("Start");
 
-            int startPosition = Int32.Parse(unLinked.SourceNode.BetterTreeNode.Attribute("Start").Value);
-            int currDistance = 100;
+            int end(MappedWords mw) =>
+                mw.SourceNode.BetterTreeNode.AttrAsInt("End");
 
-            foreach (MappedWords map in linkedSiblings)
-            {
-                int position = Int32.Parse(map.SourceNode.BetterTreeNode.Attribute("End").Value);
-                if (position < startPosition)
-                {
-                    if (preNeighbor == null)
-                    {
-                        preNeighbor = map;
-                        currDistance = startPosition - position;
-                    }
-                    else if ((startPosition - position) < currDistance)
-                    {
-                        preNeighbor = map;
-                    }
-                }
-            }
-
-            return preNeighbor;
+            return
+                linkedSiblings
+                .Select(mw => new { mw, distance = limit - end(mw) })
+                .Where(x => x.distance > 0)
+                .OrderBy(x => x.distance)
+                .Select(x => x.mw)
+                .FirstOrDefault();
         }
 
 
         public static MappedWords GetPostNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
-            MappedWords postNeighbor = null;
+            int limit = unLinked.SourceNode.BetterTreeNode.AttrAsInt("End");
 
-            int endPosition = Int32.Parse(unLinked.SourceNode.BetterTreeNode.Attribute("End").Value);
+            int end(MappedWords mw) =>
+                mw.SourceNode.BetterTreeNode.AttrAsInt("End");
 
-            foreach (MappedWords map in linkedSiblings)
-            {
-                int position = Int32.Parse(map.SourceNode.BetterTreeNode.Attribute("End").Value);
-                if (position > endPosition)
-                {
-                    postNeighbor = map;
-                    break;
-                }
-            }
-
-            return postNeighbor;
+            return
+                linkedSiblings
+                .Where(mw => end(mw) > limit)
+                .FirstOrDefault();
         }
     }
 }
