@@ -5,7 +5,6 @@ using System.Xml;
 using System.Xml.Linq;
 
 using WordInfo = GBI_Aligner.WordInfo;
-using Utils = Utilities.Utils;
 using MappedWords = GBI_Aligner.MappedWords;
 
 
