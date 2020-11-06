@@ -68,41 +68,33 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static List<MappedWords> GetLinkedSiblings(
             XElement treeNode,
-            Dictionary<string, MappedWords> linksTable, // key is source morphId
-            ref bool stopped)
+            Dictionary<string, MappedWords> linksTable)
         {
-            List<MappedWords> linkedSiblings = new List<MappedWords>();
-
-            if (treeNode.Parent == null || treeNode.Parent.Name.LocalName == "Tree") stopped = true;
-
-            if (!stopped && treeNode.Parent != null && linkedSiblings.Count == 0)
+            if (treeNode.Parent != null &&
+                treeNode.Parent.Name.LocalName != "Tree")
             {
-                foreach (XElement childNode in treeNode.Parent.Elements())
-                {
-                    if (childNode != treeNode)
-                    {
-                        List<XElement> terminals = GetTerminalXmlNodes(childNode);
-                        foreach (XElement terminal in terminals)
-                        {
-                            string morphID = terminal.Attribute("morphId").Value;
-                            if (morphID.Length == 11) morphID += "1";
-                            if (linksTable.ContainsKey(morphID))
-                            {
-                                MappedWords map = linksTable[morphID];
-                                linkedSiblings.Add(map);
-                            }
-                        }
-                    }
-                }
+                List<MappedWords> linkedSiblings =
+                    treeNode.Parent.Elements()
+                    .Where(child => child != treeNode)
+                    .SelectMany(child => GetTerminalXmlNodes(child))
+                    .Select(term => term.SourceId())
+                    .Select(sourceId => linksTable.GetValueOrDefault(sourceId))
+                    .Where(x => !(x is null))
+                    .ToList();
 
                 if (linkedSiblings.Count == 0)
                 {
-                    linkedSiblings = GetLinkedSiblings(treeNode.Parent, linksTable, ref stopped);
+                    return GetLinkedSiblings(treeNode.Parent, linksTable);
                 }
-
+                else
+                {
+                    return linkedSiblings;
+                }
             }
-
-            return linkedSiblings;
+            else
+            {
+                return new List<MappedWords>();
+            }          
         }
 
 
