@@ -458,6 +458,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
 
                 sourceLink.TreeNode = terminal;
+                sourceLink.BetterTreeNode = terminal2;
 
                 LinkedWord targetLink = linkedWords[i];
                 // (looks like linkedWords and terminals are expected to be
@@ -562,7 +563,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             bool stopped = false;
-            List<MappedWords> linkedSiblings = Align2.GetLinkedSiblings(link.SourceNode.TreeNode, linksTable, ref stopped);
+            List<MappedWords> linkedSiblings = AutoAlignUtility.GetLinkedSiblings(link.SourceNode.BetterTreeNode, linksTable, ref stopped);
 
             if (linkedSiblings.Count > 0)
             {
