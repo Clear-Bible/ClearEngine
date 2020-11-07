@@ -295,33 +295,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         static List<Candidate> GetConflictingCandidates(string target, List<string> positions, AlternativesForTerminals candidateTable)
         {
-            List<Candidate> conflictingCandidates = new List<Candidate>();
-
-            foreach (string morphID in positions)
-            {
-                Candidate c = GetConflictingCandidate(morphID, target, candidateTable);
-                conflictingCandidates.Add(c);
-            }
-
-            return conflictingCandidates;
-        }
-
-        static Candidate GetConflictingCandidate(string morphID, string target, AlternativesForTerminals candidateTable)
-        {
-            Candidate conflictingCandidate = null;
-
-            List<Candidate> candidates = candidateTable[morphID];
-            foreach (Candidate candidate in candidates)
-            {
-                string linkedWords = GBI_Aligner_Align.GetWords(candidate);
-                if (linkedWords == target)
-                {
-                    conflictingCandidate = candidate;
-                    break;
-                }
-            }
-
-            return conflictingCandidate;
+            return
+                positions
+                .Select(morphID =>
+                    candidateTable[morphID]
+                    .FirstOrDefault(c =>
+                        GBI_Aligner_Align.GetWords(c) == target))
+                .ToList();
         }
 
 
