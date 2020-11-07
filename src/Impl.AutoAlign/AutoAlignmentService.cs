@@ -444,7 +444,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //Console.WriteLine("\nAlignTheRest\n\n");
 
             List<LinkedWord> linkedWords = new List<LinkedWord>();
-            GBI_Aligner_Align2.GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
+            AutoAlignUtility.GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
 
             // linkedWords has a LinkedWord for each target word found in
             // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
