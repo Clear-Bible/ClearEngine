@@ -10,9 +10,6 @@ using AlternativeCandidates = GBI_Aligner.AlternativeCandidates;
 using Candidate = GBI_Aligner.Candidate;
 
 
-using GBI_Aligner_Align = GBI_Aligner.Align;
-
-
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
@@ -261,7 +258,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     Candidate c = candidates[i];
 
-                    string linkedWords = GBI_Aligner_Align.GetWords(c);
+                    string linkedWords = AutoAlignUtility.GetWords(c);
                     if (targets.ContainsKey(linkedWords))
                     {
                         List<string> positions = targets[linkedWords];
@@ -300,7 +297,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select(morphID =>
                     candidateTable[morphID]
                     .FirstOrDefault(c =>
-                        GBI_Aligner_Align.GetWords(c) == target))
+                        AutoAlignUtility.GetWords(c) == target))
                 .ToList();
         }
 
@@ -315,7 +312,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     Candidate c = candidates[i];
                     string targetID = GetTargetID(c);
                     if (targetID == string.Empty) continue;
-                    string linkedWords = GBI_Aligner_Align.GetWords(c);
+                    string linkedWords = AutoAlignUtility.GetWords(c);
                     if (linkedWords == target && c != winningCandidate && c.Prob < 0.0)
                     {
                         candidates.Remove(c);
@@ -344,7 +341,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (string morphID in gaps)
             {
-                List<Candidate> emptyCandidate = GBI_Aligner_Align.CreateEmptyCandidate();
+                List<Candidate> emptyCandidate = AutoAlignUtility.CreateEmptyCandidate();
                 candidateTable[morphID] = emptyCandidate;
             }
         }

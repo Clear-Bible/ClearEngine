@@ -539,6 +539,7 @@ namespace GBI_Aligner
             return words.Trim();
         }
 
+
         public static string GetWordsInPath(CandidateChain path)
         {
             List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
@@ -690,7 +691,6 @@ namespace GBI_Aligner
                     return path.Cast<TargetWord>();
                 }
             }
-
 
             return helper(path).ToList();
         }
