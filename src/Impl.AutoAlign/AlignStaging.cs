@@ -462,5 +462,151 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return true;
         }
+
+
+        public static double ComputeJointProb(CandidateChain path)
+        {
+            double jointProb = 0.0;
+
+            // Look at this again.
+            // It assumes that the chain is all Candidates.
+            foreach (Candidate c in path)
+            {
+                jointProb += c.Prob;
+            }
+
+            return jointProb;
+        }
+
+
+        public static List<Candidate> GetTopPaths2(List<CandidateChain> paths, Dictionary<CandidateChain, double> probs)
+        {
+            List<Candidate> topCandidates = new List<Candidate>();
+
+            double topProb = 10;
+
+            for (int i = 0; i < paths.Count; i++)
+            {
+                CandidateChain path = paths[i];
+                Candidate c = new Candidate(path, (double)probs[path]);
+                if (topProb == 10) topProb = c.Prob;
+                if (c.Prob < topProb) break;
+                topCandidates.Add(c);
+            }
+
+            return topCandidates;
+        }
+
+
+        public static Dictionary<CandidateChain, double>
+            AdjustProbsByDistanceAndOrder(
+                Dictionary<CandidateChain, double> pathProbs)
+        {
+            Dictionary<CandidateChain, double> pathProbs2 =
+                new Dictionary<CandidateChain, double>();
+
+            List<Candidate> candidates = new List<Candidate>();
+
+            foreach (var pathEnum in pathProbs)
+            {
+                Candidate candidate = new Candidate(
+                    pathEnum.Key,
+                    (double)pathEnum.Value);
+                candidates.Add(candidate);
+            }
+
+            int minimalDistance = 10000;
+            foreach (Candidate c in candidates)
+            {
+                int distance = ComputeDistance(c.Chain);
+                if (distance < minimalDistance) minimalDistance = distance;
+            }
+
+            if (minimalDistance > 0)
+            {
+                foreach (Candidate c in candidates)
+                {
+                    string linkedWords = AutoAlignUtility.GetWords(c);
+                    int distance = ComputeDistance(c.Chain);
+                    double distanceProb = Math.Log((double)minimalDistance / (double)distance);
+                    double orderProb = ComputeOrderProb(c.Chain);  // something about word order
+                    double adjustedProb = c.Prob + c.Prob + distanceProb + orderProb / 2.0;
+                    c.Prob = adjustedProb;
+                    pathProbs2.Add(c.Chain, adjustedProb);
+                }
+            }
+            else if (candidates.Count > 0)
+            {
+                pathProbs2 = pathProbs;
+            }
+
+            return pathProbs2;
+        }
+
+
+        public static int ComputeDistance(CandidateChain path)
+        {
+            List<TargetWord> wordsInPath = AutoAlignUtility.GetTargetWordsInPath(path);
+
+            int distance = 0;
+
+            int position = GetInitialPosition(wordsInPath);
+
+            for (int i = 0; i < wordsInPath.Count; i++)
+            {
+                TargetWord tw = (TargetWord)wordsInPath[i];
+                if (tw.Position == -1) continue;
+                if (tw.Position == position) continue;
+                distance += Math.Abs(position - tw.Position);
+                position = tw.Position;
+            }
+
+            return distance;
+        }
+
+
+        public static int GetInitialPosition(List<TargetWord> wordsInPath)
+        {
+            int initialPosition = 0;
+
+            foreach (TargetWord tWord in wordsInPath)
+            {
+                if (tWord.Position >= 0)
+                {
+                    initialPosition = tWord.Position;
+                    break;
+                }
+            }
+
+            return initialPosition;
+        }
+
+
+        static double ComputeOrderProb(CandidateChain path)
+        {
+            List<TargetWord> wordsInPath =
+                AutoAlignUtility.GetTargetWordsInPath(path);
+
+            int violations = 0;
+            int countedWords = 1;
+
+            int position = GetInitialPosition(wordsInPath);
+
+            for (int i = 0; i < wordsInPath.Count; i++)
+            {
+                TargetWord tw = (TargetWord)wordsInPath[i];
+                if (tw.Position == -1) continue;
+                if (tw.Position == position) continue;
+                if (tw.Position < position)
+                {
+                    violations++;
+                }
+                countedWords++;
+                position = tw.Position;
+            }
+
+            double prob = 1.0 - (double)violations / (double)countedWords;
+            return Math.Log(prob);
+        }
     }
 }

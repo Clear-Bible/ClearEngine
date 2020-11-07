@@ -369,7 +369,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (CandidateChain path in paths)
             {
-                double jointProb = GBI_Aligner_Align.ComputeJointProb(path); // sum of candidate probabilities in a path
+                double jointProb = AlignStaging.ComputeJointProb(path); // sum of candidate probabilities in a path
                 try
                 {
                     pathProbs.Add(path, jointProb);
@@ -387,17 +387,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     int topN2 = sortedCandidates2.Count / 10;
                     if (topN2 < n) topN2 = n;
 
-                    topCandidates = GBI_Aligner_Align.GetTopPaths2(sortedCandidates2, pathProbs);
+                    topCandidates = AlignStaging.GetTopPaths2(sortedCandidates2, pathProbs);
                     return topCandidates;
                 }
             }
 
             Dictionary<CandidateChain, double> pathProbs2 =
-                GBI_Aligner_Align.AdjustProbsByDistanceAndOrder(pathProbs);
+                AlignStaging.AdjustProbsByDistanceAndOrder(pathProbs);
 
             List<CandidateChain> sortedCandidates = SortPaths(pathProbs2);
 
-            topCandidates = GBI_Aligner_Align.GetTopPaths2(sortedCandidates, pathProbs);
+            topCandidates = AlignStaging.GetTopPaths2(sortedCandidates, pathProbs);
 
             return topCandidates;
         }
