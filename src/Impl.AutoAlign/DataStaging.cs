@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 
 using Newtonsoft.Json;
@@ -15,9 +11,6 @@ using Newtonsoft.Json.Linq;
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Impl.Data;
-    using ClearBible.Clear3.Impl.TreeService;
-    using ClearBible.Clear3.Miscellaneous;
 
     public class SourceWord
     {
@@ -146,8 +139,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public string MorphID;
         public string Lemma;
         public string English;
-        public XmlNode TreeNode;
-        public XElement BetterTreeNode;
+        public XElement TreeNode;
         public int Position;
         public double RelativePos;
         public string Category;

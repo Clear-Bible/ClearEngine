@@ -8,9 +8,9 @@
     <ProjectReference Include="..\API\Api.csproj" />
     <ProjectReference Include="..\Impl_Data\Impl.Data.csproj" />
     <ProjectReference Include="..\Impl.TreeService\Impl.TreeService.csproj" />
-    <ProjectReference Include="..\AlignmentTool\AlignmentTool.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 </Project>
