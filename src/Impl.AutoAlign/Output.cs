@@ -10,23 +10,6 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 
 
-
-using Alignment2 = GBI_Aligner.Alignment2;
-using Line = GBI_Aligner.Line;
-using WordInfo = GBI_Aligner.WordInfo;
-using SourceWord = GBI_Aligner.SourceWord;
-using TargetWord = GBI_Aligner.TargetWord;
-using MappedGroup = GBI_Aligner.MappedGroup;
-using LinkedWord = GBI_Aligner.LinkedWord;
-using Manuscript = GBI_Aligner.Manuscript;
-using Translation = GBI_Aligner.Translation;
-using TranslationWord = GBI_Aligner.TranslationWord;
-using Link = GBI_Aligner.Link;
-using SourceNode = GBI_Aligner.SourceNode;
-using ManuscriptWord = GBI_Aligner.ManuscriptWord;
-
-
-
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;

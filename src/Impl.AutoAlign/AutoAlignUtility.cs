@@ -5,12 +5,6 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 
-using WordInfo = GBI_Aligner.WordInfo;
-using MappedWords = GBI_Aligner.MappedWords;
-using Candidate = GBI_Aligner.Candidate;
-using TargetWord = GBI_Aligner.TargetWord;
-using CandidateChain = GBI_Aligner.CandidateChain;
-using LinkedWord = GBI_Aligner.LinkedWord;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
