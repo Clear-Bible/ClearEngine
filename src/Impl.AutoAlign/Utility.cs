@@ -10,6 +10,7 @@ using MappedWords = GBI_Aligner.MappedWords;
 using Candidate = GBI_Aligner.Candidate;
 using TargetWord = GBI_Aligner.TargetWord;
 using CandidateChain = GBI_Aligner.CandidateChain;
+using LinkedWord = GBI_Aligner.LinkedWord;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
@@ -191,6 +192,50 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 IsFake = true,
                 ID = "0"
             };
+        }
+
+
+        public static void GetLinkedWords(ArrayList path, List<LinkedWord> links, double prob)
+        {
+            ArrayList words = new ArrayList();
+
+            if (path.Count == 0)
+            {
+                links.Add(new LinkedWord()
+                {
+                    Word = new TargetWord
+                    {
+                        Text = string.Empty,
+                        Position = -1,
+                        IsFake = true,
+                        ID = "0"
+                    },
+                    Prob = -1000,
+                    Text = string.Empty
+                });
+            }
+            else
+            {
+                if (path[0] is Candidate)
+                {
+                    foreach (Candidate c in path)
+                    {
+                        GetLinkedWords(c.Chain, links, c.Prob);
+                    }
+                }
+                else
+                {
+                    foreach (TargetWord tWord in path)
+                    {
+                        links.Add(new LinkedWord()
+                        {
+                            Word = tWord,
+                            Prob = prob,
+                            Text = tWord.Text
+                        });
+                    }
+                }
+            }
         }
     }
 }
