@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -6,6 +7,9 @@ using System.Xml.Linq;
 
 using WordInfo = GBI_Aligner.WordInfo;
 using MappedWords = GBI_Aligner.MappedWords;
+using Candidate = GBI_Aligner.Candidate;
+using TargetWord = GBI_Aligner.TargetWord;
+using CandidateChain = GBI_Aligner.CandidateChain;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
@@ -125,6 +129,68 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 linkedSiblings
                 .Where(mw => end(mw) > limit)
                 .FirstOrDefault();
+        }
+
+
+        public static List<Candidate> CreateEmptyCandidate()
+        {
+            return new List<Candidate>()
+            {
+                new Candidate()
+            };
+        }
+
+
+        // returns "text1-posn1 text2-posn2 ..."
+        //
+        public static string GetWords(Candidate c)
+        {
+            List<TargetWord> wordsInPath = GetTargetWordsInPath(c.Chain);
+
+            string words = string.Empty;
+
+            foreach (TargetWord wordInPath in wordsInPath)
+            {
+                words += wordInPath.Text + "-" + wordInPath.Position + " ";
+            }
+
+            return words.Trim();
+        }
+
+
+        public static List<TargetWord> GetTargetWordsInPath(CandidateChain path)
+        {
+            IEnumerable<TargetWord> helper(ArrayList path)
+            {
+                if (path.Count == 0)
+                {
+                    return new TargetWord[] { CreateFakeTargetWord() };
+                }
+                else if (path[0] is Candidate)
+                {
+                    return path
+                        .Cast<Candidate>()
+                        .SelectMany(c => helper(c.Chain));
+                }
+                else
+                {
+                    return path.Cast<TargetWord>();
+                }
+            }
+
+            return helper(path).ToList();
+        }
+
+
+        public static TargetWord CreateFakeTargetWord()
+        {
+            return new TargetWord()
+            {
+                Text = string.Empty,
+                Position = -1,
+                IsFake = true,
+                ID = "0"
+            };
         }
     }
 }
