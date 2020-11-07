@@ -300,5 +300,128 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return candidates;
         }
+
+
+        public static List<CandidateChain> CreatePaths(List<List<Candidate>> childCandidatesList, int maxPaths)
+        {
+            int maxArcs = GetMaxArcs(childCandidatesList); // product of all sub-list lengths
+            int maxDepth = GetMaxDepth(childCandidatesList); // maximum sub-list length
+            if (maxArcs > maxPaths || maxArcs <= 0)
+            {
+                double root = Math.Pow((double)maxPaths, 1.0 / childCandidatesList.Count);
+                maxDepth = (int)root;
+            }
+
+            List<CandidateChain> depth_N_paths = new List<CandidateChain>();
+            try
+            {
+                depth_N_paths = Create_Depth_N_paths(childCandidatesList, maxDepth);
+            }
+            catch
+            {
+                depth_N_paths = CreatePaths(childCandidatesList, maxPaths / 2);
+            }
+
+            return depth_N_paths;
+        }
+
+
+        public static int GetMaxArcs(List<List<Candidate>> childCandidatesList)
+        {
+            int max = 1;
+
+            foreach (List<Candidate> candidates in childCandidatesList)
+            {
+                max *= candidates.Count;
+            }
+
+            return max;
+        }
+
+
+        public static int GetMaxDepth(List<List<Candidate>> childCandidatesList)
+        {
+            int max = 0;
+
+            foreach (List<Candidate> candidates in childCandidatesList)
+            {
+                if (candidates.Count > max) max = candidates.Count;
+            }
+
+            return max;
+        }
+
+
+        public static List<CandidateChain> Create_Depth_N_paths(List<List<Candidate>> childCandidatesList, int depth)
+        {
+            List<CandidateChain> paths = new List<CandidateChain>();
+
+            if (childCandidatesList.Count > 1)
+            {
+                List<Candidate> headCandidates = childCandidatesList[0];
+
+                int headDepth = headCandidates.Count - 1;
+                if (headDepth > depth)
+                {
+                    headDepth = depth;
+                }
+                // headDepth is one less than number of head candidates,
+                // but truncated to depth
+
+                CandidateChain nHeadCandidates = Get_Nth_Candidate(headCandidates, headDepth);
+                // nHeadCandidates = first headDepth members of headCandidates
+
+                List<List<Candidate>> tailCandidatesList = childCandidatesList.ToList();
+                tailCandidatesList.Remove(headCandidates);
+                // tailCandidatesList = the remaining members of childCandidatesList
+
+                List<CandidateChain> tailPaths = Create_Depth_N_paths(tailCandidatesList, depth);
+                // (recursive call)
+
+                for (int i = 0; i < nHeadCandidates.Count; i++) // for each member of nHeadCandidates
+                {
+                    Candidate nHeadCandidate = (Candidate)nHeadCandidates[i];
+
+                    for (int j = 0; j < tailPaths.Count; j++)
+                    {
+                        CandidateChain tailPath = tailPaths[j];
+                        CandidateChain path = ConsChain(nHeadCandidate, tailPath);
+
+                        if (paths.Count > 16000000)
+                        {
+                            return paths;
+                        }
+                        paths.Add(path);
+                    }
+                }
+            }
+            else
+            {
+                List<Candidate> candidates = childCandidatesList[0];
+                for (int i = 0; i < candidates.Count && i <= depth; i++)
+                {
+                    Candidate candidate = candidates[i];
+                    CandidateChain path = new CandidateChain(Enumerable.Repeat(candidate, 1));
+                    paths.Add(path);
+                }
+            }
+
+            return paths;
+        }
+
+
+        public static CandidateChain Get_Nth_Candidate(List<Candidate> headCandidates, int depth)
+        {
+            return new CandidateChain(
+                headCandidates.Cast<Candidate>().Take(depth + 1));
+        }
+
+
+        // prepends head to a copy of tail to obtain result
+        public static CandidateChain ConsChain(Candidate head, CandidateChain tail)
+        {
+            return new CandidateChain(
+                tail.Cast<Candidate>().Prepend(head));
+        }
     }
 }

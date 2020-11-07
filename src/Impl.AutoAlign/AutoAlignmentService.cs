@@ -30,7 +30,6 @@ using CandidateChain = GBI_Aligner.CandidateChain;
 
 
 using GBI_Aligner_Align = GBI_Aligner.Align;
-using GBI_Aligner_Align2 = GBI_Aligner.Align2;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
@@ -326,7 +325,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 List<Candidate> makeNonEmpty(List<Candidate> list) =>
                     list.Count == 0
-                    ? GBI_Aligner_Align.CreateEmptyCandidate()
+                    ? AutoAlignUtility.CreateEmptyCandidate()
                     : list;
 
                 List<Candidate> candidatesForNode(XElement node) =>
@@ -355,7 +354,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<CandidateChain, double> pathProbs =
                 new Dictionary<CandidateChain, double>();
 
-            List<CandidateChain> allPaths = GBI_Aligner_Align.CreatePaths(childCandidateList, maxPaths);
+            List<CandidateChain> allPaths = AlignStaging.CreatePaths(childCandidateList, maxPaths);
 
             List<CandidateChain> paths = GBI_Aligner_Align.FilterPaths(allPaths);
             // paths = those where the candidates use different words
