@@ -119,5 +119,82 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
         }
+
+
+        public static List<List<MappedWords>> FindConflictingLinks(List<MappedWords> links)
+        {
+            return links
+                .Where(link => link.TargetNode.Word.Text != string.Empty)
+                .GroupBy(link =>
+                    $"{link.TargetNode.Word.Text}-{link.TargetNode.Word.ID}")
+                .Where(group => group.Count() > 1)
+                .Select(group => group.ToList())
+                .ToList();
+        }
+
+
+        public static void ResolveConflicts(
+            List<List<MappedWords>> conflicts,
+            List<MappedWords> links,
+            int pass)
+        {
+            List<MappedWords> linksToRemove = conflicts.
+                SelectMany(conflict =>
+                    conflict.Except(
+                        FindWinners(conflict, pass).Where((_, n) => n == 0)))
+                .ToList();
+
+            for (int i = 0; i < links.Count; i++)
+            {
+                MappedWords link = links[i];
+                if (linksToRemove.Contains(link))
+                {
+                    links[i] = new MappedWords
+                    {
+                        SourceNode = link.SourceNode,
+                        TargetNode = new LinkedWord()
+                        {
+                            Prob = -1000,
+                            Word = AutoAlignUtility.CreateFakeTargetWord()
+                        }
+                    };
+                }
+            }
+        }
+
+
+        public static List<MappedWords> FindWinners(List<MappedWords> conflict, int pass)
+        {
+            double prob(MappedWords mw) => mw.TargetNode.Prob;
+
+            double distance(MappedWords mw) =>
+                Math.Abs(mw.SourceNode.RelativePos -
+                         mw.TargetNode.Word.RelativePos);
+
+            // We know that conflict is not the empty list.
+
+            double bestProb = conflict.Max(mw => prob(mw));
+
+            List<MappedWords> winners = conflict
+                .Where(mw => mw.TargetNode.Prob == bestProb)
+                .ToList();
+
+            if (pass == 2 && winners.Count > 1)
+            {
+                double minDistance = conflict.Min(mw => distance(mw));
+
+                MappedWords winner2 = winners
+                    .Where(mw => distance(mw) == minDistance)
+                    .FirstOrDefault();
+
+                if (winner2 != null)
+                {
+                    winners = new List<MappedWords>();
+                    winners.Add(winner2);
+                }
+            }
+
+            return winners;
+        }
     }
 }

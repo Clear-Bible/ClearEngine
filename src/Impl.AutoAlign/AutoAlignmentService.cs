@@ -480,11 +480,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
 
-            List<List<MappedWords>> conflicts = GBI_Aligner_Align2.FindConflictingLinks(links);
+            List<List<MappedWords>> conflicts = AlignStaging.FindConflictingLinks(links);
 
             if (conflicts.Count > 0)
             {
-                GBI_Aligner_Align2.ResolveConflicts(conflicts, links, 1);
+                AlignStaging.ResolveConflicts(conflicts, links, 1);
             }
 
 
