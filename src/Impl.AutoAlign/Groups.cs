@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
-
-using Newtonsoft.Json;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
-    using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Data;
-    using ClearBible.Clear3.Impl.TreeService;
     using ClearBible.Clear3.Miscellaneous;
 
     public class Groups
@@ -298,8 +289,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             sNode.Position = treeNode.AttrAsInt("Start");
             sNode.RelativePos = (double)sNode.Position / (double)terminals.Count;
             sNode.Category = treeNode.Attribute("Cat").Value;
-            sNode.TreeNode = null;
-            sNode.BetterTreeNode = treeNode;
+            sNode.TreeNode = treeNode;
 
             return sNode;
         }

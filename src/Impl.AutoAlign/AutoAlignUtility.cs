@@ -2,16 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using System.Xml.Linq;
 
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
-    using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Impl.Data;
-    using ClearBible.Clear3.Impl.TreeService;
     using ClearBible.Clear3.Miscellaneous;
 
     public class AutoAlignUtility
@@ -98,10 +94,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static MappedWords GetPreNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
-            int limit = unLinked.SourceNode.BetterTreeNode.AttrAsInt("Start");
+            int limit = unLinked.SourceNode.TreeNode.AttrAsInt("Start");
 
             int end(MappedWords mw) =>
-                mw.SourceNode.BetterTreeNode.AttrAsInt("End");
+                mw.SourceNode.TreeNode.AttrAsInt("End");
 
             return
                 linkedSiblings
@@ -115,10 +111,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static MappedWords GetPostNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
         {
-            int limit = unLinked.SourceNode.BetterTreeNode.AttrAsInt("End");
+            int limit = unLinked.SourceNode.TreeNode.AttrAsInt("End");
 
             int end(MappedWords mw) =>
-                mw.SourceNode.BetterTreeNode.AttrAsInt("End");
+                mw.SourceNode.TreeNode.AttrAsInt("End");
 
             return
                 linkedSiblings

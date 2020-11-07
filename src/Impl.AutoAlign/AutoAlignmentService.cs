@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 
 using Newtonsoft.Json;
@@ -64,8 +63,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
 
             ChapterID prevChapter = ChapterID.None;
-
-            Dictionary<string, XmlNode> trees = new Dictionary<string, XmlNode>();
 
             Alignment2 align = new Alignment2();  // The output goes here.
 
@@ -148,7 +145,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             VerseID sEndVerseID = verseIdFromLegacySourceIdString(entry.SourceSegments.Last().ID);
 
             XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
-            XmlNode treeNode2 = treeNode.ToXmlNode();
 
             Dictionary<string, WordInfo> wordInfoTable =
                 AutoAlignUtility.BuildWordInfoTable(treeNode);
@@ -204,11 +200,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<Candidate> verseAlignment = alignments[goalNodeId];
             Candidate topCandidate = verseAlignment[0];
 
-            List<XmlNode> terminals2 = Trees.Terminals.GetTerminalXmlNodes(treeNode2);
             List<XElement> terminals = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
 
             List<MappedWords> links = AlignTheRest(
-                topCandidate, terminals2, terminals, sWordsFromTranslationPair.Count, tWords, model,
+                topCandidate, terminals, sWordsFromTranslationPair.Count, tWords, model,
                 preAlignment, useAlignModel, puncs, stopWords, goodLinks,
                 goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords,
                 targetFuncWords, contentWordsOnly);
@@ -400,8 +395,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static List<MappedWords> AlignTheRest(
             Candidate topCandidate,
-            List<XmlNode> terminals,
-            List<XElement> terminals2,
+            List<XElement> terminals,
             int numberSourceWords,
             List<TargetWord> targetWords,
             TranslationModel model,
@@ -430,22 +424,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<MappedWords> links = new List<MappedWords>();
             for (int i = 0; i < terminals.Count; i++)
             {
-                XmlNode terminal = terminals[i];
-                XElement terminal2 = terminals2[i];
+                XElement terminal = terminals[i];
 
                 SourceNode sourceLink = new SourceNode();
 
-                sourceLink.MorphID = terminal2.Attribute("morphId").Value;
-                sourceLink.English = terminal2.Attribute("English").Value;
-                sourceLink.Lemma = terminal2.Attribute("UnicodeLemma").Value;
-                sourceLink.Category = terminal2.Attribute("Cat").Value;
-                sourceLink.Position = Int32.Parse(terminal2.Attribute("Start").Value);
+                sourceLink.MorphID = terminal.Attribute("morphId").Value;
+                sourceLink.English = terminal.Attribute("English").Value;
+                sourceLink.Lemma = terminal.Attribute("UnicodeLemma").Value;
+                sourceLink.Category = terminal.Attribute("Cat").Value;
+                sourceLink.Position = Int32.Parse(terminal.Attribute("Start").Value);
 
                 sourceLink.RelativePos = (double)sourceLink.Position / (double)numberSourceWords;
                 if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
 
                 sourceLink.TreeNode = terminal;
-                sourceLink.BetterTreeNode = terminal2;
 
                 LinkedWord targetLink = linkedWords[i];
                 // (looks like linkedWords and terminals are expected to be
@@ -549,7 +541,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            List<MappedWords> linkedSiblings = AutoAlignUtility.GetLinkedSiblings(link.SourceNode.BetterTreeNode, linksTable);
+            List<MappedWords> linkedSiblings = AutoAlignUtility.GetLinkedSiblings(link.SourceNode.TreeNode, linksTable);
 
             if (linkedSiblings.Count > 0)
             {

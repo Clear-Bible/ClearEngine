@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Linq;
-
-using Newtonsoft.Json;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Data;
-    using ClearBible.Clear3.Impl.TreeService;
-    using ClearBible.Clear3.Miscellaneous;
+
 
     public class Output
     {
