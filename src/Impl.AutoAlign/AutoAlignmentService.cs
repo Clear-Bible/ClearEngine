@@ -554,7 +554,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     return;
                 }
-                string targetWord = GBI_Aligner_Align2.GetTargetWordTextFromID(targetID, targetWords);
+                string targetWord = AlignStaging.GetTargetWordTextFromID(targetID, targetWords);
                 string pair = link.SourceNode.Lemma + "#" + targetWord;
                 if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.ContainsKey(pair))
                 {
@@ -567,7 +567,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     link.TargetNode.Word.ID = targetID;
                     link.TargetNode.Word.IsFake = false;
                     link.TargetNode.Word.Text = targetWord;
-                    link.TargetNode.Word.Position = GBI_Aligner_Align2.GetTargetPositionFromID(targetID, targetWords);
+                    link.TargetNode.Word.Position = AlignStaging.GetTargetPositionFromID(targetID, targetWords);
                     return;
                 }
             }
@@ -582,7 +582,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 bool foundTarget = false;
                 if (!(preNeighbor == null || postNeighbor == null))
                 {
-                    targetCandidates = GBI_Aligner_Align2.GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    targetCandidates = AlignStaging.GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
                     if (targetCandidates.Count > 0)
                     {
                         LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
@@ -595,7 +595,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
                 else if (preNeighbor != null && !foundTarget)
                 {
-                    targetCandidates = GBI_Aligner_Align2.GetTargetCandidates(preNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    targetCandidates = AlignStaging.GetTargetCandidates(preNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
                     if (targetCandidates.Count > 0)
                     {
                         LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
@@ -608,7 +608,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
                 else if (postNeighbor != null && !foundTarget)
                 {
-                    targetCandidates = GBI_Aligner_Align2.GetTargetCandidates(postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    targetCandidates = AlignStaging.GetTargetCandidates(postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
                     if (targetCandidates.Count > 0)
                     {
                         LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);

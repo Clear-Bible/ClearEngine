@@ -213,5 +213,92 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Where(mw => !mw.TargetNode.Word.IsFake)
                 .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
         }
+
+
+        public static string GetTargetWordTextFromID(string targetID, List<TargetWord> targetWords)
+        {
+            return targetWords
+                .Where(tw => targetID == tw.ID)
+                .Select(tw => tw.Text)
+                .DefaultIfEmpty("")
+                .First();
+        }
+
+
+        public static int GetTargetPositionFromID(string targetID, List<TargetWord> targetWords)
+        {
+            return targetWords
+                .Where(tw => targetID == tw.ID)
+                .Select(tw => tw.Position)
+                .DefaultIfEmpty(0)
+                .First();
+        }
+
+
+        public static List<TargetWord> GetTargetCandidates(MappedWords postNeighbor, List<TargetWord> targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
+        {
+            List<TargetWord> candidates = new List<TargetWord>();
+
+            int anchorPosition = postNeighbor.TargetNode.Word.Position;
+
+            for (int i = anchorPosition - 1; i >= 0 && i >= anchorPosition - 3; i--)
+            {
+                TargetWord targetWord = targetWords[i];
+                string word = targetWord.Text;
+                string id = targetWord.ID;
+                if (contentWordsOnly && targetFuncWords.Contains(word)) continue;
+                if (linkedTargets.Contains(word)) continue;
+                if (puncs.Contains(word)) break;
+                TargetWord tWord = new TargetWord();
+                tWord.ID = id;
+                tWord.Position = i;
+                tWord.Text = word;
+                candidates.Add(tWord);
+            }
+            for (int i = anchorPosition + 1; i < targetWords.Count && i <= anchorPosition + 3; i++)
+            {
+                TargetWord targetWord = targetWords[i];
+                string word = targetWord.Text;
+                string id = targetWord.ID;
+                if (contentWordsOnly && targetFuncWords.Contains(word)) continue;
+                if (linkedTargets.Contains(word)) continue;
+                if (puncs.Contains(word)) break;
+                TargetWord tWord = new TargetWord();
+                tWord.ID = id;
+                tWord.Position = i;
+                tWord.Text = word;
+                candidates.Add(tWord);
+            }
+
+            return candidates;
+        }
+
+
+        public static List<TargetWord> GetTargetCandidates(MappedWords preNeighbor, MappedWords postNeighbor, List<TargetWord> targetWords, List<string> linkedTargets, List<string> puncBounds, List<string> targetFuncWords, bool contentWordsOnly)
+        {
+            List<TargetWord> candidates = new List<TargetWord>();
+
+            int startPosition = preNeighbor.TargetNode.Word.Position;
+            int endPosition = postNeighbor.TargetNode.Word.Position;
+
+            for (int i = startPosition; i >= 0 && i < targetWords.Count && i < endPosition; i++)
+            {
+                if (i == startPosition) continue;
+                if (i == endPosition) continue;
+                TargetWord targetWord = targetWords[i];
+                string word = targetWord.Text;
+                string id = targetWord.ID;
+                if (contentWordsOnly && targetFuncWords.Contains(word)) continue;
+                if (linkedTargets.Contains(word)) continue;
+                if (puncBounds.Contains(word)) break;
+                TargetWord tWord = new TargetWord();
+                tWord.ID = id;
+                tWord.Position = i;
+                tWord.Text = word;
+                candidates.Add(tWord);
+            }
+
+            return candidates;
+        }
     }
 }
