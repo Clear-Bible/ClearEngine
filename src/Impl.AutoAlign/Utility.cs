@@ -183,6 +183,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        public static string GetWordsInPath(CandidateChain path)
+        {
+            List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
+
+            string words = string.Empty;
+
+            foreach (TargetWord wordInPath in wordsInPath)
+            {
+                words += wordInPath.Text + "-" + wordInPath.Position + " ";
+            }
+
+            return words.Trim();
+        }
+
+
+
         public static TargetWord CreateFakeTargetWord()
         {
             return new TargetWord()

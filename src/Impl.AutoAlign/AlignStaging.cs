@@ -423,5 +423,44 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return new CandidateChain(
                 tail.Cast<Candidate>().Prepend(head));
         }
+
+
+        public static List<CandidateChain> FilterPaths(List<CandidateChain> paths)
+        {
+            List<CandidateChain> filteredPaths = new List<CandidateChain>();
+
+            foreach (CandidateChain path in paths)
+            {
+                if (IsValidPath(path))
+                {
+                    filteredPaths.Add(path);
+                }
+            }
+
+            return filteredPaths;
+        }
+
+
+        public static bool IsValidPath(CandidateChain path)
+        {
+            string wordsInPath = AutoAlignUtility.GetWordsInPath(path);
+            string[] words = wordsInPath.Split(" ".ToCharArray());
+            List<string> usedWords = new List<string>();
+            for (int i = 0; i < words.Length; i++)
+            {
+                string word = words[i];
+                if (word == "--1") continue;
+                if (usedWords.Contains(word))
+                {
+                    return false;
+                }
+                else
+                {
+                    usedWords.Add(word);
+                }
+            }
+
+            return true;
+        }
     }
 }
