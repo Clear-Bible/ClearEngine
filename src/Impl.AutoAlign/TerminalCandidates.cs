@@ -121,13 +121,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<TargetWord, double> probs =
                 new Dictionary<TargetWord, double>();
 
-            bool isContentWord = GBI_Aligner_Align.IsContentWord(sWord.Lemma, sourceFuncWords);
+            bool isContentWord = !sourceFuncWords.Contains(sWord.Lemma);
+
             if (!isContentWord) return topCandidates;
 
             if (strongs.ContainsKey(sWord.Strong))
             {
                 Dictionary<string, int> wordIds = strongs[sWord.Strong];
-                List<TargetWord> matchingTwords = GBI_Aligner_Align.GetMatchingTwords(wordIds, tWords);
+                List<TargetWord> matchingTwords = 
+                    tWords.Where(tw => wordIds.ContainsKey(tw.ID)).ToList();
+
                 foreach (TargetWord target in matchingTwords)
                 {
                     Candidate c = new Candidate(target, 0.0);
@@ -224,15 +227,25 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     string target = conflictEnum.Key;
                     List<string> positions = conflictEnum.Value;
+
                     List<Candidate> conflictingCandidates = GetConflictingCandidates(target, positions, candidateTable);
-                    Candidate winningCandidate = GBI_Aligner_Align.GetWinningCandidate(conflictingCandidates);
-                    if (winningCandidate != null)
+
+                    double topProb =
+                        conflictingCandidates.Max(c => c.Prob);
+
+                    List<Candidate> best =
+                        conflictingCandidates
+                        .Where(c => c.Prob == topProb)
+                        .ToList();
+
+                    if (best.Count == 1)
                     {
-                        RemoveLosingCandidates(target, positions, winningCandidate, candidateTable);
+                        RemoveLosingCandidates(target, positions, best[0], candidateTable);
                     }
                 }
             }
         }
+
 
         static Dictionary<string, List<string>> FindConflicts(AlternativesForTerminals candidateTable)
         {
