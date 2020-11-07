@@ -491,10 +491,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             #region Andi does not use this part anymore.
 
-            List<string> linkedTargets = GBI_Aligner_Align2.GetLinkedTargets(links);
+            List<string> linkedTargets = AlignStaging.GetLinkedTargets(links);
 
 
-            Dictionary<string, MappedWords> linksTable = GBI_Aligner_Align2.CreateLinksTable(links);
+            Dictionary<string, MappedWords> linksTable = AlignStaging.CreateLinksTable(links);
 
             for (int i = 0; i < links.Count; i++)
             {
@@ -510,11 +510,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            conflicts = GBI_Aligner_Align2.FindConflictingLinks(links);
+            conflicts = AlignStaging.FindConflictingLinks(links);
 
             if (conflicts.Count > 0)
             {
-                GBI_Aligner_Align2.ResolveConflicts(conflicts, links, 2);
+                AlignStaging.ResolveConflicts(conflicts, links, 2);
             }
 
             #endregion
