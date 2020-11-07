@@ -356,7 +356,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<CandidateChain> allPaths = AlignStaging.CreatePaths(childCandidateList, maxPaths);
 
-            List<CandidateChain> paths = GBI_Aligner_Align.FilterPaths(allPaths);
+            List<CandidateChain> paths = AlignStaging.FilterPaths(allPaths);
             // paths = those where the candidates use different words
 
             if (paths.Count == 0)
