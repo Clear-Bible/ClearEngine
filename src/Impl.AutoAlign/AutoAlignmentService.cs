@@ -29,9 +29,6 @@ using SourceNode = GBI_Aligner.SourceNode;
 using CandidateChain = GBI_Aligner.CandidateChain;
 
 
-using GBI_Aligner_Align = GBI_Aligner.Align;
-
-
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
