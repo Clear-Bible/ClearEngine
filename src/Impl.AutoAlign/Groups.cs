@@ -9,13 +9,6 @@ using System.Xml.Linq;
 
 using Newtonsoft.Json;
 
-using SourceWord = GBI_Aligner.SourceWord;
-using TargetWord = GBI_Aligner.TargetWord;
-using MappedWords = GBI_Aligner.MappedWords;
-using MappedGroup = GBI_Aligner.MappedGroup;
-using LinkedWord = GBI_Aligner.LinkedWord;
-using SourceNode = GBI_Aligner.SourceNode;
-
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {

@@ -3,12 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-using AlternativesForTerminals = GBI_Aligner.AlternativesForTerminals;
-using TargetWord = GBI_Aligner.TargetWord;
-using SourceWord = GBI_Aligner.SourceWord;
-using AlternativeCandidates = GBI_Aligner.AlternativeCandidates;
-using Candidate = GBI_Aligner.Candidate;
-
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
