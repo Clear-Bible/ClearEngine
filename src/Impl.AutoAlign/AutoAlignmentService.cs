@@ -29,10 +29,8 @@ using SourceNode = GBI_Aligner.SourceNode;
 using CandidateChain = GBI_Aligner.CandidateChain;
 
 
-using Align = GBI_Aligner.Align;
-using Align2 = GBI_Aligner.Align2;
-using GBI_Aligner_Data = GBI_Aligner.Data;
-
+using GBI_Aligner_Align = GBI_Aligner.Align;
+using GBI_Aligner_Align2 = GBI_Aligner.Align2;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
@@ -272,7 +270,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         x.Item2.Int);
 
             Groups.AlignGroups(links2, sWordsFromTranslationPair, tWords, groups_old, terminals);
-            Align2.FixCrossingLinks(ref links2);
+            GBI_Aligner_Align2.FixCrossingLinks(ref links2);
 
             Output.WriteAlignment(links2, sWordsFromTranslationPair, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
             // In spite of its name, Output.WriteAlignment does not touch the
@@ -328,7 +326,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 List<Candidate> makeNonEmpty(List<Candidate> list) =>
                     list.Count == 0
-                    ? Align.CreateEmptyCandidate()
+                    ? GBI_Aligner_Align.CreateEmptyCandidate()
                     : list;
 
                 List<Candidate> candidatesForNode(XElement node) =>
@@ -357,9 +355,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<CandidateChain, double> pathProbs =
                 new Dictionary<CandidateChain, double>();
 
-            List<CandidateChain> allPaths = Align.CreatePaths(childCandidateList, maxPaths);
+            List<CandidateChain> allPaths = GBI_Aligner_Align.CreatePaths(childCandidateList, maxPaths);
 
-            List<CandidateChain> paths = Align.FilterPaths(allPaths);
+            List<CandidateChain> paths = GBI_Aligner_Align.FilterPaths(allPaths);
             // paths = those where the candidates use different words
 
             if (paths.Count == 0)
@@ -372,7 +370,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (CandidateChain path in paths)
             {
-                double jointProb = Align.ComputeJointProb(path); // sum of candidate probabilities in a path
+                double jointProb = GBI_Aligner_Align.ComputeJointProb(path); // sum of candidate probabilities in a path
                 try
                 {
                     pathProbs.Add(path, jointProb);
@@ -390,19 +388,34 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     int topN2 = sortedCandidates2.Count / 10;
                     if (topN2 < n) topN2 = n;
 
-                    topCandidates = Align.GetTopPaths2(sortedCandidates2, pathProbs);
+                    topCandidates = GBI_Aligner_Align.GetTopPaths2(sortedCandidates2, pathProbs);
                     return topCandidates;
                 }
             }
 
             Dictionary<CandidateChain, double> pathProbs2 =
-                Align.AdjustProbsByDistanceAndOrder(pathProbs);
+                GBI_Aligner_Align.AdjustProbsByDistanceAndOrder(pathProbs);
 
-            List<CandidateChain> sortedCandidates = GBI_Aligner_Data.SortPaths(pathProbs2);
+            List<CandidateChain> sortedCandidates = SortPaths(pathProbs2);
 
-            topCandidates = Align.GetTopPaths2(sortedCandidates, pathProbs);
+            topCandidates = GBI_Aligner_Align.GetTopPaths2(sortedCandidates, pathProbs);
 
             return topCandidates;
+        }
+
+
+
+        public static List<CandidateChain> SortPaths(Dictionary<CandidateChain, double> pathProbs)
+        {
+            int hashCodeOfWordsInPath(CandidateChain path) =>
+                AutoAlignUtility.GetTargetWordsInPath(path).GetHashCode();
+
+            return pathProbs
+                .OrderByDescending(kvp => kvp.Value)
+                .ThenByDescending(kvp =>
+                    hashCodeOfWordsInPath(kvp.Key))
+                .Select(kvp => kvp.Key)
+                .ToList();
         }
 
 
@@ -431,7 +444,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //Console.WriteLine("\nAlignTheRest\n\n");
 
             List<LinkedWord> linkedWords = new List<LinkedWord>();
-            Align2.GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
+            GBI_Aligner_Align2.GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
 
             // linkedWords has a LinkedWord for each target word found in
             // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
@@ -467,21 +480,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
 
-            List<List<MappedWords>> conflicts = Align2.FindConflictingLinks(links);
+            List<List<MappedWords>> conflicts = GBI_Aligner_Align2.FindConflictingLinks(links);
 
             if (conflicts.Count > 0)
             {
-                Align2.ResolveConflicts(conflicts, links, 1);
+                GBI_Aligner_Align2.ResolveConflicts(conflicts, links, 1);
             }
 
 
 
             #region Andi does not use this part anymore.
 
-            List<string> linkedTargets = Align2.GetLinkedTargets(links);
+            List<string> linkedTargets = GBI_Aligner_Align2.GetLinkedTargets(links);
 
 
-            Dictionary<string, MappedWords> linksTable = Align2.CreateLinksTable(links);
+            Dictionary<string, MappedWords> linksTable = GBI_Aligner_Align2.CreateLinksTable(links);
 
             for (int i = 0; i < links.Count; i++)
             {
@@ -497,11 +510,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            conflicts = Align2.FindConflictingLinks(links);
+            conflicts = GBI_Aligner_Align2.FindConflictingLinks(links);
 
             if (conflicts.Count > 0)
             {
-                Align2.ResolveConflicts(conflicts, links, 2);
+                GBI_Aligner_Align2.ResolveConflicts(conflicts, links, 2);
             }
 
             #endregion
@@ -541,7 +554,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     return;
                 }
-                string targetWord = Align2.GetTargetWordTextFromID(targetID, targetWords);
+                string targetWord = GBI_Aligner_Align2.GetTargetWordTextFromID(targetID, targetWords);
                 string pair = link.SourceNode.Lemma + "#" + targetWord;
                 if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.ContainsKey(pair))
                 {
@@ -554,7 +567,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     link.TargetNode.Word.ID = targetID;
                     link.TargetNode.Word.IsFake = false;
                     link.TargetNode.Word.Text = targetWord;
-                    link.TargetNode.Word.Position = Align2.GetTargetPositionFromID(targetID, targetWords);
+                    link.TargetNode.Word.Position = GBI_Aligner_Align2.GetTargetPositionFromID(targetID, targetWords);
                     return;
                 }
             }
@@ -569,7 +582,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 bool foundTarget = false;
                 if (!(preNeighbor == null || postNeighbor == null))
                 {
-                    targetCandidates = Align2.GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    targetCandidates = GBI_Aligner_Align2.GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
                     if (targetCandidates.Count > 0)
                     {
                         LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
@@ -582,7 +595,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
                 else if (preNeighbor != null && !foundTarget)
                 {
-                    targetCandidates = Align2.GetTargetCandidates(preNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    targetCandidates = GBI_Aligner_Align2.GetTargetCandidates(preNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
                     if (targetCandidates.Count > 0)
                     {
                         LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
@@ -595,7 +608,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
                 else if (postNeighbor != null && !foundTarget)
                 {
-                    targetCandidates = Align2.GetTargetCandidates(postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    targetCandidates = GBI_Aligner_Align2.GetTargetCandidates(postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
                     if (targetCandidates.Count > 0)
                     {
                         LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
@@ -662,7 +675,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             if (probs.Count > 0)
             {
-                List<TargetWord> candidates = GBI_Aligner_Data.SortWordCandidates(probs);
+                List<TargetWord> candidates = SortWordCandidates(probs);
 
                 TargetWord topCandidate = candidates[0];
                 topCandidate.IsFake = false;
@@ -675,6 +688,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             return null;
+        }
+
+
+        public static List<TargetWord> SortWordCandidates(
+            Dictionary<TargetWord, double> pathProbs)
+        {
+            int hashCodeOfWordAndPosition(TargetWord tw) =>
+                $"{tw.Text}-{tw.Position}".GetHashCode();
+
+            return
+                pathProbs
+                    .OrderByDescending(kvp => kvp.Value)
+                    .ThenByDescending(kvp =>
+                        hashCodeOfWordAndPosition(kvp.Key))
+                    .Select(kvp => kvp.Key)
+                    .ToList();
         }
 
 
