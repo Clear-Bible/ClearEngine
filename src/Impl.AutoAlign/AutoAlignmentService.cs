@@ -460,10 +460,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             #region Andi does not use this part anymore.
 
-            List<string> linkedTargets = AlignStaging.GetLinkedTargets(links);
+            List<string> linkedTargets = 
+                links
+                .Where(mw => !mw.TargetNode.Word.IsFake)
+                .Select(mw => mw.TargetNode.Word.ID)
+                .ToList();
 
-
-            Dictionary<string, MappedWords> linksTable = AlignStaging.CreateLinksTable(links);
+            Dictionary<string, MappedWords> linksTable = 
+                links
+                .Where(mw => !mw.TargetNode.Word.IsFake)
+                .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
 
             for (int i = 0; i < links.Count; i++)
             {
