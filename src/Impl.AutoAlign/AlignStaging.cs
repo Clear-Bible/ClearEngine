@@ -133,38 +133,43 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<MappedWords> FindWinners(List<MappedWords> conflict, int pass)
+        public static List<MappedWords> FindWinners(
+            List<MappedWords> conflict,
+            int pass)
         {
-            double prob(MappedWords mw) => mw.TargetNode.Prob;
-
-            double distance(MappedWords mw) =>
-                Math.Abs(mw.SourceNode.RelativePos -
-                         mw.TargetNode.Word.RelativePos);
-
-            // We know that conflict is not the empty list.
-
+            // The winners are the links of maximal probability.
+            // (we know that conflict is not the empty list)
+            //
             double bestProb = conflict.Max(mw => prob(mw));
-
             List<MappedWords> winners = conflict
                 .Where(mw => mw.TargetNode.Prob == bestProb)
                 .ToList();
 
+            // On the second pass, if there are multiple winners,
+            // then select the winner where the source and target
+            // relative positions are closest in a relative sense.
+            //
             if (pass == 2 && winners.Count > 1)
             {
-                double minDistance = conflict.Min(mw => distance(mw));
+                double minDelta = conflict.Min(mw => relativeDelta(mw));
 
                 MappedWords winner2 = winners
-                    .Where(mw => distance(mw) == minDistance)
+                    .Where(mw => relativeDelta(mw) == minDelta)
                     .FirstOrDefault();
 
                 if (winner2 != null)
                 {
-                    winners = new List<MappedWords>();
-                    winners.Add(winner2);
+                    winners = new List<MappedWords>() { winner2 };
                 }
             }
 
             return winners;
+
+            double prob(MappedWords mw) => mw.TargetNode.Prob;
+
+            double relativeDelta(MappedWords mw) =>
+                Math.Abs(mw.SourceNode.RelativePos -
+                         mw.TargetNode.Word.RelativePos);         
         }
 
 
