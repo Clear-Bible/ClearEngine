@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    using System.Runtime.CompilerServices;
     using ClearBible.Clear3.Miscellaneous;
 
     public class AlignStaging
@@ -73,10 +74,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
            
 
-
- 
-
-
         public static List<List<MappedWords>> FindConflictingLinks(List<MappedWords> links)
         {
             return links
@@ -101,28 +98,38 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<MappedWords> links,
             int pass)
         {
-            List<MappedWords> linksToRemove = conflicts.
+            List<MappedWords> linksToRemove =
+                conflicts.
                 SelectMany(conflict =>
                     conflict.Except(
-                        FindWinners(conflict, pass).Where((_, n) => n == 0)))
+                        FindWinners(conflict, pass).Take(1)))
                 .ToList();
 
-            for (int i = 0; i < links.Count; i++)
-            {
-                MappedWords link = links[i];
-                if (linksToRemove.Contains(link))
-                {
-                    links[i] = new MappedWords
-                    {
-                        SourceNode = link.SourceNode,
-                        TargetNode = new LinkedWord()
-                        {
-                            Prob = -1000,
-                            Word = AutoAlignUtility.CreateFakeTargetWord()
-                        }
-                    };
-                }
+            List<int> toStrikeOut =
+                links
+                .Select((link, index) => new { link, index })
+                .Where(x => linksToRemove.Contains(x.link))
+                .Select(x => x.index)
+                .ToList();
+
+            foreach (int i in toStrikeOut)
+            {               
+                strikeOut(i);
             }
+
+            void strikeOut(int i) =>
+                links[i] = makeFakeLink(links[i].SourceNode);
+
+            MappedWords makeFakeLink(SourceNode sourceNode) =>
+                new MappedWords
+                {
+                    SourceNode = sourceNode,
+                    TargetNode = new LinkedWord()
+                    {
+                        Prob = -1000,
+                        Word = AutoAlignUtility.CreateFakeTargetWord()
+                    }
+                };
         }
 
 
