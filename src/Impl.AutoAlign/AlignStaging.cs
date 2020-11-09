@@ -194,42 +194,53 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<TargetWord> GetTargetCandidates(MappedWords postNeighbor, List<TargetWord> targetWords, List<string> linkedTargets, List<string> puncs, List<string> targetFuncWords, bool contentWordsOnly)
+        public static List<TargetWord> GetTargetCandidates(
+            MappedWords anchorLink,
+            List<TargetWord> targetWords,
+            List<string> linkedTargets,
+            List<string> puncs,
+            List<string> targetFuncWords,
+            bool contentWordsOnly)
         {
-            List<TargetWord> candidates = new List<TargetWord>();
+            int anchorPosition = anchorLink.TargetNode.Word.Position;
 
-            int anchorPosition = postNeighbor.TargetNode.Word.Position;
+            IEnumerable<int> down = 
+                Enumerable.Range(1, 3)
+                .Select(n => anchorPosition - n)
+                .Where(n => n >= 0);
 
-            for (int i = anchorPosition - 1; i >= 0 && i >= anchorPosition - 3; i--)
-            {
-                TargetWord targetWord = targetWords[i];
-                string word = targetWord.Text;
-                string id = targetWord.ID;
-                if (contentWordsOnly && targetFuncWords.Contains(word)) continue;
-                if (linkedTargets.Contains(word)) continue;
-                if (puncs.Contains(word)) break;
-                TargetWord tWord = new TargetWord();
-                tWord.ID = id;
-                tWord.Position = i;
-                tWord.Text = word;
-                candidates.Add(tWord);
-            }
-            for (int i = anchorPosition + 1; i < targetWords.Count && i <= anchorPosition + 3; i++)
-            {
-                TargetWord targetWord = targetWords[i];
-                string word = targetWord.Text;
-                string id = targetWord.ID;
-                if (contentWordsOnly && targetFuncWords.Contains(word)) continue;
-                if (linkedTargets.Contains(word)) continue;
-                if (puncs.Contains(word)) break;
-                TargetWord tWord = new TargetWord();
-                tWord.ID = id;
-                tWord.Position = i;
-                tWord.Text = word;
-                candidates.Add(tWord);
-            }
+            IEnumerable<int> up = 
+                Enumerable.Range(1, 3)
+                .Select(n => anchorPosition + n);
 
-            return candidates;
+            return
+                getTargetWords(down)
+                .Concat(getTargetWords(up))
+                .ToList();
+
+            IEnumerable<TargetWord> getTargetWords(IEnumerable<int> ns) =>
+                ns
+                .Select(n => new { n, tw = targetWords[n] })
+                .Select(x => new { x.n, x.tw.Text, x.tw.ID })
+                .Where(x => !contentWordsOnly || isContentWord(x.Text))
+                .Where(x => isNotLinkedAlready(x.Text))
+                .TakeWhile(x => isNotPunctuation(x.Text))
+                .Select(x => new TargetWord()
+                {
+                    ID = x.ID,
+                    Position = x.n,
+                    Text = x.Text
+                })
+                .ToList();
+
+            bool isContentWord(string text) =>
+                !targetFuncWords.Contains(text);
+
+            bool isNotLinkedAlready(string text) =>
+                !linkedTargets.Contains(text);
+
+            bool isNotPunctuation(string text) =>
+                !puncs.Contains(text);
         }
 
 
