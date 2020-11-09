@@ -298,8 +298,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static List<CandidateChain> CreatePaths(List<List<Candidate>> childCandidatesList, int maxPaths)
         {
-            int maxArcs = GetMaxArcs(childCandidatesList); // product of all sub-list lengths
-            int maxDepth = GetMaxDepth(childCandidatesList); // maximum sub-list length
+            // FIXME: what about overflow?
+            // Maybe the condition (maxArcs <= 0) below is meant for overflow?
+            //
+            int maxArcs =
+                childCandidatesList
+                .Select(candidates => candidates.Count)
+                .Aggregate(1, (product, n) => product * n);
+
+            int maxDepth = // GetMaxDepth(childCandidatesList); // maximum sub-list length
+                childCandidatesList
+                .Select(candidates => candidates.Count)
+                .DefaultIfEmpty(0)
+                .Max();
+
             if (maxArcs > maxPaths || maxArcs <= 0)
             {
                 double root = Math.Pow((double)maxPaths, 1.0 / childCandidatesList.Count);
@@ -307,6 +319,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             List<CandidateChain> depth_N_paths = new List<CandidateChain>();
+
             try
             {
                 depth_N_paths = Create_Depth_N_paths(childCandidatesList, maxDepth);
@@ -317,32 +330,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             return depth_N_paths;
-        }
-
-
-        public static int GetMaxArcs(List<List<Candidate>> childCandidatesList)
-        {
-            int max = 1;
-
-            foreach (List<Candidate> candidates in childCandidatesList)
-            {
-                max *= candidates.Count;
-            }
-
-            return max;
-        }
-
-
-        public static int GetMaxDepth(List<List<Candidate>> childCandidatesList)
-        {
-            int max = 0;
-
-            foreach (List<Candidate> candidates in childCandidatesList)
-            {
-                if (candidates.Count > max) max = candidates.Count;
-            }
-
-            return max;
         }
 
 
