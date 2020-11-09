@@ -16,7 +16,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 links
                 .Where(linkIsOneToOne)
                 .GroupBy(lemmaOfSoleSourceWord)
-                //.Select(links => links.ToList())
                 .Where(links => links.Count() == 2)
                 .Select(links => new
                 {
@@ -53,34 +52,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        //// lemma => list of MappedGroup
-        //// where the MappedGroup has just one source and target node
-        //public static Dictionary<string, List<MappedGroup>> GetUniqueLemmaLinks(List<MappedGroup> links)
-        //{
-        //    return links
-        //        .Where(link =>
-        //            link.SourceNodes.Count == 1 && link.TargetNodes.Count == 1)
-        //        .GroupBy(link =>
-        //            link.SourceNodes[0].Lemma)
-        //        .ToDictionary(
-        //            g => g.Key,
-        //            g => g.ToList());
-        //}
-
-
-        //public static List<CrossingLinks> IdentifyCrossingLinks(Dictionary<string, List<MappedGroup>> uniqueLemmaLinks)
-        //{
-        //    return uniqueLemmaLinks.Values
-        //        .Where(links => links.Count == 2 && Crossing(links))
-        //        .Select(links => new CrossingLinks()
-        //        {
-        //            Link1 = links[0],
-        //            Link2 = links[1]
-        //        })
-        //        .ToList();
-        //}
-
-
         public static bool Crossing(MappedGroup link1, MappedGroup link2)
         {
             int tpos1 = positionOfSoleWordInTargetGroup(link1);
@@ -103,39 +74,25 @@ namespace ClearBible.Clear3.Impl.AutoAlign
            
 
 
-        public static void SwapTargets(List<CrossingLinks> crossingLinks, List<MappedGroup> links)
-        {
-            foreach (CrossingLinks cl in crossingLinks)
-            {
-                string src1Id = idOfSoleWordInSourceGroup(cl.Link1);
-                string src2Id = idOfSoleWordInSourceGroup(cl.Link2);
-
-                Miscellaneous.Swap(
-                    ref cl.Link1.TargetNodes,
-                    ref cl.Link2.TargetNodes);
-
-                foreach (MappedGroup mp in links)
-                {
-                    string sourceId = idOfSoleWordInSourceGroup(mp);
-                    if (sourceId == src1Id) mp.TargetNodes = cl.Link1.TargetNodes;
-                    if (sourceId == src2Id) mp.TargetNodes = cl.Link2.TargetNodes;
-                }
-            }
-
-            string idOfSoleWordInSourceGroup(MappedGroup g) =>
-                g.SourceNodes[0].MorphID;
-        }
+ 
 
 
         public static List<List<MappedWords>> FindConflictingLinks(List<MappedWords> links)
         {
             return links
-                .Where(link => link.TargetNode.Word.Text != string.Empty)
-                .GroupBy(link =>
-                    $"{link.TargetNode.Word.Text}-{link.TargetNode.Word.ID}")
+                .Where(targetWordNotEmpty)
+                .GroupBy(targetTextAndId)
                 .Where(group => group.Count() > 1)
                 .Select(group => group.ToList())
                 .ToList();
+
+            bool targetWordNotEmpty(MappedWords link) =>
+                link.TargetNode.Word.Text != string.Empty;
+
+            Tuple<string, string> targetTextAndId(MappedWords link) =>
+                Tuple.Create(
+                    link.TargetNode.Word.Text,
+                    link.TargetNode.Word.ID);
         }
 
 
