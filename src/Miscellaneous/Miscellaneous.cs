@@ -92,4 +92,15 @@ namespace ClearBible.Clear3.Miscellaneous
             }
         }
     }
+
+
+    public class Miscellaneous
+    {
+        public static void Swap<T>(ref T x, ref T y)
+        {
+            T temp = x;
+            x = y;
+            y = temp;
+        }
+    }
 }

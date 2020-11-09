@@ -6,83 +6,124 @@ using System.Linq;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    using ClearBible.Clear3.Miscellaneous;
+
     public class AlignStaging
     {
         public static void FixCrossingLinks(ref List<MappedGroup> links)
         {
-            Dictionary<string, List<MappedGroup>> uniqueLemmaLinks =
-                GetUniqueLemmaLinks(links);
-            List<CrossingLinks> crossingLinks = IdentifyCrossingLinks(uniqueLemmaLinks);
-            SwapTargets(crossingLinks, links);
-        }
-
-
-        // lemma => list of MappedGroup
-        // where the MappedGroup has just one source and target node
-        public static Dictionary<string, List<MappedGroup>> GetUniqueLemmaLinks(List<MappedGroup> links)
-        {
-            return links
-                .Where(link =>
-                    link.SourceNodes.Count == 1 && link.TargetNodes.Count == 1)
-                .GroupBy(link =>
-                    link.SourceNodes[0].Lemma)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.ToList());
-        }
-
-
-        public static List<CrossingLinks> IdentifyCrossingLinks(Dictionary<string, List<MappedGroup>> uniqueLemmaLinks)
-        {
-            return uniqueLemmaLinks.Values
-                .Where(links => links.Count == 2 && Crossing(links))
-                .Select(links => new CrossingLinks()
+            var crossingLinks =
+                links
+                .Where(linkIsOneToOne)
+                .GroupBy(lemmaOfSoleSourceWord)
+                //.Select(links => links.ToList())
+                .Where(links => links.Count() == 2)
+                .Select(links => new
                 {
-                    Link1 = links[0],
-                    Link2 = links[1]
+                    Link1 = links.ElementAt(0),
+                    Link2 = links.ElementAt(1)
                 })
-                .ToList();
-        }
+                .Where(x => Crossing(x.Link1, x.Link2))
+                .Select(x => new
+                {
+                    Src1Id = idOfSoleSourceWord(x.Link1),
+                    Src2Id = idOfSoleSourceWord(x.Link2),
+                    Target1 = x.Link1.TargetNodes,
+                    Target2 = x.Link2.TargetNodes
+                });
 
-
-        public static bool Crossing(List<MappedGroup> links)
-        {
-            MappedGroup link1 = links[0];
-            MappedGroup link2 = links[1];
-            SourceNode sWord1 = link1.SourceNodes[0];
-            LinkedWord tWord1 = link1.TargetNodes[0];
-            SourceNode sWord2 = link2.SourceNodes[0];
-            LinkedWord tWord2 = link2.TargetNodes[0];
-            if (tWord1.Word.Position < 0 || tWord2.Word.Position < 0) return false;
-            if ((sWord1.Position < sWord2.Position && tWord1.Word.Position > tWord2.Word.Position)
-               || (sWord1.Position > sWord2.Position && tWord1.Word.Position < tWord2.Word.Position)
-               )
+            foreach (var x in crossingLinks)
             {
-                return true;
+                foreach (MappedGroup mp in links)
+                {
+                    string sourceId = idOfSoleSourceWord(mp);
+                    if (sourceId == x.Src1Id) mp.TargetNodes = x.Target2;
+                    if (sourceId == x.Src2Id) mp.TargetNodes = x.Target1;
+                }
             }
 
-            return false;
+            string idOfSoleSourceWord(MappedGroup g) =>
+                g.SourceNodes[0].MorphID;
+
+            bool linkIsOneToOne(MappedGroup link) =>
+                link.SourceNodes.Count == 1 && link.TargetNodes.Count == 1;
+
+            string lemmaOfSoleSourceWord(MappedGroup link) =>
+                link.SourceNodes[0].Lemma;
         }
+
+
+        //// lemma => list of MappedGroup
+        //// where the MappedGroup has just one source and target node
+        //public static Dictionary<string, List<MappedGroup>> GetUniqueLemmaLinks(List<MappedGroup> links)
+        //{
+        //    return links
+        //        .Where(link =>
+        //            link.SourceNodes.Count == 1 && link.TargetNodes.Count == 1)
+        //        .GroupBy(link =>
+        //            link.SourceNodes[0].Lemma)
+        //        .ToDictionary(
+        //            g => g.Key,
+        //            g => g.ToList());
+        //}
+
+
+        //public static List<CrossingLinks> IdentifyCrossingLinks(Dictionary<string, List<MappedGroup>> uniqueLemmaLinks)
+        //{
+        //    return uniqueLemmaLinks.Values
+        //        .Where(links => links.Count == 2 && Crossing(links))
+        //        .Select(links => new CrossingLinks()
+        //        {
+        //            Link1 = links[0],
+        //            Link2 = links[1]
+        //        })
+        //        .ToList();
+        //}
+
+
+        public static bool Crossing(MappedGroup link1, MappedGroup link2)
+        {
+            int tpos1 = positionOfSoleWordInTargetGroup(link1);
+            int tpos2 = positionOfSoleWordInTargetGroup(link2);
+
+            if (tpos1 < 0 || tpos2 < 0) return false;
+
+            int spos1 = positionOfSoleWordInSourceGroup(link1);
+            int spos2 = positionOfSoleWordInSourceGroup(link2);
+
+            return (spos1 < spos2 && tpos1 > tpos2) ||
+                (spos1 > spos2 && tpos1 < tpos2);
+
+            int positionOfSoleWordInSourceGroup(MappedGroup g) =>
+                g.SourceNodes[0].Position;
+
+            int positionOfSoleWordInTargetGroup(MappedGroup g) =>
+                g.TargetNodes[0].Word.Position;
+        }
+           
 
 
         public static void SwapTargets(List<CrossingLinks> crossingLinks, List<MappedGroup> links)
         {
-            for (int i = 0; i < crossingLinks.Count; i++)
+            foreach (CrossingLinks cl in crossingLinks)
             {
-                CrossingLinks cl = crossingLinks[i];
-                SourceNode sNode1 = cl.Link1.SourceNodes[0];
-                SourceNode sNode2 = cl.Link2.SourceNodes[0];
-                List<LinkedWord> TargetNodes0 = cl.Link1.TargetNodes;
-                cl.Link1.TargetNodes = cl.Link2.TargetNodes;
-                cl.Link2.TargetNodes = TargetNodes0;
-                for (int j = 0; j < links.Count; j++)
+                string src1Id = idOfSoleWordInSourceGroup(cl.Link1);
+                string src2Id = idOfSoleWordInSourceGroup(cl.Link2);
+
+                Miscellaneous.Swap(
+                    ref cl.Link1.TargetNodes,
+                    ref cl.Link2.TargetNodes);
+
+                foreach (MappedGroup mp in links)
                 {
-                    MappedGroup mp = links[j];
-                    SourceNode sNode = (SourceNode)mp.SourceNodes[0];
-                    if (sNode.MorphID == sNode1.MorphID) mp.TargetNodes = cl.Link1.TargetNodes;
-                    if (sNode.MorphID == sNode2.MorphID) mp.TargetNodes = cl.Link2.TargetNodes;
+                    string sourceId = idOfSoleWordInSourceGroup(mp);
+                    if (sourceId == src1Id) mp.TargetNodes = cl.Link1.TargetNodes;
+                    if (sourceId == src2Id) mp.TargetNodes = cl.Link2.TargetNodes;
                 }
             }
+
+            string idOfSoleWordInSourceGroup(MappedGroup g) =>
+                g.SourceNodes[0].MorphID;
         }
 
 
