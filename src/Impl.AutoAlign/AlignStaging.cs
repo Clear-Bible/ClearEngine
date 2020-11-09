@@ -173,22 +173,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<string> GetLinkedTargets(List<MappedWords> links)
-        {
-            return links
-                .Where(mw => !mw.TargetNode.Word.IsFake)
-                .Select(mw => mw.TargetNode.Word.ID)
-                .ToList();
-        }
-
-
-        public static Dictionary<string, MappedWords> CreateLinksTable(List<MappedWords> links)
-        {
-            return links
-                .Where(mw => !mw.TargetNode.Word.IsFake)
-                .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
-        }
-
 
         public static string GetTargetWordTextFromID(string targetID, List<TargetWord> targetWords)
         {
