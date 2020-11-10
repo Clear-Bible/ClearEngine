@@ -322,7 +322,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             try
             {
-                depth_N_paths = Create_Depth_N_paths(childCandidatesList, maxDepth);
+                depth_N_paths = CreatePathsWithDepthLimit(childCandidatesList, maxDepth);
             }
             catch
             {
@@ -333,50 +333,44 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<CandidateChain> Create_Depth_N_paths(List<List<Candidate>> childCandidatesList, int depth)
+        public static List<CandidateChain> CreatePathsWithDepthLimit(
+            List<List<Candidate>> childCandidatesList,
+            int depth)
         {
-            List<CandidateChain> paths = new List<CandidateChain>();
-
             if (childCandidatesList.Count > 1)
             {
-                List<Candidate> headCandidates = childCandidatesList[0];
-                int headDepth = Math.Min(headCandidates.Count, depth + 1);
-                CandidateChain nHeadCandidates = 
-                    new CandidateChain(headCandidates.Take(headDepth));
+                IEnumerable<Candidate> headCandidates =
+                    childCandidatesList[0].Take(depth + 1);
 
-
-                List<List<Candidate>> tailCandidatesList =
-                    childCandidatesList.Skip(1).ToList();
-
-                List<CandidateChain> tailPaths = Create_Depth_N_paths(tailCandidatesList, depth);
                 // (recursive call)
+                List<CandidateChain> tailPaths =
+                    CreatePathsWithDepthLimit(
+                        getTail(childCandidatesList),
+                        depth);
 
-                foreach (Candidate nHeadCandidate in nHeadCandidates)
-                {
-                    foreach (CandidateChain tailPath in tailPaths)
-                    {
-                        CandidateChain path = ConsChain(nHeadCandidate, tailPath);
-
-                        if (paths.Count > 16000000)
-                        {
-                            return paths;
-                        }
-                        paths.Add(path);
-                    }
-                }
+                return
+                    headCandidates
+                    .SelectMany((Candidate nHeadCandidate) =>
+                        tailPaths
+                        .Select((CandidateChain tailPath) =>
+                            ConsChain(nHeadCandidate, tailPath)))
+                    .Take(16000000)
+                    .ToList();
             }
             else
             {
-                List<Candidate> candidates = childCandidatesList[0];
-                for (int i = 0; i < candidates.Count && i <= depth; i++)
-                {
-                    Candidate candidate = candidates[i];
-                    CandidateChain path = new CandidateChain(Enumerable.Repeat(candidate, 1));
-                    paths.Add(path);
-                }
+                return
+                    childCandidatesList[0]
+                    .Take(depth + 1)
+                    .Select(makeSingletonChain)
+                    .ToList();
             }
 
-            return paths;
+            List<List<Candidate>> getTail(List<List<Candidate>> x) =>
+                x.Skip(1).ToList();
+
+            CandidateChain makeSingletonChain(Candidate candidate) =>
+                new CandidateChain(Enumerable.Repeat(candidate, 1));
         }
 
 
