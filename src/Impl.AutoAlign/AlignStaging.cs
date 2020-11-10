@@ -382,26 +382,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static bool IsValidPath(CandidateChain path)
+        public static bool HasNoDuplicateWords(CandidateChain path)
         {
-            string wordsInPath = AutoAlignUtility.GetWordsInPath(path);
-            string[] words = wordsInPath.Split(" ".ToCharArray());
-            List<string> usedWords = new List<string>();
-            for (int i = 0; i < words.Length; i++)
-            {
-                string word = words[i];
-                if (word == "--1") continue;
-                if (usedWords.Contains(word))
-                {
-                    return false;
-                }
-                else
-                {
-                    usedWords.Add(word);
-                }
-            }
+            bool pathHasDuplicateWords =
+                AutoAlignUtility.GetTargetWordsInPath(path)
+                .Where(word => !word.IsFake)
+                .GroupBy(word => new { word.Text, word.Position })
+                .Any(hasAtLeastTwoMembers);
 
-            return true;
+            return !pathHasDuplicateWords;
+
+            bool hasAtLeastTwoMembers(IEnumerable<TargetWord> words) =>
+                words.Skip(1).Any();
         }
 
 

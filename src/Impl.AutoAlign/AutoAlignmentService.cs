@@ -331,7 +331,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 AlignStaging.CreatePaths(childCandidateList, maxPaths);
 
             List<CandidateChain> paths =
-                allPaths.Where(AlignStaging.IsValidPath).ToList();
+                allPaths.Where(AlignStaging.HasNoDuplicateWords).ToList();
 
             // paths = those where the candidates use different words
 
