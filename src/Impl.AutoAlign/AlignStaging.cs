@@ -416,45 +416,30 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AdjustProbsByDistanceAndOrder(
                 Dictionary<CandidateChain, double> pathProbs)
         {
-            Dictionary<CandidateChain, double> pathProbs2 =
-                new Dictionary<CandidateChain, double>();
-
-            List<Candidate> candidates = new List<Candidate>();
-
-            foreach (var pathEnum in pathProbs)
-            {
-                Candidate candidate = new Candidate(
-                    pathEnum.Key,
-                    (double)pathEnum.Value);
-                candidates.Add(candidate);
-            }
-
-            int minimalDistance = 10000;
-            foreach (Candidate c in candidates)
-            {
-                int distance = ComputeDistance(c.Chain);
-                if (distance < minimalDistance) minimalDistance = distance;
-            }
+            int minimalDistance =
+                pathProbs.Keys
+                .Select(ComputeDistance)
+                .DefaultIfEmpty(10000)
+                .Min();
 
             if (minimalDistance > 0)
             {
-                foreach (Candidate c in candidates)
-                {
-                    string linkedWords = AutoAlignUtility.GetWords(c);
-                    int distance = ComputeDistance(c.Chain);
-                    double distanceProb = Math.Log((double)minimalDistance / (double)distance);
-                    double orderProb = ComputeOrderProb(c.Chain);  // something about word order
-                    double adjustedProb = c.Prob + c.Prob + distanceProb + orderProb / 2.0;
-                    c.Prob = adjustedProb;
-                    pathProbs2.Add(c.Chain, adjustedProb);
-                }
-            }
-            else if (candidates.Count > 0)
-            {
-                pathProbs2 = pathProbs;
-            }
+                double getDistanceProb(double distance) =>
+                    Math.Log(minimalDistance / distance);
 
-            return pathProbs2;
+                return
+                    pathProbs
+                    .Select(kvp => new { Chain = kvp.Key, Prob = kvp.Value })
+                    .ToDictionary(
+                        c => c.Chain,
+                        c => c.Prob + c.Prob +
+                            getDistanceProb(ComputeDistance(c.Chain)) +
+                            ComputeOrderProb(c.Chain) / 2.0);
+            }
+            else
+            {
+                return pathProbs;
+            }
         }
 
 
