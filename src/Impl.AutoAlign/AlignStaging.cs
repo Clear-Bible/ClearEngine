@@ -450,24 +450,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Where(tw => !tw.IsFake)
                 .Select(tw => tw.Position);
 
-            return
+            IEnumerable<Tuple<int, int>> motions =
                 positions
-                .Zip(positions.Skip(1), (n1, n2) => Math.Abs(n1 - n2))
-                .Sum();
-        }
+                .Zip(positions.Skip(1), Tuple.Create)
+                .Where(m => m.Item1 != m.Item2);
 
-
-        /// <summary>
-        /// Returns the position of the first non-fake target word
-        /// in the path (or 0 otherwise).
-        /// </summary>
-        ///
-        public static int GetInitialPosition(List<TargetWord> wordsInPath)
-        {
-            return
-                wordsInPath
-                .Select(w => w.Position)
-                .FirstOrDefault(position => position >= 0);
+            return motions.Sum(m => Math.Abs(m.Item1 - m.Item2));
         }
 
 
