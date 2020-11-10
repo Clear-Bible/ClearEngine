@@ -464,20 +464,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        /// <summary>
+        /// Returns the position of the first non-fake target word
+        /// in the path.
+        /// </summary>
+        ///
         public static int GetInitialPosition(List<TargetWord> wordsInPath)
         {
-            int initialPosition = 0;
-
-            foreach (TargetWord tWord in wordsInPath)
-            {
-                if (tWord.Position >= 0)
-                {
-                    initialPosition = tWord.Position;
-                    break;
-                }
-            }
-
-            return initialPosition;
+            return
+                wordsInPath
+                .Select(w => w.Position)
+                .FirstOrDefault(position => position >= 0);
         }
 
 
