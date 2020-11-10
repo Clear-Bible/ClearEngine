@@ -399,37 +399,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static double ComputeJointProb(CandidateChain path)
         {
-            //double jointProb = 0.0;
-
-            //// Look at this again.
-            //// It assumes that the chain is all Candidates.
-            //foreach (Candidate c in path)
-            //{
-            //    jointProb += c.Prob;
-            //}
-
-            //return jointProb;
-
             return path.Cast<Candidate>().Sum(c => c.Prob);
         }
 
 
-        public static List<Candidate> GetTopPaths2(List<CandidateChain> paths, Dictionary<CandidateChain, double> probs)
+        public static List<Candidate> GetLeadingCandidates(
+            List<CandidateChain> paths,
+            Dictionary<CandidateChain, double> probs)
         {
-            List<Candidate> topCandidates = new List<Candidate>();
+            double leadingProb =
+                paths.Select(path => probs[path]).FirstOrDefault();
 
-            double topProb = 10;
-
-            for (int i = 0; i < paths.Count; i++)
-            {
-                CandidateChain path = paths[i];
-                Candidate c = new Candidate(path, (double)probs[path]);
-                if (topProb == 10) topProb = c.Prob;
-                if (c.Prob < topProb) break;
-                topCandidates.Add(c);
-            }
-
-            return topCandidates;
+            return
+                paths
+                .Select(path => new Candidate(path, probs[path]))
+                .TakeWhile(cand => cand.Prob == leadingProb)
+                .ToList();
         }
 
 
