@@ -327,9 +327,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<CandidateChain, double> pathProbs =
                 new Dictionary<CandidateChain, double>();
 
-            List<CandidateChain> allPaths = AlignStaging.CreatePaths(childCandidateList, maxPaths);
+            List<CandidateChain> allPaths =
+                AlignStaging.CreatePaths(childCandidateList, maxPaths);
 
-            List<CandidateChain> paths = AlignStaging.FilterPaths(allPaths);
+            List<CandidateChain> paths =
+                allPaths.Where(AlignStaging.IsValidPath).ToList();
+
             // paths = those where the candidates use different words
 
             if (paths.Count == 0)

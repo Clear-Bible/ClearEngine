@@ -382,22 +382,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<CandidateChain> FilterPaths(List<CandidateChain> paths)
-        {
-            List<CandidateChain> filteredPaths = new List<CandidateChain>();
-
-            foreach (CandidateChain path in paths)
-            {
-                if (IsValidPath(path))
-                {
-                    filteredPaths.Add(path);
-                }
-            }
-
-            return filteredPaths;
-        }
-
-
         public static bool IsValidPath(CandidateChain path)
         {
             string wordsInPath = AutoAlignUtility.GetWordsInPath(path);
