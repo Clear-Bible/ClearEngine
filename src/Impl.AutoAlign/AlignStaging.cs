@@ -473,29 +473,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         static double ComputeOrderProb(CandidateChain path)
         {
-            List<TargetWord> wordsInPath =
-                AutoAlignUtility.GetTargetWordsInPath(path);
+            IEnumerable<int> positions =
+                AutoAlignUtility.GetTargetWordsInPath(path)
+                .Where(tw => !tw.IsFake)
+                .Select(tw => tw.Position);
 
-            int violations = 0;
-            int countedWords = 1;
+            IEnumerable<Tuple<int, int>> motions =
+                positions
+                .Zip(positions.Skip(1), Tuple.Create)
+                .Where(m => m.Item1 != m.Item2);
 
-            int position = GetInitialPosition(wordsInPath);
+            double countedWords = 1 + motions.Count();
+            double violations = motions.Count(m => m.Item2 < m.Item1);
 
-            for (int i = 0; i < wordsInPath.Count; i++)
-            {
-                TargetWord tw = (TargetWord)wordsInPath[i];
-                if (tw.Position == -1) continue;
-                if (tw.Position == position) continue;
-                if (tw.Position < position)
-                {
-                    violations++;
-                }
-                countedWords++;
-                position = tw.Position;
-            }
+            double myAnswer = Math.Log(1.0 - violations / countedWords);
 
-            double prob = 1.0 - (double)violations / (double)countedWords;
-            return Math.Log(prob);
+            return myAnswer;
         }
     }
 }
