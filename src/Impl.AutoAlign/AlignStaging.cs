@@ -397,12 +397,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static double ComputeJointProb(CandidateChain path)
-        {
-            return path.Cast<Candidate>().Sum(c => c.Prob);
-        }
-
-
         public static List<Candidate> GetLeadingCandidates(
             List<CandidateChain> paths,
             Dictionary<CandidateChain, double> probs)

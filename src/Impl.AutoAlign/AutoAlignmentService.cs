@@ -336,19 +336,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .DefaultIfEmpty(allPaths[0])
                 .ToList();
 
-            //// paths = those where the candidates use different words
-
-            //if (paths.Count == 0)
-            //{
-            //    CandidateChain topPath = allPaths[0];
-            //    paths.Add(topPath);
-            //}
-
             List<Candidate> topCandidates = new List<Candidate>();
 
             foreach (CandidateChain path in paths)
             {
-                double jointProb = AlignStaging.ComputeJointProb(path); // sum of candidate probabilities in a path
+                double jointProb =
+                    path.Cast<Candidate>().Sum(c => c.Prob);
+
                 try
                 {
                     pathProbs.Add(path, jointProb);
