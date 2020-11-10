@@ -445,22 +445,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static int ComputeDistance(CandidateChain path)
         {
-            List<TargetWord> wordsInPath =
-                AutoAlignUtility.GetTargetWordsInPath(path);
-
-            int position = GetInitialPosition(wordsInPath);
+            IEnumerable<int> positions =
+                AutoAlignUtility.GetTargetWordsInPath(path)
+                .Where(tw => !tw.IsFake)
+                .Select(tw => tw.Position);
 
             return
-                wordsInPath
-                .Where(tw => tw.Position != -1)
-                .Aggregate(
-                    new { pos = position, sum = 0 },
-                    (state, tw) => new
-                    {
-                        pos = tw.Position,
-                        sum = state.sum + Math.Abs(state.pos - tw.Position)
-                    })
-                .sum;
+                positions
+                .Zip(positions.Skip(1), (n1, n2) => Math.Abs(n1 - n2))
+                .Sum();
         }
 
 
