@@ -74,7 +74,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
            
 
-        public static List<List<MappedWords>> FindConflictingLinks(List<MappedWords> links)
+        public static List<List<MappedWords>> FindConflictingLinks(
+            List<MappedWords> links)
         {
             return links
                 .Where(targetWordNotEmpty)
@@ -445,38 +446,35 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static int ComputeDistance(CandidateChain path)
         {
-            IEnumerable<int> positions =
-                AutoAlignUtility.GetTargetWordsInPath(path)
-                .Where(tw => !tw.IsFake)
-                .Select(tw => tw.Position);
-
-            IEnumerable<Tuple<int, int>> motions =
-                positions
-                .Zip(positions.Skip(1), Tuple.Create)
-                .Where(m => m.Item1 != m.Item2);
+            IEnumerable<Tuple<int, int>> motions = ComputeMotions(path);
 
             return motions.Sum(m => Math.Abs(m.Item1 - m.Item2));
         }
 
 
-        static double ComputeOrderProb(CandidateChain path)
+        public static double ComputeOrderProb(CandidateChain path)
+        {
+            IEnumerable<Tuple<int, int>> motions = ComputeMotions(path);
+
+            double countedWords = 1 + motions.Count();
+            double violations = motions.Count(m => m.Item2 < m.Item1);
+
+            return Math.Log(1.0 - violations / countedWords);
+        }
+
+
+        public static IEnumerable<Tuple<int, int>> ComputeMotions(
+            CandidateChain path)
         {
             IEnumerable<int> positions =
                 AutoAlignUtility.GetTargetWordsInPath(path)
                 .Where(tw => !tw.IsFake)
                 .Select(tw => tw.Position);
 
-            IEnumerable<Tuple<int, int>> motions =
+            return
                 positions
                 .Zip(positions.Skip(1), Tuple.Create)
                 .Where(m => m.Item1 != m.Item2);
-
-            double countedWords = 1 + motions.Count();
-            double violations = motions.Count(m => m.Item2 < m.Item1);
-
-            double myAnswer = Math.Log(1.0 - violations / countedWords);
-
-            return myAnswer;
         }
     }
 }
