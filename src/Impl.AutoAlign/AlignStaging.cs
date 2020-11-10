@@ -399,16 +399,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static double ComputeJointProb(CandidateChain path)
         {
-            double jointProb = 0.0;
+            //double jointProb = 0.0;
 
-            // Look at this again.
-            // It assumes that the chain is all Candidates.
-            foreach (Candidate c in path)
-            {
-                jointProb += c.Prob;
-            }
+            //// Look at this again.
+            //// It assumes that the chain is all Candidates.
+            //foreach (Candidate c in path)
+            //{
+            //    jointProb += c.Prob;
+            //}
 
-            return jointProb;
+            //return jointProb;
+
+            return path.Cast<Candidate>().Sum(c => c.Prob);
         }
 
 
