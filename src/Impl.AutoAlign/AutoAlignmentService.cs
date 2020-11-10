@@ -363,7 +363,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     int topN2 = sortedCandidates2.Count / 10;
                     if (topN2 < n) topN2 = n;
 
-                    topCandidates = AlignStaging.GetTopPaths2(sortedCandidates2, pathProbs);
+                    topCandidates = AlignStaging.GetLeadingCandidates(sortedCandidates2, pathProbs);
                     return topCandidates;
                 }
             }
@@ -373,7 +373,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<CandidateChain> sortedCandidates = SortPaths(pathProbs2);
 
-            topCandidates = AlignStaging.GetTopPaths2(sortedCandidates, pathProbs);
+            topCandidates = AlignStaging.GetLeadingCandidates(sortedCandidates, pathProbs);
 
             return topCandidates;
         }
