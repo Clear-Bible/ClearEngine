@@ -340,32 +340,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             if (childCandidatesList.Count > 1)
             {
                 List<Candidate> headCandidates = childCandidatesList[0];
+                int headDepth = Math.Min(headCandidates.Count, depth + 1);
+                CandidateChain nHeadCandidates = 
+                    new CandidateChain(headCandidates.Take(headDepth));
 
-                int headDepth = headCandidates.Count - 1;
-                if (headDepth > depth)
-                {
-                    headDepth = depth;
-                }
-                // headDepth is one less than number of head candidates,
-                // but truncated to depth
 
-                CandidateChain nHeadCandidates = Get_Nth_Candidate(headCandidates, headDepth);
-                // nHeadCandidates = first headDepth members of headCandidates
-
-                List<List<Candidate>> tailCandidatesList = childCandidatesList.ToList();
-                tailCandidatesList.Remove(headCandidates);
-                // tailCandidatesList = the remaining members of childCandidatesList
+                List<List<Candidate>> tailCandidatesList =
+                    childCandidatesList.Skip(1).ToList();
 
                 List<CandidateChain> tailPaths = Create_Depth_N_paths(tailCandidatesList, depth);
                 // (recursive call)
 
-                for (int i = 0; i < nHeadCandidates.Count; i++) // for each member of nHeadCandidates
+                foreach (Candidate nHeadCandidate in nHeadCandidates)
                 {
-                    Candidate nHeadCandidate = (Candidate)nHeadCandidates[i];
-
-                    for (int j = 0; j < tailPaths.Count; j++)
+                    foreach (CandidateChain tailPath in tailPaths)
                     {
-                        CandidateChain tailPath = tailPaths[j];
                         CandidateChain path = ConsChain(nHeadCandidate, tailPath);
 
                         if (paths.Count > 16000000)
@@ -388,13 +377,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             return paths;
-        }
-
-
-        public static CandidateChain Get_Nth_Candidate(List<Candidate> headCandidates, int depth)
-        {
-            return new CandidateChain(
-                headCandidates.Cast<Candidate>().Take(depth + 1));
         }
 
 
