@@ -257,5 +257,23 @@ namespace ClearBible.Clear3.Impl.TreeService
                     new XAttribute("Length", totalLength.ToString()),
                     subTrees);
         }
+
+
+        public static void QueryTerminalNode(
+            XElement terminalNode,
+            out string sourceID,
+            out string lemma,
+            out string strong)
+        {
+            sourceID = terminalNode.Attribute("morphId").Value;
+            if (sourceID.Length == 11)
+            {
+                sourceID += "1";
+            }
+
+            lemma = terminalNode.Attribute("UnicodeLemma").Value;
+            strong = terminalNode.Attribute("Language").Value +
+                terminalNode.Attribute("StrongNumberX").Value;
+        }
     }
 }
