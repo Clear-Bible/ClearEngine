@@ -61,6 +61,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
+            Assumptions assumptions = new Assumptions(
+                translationModel,
+                manTransModel,
+                alignProbs,
+                useAlignModel,
+                puncs,
+                stopWords,
+                goodLinks,
+                goodLinkMinCount,
+                badLinks,
+                badLinkMinCount,
+                oldLinks,
+                sourceFuncWords,
+                targetFuncWords,
+                contentWordsOnly,
+                strongs);
+
             CandidateFinder candidateFinder = new CandidateFinder(
                 translationModel,
                 manTransModel,
@@ -114,7 +131,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     groups, treeService, ref align, i, maxPaths, puncs, stopWords,
                     goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                     glossTable, oldLinks, sourceFuncWords, targetFuncWords,
-                    contentWordsOnly, strongs);
+                    contentWordsOnly, strongs, assumptions);
 
                 i += 1;
             }
@@ -148,7 +165,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
             bool contentWordsOnly,
-            Dictionary<string, Dictionary<string, int>> strongs
+            Dictionary<string, Dictionary<string, int>> strongs,
+            Assumptions assumptions
             )
         {
             VerseID verseIdFromLegacySourceIdString(string s) =>
@@ -219,7 +237,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 topCandidate, terminals, sWordsFromTranslationPair.Count, tWords, model,
                 preAlignment, useAlignModel, puncs, stopWords, goodLinks,
                 goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords,
-                targetFuncWords, contentWordsOnly);
+                targetFuncWords, contentWordsOnly,
+                assumptions);
 
             List<MappedWords> linksWip = links
                 .Where(link => !link.TargetNode.Word.IsFake)
@@ -422,7 +441,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int badLinkMinCount,
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
-            bool contentWordsOnly
+            bool contentWordsOnly,
+            Assumptions assumptions
             )
         {
             //Console.WriteLine("\nAlignTheRest\n\n");
@@ -494,7 +514,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         linkedTargets, model, preAlignment, useAlignModel,
                         puncs, stopWords, goodLinks, goodLinkMinCount,
                         badLinks, badLinkMinCount, sourceFuncWords,
-                        targetFuncWords, contentWordsOnly);
+                        targetFuncWords, contentWordsOnly,
+                        assumptions);
                 }
             }
 
@@ -530,7 +551,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int badLinkMinCount,
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
-            bool contentWordsOnly
+            bool contentWordsOnly,
+            Assumptions assumptions
             )
         {
             if (stopWords.Contains(link.SourceNode.Lemma)) return;
@@ -566,40 +588,41 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 MappedWords preNeighbor = AutoAlignUtility.GetPreNeighbor(link, linkedSiblings);
                 MappedWords postNeighbor = AutoAlignUtility.GetPostNeighbor(link, linkedSiblings);
-                List<TargetWord> targetCandidates = new List<TargetWord>();
-                bool foundTarget = false;
-                if (!(preNeighbor == null || postNeighbor == null))
+
+
+                if (preNeighbor != null && postNeighbor != null)
                 {
-                    targetCandidates = AlignStaging.GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    List<TargetWord> targetCandidates =
+                        AlignStaging.GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
                     if (targetCandidates.Count > 0)
                     {
-                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
+                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, linkedTargets, assumptions);
                         if (newTarget != null)
                         {
                             link.TargetNode = newTarget;
-                            foundTarget = true;
                         }
                     }
                 }
-                else if (preNeighbor != null && !foundTarget)
+                else if (preNeighbor != null)
                 {
-                    targetCandidates = AlignStaging.GetTargetCandidates(preNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    List<TargetWord> targetCandidates =
+                        AlignStaging.GetTargetCandidates(preNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
                     if (targetCandidates.Count > 0)
                     {
-                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
+                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, linkedTargets, assumptions);
                         if (newTarget != null)
                         {
                             link.TargetNode = newTarget;
-                            foundTarget = true;
                         }
                     }
                 }
-                else if (postNeighbor != null && !foundTarget)
+                else if (postNeighbor != null)
                 {
-                    targetCandidates = AlignStaging.GetTargetCandidates(postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
+                    List<TargetWord> targetCandidates =
+                        AlignStaging.GetTargetCandidates(postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
                     if (targetCandidates.Count > 0)
                     {
-                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, model, linkedTargets, puncs, stopWords, goodLinks, goodLinkMinCount, badLinks, badLinkMinCount);
+                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, linkedTargets, assumptions);
                         if (newTarget != null)
                         {
                             link.TargetNode = newTarget;
@@ -615,57 +638,53 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static LinkedWord GetTopCandidate(
             SourceNode sWord,
             List<TargetWord> tWords,
-            TranslationModel model,
             List<string> linkedTargets,
-            List<string> puncs,
-            List<string> stopWords,
-            Dictionary<string, int> goodLinks,
-            int goodLinkMinCount,
-            Dictionary<string, int> badLinks,
-            int badLinkMinCount
+            Assumptions assumptions
             )
         {
-            Dictionary<TargetWord, double> probs = new Dictionary<TargetWord, double>();
-
-            for (int i = 0; i < tWords.Count; i++)
-            {
-                TargetWord tWord = (TargetWord)tWords[i];
-                string link = sWord.Lemma + "#" + tWord.Text;
-                if (badLinks.ContainsKey(link) && (int)badLinks[link] >= badLinkMinCount)
+            Dictionary<TargetWord, double> probs =
+                tWords
+                .Where(notPunctuation)
+                .Where(notTargetStopWord)
+                .Where(notBadLink)
+                .Where(sourceStopWordImpliesIsGoodLink)
+                .Where(notAlreadyLinked)
+                .Select(tWord => new
                 {
-                    continue;
-                }
-                if (puncs.Contains(tWord.Text)) continue;
-                if (stopWords.Contains(tWord.Text)) continue;
-                if (stopWords.Contains(sWord.Lemma) && !(goodLinks.ContainsKey(link) && (int)goodLinks[link] >= goodLinkMinCount))
-                {
-                    continue;
-                }
+                    tWord,
+                    score = getTranslationModelScore(tWord)
+                })
+                .Where(x => x.score >= 0.17)
+                .ToDictionary(
+                    x => x.tWord,
+                    x => Math.Log(x.score));
 
-                if (linkedTargets.Contains(tWord.ID)) continue;
+            bool notPunctuation(TargetWord tw) =>
+                !assumptions.IsPunctuation(tw);
 
-                //if (model.Inner.ContainsKey(new Lemma(sWord.Lemma)))
-                if (model.Inner.TryGetValue(new Lemma(sWord.Lemma),
-                    out Dictionary<TargetMorph, Score> translations))
-                {
-                    // if (translations.ContainsKey(new TargetMorph(tWord.Text)))
-                    if (translations.TryGetValue(new TargetMorph(tWord.Text),
-                        out Score score))
-                    {
-                        double prob = score.Double;
-                        if (prob >= 0.17)
-                        {
-                            probs.Add(tWord, Math.Log(prob));
-                        }
-                    }
-                }
-            }
+            bool notTargetStopWord(TargetWord tw) =>
+                !assumptions.IsTargetStopWord(tw);
+
+            bool notAlreadyLinked(TargetWord tw) =>
+                !linkedTargets.Contains(tw.ID);
+
+            bool notBadLink(TargetWord tw) =>
+                !assumptions.IsBadLink(sWord, tw);
+
+            bool sourceStopWordImpliesIsGoodLink(TargetWord tw) =>
+                !assumptions.IsSourceStopWord(sWord) ||
+                assumptions.IsGoodLink(sWord, tw);
+
+            double getTranslationModelScore(TargetWord tw) =>
+                assumptions.GetTranslationModelScore(sWord, tw);
+            
 
             if (probs.Count > 0)
             {
                 List<TargetWord> candidates = SortWordCandidates(probs);
 
                 TargetWord topCandidate = candidates[0];
+
                 topCandidate.IsFake = false;
 
                 LinkedWord linkedWord = new LinkedWord();
