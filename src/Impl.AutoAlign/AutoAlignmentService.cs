@@ -606,43 +606,43 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 MappedWords postNeighbor =
                     AutoAlignUtility.GetPostNeighbor(link, linkedSiblings);
 
+                List<TargetWord> targetCandidates = new List<TargetWord>();
+
                 if (preNeighbor != null && postNeighbor != null)
                 {
-                    List<TargetWord> targetCandidates =
-                        AlignStaging.GetTargetCandidates(preNeighbor, postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
-                    if (targetCandidates.Count > 0)
-                    {
-                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, linkedTargets, assumptions);
-                        if (newTarget != null)
-                        {
-                            link.TargetNode = newTarget;
-                        }
-                    }
+                    targetCandidates =
+                        AlignStaging.GetTargetCandidates(
+                            preNeighbor,
+                            postNeighbor,
+                            targetWords,
+                            linkedTargets,
+                            assumptions);
                 }
                 else if (preNeighbor != null)
                 {
-                    List<TargetWord> targetCandidates =
-                        AlignStaging.GetTargetCandidates(preNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
-                    if (targetCandidates.Count > 0)
-                    {
-                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, linkedTargets, assumptions);
-                        if (newTarget != null)
-                        {
-                            link.TargetNode = newTarget;
-                        }
-                    }
+                    targetCandidates =
+                        AlignStaging.GetTargetCandidates(
+                            preNeighbor,
+                            targetWords,
+                            linkedTargets,
+                            assumptions);
                 }
                 else if (postNeighbor != null)
                 {
-                    List<TargetWord> targetCandidates =
-                        AlignStaging.GetTargetCandidates(postNeighbor, targetWords, linkedTargets, puncs, targetFuncWords, contentWordsOnly);
-                    if (targetCandidates.Count > 0)
+                    targetCandidates =
+                        AlignStaging.GetTargetCandidates(
+                            postNeighbor,
+                            targetWords,
+                            linkedTargets,
+                            assumptions);
+                }
+
+                if (targetCandidates.Count > 0)
+                {
+                    LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, linkedTargets, assumptions);
+                    if (newTarget != null)
                     {
-                        LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, linkedTargets, assumptions);
-                        if (newTarget != null)
-                        {
-                            link.TargetNode = newTarget;
-                        }
+                        link.TargetNode = newTarget;
                     }
                 }
 
