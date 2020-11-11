@@ -78,12 +78,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public bool UseAlignModel => _useAlignModel;
 
 
+        public bool IsPunctuation(string text) =>
+            _puncs.Contains(text);
+
+
         public bool IsPunctuation(TargetWord tw) =>
-                _puncs.Contains(tw.Text);
+            _puncs.Contains(tw.Text);
 
 
         public bool IsTargetStopWord(TargetWord tw) =>
             _stopWords.Contains(tw.Text);
+
+
+        public bool IsTargetFunctionWord(string text) =>
+            _targetFuncWords.Contains(text);
 
 
         public bool IsSourceStopWord(SourceNode sn) =>

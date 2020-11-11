@@ -199,9 +199,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             MappedWords anchorLink,
             List<TargetWord> targetWords,
             List<string> linkedTargets,
-            List<string> puncs,
-            List<string> targetFuncWords,
-            bool contentWordsOnly)
+            Assumptions assumptions)
         {
             int anchor = anchorLink.TargetNode.Word.Position;
 
@@ -227,9 +225,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     positions,
                     targetWords,
                     linkedTargets,
-                    puncs,
-                    targetFuncWords,
-                    contentWordsOnly);
+                    assumptions);
         }
 
 
@@ -238,9 +234,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             MappedWords rightAnchor,
             List<TargetWord> targetWords,
             List<string> linkedTargets,
-            List<string> puncs,
-            List<string> targetFuncWords,
-            bool contentWordsOnly)
+            Assumptions assumptions)
         {
             IEnumerable<int> span()
             {
@@ -256,9 +250,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 span(),
                 targetWords,
                 linkedTargets,
-                puncs,
-                targetFuncWords,
-                contentWordsOnly).ToList();
+                assumptions).ToList();
         }
 
 
@@ -266,16 +258,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             IEnumerable<int> positions,
             List<TargetWord> targetWords,
             List<string> linkedTargets,
-            List<string> puncs,
-            List<string> targetFuncWords,
-            bool contentWordsOnly)
+            Assumptions assumptions)
         {
             return
                 positions
                 .Where(n => n >= 0 && n < targetWords.Count)
                 .Select(n => new { n, tw = targetWords[n] })
                 .Select(x => new { x.n, x.tw.Text, x.tw.ID })
-                .Where(x => !contentWordsOnly || isContentWord(x.Text))
+                .Where(x =>
+                    !assumptions.ContentWordsOnly || isContentWord(x.Text))
                 .Where(x => isNotLinkedAlready(x.Text))
                 .TakeWhile(x => isNotPunctuation(x.Text))
                 .Select(x => new TargetWord()
@@ -287,13 +278,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .ToList();
 
             bool isContentWord(string text) =>
-                !targetFuncWords.Contains(text);
+                !assumptions.IsTargetFunctionWord(text);
 
             bool isNotLinkedAlready(string text) =>
                 !linkedTargets.Contains(text);
 
             bool isNotPunctuation(string text) =>
-                !puncs.Contains(text);
+                !assumptions.IsPunctuation(text);
         }
 
 
