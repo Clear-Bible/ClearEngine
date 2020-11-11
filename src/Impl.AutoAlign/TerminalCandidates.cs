@@ -7,42 +7,38 @@ using System.Xml.Linq;
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
+    using ClearBible.Clear3.Impl.TreeService;
 
 
     public class TerminalCandidates2
     {
-        public static void GetTerminalCandidates(
-            AlternativesForTerminals candidateTable,  // the output goes here
+        public static AlternativesForTerminals GetTerminalCandidates(
             XElement treeNode,
-            List<TargetWord> tWords,
             Dictionary<string, string> idMap,
             CandidateFinder candidateFinder
             )
         {
-            List<XElement> terminalNodes = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
+            AlternativesForTerminals candidateTable =
+                new AlternativesForTerminals();
 
-            foreach (XElement terminalNode in terminalNodes)
+            foreach (XElement terminalNode in
+                AutoAlignUtility.GetTerminalXmlNodes(treeNode))
             {
-                string sourceID = terminalNode.Attribute("morphId").Value;               
-                if (sourceID.Length == 11)
-                {
-                    sourceID += "1";
-                }
-
-                string altID = idMap[sourceID];
-                string lemma = terminalNode.Attribute("UnicodeLemma").Value;
-                string strong = terminalNode.Attribute("Language").Value +
-                    terminalNode.Attribute("StrongNumberX").Value;
+                TreeService.QueryTerminalNode(terminalNode,
+                    out string sourceID,
+                    out string lemma,
+                    out string strong);
 
                 if (lemma == null) continue;
+
+                string altID = idMap[sourceID];
 
                 AlternativeCandidates topCandidates =
                     candidateFinder.GetTopCandidates(
                         sourceID,
                         altID,
                         lemma,
-                        strong,
-                        tWords);
+                        strong);
 
                 candidateTable.Add(sourceID, topCandidates);
 
@@ -50,6 +46,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             FillGaps(candidateTable);
+
+            return candidateTable;
         }
 
 

@@ -21,6 +21,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         private Dictionary<string, Dictionary<string, int>> _strongs;
 
         public Dictionary<string, string> ExistingLinks { get; set; }
+        public List<TargetWord> TargetWords { get; set; }
 
         public CandidateFinder(
             TranslationModel model,
@@ -50,8 +51,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string sourceID,
             string altID,
             string lemma,
-            string strong,
-            List<TargetWord> tWords)
+            string strong)
         {
             AlternativeCandidates topCandidates = new AlternativeCandidates();
 
@@ -60,7 +60,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 string targetAltID = (string)ExistingLinks[altID];
 
                 TargetWord target =
-                    tWords.Where(tw => targetAltID == tw.AltID).FirstOrDefault();
+                    TargetWords.Where(tw => targetAltID == tw.AltID).FirstOrDefault();
 
                 if (target != null)
                 {
@@ -81,7 +81,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 Dictionary<string, int> wordIds = _strongs[strong];
                 List<TargetWord> matchingTwords =
-                    tWords.Where(tw => wordIds.ContainsKey(tw.ID)).ToList();
+                    TargetWords.Where(tw => wordIds.ContainsKey(tw.ID)).ToList();
 
                 foreach (TargetWord target in matchingTwords)
                 {
@@ -94,9 +94,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             if (_manModel.Inner.TryGetValue(new Lemma(lemma),
                 out Dictionary<TargetMorph, Score> manTranslations))
             {
-                for (int i = 0; i < tWords.Count; i++)
+                for (int i = 0; i < TargetWords.Count; i++)
                 {
-                    TargetWord tWord = tWords[i];
+                    TargetWord tWord = TargetWords[i];
                     if (manTranslations.TryGetValue(new TargetMorph(tWord.Text),
                         out Score manScore))
                     {
@@ -109,9 +109,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             else if (_model.Inner.TryGetValue(new Lemma(lemma),
                 out Dictionary<TargetMorph, Score> translations))
             {
-                for (int i = 0; i < tWords.Count; i++)
+                for (int i = 0; i < TargetWords.Count; i++)
                 {
-                    TargetWord tWord = tWords[i];
+                    TargetWord tWord = TargetWords[i];
                     string link = lemma + "#" + tWord.Text;
                     if (_badLinks.ContainsKey(link) && (int)_badLinks[link] >= _badLinkMinCount)
                     {
