@@ -23,24 +23,28 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (XElement terminalNode in terminalNodes)
             {
-                SourceWord sWord = new SourceWord();
-                sWord.ID = terminalNode.Attribute("morphId").Value;               
-                if (sWord.ID.Length == 11)
+                string sourceID = terminalNode.Attribute("morphId").Value;               
+                if (sourceID.Length == 11)
                 {
-                    sWord.ID += "1";
+                    sourceID += "1";
                 }
 
-                sWord.AltID = (string)idMap[sWord.ID];
-                sWord.Text = terminalNode.Attribute("Unicode").Value;
-                sWord.Lemma = terminalNode.Attribute("UnicodeLemma").Value;
-                sWord.Strong = terminalNode.Attribute("Language").Value +
+                string altID = idMap[sourceID];
+                string lemma = terminalNode.Attribute("UnicodeLemma").Value;
+                string strong = terminalNode.Attribute("Language").Value +
                     terminalNode.Attribute("StrongNumberX").Value;
-                if (sWord.Lemma == null) continue;
+
+                if (lemma == null) continue;
 
                 AlternativeCandidates topCandidates =
-                    candidateFinder.GetTopCandidates(sWord, tWords);
+                    candidateFinder.GetTopCandidates(
+                        sourceID,
+                        altID,
+                        lemma,
+                        strong,
+                        tWords);
 
-                candidateTable.Add(sWord.ID, topCandidates);
+                candidateTable.Add(sourceID, topCandidates);
 
                 ResolveConflicts(candidateTable);
             }
