@@ -127,11 +127,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 AlignZone(
                     entryPrime,
                     candidateFinder,
-                    translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
-                    groups, treeService, ref align, i, maxPaths, puncs, stopWords,
-                    goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
-                    glossTable, oldLinks, sourceFuncWords, targetFuncWords,
-                    contentWordsOnly, strongs, assumptions);
+                    groups, treeService, ref align, i, maxPaths,
+                    glossTable, oldLinks, assumptions);
 
                 i += 1;
             }
@@ -144,28 +141,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static void AlignZone(
             TranslationPair entry,
             CandidateFinder candidateFinder,
-            TranslationModel model, // translation model
-            TranslationModel manModel, // manually checked alignments
-            AlignmentModel alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
-            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
-            bool useAlignModel,
             GroupTranslationsTable groups,
             TreeService treeService, 
             ref Alignment2 align,  // Output goes here.
             int i,
             int maxPaths,
-            List<string> puncs,
-            List<string> stopWords,
-            Dictionary<string, int> goodLinks,
-            int goodLinkMinCount,
-            Dictionary<string, int> badLinks,
-            int badLinkMinCount,
             Dictionary<string, Gloss> glossTable,
             Dictionary<string, Dictionary<string, string>> oldLinks,  // (verseID => (mWord.altId => tWord.altId))
-            List<string> sourceFuncWords,
-            List<string> targetFuncWords,
-            bool contentWordsOnly,
-            Dictionary<string, Dictionary<string, int>> strongs,
             Assumptions assumptions
             )
         {
@@ -225,7 +207,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();
             AlignNodes(
-                treeNode, tWords, alignments, tWords.Count, sWordsFromTranslationPair.Count,
+                treeNode,
+                tWords, alignments, tWords.Count, sWordsFromTranslationPair.Count,
                 maxPaths, terminalCandidates);
 
             List<Candidate> verseAlignment = alignments[goalNodeId];
@@ -234,10 +217,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<XElement> terminals = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
 
             List<MappedWords> links = AlignTheRest(
-                topCandidate, terminals, sWordsFromTranslationPair.Count, tWords, model,
-                preAlignment, useAlignModel, puncs, stopWords, goodLinks,
-                goodLinkMinCount, badLinks, badLinkMinCount, sourceFuncWords,
-                targetFuncWords, contentWordsOnly,
+                topCandidate,
+                terminals,
+                sWordsFromTranslationPair.Count,
+                tWords, 
                 assumptions);
 
             List<MappedWords> linksWip = links
@@ -430,18 +413,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<XElement> terminals,
             int numberSourceWords,
             List<TargetWord> targetWords,
-            TranslationModel model,
-            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
-            bool useAlignModel,
-            List<string> puncs,
-            List<string> stopWords,
-            Dictionary<string, int> goodLinks,
-            int goodLinkMinCount,
-            Dictionary<string, int> badLinks,
-            int badLinkMinCount,
-            List<string> sourceFuncWords,
-            List<string> targetFuncWords,
-            bool contentWordsOnly,
             Assumptions assumptions
             )
         {
@@ -504,19 +475,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Where(mw => !mw.TargetNode.Word.IsFake)
                 .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
 
-            for (int i = 0; i < links.Count; i++)
+            foreach (MappedWords link in
+                links.Where(link => link.TargetNode.Word.IsFake))
             {
-                MappedWords link = (MappedWords)links[i];
-
-                if (link.TargetNode.Word.IsFake)
-                {
-                    AlignWord(ref link, targetWords, linksTable,
-                        linkedTargets, model, preAlignment, useAlignModel,
-                        puncs, stopWords, goodLinks, goodLinkMinCount,
-                        badLinks, badLinkMinCount, sourceFuncWords,
-                        targetFuncWords, contentWordsOnly,
-                        assumptions);
-                }
+                AlignWord(
+                    link,
+                    targetWords,
+                    linksTable,
+                    linkedTargets,
+                    assumptions);
             }
 
             conflicts = AlignStaging.FindConflictingLinks(links);
@@ -536,24 +503,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static void AlignWord(
-            ref MappedWords link, // (target word is fake)
+            MappedWords link,
             List<TargetWord> targetWords,
-            Dictionary<string, MappedWords> linksTable,  // source morphId => MappedWords, non-fake
-            List<string> linkedTargets, // target word IDs from non-fake words
-            TranslationModel model, // translation model, (source => (target => probability))
-            Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
-            bool useAlignModel,
-            List<string> puncs,
-            List<string> stopWords,
-            Dictionary<string, int> goodLinks,
-            int goodLinkMinCount,
-            Dictionary<string, int> badLinks,
-            int badLinkMinCount,
-            List<string> sourceFuncWords,
-            List<string> targetFuncWords,
-            bool contentWordsOnly,
-            Assumptions assumptions
-            )
+            Dictionary<string, MappedWords> linksTable,
+            List<string> linkedTargets,
+            Assumptions assumptions)
         {
             if (assumptions.IsSourceStopWord(link.SourceNode)) return;
 
@@ -639,7 +593,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 if (targetCandidates.Count > 0)
                 {
-                    LinkedWord newTarget = GetTopCandidate(link.SourceNode, targetCandidates, linkedTargets, assumptions);
+                    LinkedWord newTarget = GetTopCandidate(
+                        link.SourceNode,
+                        targetCandidates,
+                        linkedTargets,
+                        assumptions);
+
                     if (newTarget != null)
                     {
                         link.TargetNode = newTarget;
