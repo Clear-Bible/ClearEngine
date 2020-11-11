@@ -27,6 +27,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         private bool _contentWordsOnly;
         private Dictionary<string, Dictionary<string, int>> _strongs;
 
+        private Dictionary<string, string> _preAlignment;
+
         public Assumptions(
             TranslationModel translationModel,
             TranslationModel manTransModel,
@@ -59,7 +61,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             _targetFuncWords = targetFuncWords;
             _contentWordsOnly = contentWordsOnly;
             _strongs = strongs;
+
+            _preAlignment =
+                alignProbs.Inner.Keys
+                .GroupBy(pair => pair.Item1)
+                .Where(group => group.Any())
+                .ToDictionary(
+                    group => group.Key.Legacy,
+                    group => group.First().Item2.Legacy);
         }
+
+
+        public bool ContentWordsOnly => _contentWordsOnly;
+
+
+        public bool UseAlignModel => _useAlignModel;
 
 
         public bool IsPunctuation(TargetWord tw) =>
@@ -72,6 +88,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public bool IsSourceStopWord(SourceNode sn) =>
             _stopWords.Contains(sn.Lemma);
+
+        public bool IsSourceFunctionWord(SourceNode sn) =>
+            _sourceFuncWords.Contains(sn.Lemma);
 
 
         public bool IsBadLink(SourceNode sn, TargetWord tw)
@@ -106,5 +125,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return 0;
         }
+
+
+        public bool TryGetPreAlignment(
+            SourceNode sn,
+            out string targetID)
+            =>
+            _preAlignment.TryGetValue(sn.MorphID, out targetID);
     }
 }
