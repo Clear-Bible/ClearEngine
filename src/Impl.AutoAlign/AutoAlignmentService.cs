@@ -555,40 +555,56 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Assumptions assumptions
             )
         {
-            if (stopWords.Contains(link.SourceNode.Lemma)) return;
-            if (contentWordsOnly && sourceFuncWords.Contains(link.SourceNode.Lemma)) return;
-            if (useAlignModel && preAlignment.ContainsKey(link.SourceNode.MorphID))
+            if (assumptions.IsSourceStopWord(link.SourceNode)) return;
+
+            if (assumptions.ContentWordsOnly &&
+                assumptions.IsSourceFunctionWord(link.SourceNode))
             {
-                string targetID = (string)preAlignment[link.SourceNode.MorphID];
-                if (linkedTargets.Contains(targetID))
+                return;
+            }
+                
+            if (assumptions.UseAlignModel &&
+                assumptions.TryGetPreAlignment(
+                    link.SourceNode,
+                    out string targetID))
+            {
+                if (linkedTargets.Contains(targetID)) return;
+
+                TargetWord newTargetWord =
+                    targetWords.First(tw => tw.ID == targetID);
+
+                if (assumptions.IsSourceStopWord(link.SourceNode) &&
+                    !assumptions.IsGoodLink(link.SourceNode, newTargetWord))
                 {
                     return;
                 }
-                string targetWord = AlignStaging.GetTargetWordTextFromID(targetID, targetWords);
-                string pair = link.SourceNode.Lemma + "#" + targetWord;
-                if (stopWords.Contains(link.SourceNode.Lemma) && !goodLinks.ContainsKey(pair))
+
+                if (!assumptions.IsBadLink(link.SourceNode, newTargetWord) &&
+                    !assumptions.IsPunctuation(newTargetWord) &&
+                    !assumptions.IsTargetStopWord(newTargetWord))
                 {
-                    return;
-                }
-                if (!(badLinks.ContainsKey(pair) || puncs.Contains(targetWord) || stopWords.Contains(targetWord)))
-                {
-                    link.TargetNode.Text = targetWord;
+                    link.TargetNode.Text = newTargetWord.Text;
                     link.TargetNode.Prob = 0;
                     link.TargetNode.Word.ID = targetID;
                     link.TargetNode.Word.IsFake = false;
-                    link.TargetNode.Word.Text = targetWord;
-                    link.TargetNode.Word.Position = AlignStaging.GetTargetPositionFromID(targetID, targetWords);
+                    link.TargetNode.Word.Text = newTargetWord.Text;
+                    link.TargetNode.Word.Position = newTargetWord.Position;
                     return;
                 }
             }
 
-            List<MappedWords> linkedSiblings = AutoAlignUtility.GetLinkedSiblings(link.SourceNode.TreeNode, linksTable);
+            List<MappedWords> linkedSiblings =
+                AutoAlignUtility.GetLinkedSiblings(
+                    link.SourceNode.TreeNode,
+                    linksTable);
 
             if (linkedSiblings.Count > 0)
             {
-                MappedWords preNeighbor = AutoAlignUtility.GetPreNeighbor(link, linkedSiblings);
-                MappedWords postNeighbor = AutoAlignUtility.GetPostNeighbor(link, linkedSiblings);
+                MappedWords preNeighbor =
+                    AutoAlignUtility.GetPreNeighbor(link, linkedSiblings);
 
+                MappedWords postNeighbor =
+                    AutoAlignUtility.GetPostNeighbor(link, linkedSiblings);
 
                 if (preNeighbor != null && postNeighbor != null)
                 {
