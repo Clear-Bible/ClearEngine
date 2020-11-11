@@ -47,14 +47,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
         public AlternativeCandidates GetTopCandidates(
-            SourceWord sWord,
+            string sourceID,
+            string altID,
+            string lemma,
+            string strong,
             List<TargetWord> tWords)
         {
             AlternativeCandidates topCandidates = new AlternativeCandidates();
 
-            if (ExistingLinks.Count > 0 && sWord.AltID != null && ExistingLinks.ContainsKey(sWord.AltID))
+            if (ExistingLinks.Count > 0 && altID != null && ExistingLinks.ContainsKey(altID))
             {
-                string targetAltID = (string)ExistingLinks[sWord.AltID];
+                string targetAltID = (string)ExistingLinks[altID];
 
                 TargetWord target =
                     tWords.Where(tw => targetAltID == tw.AltID).FirstOrDefault();
@@ -70,13 +73,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<TargetWord, double> probs =
                 new Dictionary<TargetWord, double>();
 
-            bool isContentWord = !_sourceFuncWords.Contains(sWord.Lemma);
+            bool isContentWord = !_sourceFuncWords.Contains(lemma);
 
             if (!isContentWord) return topCandidates;
 
-            if (_strongs.ContainsKey(sWord.Strong))
+            if (_strongs.ContainsKey(strong))
             {
-                Dictionary<string, int> wordIds = _strongs[sWord.Strong];
+                Dictionary<string, int> wordIds = _strongs[strong];
                 List<TargetWord> matchingTwords =
                     tWords.Where(tw => wordIds.ContainsKey(tw.ID)).ToList();
 
@@ -88,7 +91,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 return topCandidates;
             }
 
-            if (_manModel.Inner.TryGetValue(new Lemma(sWord.Lemma),
+            if (_manModel.Inner.TryGetValue(new Lemma(lemma),
                 out Dictionary<TargetMorph, Score> manTranslations))
             {
                 for (int i = 0; i < tWords.Count; i++)
@@ -103,19 +106,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     }
                 }
             }
-            else if (_model.Inner.TryGetValue(new Lemma(sWord.Lemma),
+            else if (_model.Inner.TryGetValue(new Lemma(lemma),
                 out Dictionary<TargetMorph, Score> translations))
             {
                 for (int i = 0; i < tWords.Count; i++)
                 {
                     TargetWord tWord = tWords[i];
-                    string link = sWord.Lemma + "#" + tWord.Text;
+                    string link = lemma + "#" + tWord.Text;
                     if (_badLinks.ContainsKey(link) && (int)_badLinks[link] >= _badLinkMinCount)
                     {
                         continue;
                     }
                     if (_puncs.Contains(tWord.Text)) continue;
-                    if (_stopWords.Contains(sWord.Lemma)) continue;
+                    if (_stopWords.Contains(lemma)) continue;
                     if (_stopWords.Contains(tWord.Text)) continue;
 
                     if (translations.TryGetValue(new TargetMorph(tWord.Text),
@@ -124,7 +127,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         double prob = score.Double;
 
                         Tuple<SourceID, TargetID> key = Tuple.Create(
-                            new SourceID(sWord.ID),
+                            new SourceID(sourceID),
                             new TargetID(tWord.ID));
 
                         double adjustedProb;
