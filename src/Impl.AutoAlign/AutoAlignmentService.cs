@@ -199,12 +199,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlternativesForTerminals terminalCandidates =
                 new AlternativesForTerminals();
             TerminalCandidates2.GetTerminalCandidates(
-                terminalCandidates, treeNode, tWords, model, manModel,
-                alignProbs, useAlignModel, tWords.Count, verseIDFromTree, puncs, stopWords,
-                badLinks, badLinkMinCount,
-                existingLinks, idMap, sourceFuncWords,
-                strongs,
+                terminalCandidates,
+                treeNode,
+                tWords,
+                idMap,
                 candidateFinder);
+
+            //AlternativesForTerminals candidateTable,  // the output goes here
+            //XElement treeNode,
+            //List<TargetWord> tWords,
+            //Dictionary< string, string> idMap,
+            //CandidateFinder candidateFinder
 
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();

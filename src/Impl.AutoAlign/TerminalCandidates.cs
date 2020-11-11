@@ -13,23 +13,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     {
         public static void GetTerminalCandidates(
             AlternativesForTerminals candidateTable,  // the output goes here
-            XElement treeNode, // syntax tree for current verse
-            List<TargetWord> tWords, // ArrayList(TargetWord)
-            TranslationModel model,
-            TranslationModel manModel, // manually checked alignments
-                                                                    // (source => (target => Stats{ count, probability})
-            AlignmentModel alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
-            bool useAlignModel,
-            int n,  // number of target tokens
-            string verseID, // from the syntax tree
-            List<string> puncs,
-            List<string> stopWords,
-            Dictionary<string, int> badLinks,  // (link => count)
-            int badLinkMinCount,
-            Dictionary<string, string> existingLinks, // (mWord.altId => tWord.altId)
+            XElement treeNode,
+            List<TargetWord> tWords,
             Dictionary<string, string> idMap,
-            List<string> sourceFuncWords,
-            Dictionary<string, Dictionary<string, int>> strongs,
             CandidateFinder candidateFinder
             )
         {
