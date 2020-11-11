@@ -61,6 +61,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
+            CandidateFinder candidateFinder = new CandidateFinder(
+                translationModel,
+                manTransModel,
+                alignProbs,
+                useAlignModel,
+                puncs,
+                stopWords,
+                badLinks,
+                badLinkMinCount,
+                sourceFuncWords,
+                strongs);
 
             ChapterID prevChapter = ChapterID.None;
 
@@ -98,6 +109,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // Align a single verse
                 AlignZone(
                     entryPrime,
+                    candidateFinder,
                     translationModel, manTransModel, alignProbs, preAlignment, useAlignModel,
                     groups, treeService, ref align, i, maxPaths, puncs, stopWords,
                     goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
@@ -114,6 +126,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static void AlignZone(
             TranslationPair entry,
+            CandidateFinder candidateFinder,
             TranslationModel model, // translation model
             TranslationModel manModel, // manually checked alignments
             AlignmentModel alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
@@ -181,6 +194,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 existingLinks = new Dictionary<string, string>();
             }
+            candidateFinder.ExistingLinks = existingLinks;
 
             AlternativesForTerminals terminalCandidates =
                 new AlternativesForTerminals();
@@ -189,7 +203,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 alignProbs, useAlignModel, tWords.Count, verseIDFromTree, puncs, stopWords,
                 badLinks, badLinkMinCount,
                 existingLinks, idMap, sourceFuncWords,
-                strongs);
+                strongs,
+                candidateFinder);
 
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();

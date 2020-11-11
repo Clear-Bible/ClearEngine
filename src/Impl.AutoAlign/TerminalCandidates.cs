@@ -29,7 +29,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, string> existingLinks, // (mWord.altId => tWord.altId)
             Dictionary<string, string> idMap,
             List<string> sourceFuncWords,
-            Dictionary<string, Dictionary<string, int>> strongs
+            Dictionary<string, Dictionary<string, int>> strongs,
+            CandidateFinder candidateFinder
             )
         {
             List<XElement> terminalNodes = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
@@ -51,11 +52,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 if (sWord.Lemma == null) continue;
 
                 AlternativeCandidates topCandidates =
-                    GetTopCandidates(sWord, tWords, model, manModel,
-                        alignProbs, useAlignModel, n, puncs, stopWords,
-                        badLinks, badLinkMinCount,
-                        existingLinks, sourceFuncWords,
-                        strongs);
+                    candidateFinder.GetTopCandidates(sWord, tWords);
 
                 candidateTable.Add(sWord.ID, topCandidates);
 
