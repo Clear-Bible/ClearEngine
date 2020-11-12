@@ -164,12 +164,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public List<LinkedWord> TargetNodes = new List<LinkedWord>();
     }
 
-    public class CrossingLinks
-    {
-        public MappedGroup Link1;
-        public MappedGroup Link2;
-    }
-
     public class ManuscriptWord
     {
         public long id;
