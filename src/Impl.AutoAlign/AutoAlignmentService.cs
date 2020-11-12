@@ -188,6 +188,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     existingLinks,
                     assumptions);
 
+            // the key is the node ID I believe
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();
             AlignNodes(
@@ -404,6 +405,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<LinkedWord> linkedWords = new List<LinkedWord>();
             AutoAlignUtility.GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
 
+            // LinkedWord is a TargetWord with some extra information.
+
             // linkedWords has a LinkedWord for each target word found in
             // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
             // TargetWord for zero-length sub-paths in topCandidate.sequence.
@@ -422,6 +425,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 sourceLink.Position = Int32.Parse(terminal.Attribute("Start").Value);
 
                 sourceLink.RelativePos = (double)sourceLink.Position / (double)numberSourceWords;
+
                 if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
 
                 sourceLink.TreeNode = terminal;
@@ -429,6 +433,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 LinkedWord targetLink = linkedWords[i];
                 // (looks like linkedWords and terminals are expected to be
                 // in 1-to-1 correspondence.)
+
                 MappedWords link = new MappedWords();
                 link.SourceNode = sourceLink;
                 link.TargetNode = targetLink;
