@@ -5,6 +5,7 @@ using System.Xml.Linq;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    using System.Linq;
     using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Miscellaneous;
 
@@ -18,12 +19,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<XElement> terminals
             )
         {
-            SourceWord[] sWords = BuildSourceArray(sourceWords);
-            TargetWord[] tWords = BuildTargetArray(targetWords);
-            List<string[][]> mappedGroups = GetGroupLinks(sWords, tWords, groups);
+            SourceWord[] sWords = sourceWords.ToArray();
+            TargetWord[] tWords = targetWords.ToArray();
+
+            List<string[][]> mappedGroups = GetGroupLinks(
+                sWords, tWords, groups);
+
             if (mappedGroups.Count > 0)
             {
-                RemoveOldLinks(mappedGroups, ref links);
+                links = RemoveOldLinks(mappedGroups, links);
+
                 foreach (string[][] group in mappedGroups)
                 {
                     AddGroup(group, links, terminals, targetWords);
@@ -32,15 +37,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        static List<string[][]> GetGroupLinks(SourceWord[] sourceWords, TargetWord[] targetWords, GroupTranslationsTable_Old groups)
+        static List<string[][]> GetGroupLinks(
+            SourceWord[] sourceWords,
+            TargetWord[] targetWords,
+            GroupTranslationsTable_Old groups)
         {
             List<string[][]> mappedGroups = new List<string[][]>();
 
             for (int i = 0; i < sourceWords.Length; i++)
-            {
-                bool foundMatch = false;
-
+            { 
                 SourceWord sw = (SourceWord)sourceWords[i];
+
+
+                bool foundMatch = false;
                 if (sw.Lemma == "οὐ")
                 {
                     ;
@@ -183,7 +192,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        static void RemoveOldLinks(List<string[][]> mappedGroups, ref List<MappedGroup> links)
+        static List<MappedGroup> RemoveOldLinks(
+            List<string[][]> mappedGroups,
+            List<MappedGroup> links)
         {
             List<MappedGroup> cleanLinks = new List<MappedGroup>();
 
@@ -198,39 +209,40 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            links = cleanLinks;
+            return cleanLinks;
         }
+
 
         static List<string> GetSourceWordsInGroups(List<string[][]> mappedGroups)
         {
-            List<string> wordsInGroups = new List<string>();
-
-            foreach (string[][] mg in mappedGroups)
-            {
-                string[] sourceWords = mg[0];
-                for (int i = 0; i < sourceWords.Length; i++)
-                {
-                    wordsInGroups.Add(sourceWords[i]);
-                }
-            }
-
-            return wordsInGroups;
+            return
+                mappedGroups
+                .Select(mappedGroup => mappedGroup[0])
+                .SelectMany(sourceWord => sourceWord)
+                .ToList();
         }
+
 
         static List<string> GetTargetWordsInGroups(List<string[][]> mappedGroups)
         {
-            List<string> wordsInGroups = new List<string>();
+            //List<string> wordsInGroups = new List<string>();
 
-            foreach (string[][] mg in mappedGroups)
-            {
-                string[] sourceWords = mg[1];
-                for (int i = 0; i < sourceWords.Length; i++)
-                {
-                    wordsInGroups.Add(sourceWords[i]);
-                }
-            }
+            //foreach (string[][] mg in mappedGroups)
+            //{
+            //    string[] sourceWords = mg[1];
+            //    for (int i = 0; i < sourceWords.Length; i++)
+            //    {
+            //        wordsInGroups.Add(sourceWords[i]);
+            //    }
+            //}
 
-            return wordsInGroups;
+            //return wordsInGroups;
+
+            return
+                mappedGroups
+                .Select(mappedGroup => mappedGroup[0])
+                .SelectMany(sourceWord => sourceWord)
+                .ToList();
         }
 
         static bool InGroup(MappedGroup mg, List<string> sourceWordsInGroups, List<string> targetWordsInGroups)
@@ -344,36 +356,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             return tw;
-        }
-
-        static SourceWord[] BuildSourceArray(List<SourceWord> sourceWords)
-        {
-            SourceWord[] sourceArray = new SourceWord[sourceWords.Count];
-
-            int i = 0;
-
-            foreach (SourceWord sw in sourceWords)
-            {
-                sourceArray[i] = sw;
-                i++;
-            }
-
-            return sourceArray;
-        }
-
-        static TargetWord[] BuildTargetArray(List<TargetWord> targetWords)
-        {
-            TargetWord[] targetArray = new TargetWord[targetWords.Count];
-
-            int i = 0;
-
-            foreach (TargetWord tw in targetWords)
-            {
-                targetArray[i] = tw;
-                i++;
-            }
-
-            return targetArray;
         }
 
 
