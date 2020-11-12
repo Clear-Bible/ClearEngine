@@ -88,14 +88,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             TreeService treeService = (TreeService)iTreeService;
 
-            Dictionary<string, string> preAlignment =
-                alignProbs.Inner.Keys
-                .GroupBy(pair => pair.Item1)
-                .Where(group => group.Any())
-                .ToDictionary(
-                    group => group.Key.Legacy,
-                    group => group.First().Item2.Legacy);
-
             foreach (
                 Tuple<
                     List<Tuple<SourceID, Lemma>>,
@@ -137,6 +129,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Assumptions assumptions
             )
         {
+            int numberSourceWordsInTranslationPair =
+                entry.SourceSegments.Count();
+
             VerseID verseIdFromLegacySourceIdString(string s) =>
                 (new SourceID(s)).VerseID;
 
@@ -147,17 +142,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Dictionary<string, WordInfo> wordInfoTable =
                 AutoAlignUtility.BuildWordInfoTable(treeNode);
+                // sourceID => WordInfo
 
             List<SourceWord> sWordsFromTranslationPair = MakeSourceWordList(
                 entry.SourceSegments.Select(seg => seg.ID),
                 wordInfoTable);
 
-            List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
-
-            Dictionary<string, string> idMap = sWordsFromTranslationPair
+            Dictionary<string, string> idMap =
+                sWordsFromTranslationPair
                 .ToDictionary(
                     sWord => sWord.ID,
                     sWord => sWord.AltID);
+
+            List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
 
             // Node IDs are of the form BBCCCVVVPPPSSSL,
             // where P is the 1-based position of the first word in the node,
@@ -181,6 +178,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 existingLinks = new Dictionary<string, string>();
             }
 
+            // Dictionary<string:sourceID, List<Candidate>>
+            // sourceID is obtained from the terminal from the tree
             AlternativesForTerminals terminalCandidates =
                 TerminalCandidates2.GetTerminalCandidates(
                     treeNode,
@@ -193,7 +192,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 new Dictionary<string, List<Candidate>>();
             AlignNodes(
                 treeNode,
-                tWords, alignments, tWords.Count, sWordsFromTranslationPair.Count,
+                tWords, alignments, tWords.Count,
                 maxPaths, terminalCandidates);
 
             List<Candidate> verseAlignment = alignments[goalNodeId];
@@ -204,7 +203,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<MappedWords> links = AlignTheRest(
                 topCandidate,
                 terminals,
-                sWordsFromTranslationPair.Count,
+                numberSourceWordsInTranslationPair,
                 tWords, 
                 assumptions);
 
@@ -258,7 +257,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<TargetWord> tWords,
             Dictionary<string, List<Candidate>> alignments,
             int n, // number of target tokens
-            int sLength, // number of source words
             int maxPaths,
             AlternativesForTerminals terminalCandidates
             )
@@ -268,7 +266,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             foreach (XElement subTree in treeNode.Elements())
             {
                 AlignNodes(
-                    subTree, tWords, alignments, n, sLength,
+                    subTree, tWords, alignments, n,
                     maxPaths, terminalCandidates);
             }
 
