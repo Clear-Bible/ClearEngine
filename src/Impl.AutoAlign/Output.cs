@@ -64,38 +64,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             line.links = new List<Link>();
 
-            // links :: List<MappedGroup>
-            // Line.links :: List<Link>
-            //
-            // public class Link
-            // {
-            //     public int[] source;
-            //     public int[] target;
-            //     public double? cscore;
-            // }
-            //
-            for (int j = 0; j < links.Count; j++)
+            foreach(MappedGroup mappedGroup in links)
             {
-                MappedGroup mappedGroup = (MappedGroup)links[j];
-
-                int[] s = new int[mappedGroup.SourceNodes.Count];
-                for (int i = 0; i < mappedGroup.SourceNodes.Count; i++)
-                {
-                    SourceNode sourceNode = mappedGroup.SourceNodes[i];
-                    s[i] = sourceNode.Position;
-                }
+                int[] s =
+                    mappedGroup.SourceNodes
+                    .Select(sourceNode => sourceNode.Position)
+                    .ToArray();
 
                 if (mappedGroup.TargetNodes.Count > 1)
                 {
-                    mappedGroup.TargetNodes = ReorderNodes(mappedGroup.TargetNodes, primaryPositions);
+                    mappedGroup.TargetNodes = ReorderNodes(
+                        mappedGroup.TargetNodes,
+                        primaryPositions);
                 }
-                int[] t = new int[mappedGroup.TargetNodes.Count];
 
-                for (int i = 0; i < mappedGroup.TargetNodes.Count; i++)
-                {
-                    LinkedWord linkedWord = (LinkedWord)mappedGroup.TargetNodes[i];
-                    t[i] = linkedWord.Word.Position;
-                }
+                int[] t =
+                    mappedGroup.TargetNodes
+                    .Select(linkedWord => linkedWord.Word.Position)
+                    .ToArray();
 
                 double score = 0.0;
                 if (mappedGroup.SourceNodes.Count > 1 || mappedGroup.TargetNodes.Count > 1)
@@ -104,11 +90,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
                 else
                 {
-                    LinkedWord LinkedWord = (LinkedWord)mappedGroup.TargetNodes[0];
+                    LinkedWord LinkedWord = mappedGroup.TargetNodes[0];
                     score = Math.Exp(LinkedWord.Prob);
                 }
 
-                line.links.Add(new Link() { source = s, target = t, cscore = score }); // initial score
+                line.links.Add(new Link() { source = s, target = t, cscore = score });
             }
 
             align.Lines[k] = line;
@@ -147,7 +133,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return isTrue;
         }
 
-        static void RestoreOriginalPositions(List<MappedGroup> links, List<SourceWord> sourceWords)
+
+        static void RestoreOriginalPositions(
+            List<MappedGroup> links,
+            List<SourceWord> sourceWords)
         {
             Dictionary<string, int> positionTable =
                 sourceWords.
@@ -160,14 +149,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 foreach (SourceNode sourceNode in mappedGroup.SourceNodes)
                 {
-                    //string id = sourceNode.MorphID;
-                    //int position = positionTable[id];
-                    //sourceNode.Position = position;
                     sourceNode.Position =
                         positionTable[sourceNode.MorphID];
                 }
             }
         }
+
 
         static Dictionary<string, int> BuildPrimaryTable(GroupTranslationsTable_Old groups)
         {
