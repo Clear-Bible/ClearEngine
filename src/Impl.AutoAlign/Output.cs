@@ -31,20 +31,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             line.manuscript.words = new ManuscriptWord[sourceWords.Count];
             for (int i = 0; i < sourceWords.Count; i++)
             {
-                SourceWord sourceWord = (SourceWord)sourceWords[i];
-                //ManuscriptWord mWord = new ManuscriptWord();
+                SourceWord sourceWord = sourceWords[i];
                 string id = sourceWord.ID;
-                //mWord.id = long.Parse(id);
-                //mWord.altId = sourceWord.AltID;
-                //mWord.text = sourceWord.Text;
-                //mWord.lemma = sourceWord.Lemma;
-                //mWord.strong = sourceWord.Strong;
-                //mWord.pos = sourceWord.Cat;
-                //mWord.morph = sourceWord.Morph;
-                //Gloss g = glossTable[id];
-                //mWord.gloss = g.Gloss1;
-                //mWord.gloss2 = g.Gloss2;
-                //line.manuscript.words[i] = mWord;
                 line.manuscript.words[i] =
                     sourceWord.CreateManuscriptWord(glossTable[id], wordInfoTable);
             }
@@ -161,25 +149,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         static void RestoreOriginalPositions(List<MappedGroup> links, List<SourceWord> sourceWords)
         {
-            Dictionary<string, int> positionTable = new Dictionary<string, int>();
+            Dictionary<string, int> positionTable =
+                sourceWords.
+                Select((sw, n) => new { sw.ID, n })
+                .ToDictionary(
+                    x => x.ID,
+                    x => x.n);
 
-            for (int i = 0; i < sourceWords.Count; i++)
+            foreach (MappedGroup mappedGroup in links)
             {
-                SourceWord sourceWord = sourceWords[i];
-                string id = sourceWord.ID;
-                positionTable.Add(id, i);
-            }
-
-            for (int i = 0; i < links.Count; i++)
-            {
-                MappedGroup mappedGroup = links[i];
-                List<SourceNode> sourceNodes = mappedGroup.SourceNodes;
-                for (int j = 0; j < sourceNodes.Count; j++)
+                foreach (SourceNode sourceNode in mappedGroup.SourceNodes)
                 {
-                    SourceNode sourceNode = mappedGroup.SourceNodes[j];
-                    string id = sourceNode.MorphID;
-                    int position = (int)positionTable[id];
-                    sourceNode.Position = position;
+                    //string id = sourceNode.MorphID;
+                    //int position = positionTable[id];
+                    //sourceNode.Position = position;
+                    sourceNode.Position =
+                        positionTable[sourceNode.MorphID];
                 }
             }
         }
