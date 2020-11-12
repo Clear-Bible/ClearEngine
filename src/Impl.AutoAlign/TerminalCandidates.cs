@@ -6,6 +6,7 @@ using System.Xml.Linq;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    using System.Text.RegularExpressions;
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.TreeService;
     using ClearBible.Clear3.Miscellaneous;
@@ -65,107 +66,114 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary <string, string> existingLinks,
             Assumptions assumptions)
         {
-            AlternativeCandidates topCandidates = new AlternativeCandidates();
-
-            if (existingLinks.Count > 0 && altID != null && existingLinks.ContainsKey(altID))
+            if (existingLinks.Count > 0 &&
+                altID != null &&
+                existingLinks.ContainsKey(altID))
             {
                 string targetAltID = existingLinks[altID];
 
                 TargetWord target =
-                    targetWords.Where(tw => targetAltID == tw.AltID).FirstOrDefault();
+                    targetWords
+                    .Where(tw => targetAltID == tw.AltID)
+                    .FirstOrDefault();
 
                 if (target != null)
                 {
-                    Candidate c = new Candidate(target, 0.0);
-                    topCandidates.Add(c);
-                    return topCandidates;
+                    return new AlternativeCandidates(
+                        new[] { new Candidate(target, 0.0) });
                 }
             }
 
-            Dictionary<TargetWord, double> probs =
-                new Dictionary<TargetWord, double>();
-
-            if (assumptions.IsSourceFunctionWord(lemma)) return topCandidates;
+            if (assumptions.IsSourceFunctionWord(lemma))
+            {
+                return new AlternativeCandidates();
+            }
 
             if (assumptions.Strongs.ContainsKey(strong))
             {
                 Dictionary<string, int> wordIds = assumptions.Strongs[strong];
-                List<TargetWord> matchingTwords =
-                    targetWords.Where(tw => wordIds.ContainsKey(tw.ID)).ToList();
 
-                foreach (TargetWord target in matchingTwords)
-                {
-                    Candidate c = new Candidate(target, 0.0);
-                    topCandidates.Add(c);
-                }
-                return topCandidates;
+                return new AlternativeCandidates(
+                    targetWords
+                    .Where(tw => wordIds.ContainsKey(tw.ID))
+                    .Select(tw => new Candidate(tw, 0.0)));
+            }
+
+            if (assumptions.IsStopWord(lemma))
+            {
+                return new AlternativeCandidates();
             }
 
             if (assumptions.TryGetManTranslations(lemma,
                 out TryGet<string, double> tryGetManScoreForTargetText))
             {
-                for (int i = 0; i < targetWords.Count; i++)
-                {
-                    TargetWord tWord = targetWords[i];
-                    if (tryGetManScoreForTargetText(
-                        tWord.Text,
-                        out double prob))
+                return new AlternativeCandidates(
+                    targetWords
+                    .Select(tWord =>
                     {
-                        if (prob < 0.2) prob = 0.2;
-                        probs.Add(tWord, Math.Log(prob));
-                    }
-                }
+                        bool ok = tryGetManScoreForTargetText(
+                            tWord.Text,
+                            out double score);
+                        return new { ok, tWord, score };
+                    })
+                    .Where(x => x.ok)
+                    .Select(x => new
+                    {
+                        x.tWord,
+                        score = Math.Log(Math.Max(x.score, 0.2))
+                    })
+                    .GroupBy(x => x.score)
+                    .OrderByDescending(group => group.Key)
+                    .Take(1)
+                    .SelectMany(group =>
+                        group
+                        .Select(x => new Candidate(x.tWord, x.score))));
             }
             else if (assumptions.TryGetTranslations(lemma,
                 out TryGet<string, double> tryGetScoreForTargetText))
             {
-                for (int i = 0; i < targetWords.Count; i++)
-                {
-                    TargetWord tWord = targetWords[i];
-
-                    if (assumptions.IsBadLink(lemma, tWord.Text)) continue;
-
-                    if (assumptions.IsPunctuation(tWord.Text)) continue;
-
-                    if (assumptions.IsStopWord(lemma)) continue;
-                    if (assumptions.IsStopWord(tWord.Text)) continue;
-
-                    if (tryGetScoreForTargetText(tWord.Text, out double prob))
+                return new AlternativeCandidates(
+                    targetWords
+                    .Where(tw => !assumptions.IsBadLink(lemma, tw.Text))
+                    .Where(tw => !assumptions.IsPunctuation(tw.Text))
+                    .Where(tw => !assumptions.IsStopWord(tw.Text))
+                    .Select(tWord =>
                     {
-                        double adjustedProb;
-
-                        if (assumptions.UseAlignModel)
-                        {
-                            if (assumptions.TryGetAlignment(
-                                sourceID, tWord.ID, out double alignProb))
-                            {
-                                adjustedProb =
-                                    prob + ((1.0 - prob) * alignProb);
-                            }
-                            else
-                            {
-                                adjustedProb = prob * 0.6;
-                            }
-                        }
-                        else
-                        {
-                            adjustedProb = prob;
-                        }
-
-                        probs.Add(tWord, Math.Log(adjustedProb));
-                    }
-                }
+                        bool ok = tryGetScoreForTargetText(
+                            tWord.Text,
+                            out double score);
+                        return new { ok, tWord, score };
+                    })
+                    .Where(x => x.ok)
+                    .Select(x => new
+                    {
+                        x.tWord,
+                        score = Math.Log(getAdjustedScore(x.score, x.tWord.ID))
+                    })
+                    .GroupBy(x => x.score)
+                    .OrderByDescending(group => group.Key)
+                    .Take(1)
+                    .SelectMany(group =>
+                        group
+                        .Select(x => new Candidate(x.tWord, x.score))));
             }
 
-            double bestProb = probs.Values.Append(-10.0).Max();
+            return new AlternativeCandidates();
 
-            topCandidates = new AlternativeCandidates(
-                probs
-                .Where(kvp => kvp.Value == bestProb)
-                .Select(kvp => new Candidate(kvp.Key, kvp.Value))
-                .ToList());
 
-            return topCandidates;
+            double getAdjustedScore(double score, string targetID)
+            {
+                if (assumptions.UseAlignModel)
+                {
+                    if (assumptions.TryGetAlignment(
+                        sourceID, targetID, out double alignScore))
+                    {
+                        return score + ((1.0 - score) * alignScore);
+                    }
+                    else return score * 0.6;
+                }
+                else return score;
+            }
         }
 
 
