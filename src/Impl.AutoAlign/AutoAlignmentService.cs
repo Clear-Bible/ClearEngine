@@ -140,6 +140,47 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
 
+            List<string> src1 =
+                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
+                .Select(terminalNode =>
+                {
+                    TreeService.QueryTerminalNode(terminalNode,
+                        out string sourceID,
+                        out string lemma,
+                        out string strong);
+                    return new { sourceID, lemma };
+                })
+                .OrderBy(x => x.sourceID)
+                .Select(x => $"{x.sourceID}-{x.lemma}")
+                .ToList();
+
+            List<string> src2 =
+                entry.SourceSegments
+                .Select(seg =>
+                    $"{seg.ID}-{seg.Lemma}")
+                .ToList();
+
+            if (!Enumerable.SequenceEqual(src1, src2))
+            {
+                ;
+
+                string x =
+                    src1
+                    .Zip(src2, Tuple.Create)
+                    .Where(x => x.Item1 != x.Item2)
+                    .Select(x => $"{x.Item1} != {x.Item2}")
+                    .FirstOrDefault();
+
+            }
+
+            //foreach (XElement terminalNode in
+            //    AutoAlignUtility.GetTerminalXmlNodes(treeNode))
+            //{
+            //    TreeService.QueryTerminalNode(terminalNode,
+            //        out string sourceID,
+            //        out string lemma,
+            //        out string strong);
+
             Dictionary<string, WordInfo> wordInfoTable =
                 AutoAlignUtility.BuildWordInfoTable(treeNode);
                 // sourceID => WordInfo
@@ -208,12 +249,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 tWords, 
                 assumptions);
 
-            bool hasFakes =
-                links.Any(link => link.TargetNode.Word.IsFake);
-            if (hasFakes)
-            {
-                ;
-            }
 
             List<MappedWords> linksWip = links
                 .Where(link => !link.TargetNode.Word.IsFake)
@@ -239,16 +274,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
-            bool hasFakes2 =
-                links2.Any(link2 =>
-                    link2.TargetNodes.Any(targetNode =>
-                        targetNode.Word.IsFake));
-
-            if (hasFakes2)
-            {
-                ;
-            }
-
             GroupTranslationsTable_Old groups_old =
                 new GroupTranslationsTable_Old();
             foreach (var kvp in groups.Inner)
@@ -260,27 +285,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Groups.AlignGroups(links2, sWordsFromTranslationPair, tWords, groups_old, terminals);
 
-            bool hasFakes2b =
-                links2.Any(link2 =>
-                    link2.TargetNodes.Any(targetNode =>
-                        targetNode.Word.IsFake));
-
-            if (hasFakes2b)
-            {
-                ;
-            }
-
             AlignStaging.FixCrossingLinks(ref links2);
-
-            bool hasFakes2c =
-                links2.Any(link2 =>
-                    link2.TargetNodes.Any(targetNode =>
-                        targetNode.Word.IsFake));
-
-            if (hasFakes2c)
-            {
-                ;
-            }
 
             Output.WriteAlignment(links2, sWordsFromTranslationPair, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
             // In spite of its name, Output.WriteAlignment does not touch the
