@@ -86,6 +86,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             _puncs.Contains(tw.Text);
 
 
+        public bool IsStopWord(string text) =>
+            _stopWords.Contains(text);
+
+
         public bool IsTargetStopWord(TargetWord tw) =>
             _stopWords.Contains(tw.Text);
 
@@ -97,6 +101,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public bool IsSourceStopWord(SourceNode sn) =>
             _stopWords.Contains(sn.Lemma);
 
+        public bool IsSourceFunctionWord(string lemma) =>
+            _sourceFuncWords.Contains(lemma);
+
         public bool IsSourceFunctionWord(SourceNode sn) =>
             _sourceFuncWords.Contains(sn.Lemma);
 
@@ -104,6 +111,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public bool IsBadLink(SourceNode sn, TargetWord tw)
         {
             string link = $"{sn.Lemma}#{tw.Text}";
+            return
+                _badLinks.ContainsKey(link) &&
+                _badLinks[link] >= _badLinkMinCount;
+        }
+
+
+        public bool IsBadLink(string lemma, string targetText)
+        {
+            string link = $"{lemma}#{targetText}";
             return
                 _badLinks.ContainsKey(link) &&
                 _badLinks[link] >= _badLinkMinCount;
@@ -135,10 +151,54 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        public bool TryGetAlignment(
+            string sourceID,
+            string targetID,
+            out double score)
+        {
+            var key = Tuple.Create(
+                new SourceID(sourceID),
+                new TargetID(targetID));
+
+            if (_alignProbs.Inner.TryGetValue(key, out Score score2))
+            {
+                score = score2.Double;
+                return true;
+            }
+            else
+            {
+                score = 0;
+                return false;
+            }
+        }
+
+
         public bool TryGetPreAlignment(
             SourceNode sn,
             out string targetID)
             =>
             _preAlignment.TryGetValue(sn.MorphID, out targetID);
+
+
+        public Dictionary<string, Dictionary<string, int>> Strongs =>
+            _strongs;
+
+
+        public bool TryGetTranslations(
+            string lemma,
+            out Dictionary<TargetMorph, Score> translations)
+            =>
+           _translationModel.Inner.TryGetValue(
+               new Lemma(lemma),
+               out translations);
+
+
+        public bool TryGetManTranslations(
+            string lemma,
+            out Dictionary<TargetMorph, Score> manTranslations)
+            =>
+           _manTransModel.Inner.TryGetValue(
+               new Lemma(lemma),
+               out manTranslations);
     }
 }

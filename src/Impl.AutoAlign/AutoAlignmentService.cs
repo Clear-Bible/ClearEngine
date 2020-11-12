@@ -79,16 +79,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 strongs);
 
             CandidateFinder candidateFinder = new CandidateFinder(
-                translationModel,
-                manTransModel,
-                alignProbs,
-                useAlignModel,
-                puncs,
-                stopWords,
-                badLinks,
-                badLinkMinCount,
-                sourceFuncWords,
-                strongs);
+                assumptions);
 
             ChapterID prevChapter = ChapterID.None;
 
