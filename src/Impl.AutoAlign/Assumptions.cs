@@ -8,6 +8,8 @@ using System.Xml.Linq;
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
+    using ClearBible.Clear3.Impl.Data;
+    using ClearBible.Clear3.Miscellaneous;
 
     public class Assumptions
     {
@@ -186,19 +188,56 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public bool TryGetTranslations(
             string lemma,
-            out Dictionary<TargetMorph, Score> translations)
+            out TryGet<string, double> tryGetScoreForTargetText)
             =>
-           _translationModel.Inner.TryGetValue(
-               new Lemma(lemma),
-               out translations);
+            TryGetFromTransModel(
+                _translationModel,
+                lemma,
+                out tryGetScoreForTargetText);
 
 
         public bool TryGetManTranslations(
             string lemma,
-            out Dictionary<TargetMorph, Score> manTranslations)
+            out TryGet<string, double> tryGetScoreForTargetText)
             =>
-           _manTransModel.Inner.TryGetValue(
-               new Lemma(lemma),
-               out manTranslations);
+            TryGetFromTransModel(
+                _manTransModel,
+                lemma,
+                out tryGetScoreForTargetText);
+
+
+        private bool TryGetFromTransModel(
+            TranslationModel translationModel,
+            string lemma,
+            out TryGet<string, double> tryGetScoreForTargetText)
+        {
+            if (translationModel.Inner.TryGetValue(
+                new Lemma(lemma),
+                out Dictionary<TargetMorph, Score> translations))
+            {
+                tryGetScoreForTargetText =
+                    (string targetText, out double score) =>
+                    {
+                        if (translations.TryGetValue(
+                            new TargetMorph(targetText),
+                            out Score score2))
+                        {
+                            score = score2.Double;
+                            return true;
+                        }
+                        else
+                        {
+                            score = 0;
+                            return false;
+                        }
+                    };
+                return true;
+            }
+            else
+            {
+                tryGetScoreForTargetText = null;
+                return false;
+            }
+        }
     }
 }

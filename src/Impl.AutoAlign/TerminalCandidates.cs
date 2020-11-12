@@ -8,6 +8,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.TreeService;
+    using ClearBible.Clear3.Miscellaneous;
 
 
     public class TerminalCandidates2
@@ -101,22 +102,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             if (assumptions.TryGetManTranslations(lemma,
-                out Dictionary<TargetMorph, Score> manTranslations))
+                out TryGet<string, double> tryGetManScoreForTargetText))
             {
                 for (int i = 0; i < targetWords.Count; i++)
                 {
                     TargetWord tWord = targetWords[i];
-                    if (manTranslations.TryGetValue(new TargetMorph(tWord.Text),
-                        out Score manScore))
+                    if (tryGetManScoreForTargetText(
+                        tWord.Text,
+                        out double prob))
                     {
-                        double prob = manScore.Double;
                         if (prob < 0.2) prob = 0.2;
                         probs.Add(tWord, Math.Log(prob));
                     }
                 }
             }
             else if (assumptions.TryGetTranslations(lemma,
-                out Dictionary<TargetMorph, Score> translations))
+                out TryGet<string, double> tryGetScoreForTargetText))
             {
                 for (int i = 0; i < targetWords.Count; i++)
                 {
@@ -129,11 +130,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     if (assumptions.IsStopWord(lemma)) continue;
                     if (assumptions.IsStopWord(tWord.Text)) continue;
 
-                    if (translations.TryGetValue(new TargetMorph(tWord.Text),
-                        out Score score))
+                    if (tryGetScoreForTargetText(tWord.Text, out double prob))
                     {
-                        double prob = score.Double;
-
                         double adjustedProb;
 
                         if (assumptions.UseAlignModel)
