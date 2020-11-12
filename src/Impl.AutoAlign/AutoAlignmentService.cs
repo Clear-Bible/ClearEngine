@@ -78,9 +78,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 contentWordsOnly,
                 strongs);
 
-            CandidateFinder candidateFinder = new CandidateFinder(
-                assumptions);
-
             ChapterID prevChapter = ChapterID.None;
 
             Alignment2 align = new Alignment2();  // The output goes here.
@@ -117,7 +114,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // Align a single verse
                 AlignZone(
                     entryPrime,
-                    candidateFinder,
                     groups, treeService, ref align, i, maxPaths,
                     glossTable, oldLinks, assumptions);
 
@@ -131,7 +127,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static void AlignZone(
             TranslationPair entry,
-            CandidateFinder candidateFinder,
             GroupTranslationsTable groups,
             TreeService treeService, 
             ref Alignment2 align,  // Output goes here.
@@ -186,14 +181,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 existingLinks = new Dictionary<string, string>();
             }
 
-            candidateFinder.ExistingLinks = existingLinks;
-            candidateFinder.TargetWords = tWords;
-
             AlternativesForTerminals terminalCandidates =
                 TerminalCandidates2.GetTerminalCandidates(
                     treeNode,
                     idMap,
-                    candidateFinder);
+                    tWords,
+                    existingLinks,
+                    assumptions);
 
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();

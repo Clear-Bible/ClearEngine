@@ -15,8 +15,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static AlternativesForTerminals GetTerminalCandidates(
             XElement treeNode,
             Dictionary<string, string> idMap,
-            CandidateFinder candidateFinder
-            )
+            List<TargetWord> targetWords,
+            Dictionary<string, string> existingLinks,
+            Assumptions assumptions)
         {
             AlternativesForTerminals candidateTable =
                 new AlternativesForTerminals();
@@ -34,11 +35,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 string altID = idMap[sourceID];
 
                 AlternativeCandidates topCandidates =
-                    candidateFinder.GetTopCandidates(
+                    GetTopCandidates(
                         sourceID,
                         altID,
                         lemma,
-                        strong);
+                        strong,
+                        targetWords,
+                        existingLinks,
+                        assumptions);
 
                 candidateTable.Add(sourceID, topCandidates);
 
@@ -51,39 +55,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        // uses existing link if there is one
-        // no candidates if it is not a content word
-        // uses strongs if it is there
-        // uses man trans model if it is there
-        // uses model if it is there and it is not punctuation or a stop word
-        //   and gets candidates of maximal probability
-        //
         public static AlternativeCandidates GetTopCandidates(
-            SourceWord sWord,
-            List<TargetWord> tWords,
-            TranslationModel model,
-            TranslationModel manModel,
-            AlignmentModel alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
-            bool useAlignModel,
-            int n, // number of target tokens (not actually used)
-            List<string> puncs,
-            List<string> stopWords,
-            Dictionary<string, int> badLinks,
-            int badLinkMinCount,
-            Dictionary<string, string> existingLinks, // (mWord.altId => tWord.altId)
-                                                      // it gets used here
-            List<string> sourceFuncWords,
-            Dictionary<string, Dictionary<string, int>> strongs
-            )
+            string sourceID,
+            string altID,
+            string lemma,
+            string strong,
+            List<TargetWord> targetWords,
+            Dictionary <string, string> existingLinks,
+            Assumptions assumptions)
         {
             AlternativeCandidates topCandidates = new AlternativeCandidates();
 
-            if (existingLinks.Count > 0 && sWord.AltID != null && existingLinks.ContainsKey(sWord.AltID))
+            if (existingLinks.Count > 0 && altID != null && existingLinks.ContainsKey(altID))
             {
-                string targetAltID = (string)existingLinks[sWord.AltID];
+                string targetAltID = existingLinks[altID];
 
                 TargetWord target =
-                    tWords.Where(tw => targetAltID == tw.AltID).FirstOrDefault();
+                    targetWords.Where(tw => targetAltID == tw.AltID).FirstOrDefault();
 
                 if (target != null)
                 {
@@ -96,15 +84,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<TargetWord, double> probs =
                 new Dictionary<TargetWord, double>();
 
-            bool isContentWord = !sourceFuncWords.Contains(sWord.Lemma);
+            if (assumptions.IsSourceFunctionWord(lemma)) return topCandidates;
 
-            if (!isContentWord) return topCandidates;
-
-            if (strongs.ContainsKey(sWord.Strong))
+            if (assumptions.Strongs.ContainsKey(strong))
             {
-                Dictionary<string, int> wordIds = strongs[sWord.Strong];
-                List<TargetWord> matchingTwords = 
-                    tWords.Where(tw => wordIds.ContainsKey(tw.ID)).ToList();
+                Dictionary<string, int> wordIds = assumptions.Strongs[strong];
+                List<TargetWord> matchingTwords =
+                    targetWords.Where(tw => wordIds.ContainsKey(tw.ID)).ToList();
 
                 foreach (TargetWord target in matchingTwords)
                 {
@@ -114,12 +100,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 return topCandidates;
             }
 
-            if (manModel.Inner.TryGetValue(new Lemma(sWord.Lemma),
+            if (assumptions.TryGetManTranslations(lemma,
                 out Dictionary<TargetMorph, Score> manTranslations))
             {
-                for (int i = 0; i < tWords.Count; i++)
+                for (int i = 0; i < targetWords.Count; i++)
                 {
-                    TargetWord tWord = tWords[i];
+                    TargetWord tWord = targetWords[i];
                     if (manTranslations.TryGetValue(new TargetMorph(tWord.Text),
                         out Score manScore))
                     {
@@ -129,39 +115,34 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     }
                 }
             }
-            else if (model.Inner.TryGetValue(new Lemma(sWord.Lemma),
+            else if (assumptions.TryGetTranslations(lemma,
                 out Dictionary<TargetMorph, Score> translations))
             {
-                for (int i = 0; i < tWords.Count; i++)
+                for (int i = 0; i < targetWords.Count; i++)
                 {
-                    TargetWord tWord = tWords[i];
-                    string link = sWord.Lemma + "#" + tWord.Text;
-                    if (badLinks.ContainsKey(link) && (int)badLinks[link] >= badLinkMinCount)
-                    {
-                        continue;
-                    }
-                    if (puncs.Contains(tWord.Text)) continue;
-                    if (stopWords.Contains(sWord.Lemma)) continue;
-                    if (stopWords.Contains(tWord.Text)) continue;
+                    TargetWord tWord = targetWords[i];
+
+                    if (assumptions.IsBadLink(lemma, tWord.Text)) continue;
+
+                    if (assumptions.IsPunctuation(tWord.Text)) continue;
+
+                    if (assumptions.IsStopWord(lemma)) continue;
+                    if (assumptions.IsStopWord(tWord.Text)) continue;
 
                     if (translations.TryGetValue(new TargetMorph(tWord.Text),
                         out Score score))
                     {
                         double prob = score.Double;
 
-                        Tuple<SourceID, TargetID> key = Tuple.Create(
-                            new SourceID(sWord.ID),
-                            new TargetID(tWord.ID));
-
                         double adjustedProb;
 
-                        if (useAlignModel)
+                        if (assumptions.UseAlignModel)
                         {
-                            if (alignProbs.Inner.TryGetValue(key,
-                                out Score score2))
+                            if (assumptions.TryGetAlignment(
+                                sourceID, tWord.ID, out double alignProb))
                             {
-                                double aProb = score2.Double;
-                                adjustedProb = prob + ((1.0 - prob) * aProb);
+                                adjustedProb =
+                                    prob + ((1.0 - prob) * alignProb);
                             }
                             else
                             {
@@ -172,10 +153,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         {
                             adjustedProb = prob;
                         }
-                        if (isContentWord || prob >= 0.5)
-                        {
-                            probs.Add(tWord, Math.Log(adjustedProb));
-                        }
+
+                        probs.Add(tWord, Math.Log(adjustedProb));
                     }
                 }
             }
