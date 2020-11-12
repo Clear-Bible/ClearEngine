@@ -225,22 +225,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         static List<string> GetTargetWordsInGroups(List<string[][]> mappedGroups)
         {
-            //List<string> wordsInGroups = new List<string>();
-
-            //foreach (string[][] mg in mappedGroups)
-            //{
-            //    string[] sourceWords = mg[1];
-            //    for (int i = 0; i < sourceWords.Length; i++)
-            //    {
-            //        wordsInGroups.Add(sourceWords[i]);
-            //    }
-            //}
-
-            //return wordsInGroups;
-
             return
                 mappedGroups
-                .Select(mappedGroup => mappedGroup[0])
+                .Select(mappedGroup => mappedGroup[1])
                 .SelectMany(sourceWord => sourceWord)
                 .ToList();
         }

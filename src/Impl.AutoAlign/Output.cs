@@ -22,7 +22,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, WordInfo> wordInfoTable
             )
         {
-
             // Create line object
             Line line = new Line();
 
@@ -42,7 +41,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             line.translation.words = new TranslationWord[targetWords.Count];
             for (int i = 0; i < targetWords.Count; i++)
             {
-                TargetWord targetWord = (TargetWord)targetWords[i];
+                TargetWord targetWord = targetWords[i];
                 TranslationWord tWord = new TranslationWord();
                 string id = targetWord.ID;
                 tWord.id = long.Parse(id);
@@ -55,8 +54,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, int> primaryPositions = BuildPrimaryTable(groups);
             // modified-target-group-text => primary-position
 
-            links = RemoveEmptyLinks(links);
-            // Removes any link that has a fake word in it.
+            links = GetLinksWithoutFakeWords(links);
 
             RestoreOriginalPositions(links, sourceWords);
             // Changes SourceNode.position to be the position in sourceWords.
@@ -102,35 +100,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        static List<MappedGroup> RemoveEmptyLinks(List<MappedGroup> links)
+        static List<MappedGroup> GetLinksWithoutFakeWords(List<MappedGroup> links)
         {
-            List<MappedGroup> trueLinks = new List<MappedGroup>();
-
-            foreach (MappedGroup mg in links)
-            {
-                if (IsTrueLink(mg))
-                {
-                    trueLinks.Add(mg);
-                }
-            }
-
-            return trueLinks;
-        }
-
-        static bool IsTrueLink(MappedGroup mg)
-        {
-            bool isTrue = true;
-
-            foreach (LinkedWord lw in mg.TargetNodes)
-            {
-                if (lw.Word.IsFake)
-                {
-                    isTrue = false;
-                    break;
-                }
-            }
-
-            return isTrue;
+            return
+                links
+                .Where(mappedGroup =>
+                    !mappedGroup.TargetNodes.Any(
+                        linkedWord => linkedWord.Word.IsFake))
+                .ToList();
         }
 
 

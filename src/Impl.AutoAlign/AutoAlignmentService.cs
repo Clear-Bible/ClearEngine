@@ -208,6 +208,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 tWords, 
                 assumptions);
 
+            bool hasFakes =
+                links.Any(link => link.TargetNode.Word.IsFake);
+            if (hasFakes)
+            {
+                ;
+            }
+
             List<MappedWords> linksWip = links
                 .Where(link => !link.TargetNode.Word.IsFake)
                 .Select(link => new MappedWords()
@@ -232,6 +239,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
+            bool hasFakes2 =
+                links2.Any(link2 =>
+                    link2.TargetNodes.Any(targetNode =>
+                        targetNode.Word.IsFake));
+
+            if (hasFakes2)
+            {
+                ;
+            }
+
             GroupTranslationsTable_Old groups_old =
                 new GroupTranslationsTable_Old();
             foreach (var kvp in groups.Inner)
@@ -243,7 +260,27 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Groups.AlignGroups(links2, sWordsFromTranslationPair, tWords, groups_old, terminals);
 
+            bool hasFakes2b =
+                links2.Any(link2 =>
+                    link2.TargetNodes.Any(targetNode =>
+                        targetNode.Word.IsFake));
+
+            if (hasFakes2b)
+            {
+                ;
+            }
+
             AlignStaging.FixCrossingLinks(ref links2);
+
+            bool hasFakes2c =
+                links2.Any(link2 =>
+                    link2.TargetNodes.Any(targetNode =>
+                        targetNode.Word.IsFake));
+
+            if (hasFakes2c)
+            {
+                ;
+            }
 
             Output.WriteAlignment(links2, sWordsFromTranslationPair, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
             // In spite of its name, Output.WriteAlignment does not touch the
