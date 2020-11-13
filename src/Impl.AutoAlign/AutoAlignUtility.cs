@@ -63,14 +63,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         
 
 
-        public static List<MappedWords> GetLinkedSiblings(
+        public static List<MonoLink> GetLinkedSiblings(
             XElement treeNode,
-            Dictionary<string, MappedWords> linksTable)
+            Dictionary<string, MonoLink> linksTable)
         {
             if (treeNode.Parent != null &&
                 treeNode.Parent.Name.LocalName != "Tree")
             {
-                List<MappedWords> linkedSiblings =
+                List<MonoLink> linkedSiblings =
                     treeNode.Parent.Elements()
                     .Where(child => child != treeNode)
                     .SelectMany(child => GetTerminalXmlNodes(child))
@@ -90,16 +90,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
             else
             {
-                return new List<MappedWords>();
+                return new List<MonoLink>();
             }          
         }
 
 
-        public static MappedWords GetPreNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
+        public static MonoLink GetPreNeighbor(MonoLink unLinked, List<MonoLink> linkedSiblings)
         {
             int limit = unLinked.SourceNode.TreeNode.AttrAsInt("Start");
 
-            int end(MappedWords mw) =>
+            int end(MonoLink mw) =>
                 mw.SourceNode.TreeNode.AttrAsInt("End");
 
             return
@@ -112,11 +112,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static MappedWords GetPostNeighbor(MappedWords unLinked, List<MappedWords> linkedSiblings)
+        public static MonoLink GetPostNeighbor(MonoLink unLinked, List<MonoLink> linkedSiblings)
         {
             int limit = unLinked.SourceNode.TreeNode.AttrAsInt("End");
 
-            int end(MappedWords mw) =>
+            int end(MonoLink mw) =>
                 mw.SourceNode.TreeNode.AttrAsInt("End");
 
             return

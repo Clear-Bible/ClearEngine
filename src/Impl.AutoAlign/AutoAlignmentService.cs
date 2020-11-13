@@ -193,7 +193,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<XElement> terminals = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
 
-            List<MappedWords> links = AlignTheRest(
+            List<MonoLink> links = AlignTheRest(
                 topCandidate,
                 terminals,
                 numberSourceWordsInTranslationPair,
@@ -201,9 +201,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 assumptions);
 
 
-            List<MappedWords> linksWip = links
+            List<MonoLink> linksWip = links
                 .Where(link => !link.TargetNode.Word.IsFake)
-                .Select(link => new MappedWords()
+                .Select(link => new MonoLink()
                 {
                     SourceNode = link.SourceNode,
                     TargetNode = link.TargetNode
@@ -215,7 +215,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
             SegBridgeTable segBridgeTable = new SegBridgeTable();
-            foreach (MappedWords mw in linksWip)
+            foreach (MonoLink mw in linksWip)
             {
                 segBridgeTable.AddEntry(
                     mw.SourceNode.MorphID,
@@ -430,7 +430,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static List<MappedWords> AlignTheRest(
+        public static List<MonoLink> AlignTheRest(
             Candidate topCandidate,
             List<XElement> terminals,
             int numberSourceWords,
@@ -449,7 +449,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
             // TargetWord for zero-length sub-paths in topCandidate.sequence.
 
-            List<MappedWords> links = new List<MappedWords>();
+            List<MonoLink> links = new List<MonoLink>();
             for (int i = 0; i < terminals.Count; i++)
             {
                 XElement terminal = terminals[i];
@@ -472,14 +472,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // (looks like linkedWords and terminals are expected to be
                 // in 1-to-1 correspondence.)
 
-                MappedWords link = new MappedWords();
+                MonoLink link = new MonoLink();
                 link.SourceNode = sourceLink;
                 link.TargetNode = targetLink;
                 links.Add(link);
             }
 
 
-            List<List<MappedWords>> conflicts = AlignStaging.FindConflictingLinks(links);
+            List<List<MonoLink>> conflicts = AlignStaging.FindConflictingLinks(links);
 
             if (conflicts.Count > 0)
             {
@@ -496,12 +496,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select(mw => mw.TargetNode.Word.ID)
                 .ToList();
 
-            Dictionary<string, MappedWords> linksTable = 
+            Dictionary<string, MonoLink> linksTable = 
                 links
                 .Where(mw => !mw.TargetNode.Word.IsFake)
                 .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
 
-            foreach (MappedWords link in
+            foreach (MonoLink link in
                 links.Where(link => link.TargetNode.Word.IsFake))
             {
                 AlignWord(
@@ -529,9 +529,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static void AlignWord(
-            MappedWords link,
+            MonoLink link,
             List<TargetWord> targetWords,
-            Dictionary<string, MappedWords> linksTable,
+            Dictionary<string, MonoLink> linksTable,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
@@ -573,17 +573,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            List<MappedWords> linkedSiblings =
+            List<MonoLink> linkedSiblings =
                 AutoAlignUtility.GetLinkedSiblings(
                     link.SourceNode.TreeNode,
                     linksTable);
 
             if (linkedSiblings.Count > 0)
             {
-                MappedWords preNeighbor =
+                MonoLink preNeighbor =
                     AutoAlignUtility.GetPreNeighbor(link, linkedSiblings);
 
-                MappedWords postNeighbor =
+                MonoLink postNeighbor =
                     AutoAlignUtility.GetPostNeighbor(link, linkedSiblings);
 
                 List<TargetWord> targetCandidates = new List<TargetWord>();
@@ -783,9 +783,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static void FixCrossingLinksWip(
-            List<MappedWords> links)
+            List<MonoLink> links)
         {
-            foreach (MappedWords[] cross in links
+            foreach (MonoLink[] cross in links
                 .GroupBy(link => link.SourceNode.Lemma)
                 .Where(group => group.Count() == 2 && CrossingWip(group))
                 .Select(group => group.ToArray()))
@@ -802,7 +802,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static bool CrossingWip(IEnumerable<MappedWords> mappedWords)
+        public static bool CrossingWip(IEnumerable<MonoLink> mappedWords)
         {
             int[] sourcePos =
                 mappedWords.Select(mw => mw.SourceNode.Position).ToArray();
