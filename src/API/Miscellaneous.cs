@@ -65,8 +65,7 @@ namespace ClearBible.Clear3.API
             _tag = $"{book:D2}{chapter:D3}{verse:D3}{word:D3}{subsegment:D1}";
         }
 
-        // FIXME
-        public string Legacy => _tag;
+        public string AsCanonicalString => _tag;
     }
 
 
@@ -90,8 +89,7 @@ namespace ClearBible.Clear3.API
             _tag = $"{book:D2}{chapter:D3}{verse:D3}{word:D3}";
         }
 
-        // FIXME
-        public string Legacy => _tag;
+        public string AsCanonicalString => _tag;
     }
 
 
