@@ -69,8 +69,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .GroupBy(pair => pair.Item1)
                 .Where(group => group.Any())
                 .ToDictionary(
-                    group => group.Key.Legacy,
-                    group => group.First().Item2.Legacy);
+                    group => group.Key.AsCanonicalString,
+                    group => group.First().Item2.AsCanonicalString);
         }
 
 

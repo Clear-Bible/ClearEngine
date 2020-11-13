@@ -98,9 +98,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 TranslationPair entryPrime = new TranslationPair(
                     entry.Item1.Select(src =>
-                        new SourceSegment(src.Item2.Text, src.Item1.Legacy)),
+                        new SourceSegment(src.Item2.Text, src.Item1.AsCanonicalString)),
                     entry.Item2.Select(targ =>
-                        new TargetSegment(targ.Item2.Text, targ.Item1.Legacy)));
+                        new TargetSegment(targ.Item2.Text, targ.Item1.AsCanonicalString)));
 
                 // Align a single verse
                 AlignZone(
