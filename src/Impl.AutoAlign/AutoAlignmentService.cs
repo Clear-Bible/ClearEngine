@@ -196,7 +196,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<MonoLink> links = AlignTheRest(
                 topCandidate,
                 terminals,
-                numberSourceWordsInTranslationPair,
                 tWords, 
                 assumptions);
 
@@ -433,12 +432,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static List<MonoLink> AlignTheRest(
             Candidate topCandidate,
             List<XElement> terminals,
-            int numberSourceWords,
             List<TargetWord> targetWords,
             Assumptions assumptions
             )
         {
             //Console.WriteLine("\nAlignTheRest\n\n");
+
+
 
             List<LinkedWord> linkedWords = new List<LinkedWord>();
             AutoAlignUtility.GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
@@ -448,6 +448,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // linkedWords has a LinkedWord for each target word found in
             // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
             // TargetWord for zero-length sub-paths in topCandidate.sequence.
+
+            double numberTerminals = terminals.Count;
 
             List<MonoLink> links = new List<MonoLink>();
             for (int i = 0; i < terminals.Count; i++)
@@ -463,7 +465,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 sourceNode.Category = terminal.Category();
                 sourceNode.Position = terminal.Start();
                 sourceNode.RelativePos = sourceNode.Position
-                    / numberSourceWords;
+                    / numberTerminals;
                 sourceNode.TreeNode = terminal;
 
                 LinkedWord targetLink = linkedWords[i];
