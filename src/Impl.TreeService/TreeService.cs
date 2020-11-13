@@ -308,8 +308,15 @@ namespace ClearBible.Clear3.Impl.TreeService
             term.Attribute("Language").Value +
             term.Attribute("StrongNumberX").Value;
 
-        //public string English { get; }
-        //public string Category { get; }
+        public static string English(this XElement term) =>
+            term.Attribute("English").Value;
+
+        public static string Category(this XElement term) =>
+            term.Attribute("Cat").Value;
+
+        public static int Start(this XElement term) =>
+            int.Parse(term.Attribute("Start").Value);
+
         //public string PartOfSpeech { get; }
         //public string Morphology { get; }
     }

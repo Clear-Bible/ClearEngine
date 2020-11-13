@@ -454,26 +454,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 XElement terminal = terminals[i];
 
-                SourceNode sourceLink = new SourceNode();
+                SourceNode sourceNode = new SourceNode();
 
-                sourceLink.MorphID = terminal.Attribute("morphId").Value;
-                sourceLink.English = terminal.Attribute("English").Value;
-                sourceLink.Lemma = terminal.Attribute("UnicodeLemma").Value;
-                sourceLink.Category = terminal.Attribute("Cat").Value;
-                sourceLink.Position = Int32.Parse(terminal.Attribute("Start").Value);
-
-                sourceLink.RelativePos = (double)sourceLink.Position / (double)numberSourceWords;
-
-                if (sourceLink.MorphID.Length == 11) sourceLink.MorphID += "1";
-
-                sourceLink.TreeNode = terminal;
+                // sourceNode.MorphID = terminal.Attribute("morphId").Value;
+                sourceNode.MorphID = terminal.SourceId();
+                sourceNode.English = terminal.English();
+                sourceNode.Lemma = terminal.Lemma();
+                sourceNode.Category = terminal.Category();
+                sourceNode.Position = terminal.Start();
+                sourceNode.RelativePos = sourceNode.Position
+                    / numberSourceWords;
+                sourceNode.TreeNode = terminal;
 
                 LinkedWord targetLink = linkedWords[i];
                 // (looks like linkedWords and terminals are expected to be
                 // in 1-to-1 correspondence.)
 
                 MonoLink link = new MonoLink();
-                link.SourceNode = sourceLink;
+                link.SourceNode = sourceNode;
                 link.TargetNode = targetLink;
                 links.Add(link);
             }
