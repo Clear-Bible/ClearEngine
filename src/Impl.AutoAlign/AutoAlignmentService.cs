@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    using System.ComponentModel.Design;
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Impl.TreeService;
@@ -144,15 +145,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
  
 
-            Dictionary<string, WordInfo> wordInfoTable =
-                AutoAlignUtility.BuildWordInfoTable(treeNode);
-                // sourceID => WordInfo
-
-            List<SourceWord> sourceWordList = MakeSourceWordList(
-                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
-                .Select(node => node.SourceID().AsCanonicalString)
-                .OrderBy(sourceID => sourceID),
-                wordInfoTable);
+ 
 
             List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
 
@@ -188,7 +181,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     existingLinks,
                     assumptions);
 
-            // the key is the node ID I believe
             Dictionary<string, List<Candidate>> alignments =
                 new Dictionary<string, List<Candidate>>();
             AlignNodes(
@@ -219,6 +211,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             FixCrossingLinksWip(linksWip);
 
+
+
+
             SegBridgeTable segBridgeTable = new SegBridgeTable();
             foreach (MappedWords mw in linksWip)
             {
@@ -239,6 +234,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         kvp.Key.Text,
                         x.Item1.Text,
                         x.Item2.Int);
+
+
+            Dictionary<string, WordInfo> wordInfoTable =
+                AutoAlignUtility.BuildWordInfoTable(treeNode);
+            // sourceID => WordInfo
+
+            List<SourceWord> sourceWordList = MakeSourceWordList(
+                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
+                .Select(node => node.SourceID().AsCanonicalString)
+                .OrderBy(sourceID => sourceID),
+                wordInfoTable);
 
             Groups.AlignGroups(links2, sourceWordList, tWords, groups_old, terminals);
 
@@ -739,21 +745,39 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             double totalWords = targetSegments.Count();
 
-            return targetSegments
-                .WithVersionNumber((TargetSegment s) => s.Text)
-                .Select((Tuple<TargetSegment, int> x, int n) =>
+            var wip =
+                targetSegments
+                .Select((s, n) => new
                 {
-                    TargetSegment seg = x.Item1;
-                    return new TargetWord()
+                    s.ID,
+                    Text = s.Text.ToLower(),
+                    Text2 = s.Text,
+                    Position = n,
+                    RelativePos = n / totalWords
+                });
+
+            var altId =
+                wip
+                .GroupBy(x => x.Text2)
+                .SelectMany(
+                    group => group.Select((x, groupIndex) =>
+                        new { x.ID, AltID = $"{x.Text2}-{groupIndex + 1}" }));
+
+            return
+                wip
+                .Join(
+                    altId,
+                    x => x.ID,
+                    y => y.ID,
+                    (x, y) => new TargetWord()
                     {
-                        ID = seg.ID,
-                        Text = seg.Text.ToLower(),
-                        Text2 = seg.Text,
-                        AltID = $"{seg.Text}-{x.Item2}",
-                        Position = n,
-                        RelativePos = n / totalWords
-                    };
-                })
+                        ID = x.ID,
+                        Text = x.Text,
+                        Text2 = x.Text2,
+                        AltID = y.AltID,
+                        Position = x.Position,
+                        RelativePos = x.RelativePos
+                    })
                 .ToList();
         }
 
