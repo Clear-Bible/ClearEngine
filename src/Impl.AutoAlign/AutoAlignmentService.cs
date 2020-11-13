@@ -78,7 +78,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 contentWordsOnly,
                 strongs);
 
-            ChapterID prevChapter = ChapterID.None;
 
             Alignment2 align = new Alignment2();  // The output goes here.
 
@@ -140,46 +139,30 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
 
-            List<string> src1 =
-                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
-                .Select(terminalNode =>
-                {
-                    TreeService.QueryTerminalNode(terminalNode,
-                        out string sourceID,
-                        out string lemma,
-                        out string strong);
-                    return new { sourceID, lemma };
-                })
-                .OrderBy(x => x.sourceID)
-                .Select(x => $"{x.sourceID}-{x.lemma}")
-                .ToList();
+            Dictionary<string, string> sourceAltIdMap =
+                GetSourceAltIdMap(treeNode);
 
-            List<string> src2 =
-                entry.SourceSegments
-                .Select(seg =>
-                    $"{seg.ID}-{seg.Lemma}")
-                .ToList();
+            //List<string> src1 =
+            //    AutoAlignUtility.GetTerminalXmlNodes(treeNode)
+            //    .Select(terminalNode =>
+            //    {
+            //        TreeService.QueryTerminalNode(terminalNode,
+            //            out string sourceID,
+            //            out string lemma,
+            //            out string strong);
+            //        return new { sourceID, lemma };
+            //    })
+            //    .OrderBy(x => x.sourceID)
+            //    .Select(x => $"{x.sourceID}-{x.lemma}")
+            //    .ToList();
 
-            if (!Enumerable.SequenceEqual(src1, src2))
-            {
-                ;
+            //List<string> src2 =
+            //    entry.SourceSegments
+            //    .Select(seg =>
+            //        $"{seg.ID}-{seg.Lemma}")
+            //    .ToList();
 
-                string x =
-                    src1
-                    .Zip(src2, Tuple.Create)
-                    .Where(x => x.Item1 != x.Item2)
-                    .Select(x => $"{x.Item1} != {x.Item2}")
-                    .FirstOrDefault();
-
-            }
-
-            //foreach (XElement terminalNode in
-            //    AutoAlignUtility.GetTerminalXmlNodes(treeNode))
-            //{
-            //    TreeService.QueryTerminalNode(terminalNode,
-            //        out string sourceID,
-            //        out string lemma,
-            //        out string strong);
+ 
 
             Dictionary<string, WordInfo> wordInfoTable =
                 AutoAlignUtility.BuildWordInfoTable(treeNode);
@@ -188,12 +171,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<SourceWord> sWordsFromTranslationPair = MakeSourceWordList(
                 entry.SourceSegments.Select(seg => seg.ID),
                 wordInfoTable);
-
-            Dictionary<string, string> idMap =
-                sWordsFromTranslationPair
-                .ToDictionary(
-                    sWord => sWord.ID,
-                    sWord => sWord.AltID);
 
             List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
 
@@ -224,7 +201,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlternativesForTerminals terminalCandidates =
                 TerminalCandidates2.GetTerminalCandidates(
                     treeNode,
-                    idMap,
+                    sourceAltIdMap,
                     tWords,
                     existingLinks,
                     assumptions);
@@ -292,6 +269,40 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // filesystem; it puts its result in align[i].
 
             Line line2 = MakeLineWip(segBridgeTable, sWordsFromTranslationPair, tWords, glossTable, wordInfoTable);
+        }
+
+
+        /// <summary>
+        /// Returns a mapping from sourceID to alternate ID for
+        /// each source word under the treeNode.  The alternate ID
+        /// is a string of the form xxx-n, where xxx is the surface
+        /// form and and it is the n-th occurrence of that surface
+        /// form.  (n is 1-based)
+        /// </summary>
+        /// 
+        public static Dictionary<string, string> GetSourceAltIdMap(
+            XElement treeNode)
+        {
+            return
+                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
+                .Select(node =>
+                {
+                    TreeService.Query2TerminalNode(node,
+                        out string sourceID,
+                        out string surface);
+                    return new { sourceID, surface };
+                })
+                .OrderBy(x => x.sourceID)
+                .GroupBy(x => x.surface)
+                .SelectMany(group =>
+                    group.Select((x, groupIndex) => new
+                    {
+                        x.sourceID,
+                        altID = $"{x.surface}-{groupIndex + 1}"
+                    }))
+                .ToDictionary(
+                    x => x.sourceID,
+                    x => x.altID);
         }
 
 

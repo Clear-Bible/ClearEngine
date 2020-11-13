@@ -275,5 +275,20 @@ namespace ClearBible.Clear3.Impl.TreeService
             strong = terminalNode.Attribute("Language").Value +
                 terminalNode.Attribute("StrongNumberX").Value;
         }
+
+
+        public static void Query2TerminalNode(
+            XElement terminalNode,
+            out string sourceID,
+            out string surfaceForm)
+        {
+            sourceID = terminalNode.Attribute("morphId").Value;
+            if (sourceID.Length == 11)
+            {
+                sourceID += "1";
+            }
+
+            surfaceForm = terminalNode.Attribute("Unicode").Value;
+        }
     }
 }
