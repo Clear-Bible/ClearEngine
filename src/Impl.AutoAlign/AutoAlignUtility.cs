@@ -60,6 +60,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        
+
+
         public static List<MappedWords> GetLinkedSiblings(
             XElement treeNode,
             Dictionary<string, MappedWords> linksTable)
