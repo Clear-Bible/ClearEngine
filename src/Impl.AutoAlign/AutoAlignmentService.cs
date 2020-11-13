@@ -142,26 +142,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, string> sourceAltIdMap =
                 GetSourceAltIdMap(treeNode);
 
-            //List<string> src1 =
-            //    AutoAlignUtility.GetTerminalXmlNodes(treeNode)
-            //    .Select(terminalNode =>
-            //    {
-            //        TreeService.QueryTerminalNode(terminalNode,
-            //            out string sourceID,
-            //            out string lemma,
-            //            out string strong);
-            //        return new { sourceID, lemma };
-            //    })
-            //    .OrderBy(x => x.sourceID)
-            //    .Select(x => $"{x.sourceID}-{x.lemma}")
-            //    .ToList();
-
-            //List<string> src2 =
-            //    entry.SourceSegments
-            //    .Select(seg =>
-            //        $"{seg.ID}-{seg.Lemma}")
-            //    .ToList();
-
  
 
             Dictionary<string, WordInfo> wordInfoTable =
@@ -170,7 +150,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<SourceWord> sourceWordList = MakeSourceWordList(
                 AutoAlignUtility.GetTerminalXmlNodes(treeNode)
-                .Select(TreeService.QuerySourceIDTerminalNode)
+                .Select(node => node.SourceID().AsCanonicalString)
                 .OrderBy(sourceID => sourceID),
                 wordInfoTable);
 
@@ -285,12 +265,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             return
                 AutoAlignUtility.GetTerminalXmlNodes(treeNode)
-                .Select(node =>
+                .Select(node => new
                 {
-                    TreeService.Query2TerminalNode(node,
-                        out string sourceID,
-                        out string surface);
-                    return new { sourceID, surface };
+                    sourceID = node.SourceID().AsCanonicalString,
+                    surface = node.Surface()
                 })
                 .OrderBy(x => x.sourceID)
                 .GroupBy(x => x.surface)

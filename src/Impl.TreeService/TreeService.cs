@@ -13,6 +13,7 @@ using Utilities;
 
 namespace ClearBible.Clear3.Impl.TreeService
 {
+    using System.Runtime.CompilerServices;
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Miscellaneous;
 
@@ -258,72 +259,70 @@ namespace ClearBible.Clear3.Impl.TreeService
                     new XAttribute("Length", totalLength.ToString()),
                     subTrees);
         }
-
-
-        public static void QueryTerminalNode(
-            XElement terminalNode,
-            out string sourceID,
-            out string lemma,
-            out string strong)
-        {
-            sourceID = terminalNode.Attribute("morphId").Value;
-            if (sourceID.Length == 11)
-            {
-                sourceID += "1";
-            }
-
-            lemma = terminalNode.Attribute("UnicodeLemma").Value;
-            strong = terminalNode.Attribute("Language").Value +
-                terminalNode.Attribute("StrongNumberX").Value;
-        }
-
-
-        public static void Query2TerminalNode(
-            XElement terminalNode,
-            out string sourceID,
-            out string surfaceForm)
-        {
-            sourceID = terminalNode.Attribute("morphId").Value;
-            if (sourceID.Length == 11)
-            {
-                sourceID += "1";
-            }
-
-            surfaceForm = terminalNode.Attribute("Unicode").Value;
-        }
-
-
-        public static string QuerySourceIDTerminalNode(
-            XElement terminalNode)
-        {
-            string sourceID = terminalNode.Attribute("morphId").Value;
-            if (sourceID.Length == 11)
-            {
-                sourceID += "1";
-            }
-            return sourceID;
-        }
-    }
-
-
-    public class TreeNode
-    {
-        private XElement _xElement;
-
-        public TreeNodeID ID { get; }
-    }
-
-
-    public class TreePoint : TreeNode
-    {
-        public SourceID SourceID { get; }
     }
 
 
     /// <summary>
-    /// Identifies a node in the tree by describing the contiguous
-    /// set of points that the node covers and its level within
-    /// the stack of such nodes.
+    /// Extension methods to be applied to an XElement that is
+    /// a node in the syntax tree.
+    /// </summary>
+    /// 
+    public static class TreeNodeExtensions
+    {
+        public static TreeNodeID TreeNodeID(this XElement node)
+        {
+            return new TreeNodeID(node.Attribute("nodeId").Value);
+        }
+
+        public static TreeNodeStackID TreeNodeStackID(this XElement node)
+        {
+            return node.TreeNodeID().TreeNodeStackID;
+        }
+    }
+
+
+    /// <summary>
+    /// Extension methods to be applied to an XElement that is
+    /// a terminal node in the syntax tree.
+    /// </summary>
+    /// 
+    public static class TerminalNodeExtensions
+    {
+        public static SourceID SourceID(this XElement term)
+        {
+            string sourceIDTag = term.Attribute("morphId").Value;
+            if (sourceIDTag.Length == 11)
+            {
+                sourceIDTag += "1";
+            }
+            return new SourceID(sourceIDTag);
+        }
+
+        public static string Lemma(this XElement term) =>
+            term.Attribute("UnicodeLemma").Value;
+
+        public static string Surface(this XElement term) =>
+            term.Attribute("Unicode").Value;
+
+        public static string Strong(this XElement term) =>
+            term.Attribute("Language").Value +
+            term.Attribute("StrongNumberX").Value;
+
+        //public string English { get; }
+        //public string Category { get; }
+        //public string PartOfSpeech { get; }
+        //public string Morphology { get; }
+    }
+
+
+
+
+
+
+    /// <summary>
+    /// Identifies a node in the tree by describing the position of
+    /// its first terminal, the number of terminals, and the level of
+    /// the node within the stack of such nodes.
     /// </summary>
     /// 
     public struct TreeNodeID
@@ -365,21 +364,21 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
         /// <summary>
-        /// The verse containing the first point in the node.
+        /// The verse containing the first terminal under the node.
         /// </summary>
         /// 
         public VerseID VerseID =>
             new VerseID(_tag.Substring(0, 8));
 
         /// <summary>
-        /// The 1-based position of the first point within
-        /// the verse.
+        /// The 1-based position of the first terminal under the node
+        /// within the verse.
         /// </summary>
         /// 
         public int Position => int.Parse(_tag.Substring(8, 3));
 
         /// <summary>
-        /// The number of points in the node.
+        /// The number of terminals under the node.
         /// </summary>
         /// 
         public int Span => int.Parse(_tag.Substring(11, 3));
@@ -443,21 +442,21 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
         /// <summary>
-        /// The verse containing the first point in the node.
+        /// The verse containing the first terminal under the node.
         /// </summary>
         /// 
         public VerseID VerseID =>
             new VerseID(_tag.Substring(0, 8));
 
         /// <summary>
-        /// The 1-based position of the first point within
+        /// The 1-based position of the first terminal within
         /// the verse.
         /// </summary>
         /// 
         public int Position => int.Parse(_tag.Substring(8, 3));
 
         /// <summary>
-        /// The number of points in the node.
+        /// The number of terminals under the node.
         /// </summary>
         /// 
         public int Span => int.Parse(_tag.Substring(11, 3));
