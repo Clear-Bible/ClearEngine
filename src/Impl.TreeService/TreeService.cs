@@ -290,5 +290,17 @@ namespace ClearBible.Clear3.Impl.TreeService
 
             surfaceForm = terminalNode.Attribute("Unicode").Value;
         }
+
+
+        public static string QuerySourceIDTerminalNode(
+            XElement terminalNode)
+        {
+            string sourceID = terminalNode.Attribute("morphId").Value;
+            if (sourceID.Length == 11)
+            {
+                sourceID += "1";
+            }
+            return sourceID;
+        }
     }
 }

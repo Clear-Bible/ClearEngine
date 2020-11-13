@@ -168,8 +168,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 AutoAlignUtility.BuildWordInfoTable(treeNode);
                 // sourceID => WordInfo
 
-            List<SourceWord> sWordsFromTranslationPair = MakeSourceWordList(
-                entry.SourceSegments.Select(seg => seg.ID),
+            List<SourceWord> sourceWordList = MakeSourceWordList(
+                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
+                .Select(TreeService.QuerySourceIDTerminalNode)
+                .OrderBy(sourceID => sourceID),
                 wordInfoTable);
 
             List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
@@ -247,8 +249,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
 
-
-
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
             GroupTranslationsTable_Old groups_old =
@@ -260,15 +260,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         x.Item1.Text,
                         x.Item2.Int);
 
-            Groups.AlignGroups(links2, sWordsFromTranslationPair, tWords, groups_old, terminals);
+            Groups.AlignGroups(links2, sourceWordList, tWords, groups_old, terminals);
 
             AlignStaging.FixCrossingLinks(ref links2);
 
-            Output.WriteAlignment(links2, sWordsFromTranslationPair, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
+            Output.WriteAlignment(links2, sourceWordList, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
             // In spite of its name, Output.WriteAlignment does not touch the
             // filesystem; it puts its result in align[i].
 
-            Line line2 = MakeLineWip(segBridgeTable, sWordsFromTranslationPair, tWords, glossTable, wordInfoTable);
+            Line line2 = MakeLineWip(segBridgeTable, sourceWordList, tWords, glossTable, wordInfoTable);
         }
 
 
