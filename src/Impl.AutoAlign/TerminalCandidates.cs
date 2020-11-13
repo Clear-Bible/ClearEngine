@@ -27,13 +27,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             foreach (XElement terminalNode in
                 AutoAlignUtility.GetTerminalXmlNodes(treeNode))
             {
-                TreeService.QueryTerminalNode(terminalNode,
-                    out string sourceID,
-                    out string lemma,
-                    out string strong);
-
-                if (lemma == null) continue;
-
+                string sourceID = terminalNode.SourceID().AsCanonicalString;
+                string lemma = terminalNode.Lemma();                              
+                string strong = terminalNode.Strong();               
                 string altID = idMap[sourceID];
 
                 AlternativeCandidates topCandidates =
