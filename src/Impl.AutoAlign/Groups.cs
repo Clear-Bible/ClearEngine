@@ -347,11 +347,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static List<MappedGroup> WordsToGroups(List<MappedWords> wordLinks)
+        public static List<MappedGroup> WordsToGroups(List<MonoLink> wordLinks)
         {
             List<MappedGroup> groupLinks = new List<MappedGroup>();
 
-            foreach (MappedWords wordLink in wordLinks)
+            foreach (MonoLink wordLink in wordLinks)
             {
                 MappedGroup groupLink = new MappedGroup();
                 groupLink.SourceNodes.Add(wordLink.SourceNode);

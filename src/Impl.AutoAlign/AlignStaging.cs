@@ -74,8 +74,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
            
 
-        public static List<List<MappedWords>> FindConflictingLinks(
-            List<MappedWords> links)
+        public static List<List<MonoLink>> FindConflictingLinks(
+            List<MonoLink> links)
         {
             return links
                 .Where(targetWordNotEmpty)
@@ -84,10 +84,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select(group => group.ToList())
                 .ToList();
 
-            bool targetWordNotEmpty(MappedWords link) =>
+            bool targetWordNotEmpty(MonoLink link) =>
                 link.TargetNode.Word.Text != string.Empty;
 
-            Tuple<string, string> targetTextAndId(MappedWords link) =>
+            Tuple<string, string> targetTextAndId(MonoLink link) =>
                 Tuple.Create(
                     link.TargetNode.Word.Text,
                     link.TargetNode.Word.ID);
@@ -95,11 +95,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static void ResolveConflicts(
-            List<List<MappedWords>> conflicts,
-            List<MappedWords> links,
+            List<List<MonoLink>> conflicts,
+            List<MonoLink> links,
             int pass)
         {
-            List<MappedWords> linksToRemove =
+            List<MonoLink> linksToRemove =
                 conflicts.
                 SelectMany(conflict =>
                     conflict.Except(
@@ -121,8 +121,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             void strikeOut(int i) =>
                 links[i] = makeFakeLink(links[i].SourceNode);
 
-            MappedWords makeFakeLink(SourceNode sourceNode) =>
-                new MappedWords
+            MonoLink makeFakeLink(SourceNode sourceNode) =>
+                new MonoLink
                 {
                     SourceNode = sourceNode,
                     TargetNode = new LinkedWord()
@@ -134,15 +134,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<MappedWords> FindWinners(
-            List<MappedWords> conflict,
+        public static List<MonoLink> FindWinners(
+            List<MonoLink> conflict,
             int pass)
         {
             // The winners are the links of maximal probability.
             // (we know that conflict is not the empty list)
             //
             double bestProb = conflict.Max(mw => prob(mw));
-            List<MappedWords> winners = conflict
+            List<MonoLink> winners = conflict
                 .Where(mw => mw.TargetNode.Prob == bestProb)
                 .ToList();
 
@@ -154,21 +154,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 double minDelta = conflict.Min(mw => relativeDelta(mw));
 
-                MappedWords winner2 = winners
+                MonoLink winner2 = winners
                     .Where(mw => relativeDelta(mw) == minDelta)
                     .FirstOrDefault();
 
                 if (winner2 != null)
                 {
-                    winners = new List<MappedWords>() { winner2 };
+                    winners = new List<MonoLink>() { winner2 };
                 }
             }
 
             return winners;
 
-            double prob(MappedWords mw) => mw.TargetNode.Prob;
+            double prob(MonoLink mw) => mw.TargetNode.Prob;
 
-            double relativeDelta(MappedWords mw) =>
+            double relativeDelta(MonoLink mw) =>
                 Math.Abs(mw.SourceNode.RelativePos -
                          mw.TargetNode.Word.RelativePos);         
         }
@@ -196,7 +196,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static List<TargetWord> GetTargetCandidates(
-            MappedWords anchorLink,
+            MonoLink anchorLink,
             List<TargetWord> targetWords,
             List<string> linkedTargets,
             Assumptions assumptions)
@@ -230,8 +230,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static List<TargetWord> GetTargetCandidates(
-            MappedWords leftAnchor,
-            MappedWords rightAnchor,
+            MonoLink leftAnchor,
+            MonoLink rightAnchor,
             List<TargetWord> targetWords,
             List<string> linkedTargets,
             Assumptions assumptions)

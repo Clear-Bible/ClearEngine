@@ -152,7 +152,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public double Prob;
     }
 
-    public class MappedWords
+    public class MonoLink
     {
         public SourceNode SourceNode;
         public LinkedWord TargetNode;
