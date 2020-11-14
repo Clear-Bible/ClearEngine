@@ -201,11 +201,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
             List<MonoLink> linksWip = links
-                .Where(link => !link.TargetNode.Word.IsFake)
+                .Where(link => !link.LinkedWord.Word.IsFake)
                 .Select(link => new MonoLink()
                 {
                     SourceNode = link.SourceNode,
-                    TargetNode = link.TargetNode
+                    LinkedWord = link.LinkedWord
                 }).ToList();
 
             FixCrossingLinksWip(linksWip);
@@ -218,8 +218,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 segBridgeTable.AddEntry(
                     mw.SourceNode.MorphID,
-                    mw.TargetNode.Word.ID,
-                    Math.Exp(mw.TargetNode.Prob));
+                    mw.LinkedWord.Word.ID,
+                    Math.Exp(mw.LinkedWord.Prob));
             }
 
 
@@ -458,32 +458,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 })
                 .ToList();
 
-
-
-            //List<MonoLink> links = new List<MonoLink>();
-            //for (int i = 0; i < terminals.Count; i++)
-            //{
-
-
-            //    LinkedWord targetLink = linkedWords[i];
-
-            //    MonoLink link = new MonoLink();
-            //    link.SourceNode = sourceNodes[i];
-            //    link.TargetNode = targetLink;
-            //    links.Add(link);
-            //}
-
             List<MonoLink> links =
                 sourceNodes
                 .Zip(linkedWords, (sourceNode, linkedWord) =>
                     new MonoLink
                     {
                         SourceNode = sourceNode,
-                        TargetNode = linkedWord
+                        LinkedWord = linkedWord
                     })
                 .ToList();
-
- 
 
 
             List<List<MonoLink>> conflicts = AlignStaging.FindConflictingLinks(links);
@@ -499,17 +482,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<string> linkedTargets = 
                 links
-                .Where(mw => !mw.TargetNode.Word.IsFake)
-                .Select(mw => mw.TargetNode.Word.ID)
+                .Where(mw => !mw.LinkedWord.Word.IsFake)
+                .Select(mw => mw.LinkedWord.Word.ID)
                 .ToList();
 
             Dictionary<string, MonoLink> linksTable = 
                 links
-                .Where(mw => !mw.TargetNode.Word.IsFake)
+                .Where(mw => !mw.LinkedWord.Word.IsFake)
                 .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
 
             foreach (MonoLink link in
-                links.Where(link => link.TargetNode.Word.IsFake))
+                links.Where(link => link.LinkedWord.Word.IsFake))
             {
                 AlignWord(
                     link,
@@ -570,12 +553,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     !assumptions.IsPunctuation(newTargetWord) &&
                     !assumptions.IsTargetStopWord(newTargetWord))
                 {
-                    link.TargetNode.Text = newTargetWord.Text;
-                    link.TargetNode.Prob = 0;
-                    link.TargetNode.Word.ID = targetID;
-                    link.TargetNode.Word.IsFake = false;
-                    link.TargetNode.Word.Text = newTargetWord.Text;
-                    link.TargetNode.Word.Position = newTargetWord.Position;
+                    link.LinkedWord.Text = newTargetWord.Text;
+                    link.LinkedWord.Prob = 0;
+                    link.LinkedWord.Word.ID = targetID;
+                    link.LinkedWord.Word.IsFake = false;
+                    link.LinkedWord.Word.Text = newTargetWord.Text;
+                    link.LinkedWord.Word.Position = newTargetWord.Position;
                     return;
                 }
             }
@@ -634,7 +617,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                     if (newTarget != null)
                     {
-                        link.TargetNode = newTarget;
+                        link.LinkedWord = newTarget;
                     }
                 }
 
@@ -797,7 +780,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Where(group => group.Count() == 2 && CrossingWip(group))
                 .Select(group => group.ToArray()))
             {
-                swap(ref cross[0].TargetNode, ref cross[1].TargetNode);
+                swap(ref cross[0].LinkedWord, ref cross[1].LinkedWord);
             }
 
             void swap (ref LinkedWord w1, ref LinkedWord w2)
@@ -815,7 +798,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 mappedWords.Select(mw => mw.SourceNode.Position).ToArray();
 
             int[] targetPos =
-                mappedWords.Select(mw => mw.TargetNode.Word.Position).ToArray();
+                mappedWords.Select(mw => mw.LinkedWord.Word.Position).ToArray();
 
             if (targetPos.Any(i => i < 0)) return false;
 
