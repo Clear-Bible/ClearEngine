@@ -355,7 +355,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 MappedGroup groupLink = new MappedGroup();
                 groupLink.SourceNodes.Add(wordLink.SourceNode);
-                groupLink.TargetNodes.Add(wordLink.TargetNode);
+                groupLink.TargetNodes.Add(wordLink.LinkedWord);
                 groupLinks.Add(groupLink);
             }
 

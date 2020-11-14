@@ -155,7 +155,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     public class MonoLink
     {
         public SourceNode SourceNode;
-        public LinkedWord TargetNode;
+        public LinkedWord LinkedWord;
     }
 
     public class MappedGroup

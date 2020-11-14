@@ -85,12 +85,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .ToList();
 
             bool targetWordNotEmpty(MonoLink link) =>
-                link.TargetNode.Word.Text != string.Empty;
+                link.LinkedWord.Word.Text != string.Empty;
 
             Tuple<string, string> targetTextAndId(MonoLink link) =>
                 Tuple.Create(
-                    link.TargetNode.Word.Text,
-                    link.TargetNode.Word.ID);
+                    link.LinkedWord.Word.Text,
+                    link.LinkedWord.Word.ID);
         }
 
 
@@ -125,7 +125,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 new MonoLink
                 {
                     SourceNode = sourceNode,
-                    TargetNode = new LinkedWord()
+                    LinkedWord = new LinkedWord()
                     {
                         Prob = -1000,
                         Word = AutoAlignUtility.CreateFakeTargetWord()
@@ -143,7 +143,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //
             double bestProb = conflict.Max(mw => prob(mw));
             List<MonoLink> winners = conflict
-                .Where(mw => mw.TargetNode.Prob == bestProb)
+                .Where(mw => mw.LinkedWord.Prob == bestProb)
                 .ToList();
 
             // On the second pass, if there are multiple winners,
@@ -166,11 +166,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return winners;
 
-            double prob(MonoLink mw) => mw.TargetNode.Prob;
+            double prob(MonoLink mw) => mw.LinkedWord.Prob;
 
             double relativeDelta(MonoLink mw) =>
                 Math.Abs(mw.SourceNode.RelativePos -
-                         mw.TargetNode.Word.RelativePos);         
+                         mw.LinkedWord.Word.RelativePos);         
         }
 
 
@@ -201,7 +201,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<string> linkedTargets,
             Assumptions assumptions)
         {
-            int anchor = anchorLink.TargetNode.Word.Position;
+            int anchor = anchorLink.LinkedWord.Word.Position;
 
             IEnumerable<int> down()
             {
@@ -238,8 +238,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             IEnumerable<int> span()
             {
-                for (int i = leftAnchor.TargetNode.Word.Position;
-                    i < rightAnchor.TargetNode.Word.Position;
+                for (int i = leftAnchor.LinkedWord.Word.Position;
+                    i < rightAnchor.LinkedWord.Word.Position;
                     i++)
                 {
                     yield return i;
