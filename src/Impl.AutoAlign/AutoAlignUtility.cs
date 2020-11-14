@@ -204,10 +204,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static void GetLinkedWords(ArrayList path, List<LinkedWord> links, double prob)
-        {
-            ArrayList words = new ArrayList();
 
+        public static List<LinkedWord> GetLinkedWords(Candidate candidate)
+        {
+            List<LinkedWord> linkedWords = new List<LinkedWord>();
+            GetLinkedWordsHelper(candidate.Chain, linkedWords, candidate.Prob);
+            return linkedWords;
+        }
+
+
+        public static void GetLinkedWordsHelper(ArrayList path, List<LinkedWord> links, double prob)
+        {
             if (path.Count == 0)
             {
                 links.Add(new LinkedWord()
@@ -229,7 +236,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     foreach (Candidate c in path)
                     {
-                        GetLinkedWords(c.Chain, links, c.Prob);
+                        GetLinkedWordsHelper(c.Chain, links, c.Prob);
                     }
                 }
                 else

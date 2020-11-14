@@ -436,47 +436,54 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Assumptions assumptions
             )
         {
-            //Console.WriteLine("\nAlignTheRest\n\n");
-
-
-
-            List<LinkedWord> linkedWords = new List<LinkedWord>();
-            AutoAlignUtility.GetLinkedWords(topCandidate.Chain, linkedWords, topCandidate.Prob);
-
-            // LinkedWord is a TargetWord with some extra information.
-
-            // linkedWords has a LinkedWord for each target word found in
-            // topCandidate.Sequence.  There is a LinkedWord datum with a dummy
-            // TargetWord for zero-length sub-paths in topCandidate.sequence.
+            List<LinkedWord> linkedWords = AutoAlignUtility.GetLinkedWords(topCandidate);
 
             double numberTerminals = terminals.Count;
 
-            List<MonoLink> links = new List<MonoLink>();
-            for (int i = 0; i < terminals.Count; i++)
-            {
-                XElement terminal = terminals[i];
+            List<SourceNode> sourceNodes =
+                terminals
+                .Select(term =>
+                {
+                    int position = term.Start();
+                    return new SourceNode()
+                    {
+                        MorphID = term.SourceId(),
+                        English = term.English(),
+                        Lemma = term.Lemma(),
+                        Category = term.Category(),
+                        Position = position,
+                        RelativePos = position / numberTerminals,
+                        TreeNode = term
+                    };
+                })
+                .ToList();
 
-                SourceNode sourceNode = new SourceNode();
 
-                // sourceNode.MorphID = terminal.Attribute("morphId").Value;
-                sourceNode.MorphID = terminal.SourceId();
-                sourceNode.English = terminal.English();
-                sourceNode.Lemma = terminal.Lemma();
-                sourceNode.Category = terminal.Category();
-                sourceNode.Position = terminal.Start();
-                sourceNode.RelativePos = sourceNode.Position
-                    / numberTerminals;
-                sourceNode.TreeNode = terminal;
 
-                LinkedWord targetLink = linkedWords[i];
-                // (looks like linkedWords and terminals are expected to be
-                // in 1-to-1 correspondence.)
+            //List<MonoLink> links = new List<MonoLink>();
+            //for (int i = 0; i < terminals.Count; i++)
+            //{
 
-                MonoLink link = new MonoLink();
-                link.SourceNode = sourceNode;
-                link.TargetNode = targetLink;
-                links.Add(link);
-            }
+
+            //    LinkedWord targetLink = linkedWords[i];
+
+            //    MonoLink link = new MonoLink();
+            //    link.SourceNode = sourceNodes[i];
+            //    link.TargetNode = targetLink;
+            //    links.Add(link);
+            //}
+
+            List<MonoLink> links =
+                sourceNodes
+                .Zip(linkedWords, (sourceNode, linkedWord) =>
+                    new MonoLink
+                    {
+                        SourceNode = sourceNode,
+                        TargetNode = linkedWord
+                    })
+                .ToList();
+
+ 
 
 
             List<List<MonoLink>> conflicts = AlignStaging.FindConflictingLinks(links);
