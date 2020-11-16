@@ -22,6 +22,25 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, WordInfo> wordInfoTable
             )
         {
+            Dictionary<string, int> primaryPositions =
+                BuildPrimaryPositionTable(groups);
+
+            // Get rid of fake links.
+            links =
+                links
+                .Where(mappedGroup =>
+                    !mappedGroup.TargetNodes.Any(
+                        linkedWord => linkedWord.Word.IsFake))
+            .ToList();
+
+            Dictionary<string, int> positionTable =
+                sourceWords.
+                Select((sw, n) => new { sw.ID, n })
+                .ToDictionary(
+                    x => x.ID,
+                    x => x.n);
+
+
             Line line = new Line();
 
             line.manuscript = new Manuscript();
@@ -47,62 +66,40 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .ToArray();
 
 
-            Dictionary<string, int> primaryPositions =
-                BuildPrimaryPositionTable(groups);
+            
 
-            // Get rid of fake links.
-            links = 
+
+            line.links =
                 links
-                .Where(mappedGroup =>
-                    !mappedGroup.TargetNodes.Any(
-                        linkedWord => linkedWord.Word.IsFake))
-            .ToList();
-
-            Dictionary<string, int> positionTable =
-                sourceWords.
-                Select((sw, n) => new { sw.ID, n })
-                .ToDictionary(
-                    x => x.ID,
-                    x => x.n);
-
-
-            line.links = new List<Link>();
-
-            foreach(MappedGroup mappedGroup in links)
-            {
-                int[] s =
-                    mappedGroup.SourceNodes
-                    .Select(sourceNode =>
-                        positionTable[sourceNode.MorphID])
-                    .ToArray();
-
-                if (mappedGroup.TargetNodes.Count > 1)
+                .Select(mappedGroup => new Link()
                 {
-                    mappedGroup.TargetNodes = ReorderNodes(
-                        mappedGroup.TargetNodes,
-                        primaryPositions);
-                }
+                    source =
+                        mappedGroup.SourceNodes
+                        .Select(sourceNode =>
+                            positionTable[sourceNode.MorphID])
+                        .ToArray(),
 
-                int[] t =
-                    mappedGroup.TargetNodes
-                    .Select(linkedWord => linkedWord.Word.Position)
-                    .ToArray();
+                    target =
+                        WithPrimaryWordFirst(
+                            mappedGroup.TargetNodes,
+                            primaryPositions)
+                        .Select(linkedWord => linkedWord.Word.Position)
+                        .ToArray(),
 
-                double score = 0.0;
-                if (mappedGroup.SourceNodes.Count > 1 || mappedGroup.TargetNodes.Count > 1)
-                {
-                    score = 0.9;
-                }
-                else
-                {
-                    LinkedWord LinkedWord = mappedGroup.TargetNodes[0];
-                    score = Math.Exp(LinkedWord.Prob);
-                }
+                    cscore =
+                        isNotOneToOne(mappedGroup)
+                        ? 0.9
+                        : Math.Exp(mappedGroup.TargetNodes[0].Prob)
+                })
+                .ToList();
 
-                line.links.Add(new Link() { source = s, target = t, cscore = score });
-            }
+
 
             align.Lines[k] = line;
+
+            bool isNotOneToOne(MappedGroup mappedGroup) =>
+                mappedGroup.SourceNodes.Count > 1 ||
+                mappedGroup.TargetNodes.Count > 1;
         }
 
 
@@ -126,10 +123,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        static List<LinkedWord> ReorderNodes(
+        static List<LinkedWord> WithPrimaryWordFirst(
             List<LinkedWord> targetNodes,
             Dictionary<string, int> primaryPositions)
         {
+            if (targetNodes.Count <= 1) return targetNodes;
+
             string groupKey =
                 string.Join(
                     " ",
