@@ -65,16 +65,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     x => x.ID,
                     x => x.n);
 
-            foreach (MappedGroup mappedGroup in links)
-            {
-                foreach (SourceNode sourceNode in mappedGroup.SourceNodes)
-                {
-                    sourceNode.Position =
-                        positionTable[sourceNode.MorphID];
-                }
-            }
-
-
 
             line.links = new List<Link>();
 
@@ -82,7 +72,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 int[] s =
                     mappedGroup.SourceNodes
-                    .Select(sourceNode => sourceNode.Position)
+                    .Select(sourceNode =>
+                        positionTable[sourceNode.MorphID])
                     .ToArray();
 
                 if (mappedGroup.TargetNodes.Count > 1)
@@ -112,40 +103,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             align.Lines[k] = line;
-        }
-
-
-
-        static List<MappedGroup> GetLinksWithoutFakeWords(List<MappedGroup> links)
-        {
-            return
-                links
-                .Where(mappedGroup =>
-                    !mappedGroup.TargetNodes.Any(
-                        linkedWord => linkedWord.Word.IsFake))
-                .ToList();
-        }
-
-
-        static void RestoreOriginalPositions(
-            List<MappedGroup> links,
-            List<SourceWord> sourceWords)
-        {
-            Dictionary<string, int> positionTable =
-                sourceWords.
-                Select((sw, n) => new { sw.ID, n })
-                .ToDictionary(
-                    x => x.ID,
-                    x => x.n);
-
-            foreach (MappedGroup mappedGroup in links)
-            {
-                foreach (SourceNode sourceNode in mappedGroup.SourceNodes)
-                {
-                    sourceNode.Position =
-                        positionTable[sourceNode.MorphID];
-                }
-            }
         }
 
 
