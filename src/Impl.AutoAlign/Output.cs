@@ -47,10 +47,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .ToArray();
 
 
-            Dictionary<string, int> primaryPositions = BuildPrimaryPositionTable(groups);
-            // modified-target-group-text => primary-position
+            Dictionary<string, int> primaryPositions =
+                BuildPrimaryPositionTable(groups);
 
-            links = GetLinksWithoutFakeWords(links);
+            // Get rid of fake links.
+            links = 
+                links
+                .Where(mappedGroup =>
+                    !mappedGroup.TargetNodes.Any(
+                        linkedWord => linkedWord.Word.IsFake))
+            .ToList();
 
             RestoreOriginalPositions(links, sourceWords);
             // Changes SourceNode.position to be the position in sourceWords.
