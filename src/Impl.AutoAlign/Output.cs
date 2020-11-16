@@ -126,33 +126,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        static List<LinkedWord> ReorderNodes(List<LinkedWord> targetNodes, Dictionary<string, int> primaryPositions)
+        static List<LinkedWord> ReorderNodes(
+            List<LinkedWord> targetNodes,
+            Dictionary<string, int> primaryPositions)
         {
-            List<LinkedWord> targetNodes2 = new List<LinkedWord>();
+            string groupKey =
+                string.Join(
+                    " ",
+                    targetNodes.Select(lw => lw.Text))
+                .Trim()
+                .ToLower();
 
-            string targetText = GetTargetText(targetNodes);
-            int primaryPosition = primaryPositions[targetText];
-            LinkedWord primaryWord = targetNodes[primaryPosition];
-            targetNodes2.Add(primaryWord);
-            targetNodes.Remove(primaryWord);
-            foreach (LinkedWord lw in targetNodes)
-            {
-                targetNodes2.Add(lw);
-            }
+            LinkedWord primaryWord = targetNodes[primaryPositions[groupKey]];
 
-            return targetNodes2;
-        }
-
-        static string GetTargetText(List<LinkedWord> targetNodes)
-        {
-            string text = string.Empty;
-
-            foreach (LinkedWord lw in targetNodes)
-            {
-                text += lw.Text + " ";
-            }
-
-            return text.Trim().ToLower();
+            return
+                Enumerable.Empty<LinkedWord>()
+                .Append(primaryWord)
+                .Concat(
+                    targetNodes
+                    .Where(lw => lw != primaryWord))
+                .ToList();
         }
     }
 
