@@ -41,59 +41,56 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     x => x.n);
 
 
-            Line line = new Line();
-
-            line.manuscript = new Manuscript();
-
-            line.manuscript.words =
-                sourceWords
-                .Select(sourceWord =>
-                    sourceWord.CreateManuscriptWord(
-                        glossTable[sourceWord.ID],
-                        wordInfoTable))
-                .ToArray();
-
-            line.translation = new Translation();
-
-            line.translation.words =
-                targetWords
-                .Select(targetWord => new TranslationWord()
+            Line line = new Line()
+            {
+                manuscript = new Manuscript()
                 {
-                    id = long.Parse(targetWord.ID),
-                    altId = targetWord.AltID,
-                    text = targetWord.Text2
-                })
-                .ToArray();
+                    words =
+                        sourceWords
+                        .Select(sourceWord =>
+                            sourceWord.CreateManuscriptWord(
+                                glossTable[sourceWord.ID],
+                                wordInfoTable))
+                        .ToArray()
+                },
 
-
-            
-
-
-            line.links =
-                links
-                .Select(mappedGroup => new Link()
+                translation = new Translation()
                 {
-                    source =
-                        mappedGroup.SourceNodes
-                        .Select(sourceNode =>
-                            positionTable[sourceNode.MorphID])
-                        .ToArray(),
+                    words =
+                        targetWords
+                        .Select(targetWord => new TranslationWord()
+                        {
+                            id = long.Parse(targetWord.ID),
+                            altId = targetWord.AltID,
+                            text = targetWord.Text2
+                        })
+                        .ToArray()
+                },
 
-                    target =
-                        WithPrimaryWordFirst(
-                            mappedGroup.TargetNodes,
-                            primaryPositions)
-                        .Select(linkedWord => linkedWord.Word.Position)
-                        .ToArray(),
+                links =
+                    links
+                    .Select(mappedGroup => new Link()
+                    {
+                        source =
+                            mappedGroup.SourceNodes
+                            .Select(sourceNode =>
+                                positionTable[sourceNode.MorphID])
+                            .ToArray(),
 
-                    cscore =
-                        isNotOneToOne(mappedGroup)
-                        ? 0.9
-                        : Math.Exp(mappedGroup.TargetNodes[0].Prob)
-                })
-                .ToList();
+                        target =
+                            WithPrimaryWordFirst(
+                                mappedGroup.TargetNodes,
+                                primaryPositions)
+                            .Select(linkedWord => linkedWord.Word.Position)
+                            .ToArray(),
 
-
+                        cscore =
+                            isNotOneToOne(mappedGroup)
+                            ? 0.9
+                            : Math.Exp(mappedGroup.TargetNodes[0].Prob)
+                    })
+                    .ToList()
+            };
 
             align.Lines[k] = line;
 
