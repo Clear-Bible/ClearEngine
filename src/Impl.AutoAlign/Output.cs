@@ -27,14 +27,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Create the manuscript/source element
             line.manuscript = new Manuscript();
-            line.manuscript.words = new ManuscriptWord[sourceWords.Count];
-            for (int i = 0; i < sourceWords.Count; i++)
-            {
-                SourceWord sourceWord = sourceWords[i];
-                string id = sourceWord.ID;
-                line.manuscript.words[i] =
-                    sourceWord.CreateManuscriptWord(glossTable[id], wordInfoTable);
-            }
+
+            line.manuscript.words =
+                sourceWords
+                .Select(sourceWord =>
+                    sourceWord.CreateManuscriptWord(
+                        glossTable[sourceWord.ID],
+                        wordInfoTable))
+                .ToArray();
 
             // Create the target/translation element
             line.translation = new Translation();
