@@ -11,12 +11,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class Output
     {
-        public static void WriteAlignment(
+        public static Line WriteAlignment(
             List<MappedGroup> links,
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
-            ref Alignment2 align,
-            int k,
             Dictionary<string, Gloss> glossTable,
             GroupTranslationsTable groups
             )
@@ -41,7 +39,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     sp => sp.SourceID.AsCanonicalString,
                     sp => sp.Position);
 
-            Line line = new Line()
+            return new Line()
             {
                 manuscript = new Manuscript()
                 {
@@ -106,7 +104,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .ToList()
             };
 
-            align.Lines[k] = line;
+            // align.Lines[k] = line;
 
             bool isNotOneToOne(MappedGroup mappedGroup) =>
                 mappedGroup.SourceNodes.Count > 1 ||

@@ -117,71 +117,89 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
 
-                List<XElement> terminals =
-                    AutoAlignUtility.GetTerminalXmlNodes(treeNode);
+                List<SourcePoint> sourcePoints = GetSourcePoints(treeNode);
 
-                int totalSourcePoints = terminals.Count();
+                List<TargetPoint> targetPoints = GetTargetPoints(entry.Item2);
 
-                List<SourcePoint> sourcePoints =
-                    terminals
-                    .Select(term => new
-                    {
-                        term,
-                        sourceID = term.SourceID(),
-                        surface = term.Surface()
-                    })
-                    .GroupBy(x => x.surface)
-                    .SelectMany(group =>
-                        group.Select((x, groupIndex) => new
-                        {
-                            x.term,
-                            x.sourceID,
-                            altID = $"{x.surface}-{groupIndex + 1}"
-                        }))
-                    .OrderBy(x => x.sourceID.AsCanonicalString)
-                    .Select((x, n) => new SourcePoint(
-                        x.term,
-                        x.altID,
-                        n,
-                        totalSourcePoints))
-                    .ToList();
-
-
-                int totalTargetPoints = entry.Item2.Count();
-
-                List<TargetPoint> targetPoints =
-                    entry.Item2
-                    .Select((target, position) => new
-                    {
-                        text = target.Item2.Text,
-                        targetID = target.Item1,
-                        position
-                    })
-                    .GroupBy(x => x.text)
-                    .SelectMany(group =>
-                        group.Select((x, groupIndex) => new
-                        {
-                            x.text,
-                            x.targetID,
-                            x.position,
-                            altID = $"{x.text}-{groupIndex + 1}"
-                        }))
-                    .OrderBy(x => x.position)
-                    .Select(x => new TargetPoint(
-                        x.text,
-                        x.targetID,
-                        x.altID,
-                        x.position,
-                        0))
-                    .ToList();         
-
-                Output.WriteAlignment(links2, sourcePoints, targetPoints, ref align, i, glossTable, groups);
+                align.Lines[i] =
+                    Output.WriteAlignment(
+                        links2,
+                        sourcePoints,
+                        targetPoints,
+                        glossTable,
+                        groups);
 
                 i += 1;
             }
 
             string json = JsonConvert.SerializeObject(align.Lines, Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(jsonOutput, json);
+        }
+
+
+        public static List<SourcePoint> GetSourcePoints(XElement treeNode)
+        {
+            List<XElement> terminals =
+                    AutoAlignUtility.GetTerminalXmlNodes(treeNode);
+
+            int totalSourcePoints = terminals.Count();
+
+            return
+                terminals
+                .Select(term => new
+                {
+                    term,
+                    sourceID = term.SourceID(),
+                    surface = term.Surface()
+                })
+                .GroupBy(x => x.surface)
+                .SelectMany(group =>
+                    group.Select((x, groupIndex) => new
+                    {
+                        x.term,
+                        x.sourceID,
+                        altID = $"{x.surface}-{groupIndex + 1}"
+                    }))
+                .OrderBy(x => x.sourceID.AsCanonicalString)
+                .Select((x, n) => new SourcePoint(
+                    x.term,
+                    x.altID,
+                    n,
+                    totalSourcePoints))
+                .ToList();
+        }
+
+
+        public static List<TargetPoint> GetTargetPoints(
+            List<Tuple<TargetID, TargetMorph>> targets)
+        {
+            int totalTargetPoints = targets.Count();
+
+            return
+                targets
+                .Select((target, position) => new
+                {
+                    text = target.Item2.Text,
+                    targetID = target.Item1,
+                    position
+                })
+                .GroupBy(x => x.text)
+                .SelectMany(group =>
+                    group.Select((x, groupIndex) => new
+                    {
+                        x.text,
+                        x.targetID,
+                        x.position,
+                        altID = $"{x.text}-{groupIndex + 1}"
+                    }))
+                .OrderBy(x => x.position)
+                .Select(x => new TargetPoint(
+                    x.text,
+                    x.targetID,
+                    x.altID,
+                    x.position,
+                    0))
+                .ToList();
         }
 
 
