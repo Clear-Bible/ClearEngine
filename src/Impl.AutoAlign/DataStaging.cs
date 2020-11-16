@@ -13,6 +13,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.TreeService;
 
+
     public class SourcePoint
     {
         public SourcePoint(
@@ -30,6 +31,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public XElement Terminal { get; }
         public SourceID SourceID { get; }
+        public string AltID { get; }
+        public int Position { get; }
+        public double RelativePosition { get; }
+    }
+
+
+    public class TargetPoint
+    {
+        public TargetPoint(
+            string text,
+            TargetID targetID,
+            string altID,
+            int position,
+            int totalPoints)
+        {
+            Text = text;
+            Lower = text.ToLower();
+            TargetID = targetID;
+            AltID = altID;
+            Position = position;
+            RelativePosition = position / (double)totalPoints;
+        }
+
+        public string Text { get; }
+        public string Lower { get; }
+        public TargetID TargetID { get; }
         public string AltID { get; }
         public int Position { get; }
         public double RelativePosition { get; }
