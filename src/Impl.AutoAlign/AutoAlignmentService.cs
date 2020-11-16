@@ -104,10 +104,46 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         new TargetSegment(targ.Item2.Text, targ.Item1.AsCanonicalString)));
 
                 // Align a single verse
-                AlignZone(
-                    entryPrime,
-                    groups, treeService, ref align, i, maxPaths,
-                    glossTable, oldLinks, assumptions);
+                List<MappedGroup> links2 =
+                    AlignZone(
+                        entryPrime,
+                        groups, treeService, ref align, i, maxPaths,
+                        glossTable, oldLinks, assumptions);
+
+                //---
+
+                VerseID sStartVerseID = entry.Item1.First().Item1.VerseID;
+                VerseID sEndVerseID = entry.Item1.Last().Item1.VerseID;
+
+                XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
+
+                GroupTranslationsTable_Old groups_old =
+                    new GroupTranslationsTable_Old();
+                    foreach (var kvp in groups.Inner)
+                        foreach (var x in kvp.Value)
+                            groups_old.AddEntry(
+                                kvp.Key.Text,
+                                x.Item1.Text,
+                                x.Item2.Int);            
+
+                Dictionary<string, WordInfo> wordInfoTable =
+                    AutoAlignUtility.BuildWordInfoTable(treeNode);
+
+                List<SourceWord> sourceWordList = MakeSourceWordList(
+                    AutoAlignUtility.GetTerminalXmlNodes(treeNode)
+                    .Select(node => node.SourceID().AsCanonicalString)
+                    .OrderBy(sourceID => sourceID),
+                    wordInfoTable);
+
+                List<TargetSegment> targetSegments =
+                    entry.Item2
+                    .Select(targ =>
+                        new TargetSegment(targ.Item2.Text, targ.Item1.AsCanonicalString))
+                    .ToList();
+
+                List<TargetWord> tWords = MakeTargetWordList(targetSegments);
+
+                Output.WriteAlignment(links2, sourceWordList, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
 
                 i += 1;
             }
@@ -117,7 +153,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static void AlignZone(
+        public static List<MappedGroup> AlignZone(
             TranslationPair entry,
             GroupTranslationsTable groups,
             TreeService treeService, 
@@ -145,7 +181,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
  
 
- 
 
             List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
 
@@ -249,11 +284,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             AlignStaging.FixCrossingLinks(ref links2);
 
-            Output.WriteAlignment(links2, sourceWordList, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
+            return links2;
+
+            // Output.WriteAlignment(links2, sourceWordList, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
             // In spite of its name, Output.WriteAlignment does not touch the
             // filesystem; it puts its result in align[i].
 
-            Line line2 = MakeLineWip(segBridgeTable, sourceWordList, tWords, glossTable, wordInfoTable);
+            // Line line2 = MakeLineWip(segBridgeTable, sourceWordList, tWords, glossTable, wordInfoTable);
         }
 
 
