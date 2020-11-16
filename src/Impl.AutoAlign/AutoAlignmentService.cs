@@ -117,6 +117,39 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
 
+                List<XElement> terminals =
+                    AutoAlignUtility.GetTerminalXmlNodes(treeNode);
+
+                int totalSourcePoints = terminals.Count();
+
+                List<SourcePoint> sourcePoints =
+                    terminals
+                    .Select(term => new
+                    {
+                        term,
+                        sourceID = term.SourceID(),
+                        surface = term.Surface()
+                    })
+                    .GroupBy(x => x.surface)
+                    .SelectMany(group =>
+                        group.Select((x, groupIndex) => new
+                        {
+                            x.term,
+                            x.sourceID,
+                            altID = $"{x.surface}-{groupIndex + 1}"
+                        }))
+                    .OrderBy(x => x.sourceID.AsCanonicalString)
+                    .Select((x, n) => new SourcePoint(
+                        x.term,
+                        x.altID,
+                        n,
+                        totalSourcePoints))
+                    .ToList();
+                            
+                    
+
+                
+
                 GroupTranslationsTable_Old groups_old =
                     new GroupTranslationsTable_Old();
                     foreach (var kvp in groups.Inner)
@@ -143,7 +176,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 List<TargetWord> tWords = MakeTargetWordList(targetSegments);
 
-                Output.WriteAlignment(links2, sourceWordList, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
+                Output.WriteAlignment(links2, sourcePoints, tWords, ref align, i, glossTable, groups_old);
 
                 i += 1;
             }
