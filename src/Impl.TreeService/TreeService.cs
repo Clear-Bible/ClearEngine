@@ -317,8 +317,10 @@ namespace ClearBible.Clear3.Impl.TreeService
         public static int Start(this XElement term) =>
             int.Parse(term.Attribute("Start").Value);
 
+        public static string Analysis(this XElement term) =>
+            term.Attribute("Analysis").Value;
+
         //public string PartOfSpeech { get; }
-        //public string Morphology { get; }
     }
 
 

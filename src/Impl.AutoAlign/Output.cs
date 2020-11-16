@@ -7,19 +7,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Data;
-
+    using ClearBible.Clear3.Impl.TreeService;
 
     public class Output
     {
         public static void WriteAlignment(
             List<MappedGroup> links,
-            List<SourceWord> sourceWords,
+            List<SourcePoint> sourcePoints,
             List<TargetWord> targetWords,
             ref Alignment2 align,
             int k,
             Dictionary<string, Gloss> glossTable,
-            GroupTranslationsTable_Old groups,
-            Dictionary<string, WordInfo> wordInfoTable
+            GroupTranslationsTable_Old groups
             )
         {
             // Build map of group key to position of primary
@@ -35,25 +34,37 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         linkedWord => linkedWord.Word.IsFake))
             .ToList();
 
-            // Build map of target ID to position in source words array.
+            // Build map of source ID to position in source points list.
             Dictionary<string, int> positionTable =
-                sourceWords.
-                Select((sw, n) => new { sw.ID, n })
+                sourcePoints
                 .ToDictionary(
-                    x => x.ID,
-                    x => x.n);
-
+                    sp => sp.SourceID.AsCanonicalString,
+                    sp => sp.Position);
 
             Line line = new Line()
             {
                 manuscript = new Manuscript()
                 {
                     words =
-                        sourceWords
-                        .Select(sourceWord =>
-                            sourceWord.CreateManuscriptWord(
-                                glossTable[sourceWord.ID],
-                                wordInfoTable))
+                        sourcePoints
+                        .Select(sp =>
+                        {
+                            string ID = sp.SourceID.AsCanonicalString;
+                            Gloss gloss = glossTable[ID];
+
+                            return new ManuscriptWord()
+                            {
+                                id = long.Parse(ID),
+                                altId = sp.AltID,
+                                text = sp.Terminal.Surface(),
+                                lemma = sp.Terminal.Lemma(),
+                                strong = sp.Terminal.Strong(),
+                                pos = sp.Terminal.Category(),
+                                morph = sp.Terminal.Analysis(),
+                                gloss = gloss.Gloss1,
+                                gloss2 = gloss.Gloss2
+                            };
+                        })
                         .ToArray()
                 },
 

@@ -11,6 +11,30 @@ using Newtonsoft.Json.Linq;
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
+    using ClearBible.Clear3.Impl.TreeService;
+
+    public class SourcePoint
+    {
+        public SourcePoint(
+            XElement terminal,
+            string altID,
+            int position,
+            int totalPoints)
+        {
+            Terminal = terminal;
+            AltID = altID;
+            Position = position;
+            RelativePosition = position / (double)totalPoints;
+            SourceID = terminal.SourceID();
+        }
+
+        public XElement Terminal { get; }
+        public SourceID SourceID { get; }
+        public string AltID { get; }
+        public int Position { get; }
+        public double RelativePosition { get; }
+    }
+
 
     public class SourceWord
     {
