@@ -145,10 +145,36 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         n,
                         totalSourcePoints))
                     .ToList();
-                            
-                    
 
-                
+
+                int totalTargetPoints = entry.Item2.Count();
+
+                List<TargetPoint> targetPoints =
+                    entry.Item2
+                    .Select((target, position) => new
+                    {
+                        text = target.Item2.Text,
+                        targetID = target.Item1,
+                        position
+                    })
+                    .GroupBy(x => x.text)
+                    .SelectMany(group =>
+                        group.Select((x, groupIndex) => new
+                        {
+                            x.text,
+                            x.targetID,
+                            x.position,
+                            altID = $"{x.text}-{groupIndex + 1}"
+                        }))
+                    .OrderBy(x => x.position)
+                    .Select(x => new TargetPoint(
+                        x.text,
+                        x.targetID,
+                        x.altID,
+                        x.position,
+                        0))
+                    .ToList();
+               
 
                 GroupTranslationsTable_Old groups_old =
                     new GroupTranslationsTable_Old();
@@ -157,26 +183,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             groups_old.AddEntry(
                                 kvp.Key.Text,
                                 x.Item1.Text,
-                                x.Item2.Int);            
+                                x.Item2.Int);           
 
-                Dictionary<string, WordInfo> wordInfoTable =
-                    AutoAlignUtility.BuildWordInfoTable(treeNode);
 
-                List<SourceWord> sourceWordList = MakeSourceWordList(
-                    AutoAlignUtility.GetTerminalXmlNodes(treeNode)
-                    .Select(node => node.SourceID().AsCanonicalString)
-                    .OrderBy(sourceID => sourceID),
-                    wordInfoTable);
-
-                List<TargetSegment> targetSegments =
-                    entry.Item2
-                    .Select(targ =>
-                        new TargetSegment(targ.Item2.Text, targ.Item1.AsCanonicalString))
-                    .ToList();
-
-                List<TargetWord> tWords = MakeTargetWordList(targetSegments);
-
-                Output.WriteAlignment(links2, sourcePoints, tWords, ref align, i, glossTable, groups_old);
+                Output.WriteAlignment(links2, sourcePoints, targetPoints, ref align, i, glossTable, groups_old);
 
                 i += 1;
             }

@@ -14,7 +14,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static void WriteAlignment(
             List<MappedGroup> links,
             List<SourcePoint> sourcePoints,
-            List<TargetWord> targetWords,
+            List<TargetPoint> targetPoints,
             ref Alignment2 align,
             int k,
             Dictionary<string, Gloss> glossTable,
@@ -71,12 +71,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 translation = new Translation()
                 {
                     words =
-                        targetWords
-                        .Select(targetWord => new TranslationWord()
+                        targetPoints
+                        .Select(tp => new TranslationWord()
                         {
-                            id = long.Parse(targetWord.ID),
-                            altId = targetWord.AltID,
-                            text = targetWord.Text2
+                            id = long.Parse(tp.TargetID.AsCanonicalString),
+                            altId = tp.AltID,
+                            text = tp.Text
                         })
                         .ToArray()
                 },
