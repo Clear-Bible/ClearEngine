@@ -22,10 +22,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, WordInfo> wordInfoTable
             )
         {
-            // Create line object
             Line line = new Line();
 
-            // Create the manuscript/source element
             line.manuscript = new Manuscript();
 
             line.manuscript.words =
@@ -36,19 +34,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         wordInfoTable))
                 .ToArray();
 
-            // Create the target/translation element
             line.translation = new Translation();
-            line.translation.words = new TranslationWord[targetWords.Count];
-            for (int i = 0; i < targetWords.Count; i++)
-            {
-                TargetWord targetWord = targetWords[i];
-                TranslationWord tWord = new TranslationWord();
-                string id = targetWord.ID;
-                tWord.id = long.Parse(id);
-                tWord.altId = targetWord.AltID;
-                tWord.text = targetWord.Text2;
-                line.translation.words[i] = tWord;
-            }
+
+            line.translation.words =
+                targetWords
+                .Select(targetWord => new TranslationWord()
+                {
+                    id = long.Parse(targetWord.ID),
+                    altId = targetWord.AltID,
+                    text = targetWord.Text2
+                })
+                .ToArray();
+
+
 
             // Create the links element
             Dictionary<string, int> primaryPositions = BuildPrimaryTable(groups);
