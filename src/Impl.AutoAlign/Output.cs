@@ -18,7 +18,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             ref Alignment2 align,
             int k,
             Dictionary<string, Gloss> glossTable,
-            GroupTranslationsTable_Old groups
+            GroupTranslationsTable groups
             )
         {
             // Build map of group key to position of primary
@@ -115,17 +115,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         static Dictionary<string, int> BuildPrimaryPositionTable(
-            GroupTranslationsTable_Old groups)
+            GroupTranslationsTable groups)
         {
             return
-                groups.AllEntries
+                groups.Inner
                 .Select(kvp => kvp.Value)
                 .SelectMany(groupTranslations =>
-                    groupTranslations.AllTranslations
-                    .Select(tg => new
+                    groupTranslations.Select(tg => new
                     {
-                        text = tg.TargetGroupAsText.Replace(" ~ ", " "),
-                        position = tg.PrimaryPosition
+                        text = tg.Item1.Text.Replace(" ~ ", " "),
+                        position = tg.Item2.Int
                     }))
                 .GroupBy(x => x.text)
                 .ToDictionary(

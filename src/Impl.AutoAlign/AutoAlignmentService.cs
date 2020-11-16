@@ -173,20 +173,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         x.altID,
                         x.position,
                         0))
-                    .ToList();
-               
+                    .ToList();         
 
-                GroupTranslationsTable_Old groups_old =
-                    new GroupTranslationsTable_Old();
-                    foreach (var kvp in groups.Inner)
-                        foreach (var x in kvp.Value)
-                            groups_old.AddEntry(
-                                kvp.Key.Text,
-                                x.Item1.Text,
-                                x.Item2.Int);           
-
-
-                Output.WriteAlignment(links2, sourcePoints, targetPoints, ref align, i, glossTable, groups_old);
+                Output.WriteAlignment(links2, sourcePoints, targetPoints, ref align, i, glossTable, groups);
 
                 i += 1;
             }
