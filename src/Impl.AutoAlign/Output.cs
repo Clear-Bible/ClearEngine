@@ -58,8 +58,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         linkedWord => linkedWord.Word.IsFake))
             .ToList();
 
-            RestoreOriginalPositions(links, sourceWords);
-            // Changes SourceNode.position to be the position in sourceWords.
+            Dictionary<string, int> positionTable =
+                sourceWords.
+                Select((sw, n) => new { sw.ID, n })
+                .ToDictionary(
+                    x => x.ID,
+                    x => x.n);
+
+            foreach (MappedGroup mappedGroup in links)
+            {
+                foreach (SourceNode sourceNode in mappedGroup.SourceNodes)
+                {
+                    sourceNode.Position =
+                        positionTable[sourceNode.MorphID];
+                }
+            }
+
 
 
             line.links = new List<Link>();
