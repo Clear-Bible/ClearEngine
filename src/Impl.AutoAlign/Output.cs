@@ -22,6 +22,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, WordInfo> wordInfoTable
             )
         {
+            // Build map of group key to position of primary
+            // word within group.
             Dictionary<string, int> primaryPositions =
                 BuildPrimaryPositionTable(groups);
 
@@ -33,6 +35,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         linkedWord => linkedWord.Word.IsFake))
             .ToList();
 
+            // Build map of target ID to position in source words array.
             Dictionary<string, int> positionTable =
                 sourceWords.
                 Select((sw, n) => new { sw.ID, n })
