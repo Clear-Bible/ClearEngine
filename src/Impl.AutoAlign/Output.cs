@@ -47,9 +47,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .ToArray();
 
 
-
-            // Create the links element
-            Dictionary<string, int> primaryPositions = BuildPrimaryTable(groups);
+            Dictionary<string, int> primaryPositions = BuildPrimaryPositionTable(groups);
             // modified-target-group-text => primary-position
 
             links = GetLinksWithoutFakeWords(links);
@@ -131,26 +129,25 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        static Dictionary<string, int> BuildPrimaryTable(GroupTranslationsTable_Old groups)
+        static Dictionary<string, int> BuildPrimaryPositionTable(
+            GroupTranslationsTable_Old groups)
         {
-            Dictionary<string, int> primaryTable = new Dictionary<string, int>();
-
-            foreach (GroupTranslations_Old groupTranslations in
-                groups.AllEntries.Select(kvp => kvp.Value))
-            {
-                foreach (GroupTranslation_Old tg in groupTranslations.AllTranslations)
-                {
-                    string tgText = tg.TargetGroupAsText;
-                    tgText = tgText.Replace(" ~ ", " ");
-                    if (!primaryTable.ContainsKey(tgText))
+            return
+                groups.AllEntries
+                .Select(kvp => kvp.Value)
+                .SelectMany(groupTranslations =>
+                    groupTranslations.AllTranslations
+                    .Select(tg => new
                     {
-                        primaryTable.Add(tgText, tg.PrimaryPosition);
-                    }
-                }
-            }
-
-            return primaryTable;
+                        text = tg.TargetGroupAsText.Replace(" ~ ", " "),
+                        position = tg.PrimaryPosition
+                    }))
+                .GroupBy(x => x.text)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.First().position);
         }
+
 
         static List<LinkedWord> ReorderNodes(List<LinkedWord> targetNodes, Dictionary<string, int> primaryPositions)
         {
