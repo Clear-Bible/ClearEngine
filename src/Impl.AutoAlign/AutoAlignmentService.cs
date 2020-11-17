@@ -121,8 +121,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 List<MappedGroup> links2 =
                     AlignZone(
                         entryPrime,
-                        groups, treeService, ref align, i, maxPaths,
-                        glossTable, oldLinks, assumptions);
+                        treeNode,
+                        sourcePoints,
+                        targetPoints,
+                        groups,
+                        maxPaths,
+                        oldLinks,
+                        assumptions);
 
                 //---
 
@@ -243,46 +248,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static List<MappedGroup> AlignZone(
             TranslationPair entry,
+            XElement treeNode,
+            List<SourcePoint> sourcePoints,
+            List<TargetPoint> targetPoints,
             GroupTranslationsTable groups,
-            TreeService treeService, 
-            ref Alignment2 align,  // Output goes here.
-            int i,
             int maxPaths,
-            Dictionary<string, Gloss> glossTable,
             Dictionary<string, Dictionary<string, string>> oldLinks,  // (verseID => (mWord.altId => tWord.altId))
             Assumptions assumptions
             )
         {
-            int numberSourceWordsInTranslationPair =
-                entry.SourceSegments.Count();
-
-            VerseID verseIdFromLegacySourceIdString(string s) =>
-                (new SourceID(s)).VerseID;
-
-            VerseID sStartVerseID = verseIdFromLegacySourceIdString(entry.SourceSegments.First().ID);
-            VerseID sEndVerseID = verseIdFromLegacySourceIdString(entry.SourceSegments.Last().ID);
-
-            XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
-
             Dictionary<string, string> sourceAltIdMap =
                 GetSourceAltIdMap(treeNode);
 
- 
-
-
             List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
 
-            // Node IDs are of the form BBCCCVVVPPPSSSL,
-            // where P is the 1-based position of the first word in the node,
-            // S is the span (number of words) in the node,
-            // and L is the level (starting from the leaves).
-            // BBCCCVVV is the book, chapter, and verse of the first
-            // word in the node.
-
-            // string topNodeId = Utils.GetAttribValue(treeNode2, "nodeId");
-
-            // The goal node ID is the node ID of the top node in the
-            // tree without the final L digit.
             string goalNodeId = treeNode.Attribute("nodeId").Value;
             goalNodeId = goalNodeId.Substring(0, goalNodeId.Length - 1);
 
