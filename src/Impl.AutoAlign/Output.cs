@@ -76,14 +76,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         cscore =
                             isNotOneToOne(multiLink)
                             ? 0.9
-                            : Math.Exp(multiLink.Targets.ElementAt(0).Score)
+                            : Math.Exp(multiLink.Targets[0].Score)
                     })
                     .ToList()
             };
 
             bool isNotOneToOne(MultiLink ml) =>
-                ml.Sources.Count() > 1 ||
-                ml.Targets.Count() > 1;
+                ml.Sources.Count > 1 ||
+                ml.Targets.Count > 1;
         }
 
 
@@ -91,10 +91,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         static IEnumerable<TargetBond> WithPrimaryWordFirst(
-            IEnumerable<TargetBond> targets,
+            IReadOnlyList<TargetBond> targets,
             Dictionary<string, int> primaryPositions)
         {
-            if (targets.Count() <= 1) return targets;
+            if (targets.Count <= 1) return targets;
 
             string groupKey =
                 string.Join(
@@ -103,7 +103,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Trim();
 
             TargetBond primaryWord =
-                targets.ElementAt(primaryPositions[groupKey]);
+                targets[primaryPositions[groupKey]];
 
             return
                 Enumerable.Empty<TargetBond>()
