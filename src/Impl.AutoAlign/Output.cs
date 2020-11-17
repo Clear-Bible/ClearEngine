@@ -15,14 +15,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
             Dictionary<string, Gloss> glossTable,
-            GroupTranslationsTable groups
-            )
+            Dictionary<string, int> primaryPositions)
         {
-            // Build map of group key to position of primary
-            // word within group.
-            Dictionary<string, int> primaryPositions =
-                BuildPrimaryPositionTable(groups);
-
             return new Line()
             {
                 manuscript = new Manuscript()
@@ -93,23 +87,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        static Dictionary<string, int> BuildPrimaryPositionTable(
-            GroupTranslationsTable groups)
-        {
-            return
-                groups.Inner
-                .Select(kvp => kvp.Value)
-                .SelectMany(groupTranslations =>
-                    groupTranslations.Select(tg => new
-                    {
-                        text = tg.Item1.Text.Replace(" ~ ", " "),
-                        position = tg.Item2.Int
-                    }))
-                .GroupBy(x => x.text)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.First().position);
-        }
+
 
 
         static IEnumerable<TargetBond> WithPrimaryWordFirst(
