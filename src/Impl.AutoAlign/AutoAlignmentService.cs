@@ -80,7 +80,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 strongs);
 
 
-            Alignment2 align = new Alignment2();  // The output goes here.
+            List<TranslationPair> translationPairs =
+                translationPairTable.Inner
+                .Select(x => new TranslationPair(
+                    targets:
+                        x.Item2
+                        .Select(y => new Target(
+                            targetMorph: y.Item2,
+                            targetID: y.Item1))
+                        .ToList(),
+                    firstSourceVerseID:
+                        x.Item1.First().Item1.VerseID,
+                    lastSourceVerseID:
+                        x.Item1.Last().Item1.VerseID))
+                .ToList();
+
+
+
+           Alignment2 align = new Alignment2();  // The output goes here.
 
             align.Lines = new Line[translationPairTable.Inner.Count];
 
@@ -93,14 +110,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, int> primaryPositions =
                 BuildPrimaryPositionTable(groups);
 
-            foreach (
-                Tuple<
-                    List<Tuple<SourceID, Lemma>>,
-                    List<Tuple<TargetID, TargetMorph>>>
-                entry in translationPairTable.Inner)
+            foreach (TranslationPair translationPair in translationPairs)
             {
-                VerseID sStartVerseID = entry.Item1.First().Item1.VerseID;
-                VerseID sEndVerseID = entry.Item1.Last().Item1.VerseID;
+                VerseID sStartVerseID = translationPair.FirstSourceVerseID;
+                VerseID sEndVerseID = translationPair.FirstSourceVerseID;
 
                 ChapterID chapterID = sStartVerseID.ChapterID;
                 treeService.PreloadTreesForChapter(chapterID);
@@ -109,15 +122,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 List<SourcePoint> sourcePoints = GetSourcePoints(treeNode);
 
-                List<TargetPoint> targetPoints = GetTargetPoints(entry.Item2);
+                var x = translationPair.Targets
+                    .Select(t => Tuple.Create(t.TargetID, t.TargetMorph))
+                    .ToList();
 
-                TranslationPair entryPrime = new TranslationPair(
-                    entry.Item1.Select(src =>
-                        new SourceSegment(src.Item2.Text, src.Item1.AsCanonicalString)),
-                    entry.Item2.Select(targ =>
-                        new TargetSegment(targ.Item2.Text, targ.Item1.AsCanonicalString)));
+                List<TargetPoint> targetPoints =
+                    GetTargetPoints(translationPair.Targets);
 
-                // Align a single verse
                 List<MappedGroup> links2 =
                     AlignZone(
                         treeNode,
@@ -212,7 +223,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static List<TargetPoint> GetTargetPoints(
-            List<Tuple<TargetID, TargetMorph>> targets)
+            IReadOnlyList<Target> targets)
         {
             int totalTargetPoints = targets.Count();
 
@@ -220,8 +231,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 targets
                 .Select((target, position) => new
                 {
-                    text = target.Item2.Text,
-                    targetID = target.Item1,
+                    text = target.TargetMorph.Text,
+                    targetID = target.TargetID,
                     position
                 })
                 .GroupBy(x => x.text)

@@ -63,9 +63,9 @@ namespace ClearBible.Clear3.Impl.Data
         public string ID { get; }
     }
 
-    public class TranslationPair
+    public class TranslationPair_Old
     {
-        public TranslationPair(
+        public TranslationPair_Old(
             IEnumerable<SourceSegment> sourceSegments,
             IEnumerable<TargetSegment> targetSegments)
         {
@@ -84,17 +84,17 @@ namespace ClearBible.Clear3.Impl.Data
 
     public class TranslationPairTable_Old : ITranslationPairTable
     {
-        private List<TranslationPair> _table;
+        private List<TranslationPair_Old> _table;
 
-        public IEnumerable<TranslationPair> Entries => _table;
+        public IEnumerable<TranslationPair_Old> Entries => _table;
 
         public TranslationPairTable_Old()
         {
-            _table = new List<TranslationPair>();
+            _table = new List<TranslationPair_Old>();
         }
 
         public TranslationPairTable_Old(
-            IEnumerable<TranslationPair> pairs)
+            IEnumerable<TranslationPair_Old> pairs)
         {
             _table = pairs.ToList();
         }
@@ -104,7 +104,7 @@ namespace ClearBible.Clear3.Impl.Data
             IEnumerable<LegacyTargetSegment> targetSegments)
         {
             _table.Add(
-                new TranslationPair(
+                new TranslationPair_Old(
                     sourceSegments.Select(seg =>
                         new SourceSegment(seg.Lemma, seg.LegacySourceId)),
                     targetSegments.Select(seg =>
