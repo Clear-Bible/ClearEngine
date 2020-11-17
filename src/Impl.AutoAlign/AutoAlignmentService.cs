@@ -88,6 +88,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             TreeService treeService = (TreeService)iTreeService;
 
+            // Build map of group key to position of primary
+            // word within group.
+            Dictionary<string, int> primaryPositions =
+                BuildPrimaryPositionTable(groups);
+
             foreach (
                 Tuple<
                     List<Tuple<SourceID, Lemma>>,
@@ -150,7 +155,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                                     targetMap[targetNode.Word.ID],
                                     targetNode.Prob))
                                 .ToList()))
-                    .ToList();
+                    .ToList();              
 
                 align.Lines[i] =
                     Output.WriteAlignment(
@@ -158,7 +163,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         sourcePoints,
                         targetPoints,
                         glossTable,
-                        groups);
+                        primaryPositions);
 
                 i += 1;
             }
@@ -887,6 +892,25 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         RelativePos = x.RelativePos
                     })
                 .ToList();
+        }
+
+
+        static Dictionary<string, int> BuildPrimaryPositionTable(
+            GroupTranslationsTable groups)
+        {
+            return
+                groups.Inner
+                .Select(kvp => kvp.Value)
+                .SelectMany(groupTranslations =>
+                    groupTranslations.Select(tg => new
+                    {
+                        text = tg.Item1.Text.Replace(" ~ ", " "),
+                        position = tg.Item2.Int
+                    }))
+                .GroupBy(x => x.text)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.First().position);
         }
 
 
