@@ -63,6 +63,41 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
+    public class TargetBond
+    {
+        public TargetBond(
+            TargetPoint targetPoint,
+            double score)
+        {
+            TargetPoint = targetPoint;
+            Score = score;
+        }
+
+        public TargetPoint TargetPoint { get; }
+        public double Score { get; }
+    }
+
+
+    public class MultiLink
+    {
+        public IEnumerable<SourcePoint> Sources =>
+            _sources;
+
+        private List<SourcePoint> _sources;
+
+        public IEnumerable<TargetBond> Targets =>
+            _targets;
+
+        private List<TargetBond> _targets;
+
+        public MultiLink(List<SourcePoint> sources, List<TargetBond> targets)
+        {
+            _sources = sources;
+            _targets = targets;
+        }
+    }
+
+
     public class SourceWord
     {
         public string ID { get; set; }
