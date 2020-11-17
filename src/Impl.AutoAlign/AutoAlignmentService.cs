@@ -99,8 +99,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     List<Tuple<TargetID, TargetMorph>>>
                 entry in translationPairTable.Inner)
             {
-                ChapterID chapterID = entry.Item1.First().Item1.ChapterID;
+                VerseID sStartVerseID = entry.Item1.First().Item1.VerseID;
+                VerseID sEndVerseID = entry.Item1.Last().Item1.VerseID;
+
+                ChapterID chapterID = sStartVerseID.ChapterID;
                 treeService.PreloadTreesForChapter(chapterID);
+
+                XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
+
+                List<SourcePoint> sourcePoints = GetSourcePoints(treeNode);
+
+                List<TargetPoint> targetPoints = GetTargetPoints(entry.Item2);
 
                 TranslationPair entryPrime = new TranslationPair(
                     entry.Item1.Select(src =>
@@ -116,15 +125,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         glossTable, oldLinks, assumptions);
 
                 //---
-
-                VerseID sStartVerseID = entry.Item1.First().Item1.VerseID;
-                VerseID sEndVerseID = entry.Item1.Last().Item1.VerseID;
-
-                XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
-
-                List<SourcePoint> sourcePoints = GetSourcePoints(treeNode);
-
-                List<TargetPoint> targetPoints = GetTargetPoints(entry.Item2);
 
                 Dictionary<string, SourcePoint> sourceMap =
                     sourcePoints
@@ -155,10 +155,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                                     targetMap[targetNode.Word.ID],
                                     targetNode.Prob))
                                 .ToList()))
-                    .ToList();              
+                    .ToList();
+
+                //---
 
                 align.Lines[i] =
-                    Output.WriteAlignment(
+                    Output.GetLine(
                         multiLinks,
                         sourcePoints,
                         targetPoints,
