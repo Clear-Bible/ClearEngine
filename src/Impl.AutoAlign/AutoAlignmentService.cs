@@ -155,7 +155,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 align.Lines[i] =
                     Output.WriteAlignment(
                         multiLinks,
-                        links2,
                         sourcePoints,
                         targetPoints,
                         glossTable,
