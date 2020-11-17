@@ -80,12 +80,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class MultiLink
     {
-        public IEnumerable<SourcePoint> Sources =>
+        public IReadOnlyList<SourcePoint> Sources =>
             _sources;
 
         private List<SourcePoint> _sources;
 
-        public IEnumerable<TargetBond> Targets =>
+        public IReadOnlyList<TargetBond> Targets =>
             _targets;
 
         private List<TargetBond> _targets;
