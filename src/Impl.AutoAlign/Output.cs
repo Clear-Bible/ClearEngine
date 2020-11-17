@@ -6,14 +6,12 @@ using System.Linq;
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Impl.TreeService;
 
     public class Output
     {
         public static Line WriteAlignment(
             List<MultiLink> multiLinks,
-            List<MappedGroup> links,
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
             Dictionary<string, Gloss> glossTable,
@@ -24,21 +22,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // word within group.
             Dictionary<string, int> primaryPositions =
                 BuildPrimaryPositionTable(groups);
-
-            // Get rid of fake links.
-            links =
-                links
-                .Where(mappedGroup =>
-                    !mappedGroup.TargetNodes.Any(
-                        linkedWord => linkedWord.Word.IsFake))
-            .ToList();
-
-            // Build map of source ID to position in source points list.
-            Dictionary<string, int> positionTable =
-                sourcePoints
-                .ToDictionary(
-                    sp => sp.SourceID.AsCanonicalString,
-                    sp => sp.Position);
 
             return new Line()
             {
@@ -81,35 +64,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 },
 
                 links =
-                    links
-                    .Select(mappedGroup => new Link()
+                    multiLinks
+                    .Select(multiLink => new Link()
                     {
                         source =
-                            mappedGroup.SourceNodes
-                            .Select(sourceNode =>
-                                positionTable[sourceNode.MorphID])
+                            multiLink.Sources
+                            .Select(sourcePoint => sourcePoint.Position)
                             .ToArray(),
 
                         target =
                             WithPrimaryWordFirst(
-                                mappedGroup.TargetNodes,
+                                multiLink.Targets,
                                 primaryPositions)
-                            .Select(linkedWord => linkedWord.Word.Position)
+                            .Select(t => t.TargetPoint.Position)
                             .ToArray(),
 
                         cscore =
-                            isNotOneToOne(mappedGroup)
+                            isNotOneToOne(multiLink)
                             ? 0.9
-                            : Math.Exp(mappedGroup.TargetNodes[0].Prob)
+                            : Math.Exp(multiLink.Targets.ElementAt(0).Score)
                     })
                     .ToList()
             };
 
-            // align.Lines[k] = line;
-
-            bool isNotOneToOne(MappedGroup mappedGroup) =>
-                mappedGroup.SourceNodes.Count > 1 ||
-                mappedGroup.TargetNodes.Count > 1;
+            bool isNotOneToOne(MultiLink ml) =>
+                ml.Sources.Count() > 1 ||
+                ml.Targets.Count() > 1;
         }
 
 
@@ -132,27 +112,27 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        static List<LinkedWord> WithPrimaryWordFirst(
-            List<LinkedWord> targetNodes,
+        static IEnumerable<TargetBond> WithPrimaryWordFirst(
+            IEnumerable<TargetBond> targets,
             Dictionary<string, int> primaryPositions)
         {
-            if (targetNodes.Count <= 1) return targetNodes;
+            if (targets.Count() <= 1) return targets;
 
             string groupKey =
                 string.Join(
                     " ",
-                    targetNodes.Select(lw => lw.Text))
-                .Trim()
-                .ToLower();
+                    targets.Select(t => t.TargetPoint.Lower))
+                .Trim();
 
-            LinkedWord primaryWord = targetNodes[primaryPositions[groupKey]];
+            TargetBond primaryWord =
+                targets.ElementAt(primaryPositions[groupKey]);
 
             return
-                Enumerable.Empty<LinkedWord>()
+                Enumerable.Empty<TargetBond>()
                 .Append(primaryWord)
                 .Concat(
-                    targetNodes
-                    .Where(lw => lw != primaryWord))
+                    targets
+                    .Where(t => t != primaryWord))
                 .ToList();
         }
     }
