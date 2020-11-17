@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+
 namespace ClearBible.Clear3.API
 {
     public class ClearException : Exception
@@ -193,5 +195,56 @@ namespace ClearBible.Clear3.API
     {
         public string Gloss1;
         public string Gloss2;
+    }
+
+
+    /// <summary><code>
+    ///
+    /// Target ::= TargetMorph TargetID
+    /// 
+    /// </code></summary>
+    /// 
+    public struct Target
+    {
+        public readonly TargetMorph TargetMorph;
+        public readonly TargetID TargetID;
+
+        public Target(
+            TargetMorph targetMorph,
+            TargetID targetID)
+        {
+            TargetMorph = targetMorph;
+            TargetID = targetID;
+        }
+    }
+
+
+
+    /// <summary><code>
+    ///
+    /// TranslationPair ::=
+    ///     Targets :: List<Target>
+    ///     FirstSourceVerseID :: VerseID
+    ///     LastSourceVerseID :: VerseID
+    ///
+    /// </code></summary>
+    /// 
+    public class TranslationPair
+    {
+        public IReadOnlyList<Target> Targets => _targets;
+        private List<Target> _targets;
+
+        public VerseID FirstSourceVerseID { get; }
+        public VerseID LastSourceVerseID { get; }
+
+        public TranslationPair(
+            List<Target> targets,
+            VerseID firstSourceVerseID,
+            VerseID lastSourceVerseID)
+        {
+            _targets = targets;
+            FirstSourceVerseID = firstSourceVerseID;
+            LastSourceVerseID = lastSourceVerseID;
+        }
     }
 }
