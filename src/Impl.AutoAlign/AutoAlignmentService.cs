@@ -121,8 +121,40 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 List<TargetPoint> targetPoints = GetTargetPoints(entry.Item2);
 
+                Dictionary<string, SourcePoint> sourceMap =
+                    sourcePoints
+                    .ToDictionary(
+                        sp => sp.SourceID.AsCanonicalString,
+                        sp => sp);
+
+                Dictionary<string, TargetPoint> targetMap =
+                    targetPoints
+                    .ToDictionary(
+                        tp => tp.TargetID.AsCanonicalString,
+                        tp => tp);
+
+                List<MultiLink> multiLinks =
+                    links2
+                    .Where(mappedGroup =>
+                    !mappedGroup.TargetNodes.Any(
+                        linkedWord => linkedWord.Word.IsFake))
+                    .Select(mappedGroup => new MultiLink(
+                            sources:
+                                mappedGroup.SourceNodes
+                                .Select(sourceNode =>
+                                    sourceMap[sourceNode.MorphID])
+                                .ToList(),
+                            targets:
+                                mappedGroup.TargetNodes
+                                .Select(targetNode => new TargetBond(
+                                    targetMap[targetNode.Word.ID],
+                                    targetNode.Prob))
+                                .ToList()))
+                    .ToList();
+
                 align.Lines[i] =
                     Output.WriteAlignment(
+                        multiLinks,
                         links2,
                         sourcePoints,
                         targetPoints,
