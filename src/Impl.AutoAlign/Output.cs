@@ -12,6 +12,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     public class Output
     {
         public static Line WriteAlignment(
+            List<MultiLink> multiLinks,
             List<MappedGroup> links,
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
