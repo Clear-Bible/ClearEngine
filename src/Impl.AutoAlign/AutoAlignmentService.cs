@@ -120,13 +120,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // Align a single verse
                 List<MappedGroup> links2 =
                     AlignZone(
-                        entryPrime,
                         treeNode,
                         sourcePoints,
                         targetPoints,
                         groups,
                         maxPaths,
-                        oldLinks,
                         assumptions);
 
                 //---
@@ -241,37 +239,48 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     x.targetID,
                     x.altID,
                     x.position,
-                    0))
+                    totalTargetPoints))
                 .ToList();
         }
 
 
         public static List<MappedGroup> AlignZone(
-            TranslationPair entry,
             XElement treeNode,
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
             GroupTranslationsTable groups,
             int maxPaths,
-            Dictionary<string, Dictionary<string, string>> oldLinks,  // (verseID => (mWord.altId => tWord.altId))
             Assumptions assumptions
             )
         {
             Dictionary<string, string> sourceAltIdMap =
                 GetSourceAltIdMap(treeNode);
 
-            List<TargetWord> tWords = MakeTargetWordList(entry.TargetSegments);
+            List<TargetWord> tWords =
+                targetPoints
+                .Select(tp => new TargetWord()
+                {
+                    AltID = tp.AltID,
+                    ID = tp.TargetID.AsCanonicalString,
+                    InGroup = false,
+                    IsFake = false,
+                    Position = tp.Position,
+                    RelativePos = tp.RelativePosition,
+                    Text = tp.Lower,
+                    Text2 = tp.Text
+                })
+                .ToList();
 
-            string goalNodeId = treeNode.Attribute("nodeId").Value;
-            goalNodeId = goalNodeId.Substring(0, goalNodeId.Length - 1);
 
-            string verseIDFromTree = goalNodeId.Substring(0, 8);
+            string goalNodeId = treeNode.TreeNodeID().TreeNodeStackID.AsCanonicalString;
 
-            if (!oldLinks.TryGetValue(verseIDFromTree,
-                out Dictionary<string, string> existingLinks))
-            {
-                existingLinks = new Dictionary<string, string>();
-            }
+            string verseIDFromTree =
+                treeNode.TreeNodeID().VerseID.AsCanonicalString;          
+
+            Dictionary<string, string> existingLinks =
+                assumptions.OldLinksForVerse(verseIDFromTree);
+            // FIXME: What if the zone is more than one verse?
+
 
             // Dictionary<string:sourceID, List<Candidate>>
             // sourceID is obtained from the terminal from the tree
@@ -352,10 +361,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlignStaging.FixCrossingLinks(ref links2);
 
             return links2;
-
-            // Output.WriteAlignment(links2, sourceWordList, tWords, ref align, i, glossTable, groups_old, wordInfoTable);
-            // In spite of its name, Output.WriteAlignment does not touch the
-            // filesystem; it puts its result in align[i].
 
             // Line line2 = MakeLineWip(segBridgeTable, sourceWordList, tWords, glossTable, wordInfoTable);
         }

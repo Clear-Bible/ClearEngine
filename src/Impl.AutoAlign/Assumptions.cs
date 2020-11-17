@@ -137,6 +137,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        public Dictionary<string, string> OldLinksForVerse(
+            string legacyVerseID)
+        {
+            if (_oldLinks.TryGetValue(legacyVerseID,
+                out Dictionary<string, string> linksForVerse))
+            {
+                return linksForVerse;
+            }
+            else
+            {
+                return new Dictionary<string, string>();
+            }
+        }
+
+
         public double GetTranslationModelScore(SourceNode sn, TargetWord tw)
         {
             if (_translationModel.Inner.TryGetValue(new Lemma(sn.Lemma),
