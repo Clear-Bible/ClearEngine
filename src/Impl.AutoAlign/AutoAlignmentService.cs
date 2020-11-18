@@ -253,9 +253,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select(tp => new MaybeTargetPoint(tp))
                 .ToList();
 
-
-            string goalNodeId = treeNode.TreeNodeID().TreeNodeStackID.AsCanonicalString;
-
             string verseIDFromTree =
                 treeNode.TreeNodeID().VerseID.AsCanonicalString;          
 
@@ -274,16 +271,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     existingLinks,
                     assumptions);
 
-            Dictionary<string, List<Candidate>> alignments =
-                new Dictionary<string, List<Candidate>>();
-            AlignNodes(
+            Candidate topCandidate = AlignTree(
                 treeNode,
-                tWords, alignments, tWords.Count,
-                maxPaths, terminalCandidates);
-
-            List<Candidate> verseAlignment = alignments[goalNodeId];
-            Candidate topCandidate = verseAlignment[0];
-
+                tWords.Count,
+                maxPaths,
+                terminalCandidates);
 
 
             List<MonoLink> links = AlignTheRest(
@@ -291,7 +283,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 topCandidate,
                 tWords, 
                 assumptions);
-
 
             List<MonoLink> linksWip = links
                 .Where(link => !link.LinkedWord.Word.IsNothing)
@@ -350,13 +341,34 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+
+        public static Candidate AlignTree(
+            XElement treeNode,
+            int numberTargets,
+            int maxPaths,
+            AlternativesForTerminals terminalCandidates)
+        {
+            Dictionary<string, List<Candidate>> alignments =
+                new Dictionary<string, List<Candidate>>();
+
+            AlignNode(
+                treeNode,
+                alignments, numberTargets,
+                maxPaths, terminalCandidates);
+
+            string goalNodeId =
+                treeNode.TreeNodeID().TreeNodeStackID.AsCanonicalString;
+
+            List<Candidate> verseAlignment = alignments[goalNodeId];
+
+            return verseAlignment[0];
+        }
         
 
 
 
-        public static void AlignNodes(
+        public static void AlignNode(
             XElement treeNode,
-            List<MaybeTargetPoint> tWords,
             Dictionary<string, List<Candidate>> alignments,
             int n, // number of target tokens
             int maxPaths,
@@ -367,8 +379,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //
             foreach (XElement subTree in treeNode.Elements())
             {
-                AlignNodes(
-                    subTree, tWords, alignments, n,
+                AlignNode(
+                    subTree, // tWords,
+                    alignments, n,
                     maxPaths, terminalCandidates);
             }
 
