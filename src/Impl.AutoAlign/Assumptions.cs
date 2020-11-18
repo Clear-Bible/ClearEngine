@@ -137,6 +137,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        public bool IsGoodLink(string lemma, string targetText)
+        {
+            string link = $"{lemma}#{targetText}";
+            return
+                _goodLinks.ContainsKey(link) &&
+                _goodLinks[link] >= _goodLinkMinCount;
+        }
+
+
         public Dictionary<string, string> OldLinksForVerse(
             string legacyVerseID)
         {

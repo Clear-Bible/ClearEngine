@@ -273,15 +273,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Candidate topCandidate = AlignTree(
                 treeNode,
-                tWords.Count,
+                targetPoints.Count,
                 maxPaths,
                 terminalCandidates);
 
 
             List<MonoLink> links = AlignTheRest(
                 sourcePoints,
+                targetPoints,
                 topCandidate,
-                tWords, 
                 assumptions);
 
             List<MonoLink> linksWip = links
@@ -508,8 +508,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static List<MonoLink> AlignTheRest(
             List<SourcePoint> sourcePoints,
+            List<TargetPoint> targetPoints,
             Candidate topCandidate,
-            List<MaybeTargetPoint> targetWords,
             Assumptions assumptions
             )
         {
@@ -571,7 +571,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 LinkedWord linkedWord =
                     AlignWord(
                         link.SourceNode,
-                        targetWords,
+                        targetPoints,
                         linksTable,
                         linkedTargets,
                         assumptions);
@@ -599,8 +599,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
  
         public static LinkedWord AlignWord(
-            SourceNode sourceNode, 
-            List<MaybeTargetPoint> targetWords,
+            SourceNode sourceNode,
+            List<TargetPoint> targetPoints,
             Dictionary<string, MonoLink> linksTable,
             List<string> linkedTargets,
             Assumptions assumptions)
@@ -620,24 +620,29 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 if (linkedTargets.Contains(targetID)) return null;
 
-                MaybeTargetPoint newTargetWord =
-                    targetWords.First(tw => tw.ID == targetID);
+                TargetPoint targetPoint =
+                    targetPoints.First(
+                        tp => tp.TargetID.AsCanonicalString == targetID);
 
                 if (assumptions.IsSourceStopWord(sourceNode) &&
-                    !assumptions.IsGoodLink(sourceNode, newTargetWord))
+                    !assumptions.IsGoodLink(
+                        sourceNode.Lemma,
+                        targetPoint.Lower))
                 {
                     return null;
                 }
 
-                if (!assumptions.IsBadLink(sourceNode, newTargetWord) &&
-                    !assumptions.IsPunctuation(newTargetWord) &&
-                    !assumptions.IsTargetStopWord(newTargetWord))
+                if (!assumptions.IsBadLink(
+                        sourceNode.Lemma,
+                        targetPoint.Lower) &&
+                    !assumptions.IsPunctuation(targetPoint.Lower) &&
+                    !assumptions.IsStopWord(targetPoint.Lower))
                 {
                     return new LinkedWord()
                     {
-                        Text = newTargetWord.Lower,
+                        Text = targetPoint.Lower,
                         Prob = 0,
-                        Word = newTargetWord
+                        Word = new MaybeTargetPoint(targetPoint)
                     };
                 }
             }
@@ -663,7 +668,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         AlignStaging.GetTargetCandidates(
                             preNeighbor,
                             postNeighbor,
-                            targetWords,
+                            targetPoints,
                             linkedTargets,
                             assumptions);
                 }
@@ -672,7 +677,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     targetCandidates =
                         AlignStaging.GetTargetCandidates(
                             preNeighbor,
-                            targetWords,
+                            targetPoints,
                             linkedTargets,
                             assumptions);
                 }
@@ -681,7 +686,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     targetCandidates =
                         AlignStaging.GetTargetCandidates(
                             postNeighbor,
-                            targetWords,
+                            targetPoints,
                             linkedTargets,
                             assumptions);
                 }
