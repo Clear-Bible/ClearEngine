@@ -749,8 +749,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 MaybeTargetPoint topCandidate = candidates[0];
 
-                topCandidate.BecomeSomething();
-
                 LinkedWord linkedWord = new LinkedWord();
                 linkedWord.Prob = probs[topCandidate];
                 linkedWord.Text = topCandidate.Text;

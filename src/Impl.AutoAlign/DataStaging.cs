@@ -161,28 +161,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             InGroup = false;
         }
 
-        public void Set(
-            string id,
-            string text,
-            int position)
-        {
-            ID = id;
-            Text = text;
-            Position = position;
-            IsNothing = false;
-        }
-
-        public void BecomeSomething()
-        {
-            IsNothing = false;
-        }
-
-        public string ID { get; private set; }
+        public string ID { get; }
         public string AltID { get; }
-        public string Text { get; private set; }  // lowercased
+        public string Text { get; }  // lowercased
         public string Text2 { get; } // original case
-        public int Position { get; private set; }
-        public bool IsNothing { get; private set; }
+        public int Position { get; }
+        public bool IsNothing { get; }
         public double RelativePos { get; }
         public bool InGroup { get; set; }
     }
