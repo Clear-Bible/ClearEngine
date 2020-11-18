@@ -80,23 +80,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 strongs);
 
 
-            //List<TranslationPair> translationPairs =
-            //    translationPairTable.Inner
-            //    .Select(x => new TranslationPair(
-            //        targets:
-            //            x.Item2
-            //            .Select(y => new Target(
-            //                targetMorph: y.Item2,
-            //                targetID: y.Item1))
-            //            .ToList(),
-            //        firstSourceVerseID:
-            //            x.Item1.First().Item1.VerseID,
-            //        lastSourceVerseID:
-            //            x.Item1.Last().Item1.VerseID))
-            //    .ToList();
-
-
-
            Alignment2 align = new Alignment2();  // The output goes here.
 
             align.Lines = new Line[translationPairs.Count];
@@ -112,19 +95,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (TranslationPair translationPair in translationPairs)
             {
-                VerseID sStartVerseID = translationPair.FirstSourceVerseID;
-                VerseID sEndVerseID = translationPair.FirstSourceVerseID;
 
-                ChapterID chapterID = sStartVerseID.ChapterID;
-                treeService.PreloadTreesForChapter(chapterID);
-
-                XElement treeNode = treeService.GetTreeNode(sStartVerseID, sEndVerseID);
+                XElement treeNode = treeService.GetTreeNode(
+                    translationPair.FirstSourceVerseID,
+                    translationPair.LastSourceVerseID);
 
                 List<SourcePoint> sourcePoints = GetSourcePoints(treeNode);
-
-                var x = translationPair.Targets
-                    .Select(t => Tuple.Create(t.TargetID, t.TargetMorph))
-                    .ToList();
 
                 List<TargetPoint> targetPoints =
                     GetTargetPoints(translationPair.Targets);
