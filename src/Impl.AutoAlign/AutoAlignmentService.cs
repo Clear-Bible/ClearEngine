@@ -241,7 +241,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             )
         {
             Dictionary<string, string> sourceAltIdMap =
-                GetSourceAltIdMap(treeNode);
+                sourcePoints.ToDictionary(
+                    sp => sp.SourceID.AsCanonicalString,
+                    sp => sp.AltID);
 
             List<TargetWord> tWords =
                 targetPoints
@@ -353,36 +355,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        /// <summary>
-        /// Returns a mapping from sourceID to alternate ID for
-        /// each source word under the treeNode.  The alternate ID
-        /// is a string of the form xxx-n, where xxx is the surface
-        /// form and and it is the n-th occurrence of that surface
-        /// form.  (n is 1-based)
-        /// </summary>
-        /// 
-        public static Dictionary<string, string> GetSourceAltIdMap(
-            XElement treeNode)
-        {
-            return
-                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
-                .Select(node => new
-                {
-                    sourceID = node.SourceID().AsCanonicalString,
-                    surface = node.Surface()
-                })
-                .OrderBy(x => x.sourceID)
-                .GroupBy(x => x.surface)
-                .SelectMany(group =>
-                    group.Select((x, groupIndex) => new
-                    {
-                        x.sourceID,
-                        altID = $"{x.surface}-{groupIndex + 1}"
-                    }))
-                .ToDictionary(
-                    x => x.sourceID,
-                    x => x.altID);
-        }
+        
 
 
 
