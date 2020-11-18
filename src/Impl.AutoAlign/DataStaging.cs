@@ -134,6 +134,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     public class MaybeTargetPoint
     {
         public MaybeTargetPoint(
+            TargetPoint targetPoint,
             string id,
             string altID,
             string lower,
@@ -141,6 +142,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int position,
             double relativePos)
         {
+            TargetPoint = targetPoint;
             ID = id;
             AltID = altID;
             Lower = lower;
@@ -160,6 +162,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Text = "";
             InGroup = false;
         }
+
+        public TargetPoint TargetPoint { get; }
 
         public string ID { get; }
         public string AltID { get; }
