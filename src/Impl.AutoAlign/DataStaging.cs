@@ -19,21 +19,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public SourcePoint(
             XElement terminal,
             string altID,
-            int position,
+            int treePosition,
+            int sourcePosition,
             int totalPoints)
         {
             Terminal = terminal;
             AltID = altID;
-            Position = position;
-            RelativePosition = position / (double)totalPoints;
+            TreePosition = treePosition;
+            RelativeTreePosition = treePosition / (double)totalPoints;
             SourceID = terminal.SourceID();
+            SourcePosition = sourcePosition;
         }
 
         public XElement Terminal { get; }
         public SourceID SourceID { get; }
         public string AltID { get; }
-        public int Position { get; }
-        public double RelativePosition { get; }
+        public int TreePosition { get; }
+        public double RelativeTreePosition { get; }
+        public int SourcePosition { get; }
     }
 
 

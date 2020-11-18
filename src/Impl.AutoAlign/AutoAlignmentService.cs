@@ -174,11 +174,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return
                 terminals
-                .Select(term => new
+                .Select((term, n) => new
                 {
                     term,
                     sourceID = term.SourceID(),
-                    surface = term.Surface()
+                    surface = term.Surface(),
+                    treePosition = n
                 })
                 .GroupBy(x => x.surface)
                 .SelectMany(group =>
@@ -186,13 +187,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     {
                         x.term,
                         x.sourceID,
-                        altID = $"{x.surface}-{groupIndex + 1}"
+                        altID = $"{x.surface}-{groupIndex + 1}",
+                        x.treePosition
                     }))
                 .OrderBy(x => x.sourceID.AsCanonicalString)
-                .Select((x, n) => new SourcePoint(
+                .Select((x, m) => new SourcePoint(
                     x.term,
                     x.altID,
-                    n,
+                    x.treePosition,
+                    m,
                     totalSourcePoints))
                 .ToList();
         }
@@ -502,6 +505,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             )
         {
             List<LinkedWord> linkedWords = AutoAlignUtility.GetLinkedWords(topCandidate);
+            // (in candidate order, which I think is terminal order)
 
             double numberTerminals = terminals.Count;
 
@@ -584,7 +588,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static void AlignWord(
-            MonoLink link,
+            MonoLink link, // link.LinkedWord.Word.IsNothing is true
             List<MaybeTargetPoint> targetWords,
             Dictionary<string, MonoLink> linksTable,
             List<string> linkedTargets,
