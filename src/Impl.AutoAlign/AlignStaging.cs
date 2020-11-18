@@ -197,7 +197,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static List<MaybeTargetPoint> GetTargetCandidates(
             MonoLink anchorLink,
-            List<MaybeTargetPoint> targetWords,
+            List<TargetPoint> targetPoints,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
@@ -223,7 +223,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             IEnumerable<MaybeTargetPoint> getWords(IEnumerable<int> positions) =>
                 PositionsToTargetCandidates(
                     positions,
-                    targetWords,
+                    targetPoints,
                     linkedTargets,
                     assumptions);
         }
@@ -232,7 +232,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static List<MaybeTargetPoint> GetTargetCandidates(
             MonoLink leftAnchor,
             MonoLink rightAnchor,
-            List<MaybeTargetPoint> targetWords,
+            List<TargetPoint> targetPoints,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
@@ -248,7 +248,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return PositionsToTargetCandidates(
                 span(),
-                targetWords,
+                targetPoints,
                 linkedTargets,
                 assumptions).ToList();
         }
@@ -256,20 +256,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static IEnumerable<MaybeTargetPoint> PositionsToTargetCandidates(
             IEnumerable<int> positions,
-            List<MaybeTargetPoint> targetWords,
+            List<TargetPoint> targetPoints,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
             var ansr =
                 positions
-                .Where(n => n >= 0 && n < targetWords.Count)
-                .Select(n => new { n, tw = targetWords[n] })
-                .Select(x => new { x.n, x.tw.Lower, x.tw.ID, x.tw })
+                .Where(n => n >= 0 && n < targetPoints.Count)
+                .Select(n => targetPoints[n])
+                .Select(targetPoint => new
+                {
+                    targetPoint.Lower,
+                    targetPoint
+                })
                 .Where(x =>
                     !assumptions.ContentWordsOnly || isContentWord(x.Lower))
                 .Where(x => isNotLinkedAlready(x.Lower))
                 .TakeWhile(x => isNotPunctuation(x.Lower))
-                .Select(x => new MaybeTargetPoint(x.tw.TargetPoint))
+                .Select(x => new MaybeTargetPoint(x.targetPoint))
                 .ToList();
 
             return ansr;
