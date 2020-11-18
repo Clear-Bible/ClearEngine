@@ -63,7 +63,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     {
                         source =
                             multiLink.Sources
-                            .Select(sourcePoint => sourcePoint.Position)
+                            .Select(sourcePoint => sourcePoint.SourcePosition)
                             .ToArray(),
 
                         target =
