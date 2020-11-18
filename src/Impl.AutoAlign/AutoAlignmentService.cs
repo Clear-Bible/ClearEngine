@@ -290,11 +290,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<Candidate> verseAlignment = alignments[goalNodeId];
             Candidate topCandidate = verseAlignment[0];
 
-            List<XElement> terminals = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
+
 
             List<MonoLink> links = AlignTheRest(
+                sourcePoints,
                 topCandidate,
-                terminals,
                 tWords, 
                 assumptions);
 
@@ -343,6 +343,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select(node => node.SourceID().AsCanonicalString)
                 .OrderBy(sourceID => sourceID),
                 wordInfoTable);
+
+            List<XElement> terminals = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
 
             Groups.AlignGroups(links2, sourceWordList, tWords, groups_old, terminals);
 
@@ -498,8 +500,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static List<MonoLink> AlignTheRest(
+            List<SourcePoint> sourcePoints,
             Candidate topCandidate,
-            List<XElement> terminals,
             List<MaybeTargetPoint> targetWords,
             Assumptions assumptions
             )
@@ -507,25 +509,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<LinkedWord> linkedWords = AutoAlignUtility.GetLinkedWords(topCandidate);
             // (in candidate order, which I think is terminal order)
 
-            double numberTerminals = terminals.Count;
-
             List<SourceNode> sourceNodes =
-                terminals
-                .Select(term =>
+                sourcePoints
+                .OrderBy(sp => sp.TreePosition)
+                .Select(sp => new SourceNode()
                 {
-                    int position = term.Start();
-                    return new SourceNode()
-                    {
-                        MorphID = term.SourceId(),
-                        English = term.English(),
-                        Lemma = term.Lemma(),
-                        Category = term.Category(),
-                        Position = position,
-                        RelativePos = position / numberTerminals,
-                        TreeNode = term
-                    };
+                    MorphID = sp.SourceID.AsCanonicalString,
+                    English = sp.Terminal.English(),
+                    Lemma = sp.Terminal.Lemma(),
+                    Category = sp.Terminal.Category(),
+                    Position = sp.TreePosition,
+                    RelativePos = sp.RelativeTreePosition,
+                    TreeNode = sp.Terminal
                 })
                 .ToList();
+
 
             List<MonoLink> links =
                 sourceNodes
