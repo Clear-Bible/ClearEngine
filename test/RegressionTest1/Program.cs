@@ -14,6 +14,7 @@ using Data = AlignmentTool.Data;
 using Gloss = ClearBible.Clear3.API.Gloss;
 using Line = GBI_Aligner.Line;
 
+using TranslationPair = ClearBible.Clear3.API.TranslationPair;
 using TranslationPairTable = ClearBible.Clear3.API.TranslationPairTable;
 using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
 using TranslationModel = ClearBible.Clear3.API.TranslationModel;
@@ -169,8 +170,13 @@ namespace RegressionTest1
 
             string jsonOutput = output("alignment.json");
 
-            TranslationPairTable translationPairTable =
-                importExportService.ImportTranslationPairTableFromLegacy2(
+            //TranslationPairTable translationPairTable =
+            //    importExportService.ImportTranslationPairTableFromLegacy2(
+            //        parallelSourceIdLemmaPath,
+            //        parallelTargetIdPath);
+
+            List<TranslationPair> translationPairs =
+                importExportService.ImportTranslationPairsFromLegacy(
                     parallelSourceIdLemmaPath,
                     parallelTargetIdPath);
 
@@ -213,7 +219,7 @@ namespace RegressionTest1
             Console.WriteLine("Auto Alignment");
            
             clearService.AutoAlignmentService.AutoAlign(
-                translationPairTable,
+                translationPairs,
                 jsonOutput,
                 transModel2,
                 manTransModel2,
