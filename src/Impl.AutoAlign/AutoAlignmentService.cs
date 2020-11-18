@@ -267,7 +267,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 TerminalCandidates2.GetTerminalCandidates(
                     treeNode,
                     sourceAltIdMap,
-                    tWords,
+                    targetPoints,
                     existingLinks,
                     assumptions);
 

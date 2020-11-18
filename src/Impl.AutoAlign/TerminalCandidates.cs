@@ -17,7 +17,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static AlternativesForTerminals GetTerminalCandidates(
             XElement treeNode,
             Dictionary<string, string> idMap,
-            List<MaybeTargetPoint> targetWords,
+            List<TargetPoint> targetPoints,
             Dictionary<string, string> existingLinks,
             Assumptions assumptions)
         {
@@ -38,7 +38,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         altID,
                         lemma,
                         strong,
-                        targetWords,
+                        targetPoints,
                         existingLinks,
                         assumptions);
 
@@ -58,7 +58,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string altID,
             string lemma,
             string strong,
-            List<MaybeTargetPoint> targetWords,
+            List<TargetPoint> targetPoints,
             Dictionary <string, string> existingLinks,
             Assumptions assumptions)
         {
@@ -68,15 +68,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 string targetAltID = existingLinks[altID];
 
-                MaybeTargetPoint target =
-                    targetWords
-                    .Where(tw => targetAltID == tw.AltID)
+                TargetPoint targetPoint = 
+                    targetPoints
+                    .Where(tp => targetAltID == tp.AltID)
                     .FirstOrDefault();
 
-                if (target != null)
+                if (targetPoint != null)
                 {
-                    return new AlternativeCandidates(
-                        new[] { new Candidate(target, 0.0) });
+                    return new AlternativeCandidates(new[]
+                    {
+                        new Candidate(
+                            new MaybeTargetPoint(targetPoint),
+                            0.0)
+                    });
                 }
             }
 
@@ -90,9 +94,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 Dictionary<string, int> wordIds = assumptions.Strongs[strong];
 
                 return new AlternativeCandidates(
-                    targetWords
-                    .Where(tw => wordIds.ContainsKey(tw.ID))
-                    .Select(tw => new Candidate(tw, 0.0)));
+                    targetPoints
+                    .Where(tp =>
+                        wordIds.ContainsKey(tp.TargetID.AsCanonicalString))
+                    .Select(tp => new MaybeTargetPoint(tp))
+                    .Select(mtp => new Candidate(mtp, 0.0)));
             }
 
             if (assumptions.IsStopWord(lemma))
@@ -104,18 +110,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 out TryGet<string, double> tryGetManScoreForTargetText))
             {
                 return new AlternativeCandidates(
-                    targetWords
-                    .Select(tWord =>
+                    targetPoints
+                    .Select(targetPoint =>
                     {
                         bool ok = tryGetManScoreForTargetText(
-                            tWord.Lower,
+                            targetPoint.Lower,
                             out double score);
-                        return new { ok, tWord, score };
+                        return new { ok, targetPoint, score };
                     })
                     .Where(x => x.ok)
                     .Select(x => new
                     {
-                        x.tWord,
+                        x.targetPoint,
                         score = Math.Log(Math.Max(x.score, 0.2))
                     })
                     .GroupBy(x => x.score)
@@ -123,35 +129,44 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Take(1)
                     .SelectMany(group =>
                         group
-                        .Select(x => new Candidate(x.tWord, x.score))));
+                        .Select(x =>
+                            new Candidate(
+                                new MaybeTargetPoint(x.targetPoint),
+                                x.score))));
             }
             else if (assumptions.TryGetTranslations(lemma,
                 out TryGet<string, double> tryGetScoreForTargetText))
             {
                 return new AlternativeCandidates(
-                    targetWords
-                    .Where(tw => !assumptions.IsBadLink(lemma, tw.Lower))
-                    .Where(tw => !assumptions.IsPunctuation(tw.Lower))
-                    .Where(tw => !assumptions.IsStopWord(tw.Lower))
-                    .Select(tWord =>
+                    targetPoints
+                    .Where(tp => !assumptions.IsBadLink(lemma, tp.Lower))
+                    .Where(tp => !assumptions.IsPunctuation(tp.Lower))
+                    .Where(tp => !assumptions.IsStopWord(tp.Lower))
+                    .Select(targetPoint =>
                     {
                         bool ok = tryGetScoreForTargetText(
-                            tWord.Lower,
+                            targetPoint.Lower,
                             out double score);
-                        return new { ok, tWord, score };
+                        return new { ok, targetPoint, score };
                     })
                     .Where(x => x.ok)
                     .Select(x => new
                     {
-                        x.tWord,
-                        score = Math.Log(getAdjustedScore(x.score, x.tWord.ID))
+                        x.targetPoint,
+                        score = Math.Log(
+                            getAdjustedScore(
+                                x.score,
+                                x.targetPoint.TargetID.AsCanonicalString))
                     })
                     .GroupBy(x => x.score)
                     .OrderByDescending(group => group.Key)
                     .Take(1)
                     .SelectMany(group =>
                         group
-                        .Select(x => new Candidate(x.tWord, x.score))));
+                        .Select(x =>
+                        new Candidate(
+                            new MaybeTargetPoint(x.targetPoint),
+                            x.score))));
             }
 
             return new AlternativeCandidates();
