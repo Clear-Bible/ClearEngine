@@ -133,15 +133,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class MaybeTargetPoint
     {
-        //public string ID;
-        //public string AltID;
-        //public string Text;  // lowercased
-        //public string Text2; // original case
-        //public int Position;
-        //public bool IsNothing;
-        //public double RelativePos;
-        //public bool InGroup;
-
         public MaybeTargetPoint(
             string id,
             string altID,
