@@ -170,11 +170,6 @@ namespace RegressionTest1
 
             string jsonOutput = output("alignment.json");
 
-            //TranslationPairTable translationPairTable =
-            //    importExportService.ImportTranslationPairTableFromLegacy2(
-            //        parallelSourceIdLemmaPath,
-            //        parallelTargetIdPath);
-
             List<TranslationPair> translationPairs =
                 importExportService.ImportTranslationPairsFromLegacy(
                     parallelSourceIdLemmaPath,
