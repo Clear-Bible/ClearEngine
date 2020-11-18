@@ -127,14 +127,18 @@ namespace ClearBible.Clear3.Impl.TreeService
         /// Get a tree node that covers a specified verse range.
         /// The result might be a newly constructed node to cover
         /// more than one verse.  Assumes that the verse range
-        /// lies in the chapters that have been preloaded by
-        /// PreloadTreesForChapter().
+        /// fits in the chapter of the starting verse together with
+        /// the chapter before and the chapter after (where these
+        /// chapters exist in the same book).
         /// </summary>
         /// <param name="start">Starting verse.</param>
         /// <param name="end">Ending verse.</param>
         /// 
         public XElement GetTreeNode(VerseID start, VerseID end)
         {
+            ChapterID chapterID = start.ChapterID;
+            PreloadTreesForChapter(chapterID);
+
             List<XElement> verseTrees = GetVerseTrees(start, end).ToList();
 
             if (verseTrees.Count == 1)
