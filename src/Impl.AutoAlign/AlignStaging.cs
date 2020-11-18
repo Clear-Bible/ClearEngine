@@ -269,12 +269,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     !assumptions.ContentWordsOnly || isContentWord(x.Text))
                 .Where(x => isNotLinkedAlready(x.Text))
                 .TakeWhile(x => isNotPunctuation(x.Text))
-                .Select(x => new MaybeTargetPoint()
-                {
-                    ID = x.ID,
-                    Position = x.n,
-                    Text = x.Text
-                })
+                .Select(x => new MaybeTargetPoint(
+                    id: x.ID,
+                    altID: "",
+                    text: x.Text,
+                    text2: "",
+                    position: x.n,
+                    relativePos: 0))
                 .ToList();
 
             bool isContentWord(string text) =>

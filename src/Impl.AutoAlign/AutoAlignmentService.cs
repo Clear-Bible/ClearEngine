@@ -247,17 +247,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<MaybeTargetPoint> tWords =
                 targetPoints
-                .Select(tp => new MaybeTargetPoint()
-                {
-                    AltID = tp.AltID,
-                    ID = tp.TargetID.AsCanonicalString,
-                    InGroup = false,
-                    IsNothing = false,
-                    Position = tp.Position,
-                    RelativePos = tp.RelativePosition,
-                    Text = tp.Lower,
-                    Text2 = tp.Text
-                })
+                .Select(tp => new MaybeTargetPoint(
+                    id: tp.TargetID.AsCanonicalString,
+                    altID: tp.AltID,
+                    text: tp.Lower,
+                    text2: tp.Text,
+                    position: tp.Position,
+                    relativePos: tp.RelativePosition))
                 .ToList();
 
 
@@ -624,10 +620,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     link.LinkedWord.Text = newTargetWord.Text;
                     link.LinkedWord.Prob = 0;
-                    link.LinkedWord.Word.ID = targetID;
-                    link.LinkedWord.Word.IsNothing = false;
-                    link.LinkedWord.Word.Text = newTargetWord.Text;
-                    link.LinkedWord.Word.Position = newTargetWord.Position;
+                    link.LinkedWord.Word.Set(
+                        id: targetID,
+                        text: newTargetWord.Text,
+                        position: newTargetWord.Position);
                     return;
                 }
             }
@@ -745,7 +741,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 MaybeTargetPoint topCandidate = candidates[0];
 
-                topCandidate.IsNothing = false;
+                topCandidate.BecomeSomething();
 
                 LinkedWord linkedWord = new LinkedWord();
                 linkedWord.Prob = probs[topCandidate];
@@ -828,15 +824,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     altId,
                     x => x.ID,
                     y => y.ID,
-                    (x, y) => new MaybeTargetPoint()
-                    {
-                        ID = x.ID,
-                        Text = x.Text,
-                        Text2 = x.Text2,
-                        AltID = y.AltID,
-                        Position = x.Position,
-                        RelativePos = x.RelativePos
-                    })
+                    (x, y) => new MaybeTargetPoint(
+                        id: x.ID,
+                        altID: y.AltID,
+                        text: x.Text,
+                        text2: x.Text2,
+                        position: x.Position,
+                        relativePos: x.RelativePos))
                 .ToList();
         }
 

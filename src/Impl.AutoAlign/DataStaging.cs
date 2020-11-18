@@ -130,15 +130,69 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class MaybeTargetPoint
     {
-        public string ID;
-        public string AltID;
-        public string Text;  // lowercased
-        public string Text2; // original case
-        public int Position;
-        public bool IsNothing;
-        public double RelativePos;
-        public bool InGroup;
+        //public string ID;
+        //public string AltID;
+        //public string Text;  // lowercased
+        //public string Text2; // original case
+        //public int Position;
+        //public bool IsNothing;
+        //public double RelativePos;
+        //public bool InGroup;
+
+        public MaybeTargetPoint(
+            string id,
+            string altID,
+            string text,
+            string text2,
+            int position,
+            double relativePos)
+        {
+            ID = id;
+            AltID = altID;
+            Text = text;
+            Text2 = text2;
+            Position = position;
+            RelativePos = relativePos;
+            IsNothing = false;
+            InGroup = false;
+        }
+
+        public MaybeTargetPoint()
+        {
+            IsNothing = true;
+            ID = "0";
+            Position = -1;
+            Text = "";
+            Text2 = "";
+            InGroup = false;
+        }
+
+        public void Set(
+            string id,
+            string text,
+            int position)
+        {
+            ID = id;
+            Text = text;
+            Position = position;
+            IsNothing = false;
+        }
+
+        public void BecomeSomething()
+        {
+            IsNothing = false;
+        }
+
+        public string ID { get; private set; }
+        public string AltID { get; }
+        public string Text { get; private set; }  // lowercased
+        public string Text2 { get; } // original case
+        public int Position { get; private set; }
+        public bool IsNothing { get; private set; }
+        public double RelativePos { get; }
+        public bool InGroup { get; set; }
     }
+
 
     public class Candidate
     {
