@@ -260,16 +260,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<string> linkedTargets,
             Assumptions assumptions)
         {
-            return
+            var ansr =
                 positions
                 .Where(n => n >= 0 && n < targetWords.Count)
                 .Select(n => new { n, tw = targetWords[n] })
-                .Select(x => new { x.n, x.tw.Lower, x.tw.ID })
+                .Select(x => new { x.n, x.tw.Lower, x.tw.ID, x.tw })
                 .Where(x =>
                     !assumptions.ContentWordsOnly || isContentWord(x.Lower))
                 .Where(x => isNotLinkedAlready(x.Lower))
                 .TakeWhile(x => isNotPunctuation(x.Lower))
                 .Select(x => new MaybeTargetPoint(
+                    targetPoint: x.tw.TargetPoint,
                     id: x.ID,
                     altID: "",
                     lower: x.Lower,
@@ -277,6 +278,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     position: x.n,
                     relativePos: 0))
                 .ToList();
+
+            var z = ansr.FirstOrDefault(x => x.TargetPoint.TargetID.AsCanonicalString != x.ID);
+            if (z != null)
+            {
+                ;
+            }
+
+            return ansr;
 
             bool isContentWord(string text) =>
                 !assumptions.IsTargetFunctionWord(text);
