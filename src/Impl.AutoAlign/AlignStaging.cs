@@ -175,7 +175,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static string GetTargetWordTextFromID(string targetID, List<TargetWord> targetWords)
+        public static string GetTargetWordTextFromID(string targetID, List<MaybeTargetPoint> targetWords)
         {
             return targetWords
                 .Where(tw => targetID == tw.ID)
@@ -185,7 +185,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static int GetTargetPositionFromID(string targetID, List<TargetWord> targetWords)
+        public static int GetTargetPositionFromID(string targetID, List<MaybeTargetPoint> targetWords)
         {
             return targetWords
                 .Where(tw => targetID == tw.ID)
@@ -195,9 +195,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<TargetWord> GetTargetCandidates(
+        public static List<MaybeTargetPoint> GetTargetCandidates(
             MonoLink anchorLink,
-            List<TargetWord> targetWords,
+            List<MaybeTargetPoint> targetWords,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
@@ -220,7 +220,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Concat(getWords(up()))
                 .ToList();
 
-            IEnumerable<TargetWord> getWords(IEnumerable<int> positions) =>
+            IEnumerable<MaybeTargetPoint> getWords(IEnumerable<int> positions) =>
                 PositionsToTargetCandidates(
                     positions,
                     targetWords,
@@ -229,10 +229,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<TargetWord> GetTargetCandidates(
+        public static List<MaybeTargetPoint> GetTargetCandidates(
             MonoLink leftAnchor,
             MonoLink rightAnchor,
-            List<TargetWord> targetWords,
+            List<MaybeTargetPoint> targetWords,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
@@ -254,9 +254,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static IEnumerable<TargetWord> PositionsToTargetCandidates(
+        public static IEnumerable<MaybeTargetPoint> PositionsToTargetCandidates(
             IEnumerable<int> positions,
-            List<TargetWord> targetWords,
+            List<MaybeTargetPoint> targetWords,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
@@ -269,7 +269,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     !assumptions.ContentWordsOnly || isContentWord(x.Text))
                 .Where(x => isNotLinkedAlready(x.Text))
                 .TakeWhile(x => isNotPunctuation(x.Text))
-                .Select(x => new TargetWord()
+                .Select(x => new MaybeTargetPoint()
                 {
                     ID = x.ID,
                     Position = x.n,
@@ -378,13 +378,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             bool pathHasDuplicateWords =
                 AutoAlignUtility.GetTargetWordsInPath(path)
-                .Where(word => !word.IsFake)
+                .Where(word => !word.IsNothing)
                 .GroupBy(word => new { word.Text, word.Position })
                 .Any(hasAtLeastTwoMembers);
 
             return !pathHasDuplicateWords;
 
-            bool hasAtLeastTwoMembers(IEnumerable<TargetWord> words) =>
+            bool hasAtLeastTwoMembers(IEnumerable<MaybeTargetPoint> words) =>
                 words.Skip(1).Any();
         }
 
@@ -459,7 +459,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             IEnumerable<int> positions =
                 AutoAlignUtility.GetTargetWordsInPath(path)
-                .Where(tw => !tw.IsFake)
+                .Where(tw => !tw.IsNothing)
                 .Select(tw => tw.Position);
 
             return

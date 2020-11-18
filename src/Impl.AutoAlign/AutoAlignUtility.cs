@@ -139,11 +139,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         //
         public static string GetWords(Candidate c)
         {
-            List<TargetWord> wordsInPath = GetTargetWordsInPath(c.Chain);
+            List<MaybeTargetPoint> wordsInPath = GetTargetWordsInPath(c.Chain);
 
             string words = string.Empty;
 
-            foreach (TargetWord wordInPath in wordsInPath)
+            foreach (MaybeTargetPoint wordInPath in wordsInPath)
             {
                 words += wordInPath.Text + "-" + wordInPath.Position + " ";
             }
@@ -152,13 +152,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<TargetWord> GetTargetWordsInPath(CandidateChain path)
+        public static List<MaybeTargetPoint> GetTargetWordsInPath(CandidateChain path)
         {
-            IEnumerable<TargetWord> helper(ArrayList path)
+            IEnumerable<MaybeTargetPoint> helper(ArrayList path)
             {
                 if (path.Count == 0)
                 {
-                    return new TargetWord[] { CreateFakeTargetWord() };
+                    return new MaybeTargetPoint[] { CreateFakeTargetWord() };
                 }
                 else if (path[0] is Candidate)
                 {
@@ -168,7 +168,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
                 else
                 {
-                    return path.Cast<TargetWord>();
+                    return path.Cast<MaybeTargetPoint>();
                 }
             }
 
@@ -178,11 +178,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static string GetWordsInPath(CandidateChain path)
         {
-            List<TargetWord> wordsInPath = GetTargetWordsInPath(path);
+            List<MaybeTargetPoint> wordsInPath = GetTargetWordsInPath(path);
 
             string words = string.Empty;
 
-            foreach (TargetWord wordInPath in wordsInPath)
+            foreach (MaybeTargetPoint wordInPath in wordsInPath)
             {
                 words += wordInPath.Text + "-" + wordInPath.Position + " ";
             }
@@ -192,13 +192,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static TargetWord CreateFakeTargetWord()
+        public static MaybeTargetPoint CreateFakeTargetWord()
         {
-            return new TargetWord()
+            return new MaybeTargetPoint()
             {
                 Text = string.Empty,
                 Position = -1,
-                IsFake = true,
+                IsNothing = true,
                 ID = "0"
             };
         }
@@ -219,11 +219,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 links.Add(new LinkedWord()
                 {
-                    Word = new TargetWord
+                    Word = new MaybeTargetPoint
                     {
                         Text = string.Empty,
                         Position = -1,
-                        IsFake = true,
+                        IsNothing = true,
                         ID = "0"
                     },
                     Prob = -1000,
@@ -241,7 +241,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
                 else
                 {
-                    foreach (TargetWord tWord in path)
+                    foreach (MaybeTargetPoint tWord in path)
                     {
                         links.Add(new LinkedWord()
                         {

@@ -128,14 +128,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-    public class TargetWord
+    public class MaybeTargetPoint
     {
         public string ID;
         public string AltID;
         public string Text;  // lowercased
         public string Text2; // original case
         public int Position;
-        public bool IsFake;
+        public bool IsNothing;
         public double RelativePos;
         public bool InGroup;
     }
@@ -150,7 +150,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Chain = new CandidateChain();
         }
 
-        public Candidate(TargetWord tw, double probability)
+        public Candidate(MaybeTargetPoint tw, double probability)
         {
             Chain = new CandidateChain(Enumerable.Repeat(tw, 1));
             Prob = probability;
@@ -180,7 +180,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
         }
 
-        public CandidateChain(IEnumerable<TargetWord> targetWords)
+        public CandidateChain(IEnumerable<MaybeTargetPoint> targetWords)
             : base(targetWords.ToList())
         {
         }
@@ -233,7 +233,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class LinkedWord
     {
-        public TargetWord Word;
+        public MaybeTargetPoint Word;
         public string Text;
         public double Prob;
     }
