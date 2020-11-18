@@ -801,46 +801,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<MaybeTargetPoint> MakeTargetWordList(
-            IEnumerable<TargetSegment> targetSegments)
-        {
-            double totalWords = targetSegments.Count();
-
-            var wip =
-                targetSegments
-                .Select((s, n) => new
-                {
-                    s.ID,
-                    Text = s.Text.ToLower(),
-                    Text2 = s.Text,
-                    Position = n,
-                    RelativePos = n / totalWords
-                });
-
-            var altId =
-                wip
-                .GroupBy(x => x.Text2)
-                .SelectMany(
-                    group => group.Select((x, groupIndex) =>
-                        new { x.ID, AltID = $"{x.Text2}-{groupIndex + 1}" }));
-
-            return
-                wip
-                .Join(
-                    altId,
-                    x => x.ID,
-                    y => y.ID,
-                    (x, y) => new MaybeTargetPoint(
-                        id: x.ID,
-                        altID: y.AltID,
-                        lower: x.Text,
-                        text: x.Text2,
-                        position: x.Position,
-                        relativePos: x.RelativePos))
-                .ToList();
-        }
-
-
         static Dictionary<string, int> BuildPrimaryPositionTable(
             GroupTranslationsTable groups)
         {
