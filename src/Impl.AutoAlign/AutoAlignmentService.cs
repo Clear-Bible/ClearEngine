@@ -561,12 +561,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             foreach (MonoLink link in
                 links.Where(link => link.LinkedWord.Word.IsNothing))
             {
-                AlignWord(
-                    link,
-                    targetWords,
-                    linksTable,
-                    linkedTargets,
-                    assumptions);
+                LinkedWord linkedWord =
+                    AlignWord(
+                        link.SourceNode,
+                        targetWords,
+                        linksTable,
+                        linkedTargets,
+                        assumptions);
+
+                if (linkedWord != null)
+                {
+                    link.LinkedWord = linkedWord;
+                }
             }
 
             conflicts = AlignStaging.FindConflictingLinks(links);
@@ -584,64 +590,63 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-
-        public static void AlignWord(
-            MonoLink link, // link.LinkedWord.Word.IsNothing is true
+ 
+        public static LinkedWord AlignWord(
+            SourceNode sourceNode, 
             List<MaybeTargetPoint> targetWords,
             Dictionary<string, MonoLink> linksTable,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
-            if (assumptions.IsSourceStopWord(link.SourceNode)) return;
+            if (assumptions.IsSourceStopWord(sourceNode)) return null;
 
             if (assumptions.ContentWordsOnly &&
-                assumptions.IsSourceFunctionWord(link.SourceNode))
+                assumptions.IsSourceFunctionWord(sourceNode))
             {
-                return;
+                return null;
             }
                 
             if (assumptions.UseAlignModel &&
                 assumptions.TryGetPreAlignment(
-                    link.SourceNode,
+                    sourceNode,
                     out string targetID))
             {
-                if (linkedTargets.Contains(targetID)) return;
+                if (linkedTargets.Contains(targetID)) return null;
 
                 MaybeTargetPoint newTargetWord =
                     targetWords.First(tw => tw.ID == targetID);
 
-                if (assumptions.IsSourceStopWord(link.SourceNode) &&
-                    !assumptions.IsGoodLink(link.SourceNode, newTargetWord))
+                if (assumptions.IsSourceStopWord(sourceNode) &&
+                    !assumptions.IsGoodLink(sourceNode, newTargetWord))
                 {
-                    return;
+                    return null;
                 }
 
-                if (!assumptions.IsBadLink(link.SourceNode, newTargetWord) &&
+                if (!assumptions.IsBadLink(sourceNode, newTargetWord) &&
                     !assumptions.IsPunctuation(newTargetWord) &&
                     !assumptions.IsTargetStopWord(newTargetWord))
                 {
-                    link.LinkedWord.Text = newTargetWord.Text;
-                    link.LinkedWord.Prob = 0;
-                    link.LinkedWord.Word.Set(
-                        id: targetID,
-                        text: newTargetWord.Text,
-                        position: newTargetWord.Position);
-                    return;
+                    return new LinkedWord()
+                    {
+                        Text = newTargetWord.Text,
+                        Prob = 0,
+                        Word = newTargetWord
+                    };
                 }
             }
 
             List<MonoLink> linkedSiblings =
                 AutoAlignUtility.GetLinkedSiblings(
-                    link.SourceNode.TreeNode,
+                    sourceNode.TreeNode,
                     linksTable);
 
             if (linkedSiblings.Count > 0)
             {
                 MonoLink preNeighbor =
-                    AutoAlignUtility.GetPreNeighbor(link, linkedSiblings);
+                    AutoAlignUtility.GetPreNeighbor(sourceNode, linkedSiblings);
 
                 MonoLink postNeighbor =
-                    AutoAlignUtility.GetPostNeighbor(link, linkedSiblings);
+                    AutoAlignUtility.GetPostNeighbor(sourceNode, linkedSiblings);
 
                 List<MaybeTargetPoint> targetCandidates = new List<MaybeTargetPoint>();
 
@@ -677,18 +682,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 if (targetCandidates.Count > 0)
                 {
                     LinkedWord newTarget = GetTopCandidate(
-                        link.SourceNode,
+                        sourceNode,
                         targetCandidates,
                         linkedTargets,
                         assumptions);
 
                     if (newTarget != null)
                     {
-                        link.LinkedWord = newTarget;
+                        return newTarget;
                     }
                 }
-
             }
+
+            return null;
         }
 
 

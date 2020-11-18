@@ -95,9 +95,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static MonoLink GetPreNeighbor(MonoLink unLinked, List<MonoLink> linkedSiblings)
+        public static MonoLink GetPreNeighbor(SourceNode sourceNode, List<MonoLink> linkedSiblings)
         {
-            int limit = unLinked.SourceNode.TreeNode.AttrAsInt("Start");
+            int limit = sourceNode.TreeNode.AttrAsInt("Start");
 
             int end(MonoLink mw) =>
                 mw.SourceNode.TreeNode.AttrAsInt("End");
@@ -112,9 +112,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static MonoLink GetPostNeighbor(MonoLink unLinked, List<MonoLink> linkedSiblings)
+        public static MonoLink GetPostNeighbor(SourceNode sourceNode, List<MonoLink> linkedSiblings)
         {
-            int limit = unLinked.SourceNode.TreeNode.AttrAsInt("End");
+            int limit = sourceNode.TreeNode.AttrAsInt("End");
 
             int end(MonoLink mw) =>
                 mw.SourceNode.TreeNode.AttrAsInt("End");
