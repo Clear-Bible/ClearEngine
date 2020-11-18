@@ -32,5 +32,9 @@ namespace ClearBible.Clear3.APIImportExport
         TranslationPairTable ImportTranslationPairTableFromLegacy2(
             string parallelSourceIdLemmaPath,
             string parallelTargetIdPath);
+
+        List<TranslationPair> ImportTranslationPairsFromLegacy(
+            string parallelSourcePath,
+            string parallelTargetPath);
     }
 }

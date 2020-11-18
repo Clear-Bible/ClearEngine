@@ -109,6 +109,64 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
         }
 
 
+        public List<TranslationPair> ImportTranslationPairsFromLegacy(
+            string parallelSourcePath,
+            string parallelTargetPath)
+        {
+            string[] sourceLines = File.ReadAllLines(parallelSourcePath);
+            string[] targetLines = File.ReadAllLines(parallelTargetPath);
+
+            if (sourceLines.Length != targetLines.Length)
+            {
+                throw new InvalidDataException(
+                    "Parallel files must have same number of lines.");
+            }
+
+            return
+                sourceLines.Zip(targetLines, (sourceLine, targetLine) =>
+                {
+                    IEnumerable<string>
+                        sourceStrings = fields(sourceLine),
+                        targetStrings = fields(targetLine);
+
+                    return new TranslationPair(
+                        targets:
+                            targetStrings
+                            .Select(s => new Target(
+                                getTargetMorph(s),
+                                getTargetId(s)))
+                            .ToList(),
+                        firstSourceVerseID:
+                            getSourceVerseID(sourceStrings.First()),
+                        lastSourceVerseID:
+                            getSourceVerseID(sourceStrings.Last()));
+                })
+                .ToList();
+
+
+            // Local functions:
+
+            IEnumerable<string> fields(string line) =>
+                line.Split(' ').Where(s => !String.IsNullOrWhiteSpace(s));
+
+            TargetMorph getTargetMorph(string s) =>
+                new TargetMorph(getBeforeLastUnderscore(s));
+
+            TargetID getTargetId(string s) =>
+                new TargetID(getAfterLastUnderscore(s));
+
+            VerseID getSourceVerseID(string s) =>
+                (new SourceID(getAfterLastUnderscore(s))).VerseID;
+
+            string getBeforeLastUnderscore(string s) =>
+                s.Substring(0, s.LastIndexOf("_"));
+
+            string getAfterLastUnderscore(string s) =>
+                s.Substring(s.LastIndexOf("_") + 1);
+        }
+
+
+
         public ITranslationModel ImportTranslationModel_Old(
             IClear30ServiceAPI clearService,
             string filePath)

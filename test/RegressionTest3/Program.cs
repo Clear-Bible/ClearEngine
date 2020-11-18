@@ -76,8 +76,13 @@ namespace RegressionTest3
             // Clear3 uses the machine-readable metadata to download
             // resources when so requested.
 
-            TranslationPairTable translationPairTable =
-                importExportService.ImportTranslationPairTableFromLegacy2(
+            //TranslationPairTable translationPairTable =
+            //    importExportService.ImportTranslationPairTableFromLegacy2(
+            //        parallelSourceIdLemmaPath,
+            //        parallelTargetIdPath);
+
+            List<TranslationPair> translationPairs =
+                importExportService.ImportTranslationPairsFromLegacy(
                     parallelSourceIdLemmaPath,
                     parallelTargetIdPath);
 
@@ -134,7 +139,7 @@ namespace RegressionTest3
             Console.WriteLine("Calling Auto Aligner.");
 
             clearService.AutoAlignmentService.AutoAlign(
-                translationPairTable,
+                translationPairs,
                 jsonOutput,
                 transModel,
                 manTransModel,

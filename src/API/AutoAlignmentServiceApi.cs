@@ -23,7 +23,7 @@ namespace ClearBible.Clear3.API
             CancellationToken cancellationToken);
 
         void AutoAlign(
-            TranslationPairTable translationPairTable,
+            List<TranslationPair> translationPairs,
             string jsonOutput,
             TranslationModel translationModel,
             TranslationModel manTransModel,
