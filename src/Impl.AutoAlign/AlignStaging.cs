@@ -85,11 +85,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .ToList();
 
             bool targetWordNotEmpty(MonoLink link) =>
-                link.LinkedWord.Word.Text != string.Empty;
+                link.LinkedWord.Word.Lower != string.Empty;
 
             Tuple<string, string> targetTextAndId(MonoLink link) =>
                 Tuple.Create(
-                    link.LinkedWord.Word.Text,
+                    link.LinkedWord.Word.Lower,
                     link.LinkedWord.Word.ID);
         }
 
@@ -179,7 +179,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             return targetWords
                 .Where(tw => targetID == tw.ID)
-                .Select(tw => tw.Text)
+                .Select(tw => tw.Lower)
                 .DefaultIfEmpty("")
                 .First();
         }
@@ -264,16 +264,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 positions
                 .Where(n => n >= 0 && n < targetWords.Count)
                 .Select(n => new { n, tw = targetWords[n] })
-                .Select(x => new { x.n, x.tw.Text, x.tw.ID })
+                .Select(x => new { x.n, x.tw.Lower, x.tw.ID })
                 .Where(x =>
-                    !assumptions.ContentWordsOnly || isContentWord(x.Text))
-                .Where(x => isNotLinkedAlready(x.Text))
-                .TakeWhile(x => isNotPunctuation(x.Text))
+                    !assumptions.ContentWordsOnly || isContentWord(x.Lower))
+                .Where(x => isNotLinkedAlready(x.Lower))
+                .TakeWhile(x => isNotPunctuation(x.Lower))
                 .Select(x => new MaybeTargetPoint(
                     id: x.ID,
                     altID: "",
-                    text: x.Text,
-                    text2: "",
+                    lower: x.Lower,
+                    text: "",
                     position: x.n,
                     relativePos: 0))
                 .ToList();
@@ -380,7 +380,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             bool pathHasDuplicateWords =
                 AutoAlignUtility.GetTargetWordsInPath(path)
                 .Where(word => !word.IsNothing)
-                .GroupBy(word => new { word.Text, word.Position })
+                .GroupBy(word => new { word.Lower, word.Position })
                 .Any(hasAtLeastTwoMembers);
 
             return !pathHasDuplicateWords;

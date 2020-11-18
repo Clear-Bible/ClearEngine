@@ -85,7 +85,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public bool IsPunctuation(MaybeTargetPoint tw) =>
-            _puncs.Contains(tw.Text);
+            _puncs.Contains(tw.Lower);
 
 
         public bool IsStopWord(string text) =>
@@ -93,7 +93,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public bool IsTargetStopWord(MaybeTargetPoint tw) =>
-            _stopWords.Contains(tw.Text);
+            _stopWords.Contains(tw.Lower);
 
 
         public bool IsTargetFunctionWord(string text) =>
@@ -112,7 +112,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public bool IsBadLink(SourceNode sn, MaybeTargetPoint tw)
         {
-            string link = $"{sn.Lemma}#{tw.Text}";
+            string link = $"{sn.Lemma}#{tw.Lower}";
             return
                 _badLinks.ContainsKey(link) &&
                 _badLinks[link] >= _badLinkMinCount;
@@ -130,7 +130,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public bool IsGoodLink(SourceNode sn, MaybeTargetPoint tw)
         {
-            string link = $"{sn.Lemma}#{tw.Text}";
+            string link = $"{sn.Lemma}#{tw.Lower}";
             return
                 _goodLinks.ContainsKey(link) &&
                 _goodLinks[link] >= _goodLinkMinCount;
@@ -157,7 +157,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             if (_translationModel.Inner.TryGetValue(new Lemma(sn.Lemma),
                 out Dictionary<TargetMorph, Score> translations))
             {
-                if (translations.TryGetValue(new TargetMorph(tw.Text),
+                if (translations.TryGetValue(new TargetMorph(tw.Lower),
                     out Score score))
                 {
                     return score.Double;

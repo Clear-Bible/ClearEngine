@@ -253,8 +253,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select(tp => new MaybeTargetPoint(
                     id: tp.TargetID.AsCanonicalString,
                     altID: tp.AltID,
-                    text: tp.Lower,
-                    text2: tp.Text,
+                    lower: tp.Lower,
+                    text: tp.Text,
                     position: tp.Position,
                     relativePos: tp.RelativePosition))
                 .ToList();
@@ -628,7 +628,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     return new LinkedWord()
                     {
-                        Text = newTargetWord.Text,
+                        Text = newTargetWord.Lower,
                         Prob = 0,
                         Word = newTargetWord
                     };
@@ -751,7 +751,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 LinkedWord linkedWord = new LinkedWord();
                 linkedWord.Prob = probs[topCandidate];
-                linkedWord.Text = topCandidate.Text;
+                linkedWord.Text = topCandidate.Lower;
                 linkedWord.Word = topCandidate;
                 return linkedWord;
             }
@@ -764,7 +764,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<MaybeTargetPoint, double> pathProbs)
         {
             int hashCodeOfWordAndPosition(MaybeTargetPoint tw) =>
-                $"{tw.Text}-{tw.Position}".GetHashCode();
+                $"{tw.Lower}-{tw.Position}".GetHashCode();
 
             return
                 pathProbs
@@ -833,8 +833,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     (x, y) => new MaybeTargetPoint(
                         id: x.ID,
                         altID: y.AltID,
-                        text: x.Text,
-                        text2: x.Text2,
+                        lower: x.Text,
+                        text: x.Text2,
                         position: x.Position,
                         relativePos: x.RelativePos))
                 .ToList();
@@ -927,7 +927,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         {
                             id = long.Parse(tw.ID),
                             altId = tw.AltID,
-                            text = tw.Text2
+                            text = tw.Text
                         }).ToArray()
                 },
                 links = segBridgeTable.AllEntries
