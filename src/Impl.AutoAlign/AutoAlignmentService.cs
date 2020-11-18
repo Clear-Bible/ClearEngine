@@ -132,7 +132,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     links2
                     .Where(mappedGroup =>
                     !mappedGroup.TargetNodes.Any(
-                        linkedWord => linkedWord.Word.IsFake))
+                        linkedWord => linkedWord.Word.IsNothing))
                     .Select(mappedGroup => new MultiLink(
                             sources:
                                 mappedGroup.SourceNodes
@@ -245,14 +245,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     sp => sp.SourceID.AsCanonicalString,
                     sp => sp.AltID);
 
-            List<TargetWord> tWords =
+            List<MaybeTargetPoint> tWords =
                 targetPoints
-                .Select(tp => new TargetWord()
+                .Select(tp => new MaybeTargetPoint()
                 {
                     AltID = tp.AltID,
                     ID = tp.TargetID.AsCanonicalString,
                     InGroup = false,
-                    IsFake = false,
+                    IsNothing = false,
                     Position = tp.Position,
                     RelativePos = tp.RelativePosition,
                     Text = tp.Lower,
@@ -301,7 +301,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
             List<MonoLink> linksWip = links
-                .Where(link => !link.LinkedWord.Word.IsFake)
+                .Where(link => !link.LinkedWord.Word.IsNothing)
                 .Select(link => new MonoLink()
                 {
                     SourceNode = link.SourceNode,
@@ -361,7 +361,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static void AlignNodes(
             XElement treeNode,
-            List<TargetWord> tWords,
+            List<MaybeTargetPoint> tWords,
             Dictionary<string, List<Candidate>> alignments,
             int n, // number of target tokens
             int maxPaths,
@@ -501,7 +501,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static List<MonoLink> AlignTheRest(
             Candidate topCandidate,
             List<XElement> terminals,
-            List<TargetWord> targetWords,
+            List<MaybeTargetPoint> targetWords,
             Assumptions assumptions
             )
         {
@@ -551,17 +551,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<string> linkedTargets = 
                 links
-                .Where(mw => !mw.LinkedWord.Word.IsFake)
+                .Where(mw => !mw.LinkedWord.Word.IsNothing)
                 .Select(mw => mw.LinkedWord.Word.ID)
                 .ToList();
 
             Dictionary<string, MonoLink> linksTable = 
                 links
-                .Where(mw => !mw.LinkedWord.Word.IsFake)
+                .Where(mw => !mw.LinkedWord.Word.IsNothing)
                 .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
 
             foreach (MonoLink link in
-                links.Where(link => link.LinkedWord.Word.IsFake))
+                links.Where(link => link.LinkedWord.Word.IsNothing))
             {
                 AlignWord(
                     link,
@@ -589,7 +589,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static void AlignWord(
             MonoLink link,
-            List<TargetWord> targetWords,
+            List<MaybeTargetPoint> targetWords,
             Dictionary<string, MonoLink> linksTable,
             List<string> linkedTargets,
             Assumptions assumptions)
@@ -609,7 +609,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 if (linkedTargets.Contains(targetID)) return;
 
-                TargetWord newTargetWord =
+                MaybeTargetPoint newTargetWord =
                     targetWords.First(tw => tw.ID == targetID);
 
                 if (assumptions.IsSourceStopWord(link.SourceNode) &&
@@ -625,7 +625,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     link.LinkedWord.Text = newTargetWord.Text;
                     link.LinkedWord.Prob = 0;
                     link.LinkedWord.Word.ID = targetID;
-                    link.LinkedWord.Word.IsFake = false;
+                    link.LinkedWord.Word.IsNothing = false;
                     link.LinkedWord.Word.Text = newTargetWord.Text;
                     link.LinkedWord.Word.Position = newTargetWord.Position;
                     return;
@@ -645,7 +645,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 MonoLink postNeighbor =
                     AutoAlignUtility.GetPostNeighbor(link, linkedSiblings);
 
-                List<TargetWord> targetCandidates = new List<TargetWord>();
+                List<MaybeTargetPoint> targetCandidates = new List<MaybeTargetPoint>();
 
                 if (preNeighbor != null && postNeighbor != null)
                 {
@@ -697,12 +697,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static LinkedWord GetTopCandidate(
             SourceNode sWord,
-            List<TargetWord> tWords,
+            List<MaybeTargetPoint> tWords,
             List<string> linkedTargets,
             Assumptions assumptions
             )
         {
-            Dictionary<TargetWord, double> probs =
+            Dictionary<MaybeTargetPoint, double> probs =
                 tWords
                 .Where(notPunctuation)
                 .Where(notTargetStopWord)
@@ -719,33 +719,33 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     x => x.tWord,
                     x => Math.Log(x.score));
 
-            bool notPunctuation(TargetWord tw) =>
+            bool notPunctuation(MaybeTargetPoint tw) =>
                 !assumptions.IsPunctuation(tw);
 
-            bool notTargetStopWord(TargetWord tw) =>
+            bool notTargetStopWord(MaybeTargetPoint tw) =>
                 !assumptions.IsTargetStopWord(tw);
 
-            bool notAlreadyLinked(TargetWord tw) =>
+            bool notAlreadyLinked(MaybeTargetPoint tw) =>
                 !linkedTargets.Contains(tw.ID);
 
-            bool notBadLink(TargetWord tw) =>
+            bool notBadLink(MaybeTargetPoint tw) =>
                 !assumptions.IsBadLink(sWord, tw);
 
-            bool sourceStopWordImpliesIsGoodLink(TargetWord tw) =>
+            bool sourceStopWordImpliesIsGoodLink(MaybeTargetPoint tw) =>
                 !assumptions.IsSourceStopWord(sWord) ||
                 assumptions.IsGoodLink(sWord, tw);
 
-            double getTranslationModelScore(TargetWord tw) =>
+            double getTranslationModelScore(MaybeTargetPoint tw) =>
                 assumptions.GetTranslationModelScore(sWord, tw);
             
 
             if (probs.Count > 0)
             {
-                List<TargetWord> candidates = SortWordCandidates(probs);
+                List<MaybeTargetPoint> candidates = SortWordCandidates(probs);
 
-                TargetWord topCandidate = candidates[0];
+                MaybeTargetPoint topCandidate = candidates[0];
 
-                topCandidate.IsFake = false;
+                topCandidate.IsNothing = false;
 
                 LinkedWord linkedWord = new LinkedWord();
                 linkedWord.Prob = probs[topCandidate];
@@ -758,10 +758,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<TargetWord> SortWordCandidates(
-            Dictionary<TargetWord, double> pathProbs)
+        public static List<MaybeTargetPoint> SortWordCandidates(
+            Dictionary<MaybeTargetPoint, double> pathProbs)
         {
-            int hashCodeOfWordAndPosition(TargetWord tw) =>
+            int hashCodeOfWordAndPosition(MaybeTargetPoint tw) =>
                 $"{tw.Text}-{tw.Position}".GetHashCode();
 
             return
@@ -799,7 +799,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<TargetWord> MakeTargetWordList(
+        public static List<MaybeTargetPoint> MakeTargetWordList(
             IEnumerable<TargetSegment> targetSegments)
         {
             double totalWords = targetSegments.Count();
@@ -828,7 +828,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     altId,
                     x => x.ID,
                     y => y.ID,
-                    (x, y) => new TargetWord()
+                    (x, y) => new MaybeTargetPoint()
                     {
                         ID = x.ID,
                         Text = x.Text,
@@ -900,7 +900,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static Line MakeLineWip(
             SegBridgeTable segBridgeTable,
             List<SourceWord> sourceWords,
-            List<TargetWord> targetWords,
+            List<MaybeTargetPoint> targetWords,
             Dictionary<string, Gloss> glossTable,
             Dictionary<string, WordInfo> wordInfoTable)
         {

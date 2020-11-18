@@ -17,7 +17,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static AlternativesForTerminals GetTerminalCandidates(
             XElement treeNode,
             Dictionary<string, string> idMap,
-            List<TargetWord> targetWords,
+            List<MaybeTargetPoint> targetWords,
             Dictionary<string, string> existingLinks,
             Assumptions assumptions)
         {
@@ -58,7 +58,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string altID,
             string lemma,
             string strong,
-            List<TargetWord> targetWords,
+            List<MaybeTargetPoint> targetWords,
             Dictionary <string, string> existingLinks,
             Assumptions assumptions)
         {
@@ -68,7 +68,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 string targetAltID = existingLinks[altID];
 
-                TargetWord target =
+                MaybeTargetPoint target =
                     targetWords
                     .Where(tw => targetAltID == tw.AltID)
                     .FirstOrDefault();
@@ -288,7 +288,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
             else
             {
-                TargetWord tWord = (TargetWord)c.Chain[0];
+                MaybeTargetPoint tWord = (MaybeTargetPoint)c.Chain[0];
                 return tWord.ID;
             }
         }

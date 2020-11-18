@@ -14,13 +14,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static void AlignGroups(
             List<MappedGroup> links,
             List<SourceWord> sourceWords,
-            List<TargetWord> targetWords,
+            List<MaybeTargetPoint> targetWords,
             GroupTranslationsTable_Old groups,
             List<XElement> terminals
             )
         {
             SourceWord[] sWords = sourceWords.ToArray();
-            TargetWord[] tWords = targetWords.ToArray();
+            MaybeTargetPoint[] tWords = targetWords.ToArray();
 
             List<string[][]> mappedGroups = GetGroupLinks(
                 sWords, tWords, groups);
@@ -39,7 +39,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         static List<string[][]> GetGroupLinks(
             SourceWord[] sourceWords,
-            TargetWord[] targetWords,
+            MaybeTargetPoint[] targetWords,
             GroupTranslationsTable_Old groups)
         {
             List<string[][]> mappedGroups = new List<string[][]>();
@@ -116,7 +116,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return mappedGroups;
         }
 
-        static string FindTargetMatch(TargetWord[] targetWords, GroupTranslations_Old targetGroups, int minLength)
+        static string FindTargetMatch(MaybeTargetPoint[] targetWords, GroupTranslations_Old targetGroups, int minLength)
         {
             string match = string.Empty;
 
@@ -141,7 +141,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 for (int i = 0; i < targetWords.Length && wordIndex < words.Length; i++)
                 {
-                    TargetWord targetWord = targetWords[i];
+                    MaybeTargetPoint targetWord = targetWords[i];
                     if (targetWord.InGroup) continue;
                     string word = words[wordIndex].Trim();
                     if (targetWord.Text == word)
@@ -178,13 +178,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        static void SetInGroup2(TargetWord[] targetWords, List<int> targetWordsInGroup)
+        static void SetInGroup2(MaybeTargetPoint[] targetWords, List<int> targetWordsInGroup)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {
                 if (targetWordsInGroup.Contains(i))
                 {
-                    TargetWord targetWord = targetWords[i];
+                    MaybeTargetPoint targetWord = targetWords[i];
                     targetWord.InGroup = true;
                 }
             }
@@ -258,7 +258,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return inGroup;
         }
 
-        static void AddGroup(string[][] group, List<MappedGroup> links, List<XElement> terminals, List<TargetWord> targets)
+        static void AddGroup(string[][] group, List<MappedGroup> links, List<XElement> terminals, List<MaybeTargetPoint> targets)
         {
             string[] sourceWords = group[0];
             string[] targetWords = group[1];
@@ -309,7 +309,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return treeNode;
         }
 
-        static void AddTargetNodes(string[] targetWords, List<LinkedWord> targetNodes, List<TargetWord> targets)
+        static void AddTargetNodes(string[] targetWords, List<LinkedWord> targetNodes, List<MaybeTargetPoint> targets)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {
@@ -318,10 +318,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
         }
 
-        static LinkedWord GetTargetNode(string id, List<TargetWord> targets)
+        static LinkedWord GetTargetNode(string id, List<MaybeTargetPoint> targets)
         {
             LinkedWord lw = new LinkedWord();
-            TargetWord tWord = LocateTargetword(id, targets);
+            MaybeTargetPoint tWord = LocateTargetword(id, targets);
             lw.Prob = 1.0;
             lw.Text = tWord.Text;
             lw.Word = tWord;
@@ -329,11 +329,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return lw;
         }
 
-        static TargetWord LocateTargetword(string id, List<TargetWord> targets)
+        static MaybeTargetPoint LocateTargetword(string id, List<MaybeTargetPoint> targets)
         {
-            TargetWord tw = null;
+            MaybeTargetPoint tw = null;
 
-            foreach (TargetWord target in targets)
+            foreach (MaybeTargetPoint target in targets)
             {
                 if (id == target.ID)
                 {
