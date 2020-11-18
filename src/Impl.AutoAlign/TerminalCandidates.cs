@@ -108,7 +108,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(tWord =>
                     {
                         bool ok = tryGetManScoreForTargetText(
-                            tWord.Text,
+                            tWord.Lower,
                             out double score);
                         return new { ok, tWord, score };
                     })
@@ -130,13 +130,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 return new AlternativeCandidates(
                     targetWords
-                    .Where(tw => !assumptions.IsBadLink(lemma, tw.Text))
-                    .Where(tw => !assumptions.IsPunctuation(tw.Text))
-                    .Where(tw => !assumptions.IsStopWord(tw.Text))
+                    .Where(tw => !assumptions.IsBadLink(lemma, tw.Lower))
+                    .Where(tw => !assumptions.IsPunctuation(tw.Lower))
+                    .Where(tw => !assumptions.IsStopWord(tw.Lower))
                     .Select(tWord =>
                     {
                         bool ok = tryGetScoreForTargetText(
-                            tWord.Text,
+                            tWord.Lower,
                             out double score);
                         return new { ok, tWord, score };
                     })

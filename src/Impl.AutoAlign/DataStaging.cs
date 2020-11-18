@@ -136,15 +136,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public MaybeTargetPoint(
             string id,
             string altID,
+            string lower,
             string text,
-            string text2,
             int position,
             double relativePos)
         {
             ID = id;
             AltID = altID;
+            Lower = lower;
             Text = text;
-            Text2 = text2;
             Position = position;
             RelativePos = relativePos;
             IsNothing = false;
@@ -156,15 +156,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             IsNothing = true;
             ID = "0";
             Position = -1;
+            Lower = "";
             Text = "";
-            Text2 = "";
             InGroup = false;
         }
 
         public string ID { get; }
         public string AltID { get; }
-        public string Text { get; }  // lowercased
-        public string Text2 { get; } // original case
+        public string Lower { get; }  // lowercased
+        public string Text { get; } // original case
         public int Position { get; }
         public bool IsNothing { get; }
         public double RelativePos { get; }

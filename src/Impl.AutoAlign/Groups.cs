@@ -144,7 +144,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     MaybeTargetPoint targetWord = targetWords[i];
                     if (targetWord.InGroup) continue;
                     string word = words[wordIndex].Trim();
-                    if (targetWord.Text == word)
+                    if (targetWord.Lower == word)
                     {
                         match += targetWord.ID + " ";
                         wordIndex++;
@@ -323,7 +323,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             LinkedWord lw = new LinkedWord();
             MaybeTargetPoint tWord = LocateTargetword(id, targets);
             lw.Prob = 1.0;
-            lw.Text = tWord.Text;
+            lw.Text = tWord.Lower;
             lw.Word = tWord;
 
             return lw;

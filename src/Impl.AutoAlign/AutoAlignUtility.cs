@@ -145,7 +145,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (MaybeTargetPoint wordInPath in wordsInPath)
             {
-                words += wordInPath.Text + "-" + wordInPath.Position + " ";
+                words += wordInPath.Lower + "-" + wordInPath.Position + " ";
             }
 
             return words.Trim();
@@ -184,7 +184,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (MaybeTargetPoint wordInPath in wordsInPath)
             {
-                words += wordInPath.Text + "-" + wordInPath.Position + " ";
+                words += wordInPath.Lower + "-" + wordInPath.Position + " ";
             }
 
             return words.Trim();
@@ -235,7 +235,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         {
                             Word = tWord,
                             Prob = prob,
-                            Text = tWord.Text
+                            Text = tWord.Lower
                         });
                     }
                 }
