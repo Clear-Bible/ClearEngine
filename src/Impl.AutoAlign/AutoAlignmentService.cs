@@ -250,14 +250,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<MaybeTargetPoint> tWords =
                 targetPoints
-                .Select(tp => new MaybeTargetPoint(
-                    targetPoint: tp,
-                    id: tp.TargetID.AsCanonicalString,
-                    altID: tp.AltID,
-                    lower: tp.Lower,
-                    text: tp.Text,
-                    position: tp.Position,
-                    relativePos: tp.RelativePosition))
+                .Select(tp => new MaybeTargetPoint(tp))
                 .ToList();
 
 

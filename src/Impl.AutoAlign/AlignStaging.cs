@@ -269,21 +269,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     !assumptions.ContentWordsOnly || isContentWord(x.Lower))
                 .Where(x => isNotLinkedAlready(x.Lower))
                 .TakeWhile(x => isNotPunctuation(x.Lower))
-                .Select(x => new MaybeTargetPoint(
-                    targetPoint: x.tw.TargetPoint,
-                    id: x.ID,
-                    altID: "",
-                    lower: x.Lower,
-                    text: "",
-                    position: x.n,
-                    relativePos: 0))
+                .Select(x => new MaybeTargetPoint(x.tw.TargetPoint))
                 .ToList();
-
-            var z = ansr.FirstOrDefault(x => x.TargetPoint.TargetID.AsCanonicalString != x.ID);
-            if (z != null)
-            {
-                ;
-            }
 
             return ansr;
 
