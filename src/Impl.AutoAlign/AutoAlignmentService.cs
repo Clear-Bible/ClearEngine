@@ -39,7 +39,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public void AutoAlign(
-            TranslationPairTable translationPairTable,
+            List<TranslationPair> translationPairs,
             string jsonOutput,
             TranslationModel translationModel,
             TranslationModel manTransModel,
@@ -80,26 +80,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 strongs);
 
 
-            List<TranslationPair> translationPairs =
-                translationPairTable.Inner
-                .Select(x => new TranslationPair(
-                    targets:
-                        x.Item2
-                        .Select(y => new Target(
-                            targetMorph: y.Item2,
-                            targetID: y.Item1))
-                        .ToList(),
-                    firstSourceVerseID:
-                        x.Item1.First().Item1.VerseID,
-                    lastSourceVerseID:
-                        x.Item1.Last().Item1.VerseID))
-                .ToList();
+            //List<TranslationPair> translationPairs =
+            //    translationPairTable.Inner
+            //    .Select(x => new TranslationPair(
+            //        targets:
+            //            x.Item2
+            //            .Select(y => new Target(
+            //                targetMorph: y.Item2,
+            //                targetID: y.Item1))
+            //            .ToList(),
+            //        firstSourceVerseID:
+            //            x.Item1.First().Item1.VerseID,
+            //        lastSourceVerseID:
+            //            x.Item1.Last().Item1.VerseID))
+            //    .ToList();
 
 
 
            Alignment2 align = new Alignment2();  // The output goes here.
 
-            align.Lines = new Line[translationPairTable.Inner.Count];
+            align.Lines = new Line[translationPairs.Count];
 
             int i = 0;
 
