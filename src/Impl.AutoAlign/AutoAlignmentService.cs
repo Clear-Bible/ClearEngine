@@ -468,18 +468,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<LinkedWord> linkedWords = AutoAlignUtility.GetLinkedWords(topCandidate);
             // (in candidate order, which I think is terminal order)
 
-            List<SourcePoint2> sourceNodes =
+            List<SourcePoint> sourceNodes =
                 sourcePoints
                 .OrderBy(sp => sp.TreePosition)
-                .Select(sp => new SourcePoint2(
-                    morphID: sp.SourceID.AsCanonicalString,
-                    lemma: sp.Terminal.Lemma(),
-                    english: sp.Terminal.English(),
-                    treeNode: sp.Terminal,
-                    treePosition: sp.TreePosition,
-                    relativeTreePosition: sp.RelativeTreePosition,
-                    category: sp.Terminal.Category()))
                 .ToList();
+
+                //sourcePoints
+                //.OrderBy(sp => sp.TreePosition)
+                //.Select(sp => new SourcePoint(
+                //    morphID: sp.SourceID.AsCanonicalString,
+                //    lemma: sp.Terminal.Lemma(),
+                //    english: sp.Terminal.English(),
+                //    treeNode: sp.Terminal,
+                //    treePosition: sp.TreePosition,
+                //    relativeTreePosition: sp.RelativeTreePosition,
+                //    category: sp.Terminal.Category()))
+                //.ToList();
 
 
             List<MonoLink> links =
@@ -549,7 +553,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
  
         public static LinkedWord AlignWord(
-            SourcePoint2 sourceNode,
+            SourcePoint sourceNode,
             List<TargetPoint> targetPoints,
             Dictionary<string, MonoLink> linksTable,
             List<string> linkedTargets,
@@ -662,7 +666,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static LinkedWord GetTopCandidate(
-            SourcePoint2 sWord,
+            SourcePoint sWord,
             List<MaybeTargetPoint> tWords,
             List<string> linkedTargets,
             Assumptions assumptions

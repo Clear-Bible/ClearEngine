@@ -121,7 +121,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             void strikeOut(int i) =>
                 links[i] = makeFakeLink(links[i].SourceNode);
 
-            MonoLink makeFakeLink(SourcePoint2 sourceNode) =>
+            MonoLink makeFakeLink(SourcePoint sourceNode) =>
                 new MonoLink
                 {
                     SourceNode = sourceNode,

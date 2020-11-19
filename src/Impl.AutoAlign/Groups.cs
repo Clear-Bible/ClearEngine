@@ -313,7 +313,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             bool inGroup = false;
 
-            foreach (SourcePoint2 sNode in mg.SourceNodes)
+            foreach (SourcePoint sNode in mg.SourceNodes)
             {
                 if (sourceWordsInGroups.Contains(sNode.MorphID))
                 {
@@ -345,28 +345,28 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             links.Add(mg);
         }
 
-        static void AddSourceNodes(string[] sourceWords, List<SourcePoint2> sourceNodes, List<XElement> terminals)
+        static void AddSourceNodes(string[] sourceWords, List<SourcePoint> sourceNodes, List<XElement> terminals)
         {
             for (int i = 0; i < sourceWords.Length; i++)
             {
-                SourcePoint2 node = GetSourceNode(sourceWords[i], terminals);
+                SourcePoint node = GetSourceNode(sourceWords[i], terminals);
                 sourceNodes.Add(node);
             }
         }
 
-        static SourcePoint2 GetSourceNode(string id, List<XElement> terminals)
+        static SourcePoint GetSourceNode(string id, List<XElement> terminals)
         {           
             XElement treeNode = LocateTreeNode(id, terminals);
             int treePosition = treeNode.AttrAsInt("Start");
 
-            SourcePoint2 sNode = new SourcePoint2(
-                morphID: id,
-                lemma: treeNode.Attribute("UnicodeLemma").Value,
-                english: treeNode.Attribute("English").Value,
-                treeNode: treeNode,
+            SourcePoint sNode = new SourcePoint(
+                terminal: treeNode,
+                altID: "",
                 treePosition: treePosition,
-                relativeTreePosition: treePosition / (double)terminals.Count,
-                category: treeNode.Attribute("Cat").Value);
+                sourcePosition: 0,
+                totalPoints: terminals.Count);
+
+            // FIXME: altID and sourcePosition are dummy values, does it matter?
 
             return sNode;
         }

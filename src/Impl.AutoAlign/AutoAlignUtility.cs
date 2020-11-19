@@ -95,7 +95,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static MonoLink GetPreNeighbor(SourcePoint2 sourceNode, List<MonoLink> linkedSiblings)
+        public static MonoLink GetPreNeighbor(SourcePoint sourceNode, List<MonoLink> linkedSiblings)
         {
             int limit = sourceNode.Terminal.AttrAsInt("Start");
 
@@ -112,7 +112,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static MonoLink GetPostNeighbor(SourcePoint2 sourceNode, List<MonoLink> linkedSiblings)
+        public static MonoLink GetPostNeighbor(SourcePoint sourceNode, List<MonoLink> linkedSiblings)
         {
             int limit = sourceNode.Terminal.AttrAsInt("End");
 
