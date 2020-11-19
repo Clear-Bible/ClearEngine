@@ -471,16 +471,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<SourcePoint2> sourceNodes =
                 sourcePoints
                 .OrderBy(sp => sp.TreePosition)
-                .Select(sp => new SourcePoint2()
-                {
-                    MorphID = sp.SourceID.AsCanonicalString,
-                    English = sp.Terminal.English(),
-                    Lemma = sp.Terminal.Lemma(),
-                    Category = sp.Terminal.Category(),
-                    TreePosition = sp.TreePosition,
-                    RelativeTreePosition = sp.RelativeTreePosition,
-                    TreeNode = sp.Terminal
-                })
+                .Select(sp => new SourcePoint2(
+                    morphID: sp.SourceID.AsCanonicalString,
+                    lemma: sp.Terminal.Lemma(),
+                    english: sp.Terminal.English(),
+                    treeNode: sp.Terminal,
+                    treePosition: sp.TreePosition,
+                    relativeTreePosition: sp.RelativeTreePosition,
+                    category: sp.Terminal.Category()))
                 .ToList();
 
 
