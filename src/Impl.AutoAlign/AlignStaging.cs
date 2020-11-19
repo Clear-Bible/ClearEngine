@@ -70,7 +70,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 g.SourcePoints[0].TreePosition;
 
             int positionOfSoleWordInTargetGroup(MappedGroup g) =>
-                g.TargetNodes[0].Word.Position;
+                g.TargetNodes[0].MaybeTargetPoint.Position;
         }
            
 
@@ -85,12 +85,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .ToList();
 
             bool targetWordNotEmpty(MonoLink link) =>
-                link.LinkedWord.Word.Lower != string.Empty;
+                link.LinkedWord.MaybeTargetPoint.Lower != string.Empty;
 
             Tuple<string, string> targetTextAndId(MonoLink link) =>
                 Tuple.Create(
-                    link.LinkedWord.Word.Lower,
-                    link.LinkedWord.Word.ID);
+                    link.LinkedWord.MaybeTargetPoint.Lower,
+                    link.LinkedWord.MaybeTargetPoint.ID);
         }
 
 
@@ -125,11 +125,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 new MonoLink
                 {
                     SourcePoint = sourceNode,
-                    LinkedWord = new TargetBond2(
-                        word: AutoAlignUtility.CreateFakeTargetWord(),
-                        text: "",
-                        prob: -1000)
-                    
+                    LinkedWord = new OpenTargetBond(
+                        maybeTargetPoint: AutoAlignUtility.CreateFakeTargetWord(),
+                        score: -1000)                   
                 };
         }
 
@@ -143,7 +141,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //
             double bestProb = conflict.Max(mw => prob(mw));
             List<MonoLink> winners = conflict
-                .Where(mw => mw.LinkedWord.Prob == bestProb)
+                .Where(mw => mw.LinkedWord.Score == bestProb)
                 .ToList();
 
             // On the second pass, if there are multiple winners,
@@ -166,11 +164,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return winners;
 
-            double prob(MonoLink mw) => mw.LinkedWord.Prob;
+            double prob(MonoLink mw) => mw.LinkedWord.Score;
 
             double relativeDelta(MonoLink mw) =>
                 Math.Abs(mw.SourcePoint.RelativeTreePosition -
-                         mw.LinkedWord.Word.RelativePos);         
+                         mw.LinkedWord.MaybeTargetPoint.RelativePos);         
         }
 
 
@@ -201,7 +199,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<string> linkedTargets,
             Assumptions assumptions)
         {
-            int anchor = anchorLink.LinkedWord.Word.Position;
+            int anchor = anchorLink.LinkedWord.MaybeTargetPoint.Position;
 
             IEnumerable<int> down()
             {
@@ -238,8 +236,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             IEnumerable<int> span()
             {
-                for (int i = leftAnchor.LinkedWord.Word.Position;
-                    i < rightAnchor.LinkedWord.Word.Position;
+                for (int i = leftAnchor.LinkedWord.MaybeTargetPoint.Position;
+                    i < rightAnchor.LinkedWord.MaybeTargetPoint.Position;
                     i++)
                 {
                     yield return i;

@@ -93,21 +93,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-    public class TargetBond2
+    public class OpenTargetBond
     {
-        public TargetBond2(
-            MaybeTargetPoint word,
-            string text,
-            double prob)
+        public OpenTargetBond(
+            MaybeTargetPoint maybeTargetPoint,
+            double score)
         {
-            Word = word;
-            Text = text;
-            Prob = prob;
+            MaybeTargetPoint = maybeTargetPoint;
+            Score = score;
         }
 
-        public MaybeTargetPoint Word { get; }
-        public string Text { get; }
-        public double Prob { get; }
+        public MaybeTargetPoint MaybeTargetPoint { get; }
+        public double Score { get; }
+
+        public string Text =>
+            MaybeTargetPoint.Lower;
     }
 
 
@@ -185,13 +185,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     public class MonoLink
     {
         public SourcePoint SourcePoint;
-        public TargetBond2 LinkedWord;
+        public OpenTargetBond LinkedWord;
     }
 
     public class MappedGroup
     {
         public List<SourcePoint> SourcePoints = new List<SourcePoint>();
-        public List<TargetBond2> TargetNodes = new List<TargetBond2>();
+        public List<OpenTargetBond> TargetNodes = new List<OpenTargetBond>();
     }
 
 
