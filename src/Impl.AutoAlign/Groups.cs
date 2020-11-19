@@ -24,7 +24,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </summary>
         /// 
         public static List<MappedGroup> GroupAlignmentWip(
-            List<MonoLink> links,
+            List<OpenMonoLink> links,
             GroupTranslationsTable groups,
             XElement treeNode,
             List<TargetPoint> targetPoints)
@@ -423,15 +423,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static List<MappedGroup> WordsToGroups(List<MonoLink> wordLinks)
+        public static List<MappedGroup> WordsToGroups(List<OpenMonoLink> wordLinks)
         {
             List<MappedGroup> groupLinks = new List<MappedGroup>();
 
-            foreach (MonoLink wordLink in wordLinks)
+            foreach (OpenMonoLink wordLink in wordLinks)
             {
                 MappedGroup groupLink = new MappedGroup();
                 groupLink.SourcePoints.Add(wordLink.SourcePoint);
-                groupLink.TargetNodes.Add(wordLink.LinkedWord);
+                groupLink.TargetNodes.Add(wordLink.OpenTargetBond);
                 groupLinks.Add(groupLink);
             }
 

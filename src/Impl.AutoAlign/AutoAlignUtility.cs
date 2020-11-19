@@ -63,14 +63,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         
 
 
-        public static List<MonoLink> GetLinkedSiblings(
+        public static List<OpenMonoLink> GetLinkedSiblings(
             XElement treeNode,
-            Dictionary<string, MonoLink> linksTable)
+            Dictionary<string, OpenMonoLink> linksTable)
         {
             if (treeNode.Parent != null &&
                 treeNode.Parent.Name.LocalName != "Tree")
             {
-                List<MonoLink> linkedSiblings =
+                List<OpenMonoLink> linkedSiblings =
                     treeNode.Parent.Elements()
                     .Where(child => child != treeNode)
                     .SelectMany(child => GetTerminalXmlNodes(child))
@@ -90,16 +90,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
             else
             {
-                return new List<MonoLink>();
+                return new List<OpenMonoLink>();
             }          
         }
 
 
-        public static MonoLink GetPreNeighbor(SourcePoint sourceNode, List<MonoLink> linkedSiblings)
+        public static OpenMonoLink GetPreNeighbor(SourcePoint sourceNode, List<OpenMonoLink> linkedSiblings)
         {
             int limit = sourceNode.Terminal.AttrAsInt("Start");
 
-            int end(MonoLink mw) =>
+            int end(OpenMonoLink mw) =>
                 mw.SourcePoint.Terminal.AttrAsInt("End");
 
             return
@@ -112,11 +112,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static MonoLink GetPostNeighbor(SourcePoint sourceNode, List<MonoLink> linkedSiblings)
+        public static OpenMonoLink GetPostNeighbor(SourcePoint sourceNode, List<OpenMonoLink> linkedSiblings)
         {
             int limit = sourceNode.Terminal.AttrAsInt("End");
 
-            int end(MonoLink mw) =>
+            int end(OpenMonoLink mw) =>
                 mw.SourcePoint.Terminal.AttrAsInt("End");
 
             return

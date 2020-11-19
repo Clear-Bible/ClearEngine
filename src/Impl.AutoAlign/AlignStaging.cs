@@ -74,8 +74,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
            
 
-        public static List<List<MonoLink>> FindConflictingLinks(
-            List<MonoLink> links)
+        public static List<List<OpenMonoLink>> FindConflictingLinks(
+            List<OpenMonoLink> links)
         {
             return links
                 .Where(targetWordNotEmpty)
@@ -84,22 +84,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select(group => group.ToList())
                 .ToList();
 
-            bool targetWordNotEmpty(MonoLink link) =>
-                link.LinkedWord.MaybeTargetPoint.Lower != string.Empty;
+            bool targetWordNotEmpty(OpenMonoLink link) =>
+                link.OpenTargetBond.MaybeTargetPoint.Lower != string.Empty;
 
-            Tuple<string, string> targetTextAndId(MonoLink link) =>
+            Tuple<string, string> targetTextAndId(OpenMonoLink link) =>
                 Tuple.Create(
-                    link.LinkedWord.MaybeTargetPoint.Lower,
-                    link.LinkedWord.MaybeTargetPoint.ID);
+                    link.OpenTargetBond.MaybeTargetPoint.Lower,
+                    link.OpenTargetBond.MaybeTargetPoint.ID);
         }
 
 
         public static void ResolveConflicts(
-            List<List<MonoLink>> conflicts,
-            List<MonoLink> links,
+            List<List<OpenMonoLink>> conflicts,
+            List<OpenMonoLink> links,
             int pass)
         {
-            List<MonoLink> linksToRemove =
+            List<OpenMonoLink> linksToRemove =
                 conflicts.
                 SelectMany(conflict =>
                     conflict.Except(
@@ -121,27 +121,27 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             void strikeOut(int i) =>
                 links[i] = makeFakeLink(links[i].SourcePoint);
 
-            MonoLink makeFakeLink(SourcePoint sourceNode) =>
-                new MonoLink
+            OpenMonoLink makeFakeLink(SourcePoint sourceNode) =>
+                new OpenMonoLink
                 {
                     SourcePoint = sourceNode,
-                    LinkedWord = new OpenTargetBond(
+                    OpenTargetBond = new OpenTargetBond(
                         maybeTargetPoint: AutoAlignUtility.CreateFakeTargetWord(),
                         score: -1000)                   
                 };
         }
 
 
-        public static List<MonoLink> FindWinners(
-            List<MonoLink> conflict,
+        public static List<OpenMonoLink> FindWinners(
+            List<OpenMonoLink> conflict,
             int pass)
         {
             // The winners are the links of maximal probability.
             // (we know that conflict is not the empty list)
             //
             double bestProb = conflict.Max(mw => prob(mw));
-            List<MonoLink> winners = conflict
-                .Where(mw => mw.LinkedWord.Score == bestProb)
+            List<OpenMonoLink> winners = conflict
+                .Where(mw => mw.OpenTargetBond.Score == bestProb)
                 .ToList();
 
             // On the second pass, if there are multiple winners,
@@ -152,23 +152,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 double minDelta = conflict.Min(mw => relativeDelta(mw));
 
-                MonoLink winner2 = winners
+                OpenMonoLink winner2 = winners
                     .Where(mw => relativeDelta(mw) == minDelta)
                     .FirstOrDefault();
 
                 if (winner2 != null)
                 {
-                    winners = new List<MonoLink>() { winner2 };
+                    winners = new List<OpenMonoLink>() { winner2 };
                 }
             }
 
             return winners;
 
-            double prob(MonoLink mw) => mw.LinkedWord.Score;
+            double prob(OpenMonoLink mw) => mw.OpenTargetBond.Score;
 
-            double relativeDelta(MonoLink mw) =>
+            double relativeDelta(OpenMonoLink mw) =>
                 Math.Abs(mw.SourcePoint.RelativeTreePosition -
-                         mw.LinkedWord.MaybeTargetPoint.RelativePos);         
+                         mw.OpenTargetBond.MaybeTargetPoint.RelativePos);         
         }
 
 
@@ -194,12 +194,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static List<MaybeTargetPoint> GetTargetCandidates(
-            MonoLink anchorLink,
+            OpenMonoLink anchorLink,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
-            int anchor = anchorLink.LinkedWord.MaybeTargetPoint.Position;
+            int anchor = anchorLink.OpenTargetBond.MaybeTargetPoint.Position;
 
             IEnumerable<int> down()
             {
@@ -228,16 +228,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static List<MaybeTargetPoint> GetTargetCandidates(
-            MonoLink leftAnchor,
-            MonoLink rightAnchor,
+            OpenMonoLink leftAnchor,
+            OpenMonoLink rightAnchor,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
             IEnumerable<int> span()
             {
-                for (int i = leftAnchor.LinkedWord.MaybeTargetPoint.Position;
-                    i < rightAnchor.LinkedWord.MaybeTargetPoint.Position;
+                for (int i = leftAnchor.OpenTargetBond.MaybeTargetPoint.Position;
+                    i < rightAnchor.OpenTargetBond.MaybeTargetPoint.Position;
                     i++)
                 {
                     yield return i;

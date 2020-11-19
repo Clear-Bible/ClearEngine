@@ -276,7 +276,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 terminalCandidates);
 
 
-            List<MonoLink> links = AlignTheRest(
+            List<OpenMonoLink> links = AlignTheRest(
                 sourcePoints,
                 targetPoints,
                 topCandidate,
@@ -458,7 +458,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static List<MonoLink> AlignTheRest(
+        public static List<OpenMonoLink> AlignTheRest(
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
             Candidate topCandidate,
@@ -473,18 +473,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .OrderBy(sp => sp.TreePosition)
                 .ToList();
 
-            List<MonoLink> links =
+            List<OpenMonoLink> links =
                 sourceNodes
                 .Zip(linkedWords, (sourceNode, linkedWord) =>
-                    new MonoLink
+                    new OpenMonoLink
                     {
                         SourcePoint = sourceNode,
-                        LinkedWord = linkedWord
+                        OpenTargetBond = linkedWord
                     })
                 .ToList();
 
 
-            List<List<MonoLink>> conflicts = AlignStaging.FindConflictingLinks(links);
+            List<List<OpenMonoLink>> conflicts = AlignStaging.FindConflictingLinks(links);
 
             if (conflicts.Count > 0)
             {
@@ -497,17 +497,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<string> linkedTargets = 
                 links
-                .Where(mw => !mw.LinkedWord.MaybeTargetPoint.IsNothing)
-                .Select(mw => mw.LinkedWord.MaybeTargetPoint.ID)
+                .Where(mw => !mw.OpenTargetBond.MaybeTargetPoint.IsNothing)
+                .Select(mw => mw.OpenTargetBond.MaybeTargetPoint.ID)
                 .ToList();
 
-            Dictionary<string, MonoLink> linksTable = 
+            Dictionary<string, OpenMonoLink> linksTable = 
                 links
-                .Where(mw => !mw.LinkedWord.MaybeTargetPoint.IsNothing)
+                .Where(mw => !mw.OpenTargetBond.MaybeTargetPoint.IsNothing)
                 .ToDictionary(mw => mw.SourcePoint.MorphID, mw => mw);
 
-            foreach (MonoLink link in
-                links.Where(link => link.LinkedWord.MaybeTargetPoint.IsNothing))
+            foreach (OpenMonoLink link in
+                links.Where(link => link.OpenTargetBond.MaybeTargetPoint.IsNothing))
             {
                 OpenTargetBond linkedWord =
                     AlignWord(
@@ -519,7 +519,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 if (linkedWord != null)
                 {
-                    link.LinkedWord = linkedWord;
+                    link.OpenTargetBond = linkedWord;
                 }
             }
 
@@ -542,7 +542,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static OpenTargetBond AlignWord(
             SourcePoint sourceNode,
             List<TargetPoint> targetPoints,
-            Dictionary<string, MonoLink> linksTable,
+            Dictionary<string, OpenMonoLink> linksTable,
             List<string> linkedTargets,
             Assumptions assumptions)
         {
@@ -585,17 +585,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            List<MonoLink> linkedSiblings =
+            List<OpenMonoLink> linkedSiblings =
                 AutoAlignUtility.GetLinkedSiblings(
                     sourceNode.Terminal,
                     linksTable);
 
             if (linkedSiblings.Count > 0)
             {
-                MonoLink preNeighbor =
+                OpenMonoLink preNeighbor =
                     AutoAlignUtility.GetPreNeighbor(sourceNode, linkedSiblings);
 
-                MonoLink postNeighbor =
+                OpenMonoLink postNeighbor =
                     AutoAlignUtility.GetPostNeighbor(sourceNode, linkedSiblings);
 
                 List<MaybeTargetPoint> targetCandidates = new List<MaybeTargetPoint>();
@@ -771,14 +771,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static void FixCrossingLinksWip(
-            List<MonoLink> links)
+            List<OpenMonoLink> links)
         {
-            foreach (MonoLink[] cross in links
+            foreach (OpenMonoLink[] cross in links
                 .GroupBy(link => link.SourcePoint.Lemma)
                 .Where(group => group.Count() == 2 && CrossingWip(group))
                 .Select(group => group.ToArray()))
             {
-                swap(ref cross[0].LinkedWord, ref cross[1].LinkedWord);
+                swap(ref cross[0].OpenTargetBond, ref cross[1].OpenTargetBond);
             }
 
             void swap (ref OpenTargetBond w1, ref OpenTargetBond w2)
@@ -790,13 +790,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static bool CrossingWip(IEnumerable<MonoLink> mappedWords)
+        public static bool CrossingWip(IEnumerable<OpenMonoLink> mappedWords)
         {
             int[] sourcePos =
                 mappedWords.Select(mw => mw.SourcePoint.TreePosition).ToArray();
 
             int[] targetPos =
-                mappedWords.Select(mw => mw.LinkedWord.MaybeTargetPoint.Position).ToArray();
+                mappedWords.Select(mw => mw.OpenTargetBond.MaybeTargetPoint.Position).ToArray();
 
             if (targetPos.Any(i => i < 0)) return false;
 
