@@ -43,13 +43,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             string idOfSoleSourceWord(MappedGroup g) =>
-                g.SourceNodes[0].MorphID;
+                g.SourcePoints[0].MorphID;
 
             bool linkIsOneToOne(MappedGroup link) =>
-                link.SourceNodes.Count == 1 && link.TargetNodes.Count == 1;
+                link.SourcePoints.Count == 1 && link.TargetNodes.Count == 1;
 
             string lemmaOfSoleSourceWord(MappedGroup link) =>
-                link.SourceNodes[0].Lemma;
+                link.SourcePoints[0].Lemma;
         }
 
 
@@ -67,7 +67,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 (spos1 > spos2 && tpos1 < tpos2);
 
             int positionOfSoleWordInSourceGroup(MappedGroup g) =>
-                g.SourceNodes[0].TreePosition;
+                g.SourcePoints[0].TreePosition;
 
             int positionOfSoleWordInTargetGroup(MappedGroup g) =>
                 g.TargetNodes[0].Word.Position;
@@ -119,17 +119,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             void strikeOut(int i) =>
-                links[i] = makeFakeLink(links[i].SourceNode);
+                links[i] = makeFakeLink(links[i].SourcePoint);
 
             MonoLink makeFakeLink(SourcePoint sourceNode) =>
                 new MonoLink
                 {
-                    SourceNode = sourceNode,
-                    LinkedWord = new LinkedWord()
-                    {
-                        Prob = -1000,
-                        Word = AutoAlignUtility.CreateFakeTargetWord()
-                    }
+                    SourcePoint = sourceNode,
+                    LinkedWord = new TargetBond2(
+                        word: AutoAlignUtility.CreateFakeTargetWord(),
+                        text: "",
+                        prob: -1000)
+                    
                 };
         }
 
@@ -169,7 +169,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             double prob(MonoLink mw) => mw.LinkedWord.Prob;
 
             double relativeDelta(MonoLink mw) =>
-                Math.Abs(mw.SourceNode.RelativeTreePosition -
+                Math.Abs(mw.SourcePoint.RelativeTreePosition -
                          mw.LinkedWord.Word.RelativePos);         
         }
 

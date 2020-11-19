@@ -100,7 +100,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int limit = sourceNode.Terminal.AttrAsInt("Start");
 
             int end(MonoLink mw) =>
-                mw.SourceNode.Terminal.AttrAsInt("End");
+                mw.SourcePoint.Terminal.AttrAsInt("End");
 
             return
                 linkedSiblings
@@ -117,7 +117,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int limit = sourceNode.Terminal.AttrAsInt("End");
 
             int end(MonoLink mw) =>
-                mw.SourceNode.Terminal.AttrAsInt("End");
+                mw.SourcePoint.Terminal.AttrAsInt("End");
 
             return
                 linkedSiblings
@@ -199,24 +199,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static List<LinkedWord> GetLinkedWords(Candidate candidate)
+        public static List<TargetBond2> GetLinkedWords(Candidate candidate)
         {
-            List<LinkedWord> linkedWords = new List<LinkedWord>();
+            List<TargetBond2> linkedWords = new List<TargetBond2>();
             GetLinkedWordsHelper(candidate.Chain, linkedWords, candidate.Prob);
             return linkedWords;
         }
 
 
-        public static void GetLinkedWordsHelper(ArrayList path, List<LinkedWord> links, double prob)
+        public static void GetLinkedWordsHelper(ArrayList path, List<TargetBond2> links, double prob)
         {
             if (path.Count == 0)
             {
-                links.Add(new LinkedWord()
-                {
-                    Word = new MaybeTargetPoint(),
-                    Prob = -1000,
-                    Text = string.Empty
-                });
+                links.Add(new TargetBond2(
+                    word: new MaybeTargetPoint(),
+                    text: string.Empty,
+                    prob: -1000));
             }
             else
             {
@@ -231,12 +229,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     foreach (MaybeTargetPoint tWord in path)
                     {
-                        links.Add(new LinkedWord()
-                        {
-                            Word = tWord,
-                            Prob = prob,
-                            Text = tWord.Lower
-                        });
+                        links.Add(new TargetBond2(
+                            word: tWord,
+                            prob: prob,
+                            text: tWord.Lower));
                     }
                 }
             }

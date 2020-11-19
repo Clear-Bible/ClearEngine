@@ -134,7 +134,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         linkedWord => linkedWord.Word.IsNothing))
                     .Select(mappedGroup => new MultiLink(
                             sources:
-                                mappedGroup.SourceNodes
+                                mappedGroup.SourcePoints
                                 .Select(sourceNode =>
                                     sourceMap[sourceNode.MorphID])
                                 .ToList(),
@@ -465,7 +465,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Assumptions assumptions
             )
         {
-            List<LinkedWord> linkedWords = AutoAlignUtility.GetLinkedWords(topCandidate);
+            List<TargetBond2> linkedWords = AutoAlignUtility.GetLinkedWords(topCandidate);
             // (in candidate order, which I think is terminal order)
 
             List<SourcePoint> sourceNodes =
@@ -473,25 +473,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .OrderBy(sp => sp.TreePosition)
                 .ToList();
 
-                //sourcePoints
-                //.OrderBy(sp => sp.TreePosition)
-                //.Select(sp => new SourcePoint(
-                //    morphID: sp.SourceID.AsCanonicalString,
-                //    lemma: sp.Terminal.Lemma(),
-                //    english: sp.Terminal.English(),
-                //    treeNode: sp.Terminal,
-                //    treePosition: sp.TreePosition,
-                //    relativeTreePosition: sp.RelativeTreePosition,
-                //    category: sp.Terminal.Category()))
-                //.ToList();
-
-
             List<MonoLink> links =
                 sourceNodes
                 .Zip(linkedWords, (sourceNode, linkedWord) =>
                     new MonoLink
                     {
-                        SourceNode = sourceNode,
+                        SourcePoint = sourceNode,
                         LinkedWord = linkedWord
                     })
                 .ToList();
@@ -517,14 +504,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, MonoLink> linksTable = 
                 links
                 .Where(mw => !mw.LinkedWord.Word.IsNothing)
-                .ToDictionary(mw => mw.SourceNode.MorphID, mw => mw);
+                .ToDictionary(mw => mw.SourcePoint.MorphID, mw => mw);
 
             foreach (MonoLink link in
                 links.Where(link => link.LinkedWord.Word.IsNothing))
             {
-                LinkedWord linkedWord =
+                TargetBond2 linkedWord =
                     AlignWord(
-                        link.SourceNode,
+                        link.SourcePoint,
                         targetPoints,
                         linksTable,
                         linkedTargets,
@@ -552,7 +539,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
  
-        public static LinkedWord AlignWord(
+        public static TargetBond2 AlignWord(
             SourcePoint sourceNode,
             List<TargetPoint> targetPoints,
             Dictionary<string, MonoLink> linksTable,
@@ -592,12 +579,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     !assumptions.IsPunctuation(targetPoint.Lower) &&
                     !assumptions.IsStopWord(targetPoint.Lower))
                 {
-                    return new LinkedWord()
-                    {
-                        Text = targetPoint.Lower,
-                        Prob = 0,
-                        Word = new MaybeTargetPoint(targetPoint)
-                    };
+                    return new TargetBond2(
+                        word: new MaybeTargetPoint(targetPoint),
+                        text: targetPoint.Lower,
+                        prob: 0);
                 }
             }
 
@@ -647,7 +632,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 if (targetCandidates.Count > 0)
                 {
-                    LinkedWord newTarget = GetTopCandidate(
+                    TargetBond2 newTarget = GetTopCandidate(
                         sourceNode,
                         targetCandidates,
                         linkedTargets,
@@ -665,7 +650,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static LinkedWord GetTopCandidate(
+        public static TargetBond2 GetTopCandidate(
             SourcePoint sWord,
             List<MaybeTargetPoint> tWords,
             List<string> linkedTargets,
@@ -715,10 +700,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 MaybeTargetPoint topCandidate = candidates[0];
 
-                LinkedWord linkedWord = new LinkedWord();
-                linkedWord.Prob = probs[topCandidate];
-                linkedWord.Text = topCandidate.Lower;
-                linkedWord.Word = topCandidate;
+                TargetBond2 linkedWord = new TargetBond2(
+                    word: topCandidate,
+                    text: topCandidate.Lower,
+                    prob: probs[topCandidate]);
+                
                 return linkedWord;
             }
 
@@ -790,16 +776,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<MonoLink> links)
         {
             foreach (MonoLink[] cross in links
-                .GroupBy(link => link.SourceNode.Lemma)
+                .GroupBy(link => link.SourcePoint.Lemma)
                 .Where(group => group.Count() == 2 && CrossingWip(group))
                 .Select(group => group.ToArray()))
             {
                 swap(ref cross[0].LinkedWord, ref cross[1].LinkedWord);
             }
 
-            void swap (ref LinkedWord w1, ref LinkedWord w2)
+            void swap (ref TargetBond2 w1, ref TargetBond2 w2)
             {
-                LinkedWord temp = w1;
+                TargetBond2 temp = w1;
                 w1 = w2;
                 w2 = temp;
             }           
@@ -809,7 +795,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static bool CrossingWip(IEnumerable<MonoLink> mappedWords)
         {
             int[] sourcePos =
-                mappedWords.Select(mw => mw.SourceNode.TreePosition).ToArray();
+                mappedWords.Select(mw => mw.SourcePoint.TreePosition).ToArray();
 
             int[] targetPos =
                 mappedWords.Select(mw => mw.LinkedWord.Word.Position).ToArray();

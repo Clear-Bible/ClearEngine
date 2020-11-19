@@ -51,35 +51,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Terminal.Category();
     }
 
-    //public class SourcePoint
-    //{
-    //    public string MorphID { get; }
-    //    public string Lemma { get; }
-    //    public string English { get; }
-    //    public XElement Terminal { get; }
-    //    public int TreePosition { get; }
-    //    public double RelativeTreePosition { get; }
-    //    public string Category { get; }
-
-    //    public SourcePoint(
-    //        string morphID,
-    //        string lemma,
-    //        string english,
-    //        XElement treeNode,
-    //        int treePosition,
-    //        double relativeTreePosition,
-    //        string category)
-    //    {
-    //        MorphID = morphID;
-    //        Lemma = lemma;
-    //        English = english;
-    //        Terminal = treeNode;
-    //        TreePosition = treePosition;
-    //        RelativeTreePosition = relativeTreePosition;
-    //        Category = category;
-    //    }
-    //}
-
 
     public class TargetPoint
     {
@@ -119,6 +90,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public TargetPoint TargetPoint { get; }
         public double Score { get; }
+    }
+
+
+    public class TargetBond2
+    {
+        public TargetBond2(
+            MaybeTargetPoint word,
+            string text,
+            double prob)
+        {
+            Word = word;
+            Text = text;
+            Prob = prob;
+        }
+
+        public MaybeTargetPoint Word { get; }
+        public string Text { get; }
+        public double Prob { get; }
     }
 
 
@@ -193,28 +182,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-
-    
-
-
-
-    public class LinkedWord
-    {
-        public MaybeTargetPoint Word;
-        public string Text;
-        public double Prob;
-    }
-
     public class MonoLink
     {
-        public SourcePoint SourceNode;
-        public LinkedWord LinkedWord;
+        public SourcePoint SourcePoint;
+        public TargetBond2 LinkedWord;
     }
 
     public class MappedGroup
     {
-        public List<SourcePoint> SourceNodes = new List<SourcePoint>();
-        public List<LinkedWord> TargetNodes = new List<LinkedWord>();
+        public List<SourcePoint> SourcePoints = new List<SourcePoint>();
+        public List<TargetBond2> TargetNodes = new List<TargetBond2>();
     }
 
 
