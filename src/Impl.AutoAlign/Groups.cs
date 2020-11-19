@@ -313,7 +313,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             bool inGroup = false;
 
-            foreach (SourcePoint sNode in mg.SourceNodes)
+            foreach (SourcePoint sNode in mg.SourcePoints)
             {
                 if (sourceWordsInGroups.Contains(sNode.MorphID))
                 {
@@ -323,7 +323,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             if (inGroup == false)
             {
-                foreach (LinkedWord tNode in mg.TargetNodes)
+                foreach (TargetBond2 tNode in mg.TargetNodes)
                 {
                     if (targetWordsInGroups.Contains(tNode.Word.ID))
                     {
@@ -340,7 +340,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string[] sourceWords = group[0];
             string[] targetWords = group[1];
             MappedGroup mg = new MappedGroup();
-            AddSourceNodes(sourceWords, mg.SourceNodes, terminals);
+            AddSourceNodes(sourceWords, mg.SourcePoints, terminals);
             AddTargetNodes(targetWords, mg.TargetNodes, targets);
             links.Add(mg);
         }
@@ -387,24 +387,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return treeNode;
         }
 
-        static void AddTargetNodes(string[] targetWords, List<LinkedWord> targetNodes, List<MaybeTargetPoint> targets)
+        static void AddTargetNodes(string[] targetWords, List<TargetBond2> targetNodes, List<MaybeTargetPoint> targets)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {
-                LinkedWord node = GetTargetNode(targetWords[i], targets);
+                TargetBond2 node = GetTargetNode(targetWords[i], targets);
                 targetNodes.Add(node);
             }
         }
 
-        static LinkedWord GetTargetNode(string id, List<MaybeTargetPoint> targets)
+        static TargetBond2 GetTargetNode(string id, List<MaybeTargetPoint> targets)
         {
-            LinkedWord lw = new LinkedWord();
             MaybeTargetPoint tWord = LocateTargetword(id, targets);
-            lw.Prob = 1.0;
-            lw.Text = tWord.Lower;
-            lw.Word = tWord;
 
-            return lw;
+            return new TargetBond2(
+                word: tWord,
+                text: tWord.Lower,
+                prob: 1.0);
         }
 
         static MaybeTargetPoint LocateTargetword(string id, List<MaybeTargetPoint> targets)
@@ -432,7 +431,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             foreach (MonoLink wordLink in wordLinks)
             {
                 MappedGroup groupLink = new MappedGroup();
-                groupLink.SourceNodes.Add(wordLink.SourceNode);
+                groupLink.SourcePoints.Add(wordLink.SourcePoint);
                 groupLink.TargetNodes.Add(wordLink.LinkedWord);
                 groupLinks.Add(groupLink);
             }
