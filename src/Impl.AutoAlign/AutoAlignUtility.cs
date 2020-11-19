@@ -199,22 +199,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static List<TargetBond2> GetLinkedWords(Candidate candidate)
+        public static List<OpenTargetBond> GetLinkedWords(Candidate candidate)
         {
-            List<TargetBond2> linkedWords = new List<TargetBond2>();
+            List<OpenTargetBond> linkedWords = new List<OpenTargetBond>();
             GetLinkedWordsHelper(candidate.Chain, linkedWords, candidate.Prob);
             return linkedWords;
         }
 
 
-        public static void GetLinkedWordsHelper(ArrayList path, List<TargetBond2> links, double prob)
+        public static void GetLinkedWordsHelper(ArrayList path, List<OpenTargetBond> links, double prob)
         {
             if (path.Count == 0)
             {
-                links.Add(new TargetBond2(
-                    word: new MaybeTargetPoint(),
-                    text: string.Empty,
-                    prob: -1000));
+                links.Add(new OpenTargetBond(
+                    maybeTargetPoint: new MaybeTargetPoint(),
+                    score: -1000));
             }
             else
             {
@@ -229,10 +228,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     foreach (MaybeTargetPoint tWord in path)
                     {
-                        links.Add(new TargetBond2(
-                            word: tWord,
-                            prob: prob,
-                            text: tWord.Lower));
+                        links.Add(new OpenTargetBond(
+                            maybeTargetPoint: tWord,
+                            score: prob));
                     }
                 }
             }

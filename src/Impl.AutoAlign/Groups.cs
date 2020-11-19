@@ -323,9 +323,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             if (inGroup == false)
             {
-                foreach (TargetBond2 tNode in mg.TargetNodes)
+                foreach (OpenTargetBond tNode in mg.TargetNodes)
                 {
-                    if (targetWordsInGroups.Contains(tNode.Word.ID))
+                    if (targetWordsInGroups.Contains(tNode.MaybeTargetPoint.ID))
                     {
                         inGroup = true;
                     }
@@ -387,23 +387,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return treeNode;
         }
 
-        static void AddTargetNodes(string[] targetWords, List<TargetBond2> targetNodes, List<MaybeTargetPoint> targets)
+        static void AddTargetNodes(string[] targetWords, List<OpenTargetBond> targetNodes, List<MaybeTargetPoint> targets)
         {
             for (int i = 0; i < targetWords.Length; i++)
             {
-                TargetBond2 node = GetTargetNode(targetWords[i], targets);
+                OpenTargetBond node = GetTargetNode(targetWords[i], targets);
                 targetNodes.Add(node);
             }
         }
 
-        static TargetBond2 GetTargetNode(string id, List<MaybeTargetPoint> targets)
+        static OpenTargetBond GetTargetNode(string id, List<MaybeTargetPoint> targets)
         {
             MaybeTargetPoint tWord = LocateTargetword(id, targets);
 
-            return new TargetBond2(
-                word: tWord,
-                text: tWord.Lower,
-                prob: 1.0);
+            return new OpenTargetBond(
+                maybeTargetPoint: tWord,
+                score: 1.0);
         }
 
         static MaybeTargetPoint LocateTargetword(string id, List<MaybeTargetPoint> targets)
