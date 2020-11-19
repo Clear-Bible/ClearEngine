@@ -108,26 +108,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public string Text { get; set; }
         public string Lemma { get; set; }
         public string Strong { get; set; }
-
-        public ManuscriptWord CreateManuscriptWord(
-            Gloss gloss,
-            Dictionary<string, WordInfo> wordInfoTable)
-        {
-            WordInfo wordInfo = wordInfoTable[ID];
-
-            return new ManuscriptWord()
-            {
-                id = long.Parse(ID),
-                altId = AltID,
-                text = Text,
-                lemma = Lemma,
-                strong = Strong,
-                pos = wordInfo.Cat,
-                morph = wordInfo.Morph,
-                gloss = gloss.Gloss1,
-                gloss2 = gloss.Gloss2
-            };
-        }
     }
 
 
@@ -169,6 +149,38 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             TargetPoint?.RelativePosition ?? 0.0;
 
         public bool InGroup { get; set; }
+    }
+
+
+
+    public class SourceNode
+    {
+        public string MorphID;
+        public string Lemma;
+        public string English;
+        public XElement TreeNode;
+        public int Position;
+        public double RelativePos;
+        public string Category;
+    }
+
+    public class LinkedWord
+    {
+        public MaybeTargetPoint Word;
+        public string Text;
+        public double Prob;
+    }
+
+    public class MonoLink
+    {
+        public SourceNode SourceNode;
+        public LinkedWord LinkedWord;
+    }
+
+    public class MappedGroup
+    {
+        public List<SourceNode> SourceNodes = new List<SourceNode>();
+        public List<LinkedWord> TargetNodes = new List<LinkedWord>();
     }
 
 
@@ -252,35 +264,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-    public class SourceNode
-    {
-        public string MorphID;
-        public string Lemma;
-        public string English;
-        public XElement TreeNode;
-        public int Position;
-        public double RelativePos;
-        public string Category;
-    }
-
-    public class LinkedWord
-    {
-        public MaybeTargetPoint Word;
-        public string Text;
-        public double Prob;
-    }
-
-    public class MonoLink
-    {
-        public SourceNode SourceNode;
-        public LinkedWord LinkedWord;
-    }
-
-    public class MappedGroup
-    {
-        public List<SourceNode> SourceNodes = new List<SourceNode>();
-        public List<LinkedWord> TargetNodes = new List<LinkedWord>();
-    }
+    
 
     public class ManuscriptWord
     {
