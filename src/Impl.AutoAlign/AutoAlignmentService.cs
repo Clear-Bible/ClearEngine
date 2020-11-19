@@ -599,7 +599,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             List<MonoLink> linkedSiblings =
                 AutoAlignUtility.GetLinkedSiblings(
-                    sourceNode.TreeNode,
+                    sourceNode.Terminal,
                     linksTable);
 
             if (linkedSiblings.Count > 0)
