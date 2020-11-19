@@ -246,11 +246,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     sp => sp.SourceID.AsCanonicalString,
                     sp => sp.AltID);
 
-            //List<MaybeTargetPoint> tWords =
-            //    targetPoints
-            //    .Select(tp => new MaybeTargetPoint(tp))
-            //    .ToList();
-
             string verseIDFromTree =
                 treeNode.TreeNodeID().VerseID.AsCanonicalString;          
 
@@ -258,9 +253,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 assumptions.OldLinksForVerse(verseIDFromTree);
             // FIXME: What if the zone is more than one verse?
 
-
-            // Dictionary<string:sourceID, List<Candidate>>
-            // sourceID is obtained from the terminal from the tree
             AlternativesForTerminals terminalCandidates =
                 TerminalCandidates2.GetTerminalCandidates(
                     treeNode,
@@ -275,14 +267,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 maxPaths,
                 terminalCandidates);
 
+            List<OpenMonoLink> links =
+                MakeOpenMonoLinks(topCandidate, sourcePoints);
 
-            List<OpenMonoLink> links = AlignTheRest(
-                sourcePoints,
-                targetPoints,
-                topCandidate,
-                assumptions);
+            AlignStaging.ResolveConflicts(links, tryHarder: false);
 
-            FixCrossingLinksWip(links);
+
+            #region Andi does not use this part anymore.
+
+            ImproveAlignment(links, targetPoints, assumptions);
+
+            AlignStaging.ResolveConflicts(links, tryHarder: true);
+
+            #endregion
+
+
+            FixCrossingOpenMonoLinks(links);
 
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
@@ -458,15 +458,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static List<OpenMonoLink> AlignTheRest(
-            List<SourcePoint> sourcePoints,
-            List<TargetPoint> targetPoints,
+        public static List<OpenMonoLink> MakeOpenMonoLinks(
             Candidate topCandidate,
-            Assumptions assumptions
-            )
+            List<SourcePoint> sourcePoints)
         {
-            List<OpenTargetBond> linkedWords = AutoAlignUtility.GetLinkedWords(topCandidate);
-            // (in candidate order, which I think is terminal order)
+            List<OpenTargetBond> linkedWords =
+                AutoAlignUtility.GetOpenTargetBonds(topCandidate);
 
             List<SourcePoint> sourceNodes =
                 sourcePoints
@@ -481,25 +478,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         openTargetBond: linkedWord))
                 .ToList();
 
-
-            List<List<OpenMonoLink>> conflicts = AlignStaging.FindConflictingLinks(links);
-
-            if (conflicts.Count > 0)
-            {
-                AlignStaging.ResolveConflicts(conflicts, links, 1);
-            }
+            return links;
+        }
 
 
 
-            #region Andi does not use this part anymore.
-
-            List<string> linkedTargets = 
+        public static void ImproveAlignment(
+            List<OpenMonoLink> links,
+            List<TargetPoint> targetPoints,
+            Assumptions assumptions)
+        {
+            List<string> linkedTargets =
                 links
                 .Where(mw => !mw.OpenTargetBond.MaybeTargetPoint.IsNothing)
                 .Select(mw => mw.OpenTargetBond.MaybeTargetPoint.ID)
                 .ToList();
 
-            Dictionary<string, OpenMonoLink> linksTable = 
+            Dictionary<string, OpenMonoLink> linksTable =
                 links
                 .Where(mw => !mw.OpenTargetBond.MaybeTargetPoint.IsNothing)
                 .ToDictionary(mw => mw.SourcePoint.MorphID, mw => mw);
@@ -520,19 +515,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     link.ResetOpenTargetBond(linkedWord);
                 }
             }
-
-            conflicts = AlignStaging.FindConflictingLinks(links);
-
-            if (conflicts.Count > 0)
-            {
-                AlignStaging.ResolveConflicts(conflicts, links, 2);
-            }
-
-            #endregion
-
-
-
-            return links;
         }
 
 
@@ -768,7 +750,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static void FixCrossingLinksWip(
+        public static void FixCrossingOpenMonoLinks(
             List<OpenMonoLink> links)
         {
             foreach (OpenMonoLink[] cross in links

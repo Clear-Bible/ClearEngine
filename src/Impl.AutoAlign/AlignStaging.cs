@@ -95,15 +95,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static void ResolveConflicts(
-            List<List<OpenMonoLink>> conflicts,
+            // List<List<OpenMonoLink>> conflicts,
             List<OpenMonoLink> links,
-            int pass)
+            bool tryHarder)
         {
+            List<List<OpenMonoLink>> conflicts =
+                FindConflictingLinks(links);
+
+            if (conflicts.Count == 0) return;
+
             List<OpenMonoLink> linksToRemove =
                 conflicts.
                 SelectMany(conflict =>
                     conflict.Except(
-                        FindWinners(conflict, pass).Take(1)))
+                        FindWinners(conflict, tryHarder).Take(1)))
                 .ToList();
 
             List<int> toStrikeOut =
@@ -132,7 +137,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static List<OpenMonoLink> FindWinners(
             List<OpenMonoLink> conflict,
-            int pass)
+            bool tryHarder)
         {
             // The winners are the links of maximal probability.
             // (we know that conflict is not the empty list)
@@ -146,7 +151,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // then select the winner where the source and target
             // relative positions are closest in a relative sense.
             //
-            if (pass == 2 && winners.Count > 1)
+            if (tryHarder && winners.Count > 1)
             {
                 double minDelta = conflict.Min(mw => relativeDelta(mw));
 
