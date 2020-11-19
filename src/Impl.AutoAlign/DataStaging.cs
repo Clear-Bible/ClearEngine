@@ -182,10 +182,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-    public class MonoLink
+    public class OpenMonoLink
     {
         public SourcePoint SourcePoint;
-        public OpenTargetBond LinkedWord;
+        public OpenTargetBond OpenTargetBond;
     }
 
     public class MappedGroup
