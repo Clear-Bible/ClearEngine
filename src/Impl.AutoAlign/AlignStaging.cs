@@ -122,13 +122,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 links[i] = makeFakeLink(links[i].SourcePoint);
 
             OpenMonoLink makeFakeLink(SourcePoint sourceNode) =>
-                new OpenMonoLink
-                {
-                    SourcePoint = sourceNode,
-                    OpenTargetBond = new OpenTargetBond(
+                new OpenMonoLink(
+                    sourcePoint: sourceNode,
+                    openTargetBond: new OpenTargetBond(
                         maybeTargetPoint: AutoAlignUtility.CreateFakeTargetWord(),
-                        score: -1000)                   
-                };
+                        score: -1000));
         }
 
 

@@ -476,11 +476,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<OpenMonoLink> links =
                 sourceNodes
                 .Zip(linkedWords, (sourceNode, linkedWord) =>
-                    new OpenMonoLink
-                    {
-                        SourcePoint = sourceNode,
-                        OpenTargetBond = linkedWord
-                    })
+                    new OpenMonoLink(
+                        sourcePoint: sourceNode,
+                        openTargetBond: linkedWord))
                 .ToList();
 
 
@@ -510,7 +508,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 links.Where(link => link.OpenTargetBond.MaybeTargetPoint.IsNothing))
             {
                 OpenTargetBond linkedWord =
-                    AlignWord(
+                    AlignUnlinkedSourcePoint(
                         link.SourcePoint,
                         targetPoints,
                         linksTable,
@@ -519,7 +517,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 if (linkedWord != null)
                 {
-                    link.OpenTargetBond = linkedWord;
+                    link.ResetOpenTargetBond(linkedWord);
                 }
             }
 
@@ -539,7 +537,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
  
-        public static OpenTargetBond AlignWord(
+        public static OpenTargetBond AlignUnlinkedSourcePoint(
             SourcePoint sourceNode,
             List<TargetPoint> targetPoints,
             Dictionary<string, OpenMonoLink> linksTable,
@@ -778,14 +776,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Where(group => group.Count() == 2 && CrossingWip(group))
                 .Select(group => group.ToArray()))
             {
-                swap(ref cross[0].OpenTargetBond, ref cross[1].OpenTargetBond);
+                swapTargetBonds(cross[0], cross[1]);
             }
 
-            void swap (ref OpenTargetBond w1, ref OpenTargetBond w2)
+            void swapTargetBonds(OpenMonoLink link1, OpenMonoLink link2)
             {
-                OpenTargetBond temp = w1;
-                w1 = w2;
-                w2 = temp;
+                OpenTargetBond temp = link1.OpenTargetBond;
+                link1.ResetOpenTargetBond(link2.OpenTargetBond);
+                link2.ResetOpenTargetBond(temp);
             }           
         }
 
