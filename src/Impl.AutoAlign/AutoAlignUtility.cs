@@ -199,7 +199,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static List<OpenTargetBond> GetLinkedWords(Candidate candidate)
+        public static List<OpenTargetBond> GetOpenTargetBonds(Candidate candidate)
         {
             List<OpenTargetBond> linkedWords = new List<OpenTargetBond>();
             GetLinkedWordsHelper(candidate.Chain, linkedWords, candidate.Prob);
