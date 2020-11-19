@@ -818,53 +818,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 (sourcePos[0] < sourcePos[1] && targetPos[0] > targetPos[1]) ||
                 (sourcePos[0] > sourcePos[1] && targetPos[0] < targetPos[1]);
         }
-
-
-
-        public static Line MakeLineWip(
-            SegBridgeTable segBridgeTable,
-            List<SourceWord> sourceWords,
-            List<MaybeTargetPoint> targetWords,
-            Dictionary<string, Gloss> glossTable,
-            Dictionary<string, WordInfo> wordInfoTable)
-        {
-            Dictionary<string, int> bySourceID = sourceWords
-                .Select((sw, n) => new { sw.ID, n })
-                .ToDictionary(x => x.ID, x => x.n);
-
-            Dictionary<string, int> byTargetID = targetWords
-                .Select((tw, n) => new { tw.ID, n })
-                .ToDictionary(x => x.ID, x => x.n);
-
-            return new Line()
-            {
-                manuscript = new Manuscript()
-                {
-                    words = sourceWords
-                        .Select(sw => sw.CreateManuscriptWord(glossTable[sw.ID], wordInfoTable))
-                        .ToArray()
-                },
-                translation = new Translation()
-                {
-                    words = targetWords
-                        .Select(tw => new TranslationWord()
-                        {
-                            id = long.Parse(tw.ID),
-                            altId = tw.AltID,
-                            text = tw.Text
-                        }).ToArray()
-                },
-                links = segBridgeTable.AllEntries
-                    .Select(e => new Link()
-                    {
-                        source = new int[] { bySourceID[e.SourceID] },
-                        target = new int[] { byTargetID[e.TargetID] },
-                        cscore = e.Score
-                    })
-                    .OrderBy(x => x.source[0])
-                    .ToList()
-            };
-        }
     }
 }
 
