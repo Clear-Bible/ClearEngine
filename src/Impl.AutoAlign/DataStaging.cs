@@ -153,16 +153,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-    public class SourceNode
+    public class SourcePoint2
     {
         public string MorphID;
         public string Lemma;
         public string English;
         public XElement TreeNode;
-        public int Position;
-        public double RelativePos;
+        public int TreePosition;
+        public double RelativeTreePosition;
         public string Category;
     }
+
+
 
     public class LinkedWord
     {
@@ -173,13 +175,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class MonoLink
     {
-        public SourceNode SourceNode;
+        public SourcePoint2 SourceNode;
         public LinkedWord LinkedWord;
     }
 
     public class MappedGroup
     {
-        public List<SourceNode> SourceNodes = new List<SourceNode>();
+        public List<SourcePoint2> SourceNodes = new List<SourcePoint2>();
         public List<LinkedWord> TargetNodes = new List<LinkedWord>();
     }
 

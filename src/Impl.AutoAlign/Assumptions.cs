@@ -100,17 +100,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             _targetFuncWords.Contains(text);
 
 
-        public bool IsSourceStopWord(SourceNode sn) =>
+        public bool IsSourceStopWord(SourcePoint2 sn) =>
             _stopWords.Contains(sn.Lemma);
 
         public bool IsSourceFunctionWord(string lemma) =>
             _sourceFuncWords.Contains(lemma);
 
-        public bool IsSourceFunctionWord(SourceNode sn) =>
+        public bool IsSourceFunctionWord(SourcePoint2 sn) =>
             _sourceFuncWords.Contains(sn.Lemma);
 
 
-        public bool IsBadLink(SourceNode sn, MaybeTargetPoint tw)
+        public bool IsBadLink(SourcePoint2 sn, MaybeTargetPoint tw)
         {
             string link = $"{sn.Lemma}#{tw.Lower}";
             return
@@ -128,7 +128,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public bool IsGoodLink(SourceNode sn, MaybeTargetPoint tw)
+        public bool IsGoodLink(SourcePoint2 sn, MaybeTargetPoint tw)
         {
             string link = $"{sn.Lemma}#{tw.Lower}";
             return
@@ -161,7 +161,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public double GetTranslationModelScore(SourceNode sn, MaybeTargetPoint tw)
+        public double GetTranslationModelScore(SourcePoint2 sn, MaybeTargetPoint tw)
         {
             if (_translationModel.Inner.TryGetValue(new Lemma(sn.Lemma),
                 out Dictionary<TargetMorph, Score> translations))
@@ -200,7 +200,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public bool TryGetPreAlignment(
-            SourceNode sn,
+            SourcePoint2 sn,
             out string targetID)
             =>
             _preAlignment.TryGetValue(sn.MorphID, out targetID);

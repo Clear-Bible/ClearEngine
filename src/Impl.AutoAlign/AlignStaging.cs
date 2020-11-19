@@ -67,7 +67,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 (spos1 > spos2 && tpos1 < tpos2);
 
             int positionOfSoleWordInSourceGroup(MappedGroup g) =>
-                g.SourceNodes[0].Position;
+                g.SourceNodes[0].TreePosition;
 
             int positionOfSoleWordInTargetGroup(MappedGroup g) =>
                 g.TargetNodes[0].Word.Position;
@@ -121,7 +121,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             void strikeOut(int i) =>
                 links[i] = makeFakeLink(links[i].SourceNode);
 
-            MonoLink makeFakeLink(SourceNode sourceNode) =>
+            MonoLink makeFakeLink(SourcePoint2 sourceNode) =>
                 new MonoLink
                 {
                     SourceNode = sourceNode,
@@ -169,7 +169,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             double prob(MonoLink mw) => mw.LinkedWord.Prob;
 
             double relativeDelta(MonoLink mw) =>
-                Math.Abs(mw.SourceNode.RelativePos -
+                Math.Abs(mw.SourceNode.RelativeTreePosition -
                          mw.LinkedWord.Word.RelativePos);         
         }
 

@@ -468,17 +468,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<LinkedWord> linkedWords = AutoAlignUtility.GetLinkedWords(topCandidate);
             // (in candidate order, which I think is terminal order)
 
-            List<SourceNode> sourceNodes =
+            List<SourcePoint2> sourceNodes =
                 sourcePoints
                 .OrderBy(sp => sp.TreePosition)
-                .Select(sp => new SourceNode()
+                .Select(sp => new SourcePoint2()
                 {
                     MorphID = sp.SourceID.AsCanonicalString,
                     English = sp.Terminal.English(),
                     Lemma = sp.Terminal.Lemma(),
                     Category = sp.Terminal.Category(),
-                    Position = sp.TreePosition,
-                    RelativePos = sp.RelativeTreePosition,
+                    TreePosition = sp.TreePosition,
+                    RelativeTreePosition = sp.RelativeTreePosition,
                     TreeNode = sp.Terminal
                 })
                 .ToList();
@@ -551,7 +551,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
  
         public static LinkedWord AlignWord(
-            SourceNode sourceNode,
+            SourcePoint2 sourceNode,
             List<TargetPoint> targetPoints,
             Dictionary<string, MonoLink> linksTable,
             List<string> linkedTargets,
@@ -664,7 +664,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static LinkedWord GetTopCandidate(
-            SourceNode sWord,
+            SourcePoint2 sWord,
             List<MaybeTargetPoint> tWords,
             List<string> linkedTargets,
             Assumptions assumptions
@@ -807,7 +807,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static bool CrossingWip(IEnumerable<MonoLink> mappedWords)
         {
             int[] sourcePos =
-                mappedWords.Select(mw => mw.SourceNode.Position).ToArray();
+                mappedWords.Select(mw => mw.SourceNode.TreePosition).ToArray();
 
             int[] targetPos =
                 mappedWords.Select(mw => mw.LinkedWord.Word.Position).ToArray();
