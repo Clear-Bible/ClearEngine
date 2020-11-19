@@ -313,7 +313,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             bool inGroup = false;
 
-            foreach (SourceNode sNode in mg.SourceNodes)
+            foreach (SourcePoint2 sNode in mg.SourceNodes)
             {
                 if (sourceWordsInGroups.Contains(sNode.MorphID))
                 {
@@ -345,25 +345,25 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             links.Add(mg);
         }
 
-        static void AddSourceNodes(string[] sourceWords, List<SourceNode> sourceNodes, List<XElement> terminals)
+        static void AddSourceNodes(string[] sourceWords, List<SourcePoint2> sourceNodes, List<XElement> terminals)
         {
             for (int i = 0; i < sourceWords.Length; i++)
             {
-                SourceNode node = GetSourceNode(sourceWords[i], terminals);
+                SourcePoint2 node = GetSourceNode(sourceWords[i], terminals);
                 sourceNodes.Add(node);
             }
         }
 
-        static SourceNode GetSourceNode(string id, List<XElement> terminals)
+        static SourcePoint2 GetSourceNode(string id, List<XElement> terminals)
         {
-            SourceNode sNode = new SourceNode();
+            SourcePoint2 sNode = new SourcePoint2();
             XElement treeNode = LocateTreeNode(id, terminals);
             
             sNode.MorphID = id;
             sNode.English = treeNode.Attribute("English").Value;
             sNode.Lemma = treeNode.Attribute("UnicodeLemma").Value;
-            sNode.Position = treeNode.AttrAsInt("Start");
-            sNode.RelativePos = (double)sNode.Position / (double)terminals.Count;
+            sNode.TreePosition = treeNode.AttrAsInt("Start");
+            sNode.RelativeTreePosition = (double)sNode.TreePosition / (double)terminals.Count;
             sNode.Category = treeNode.Attribute("Cat").Value;
             sNode.TreeNode = treeNode;
 
