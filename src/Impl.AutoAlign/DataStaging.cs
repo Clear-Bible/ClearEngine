@@ -93,51 +93,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-    public class OpenTargetBond
+    public class MonoLink
     {
-        public OpenTargetBond(
-            MaybeTargetPoint maybeTargetPoint,
-            double score)
-        {
-            MaybeTargetPoint = maybeTargetPoint;
-            Score = score;
-        }
-
-        public MaybeTargetPoint MaybeTargetPoint { get; }
-        public double Score { get; }
-
-        public string Text =>
-            MaybeTargetPoint.Lower;
-    }
-
-
-    public class MultiLink
-    {
-        public IReadOnlyList<SourcePoint> Sources =>
-            _sources;
-
-        private List<SourcePoint> _sources;
-
-        public IReadOnlyList<TargetBond> Targets =>
-            _targets;
-
-        private List<TargetBond> _targets;
-
-        public MultiLink(List<SourcePoint> sources, List<TargetBond> targets)
-        {
-            _sources = sources;
-            _targets = targets;
-        }
-    }
-
-
-    public class SourceWord
-    {
-        public string ID { get; set; }
-        public string AltID { get; set; }
-        public string Text { get; set; }
-        public string Lemma { get; set; }
-        public string Strong { get; set; }
+        
     }
 
 
@@ -182,11 +140,84 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
+    public class OpenTargetBond
+    {
+        public OpenTargetBond(
+            MaybeTargetPoint maybeTargetPoint,
+            double score)
+        {
+            MaybeTargetPoint = maybeTargetPoint;
+            Score = score;
+        }
+
+        public MaybeTargetPoint MaybeTargetPoint { get; }
+        public double Score { get; }
+
+        public string Text =>
+            MaybeTargetPoint.Lower;
+
+        public bool HasTargetPoint =>
+            !MaybeTargetPoint.IsNothing;
+    }
+
+
     public class OpenMonoLink
     {
-        public SourcePoint SourcePoint;
-        public OpenTargetBond OpenTargetBond;
+        public SourcePoint SourcePoint { get; }
+        public OpenTargetBond OpenTargetBond { get; private set; }
+
+        public bool HasTargetPoint =>
+            OpenTargetBond.HasTargetPoint;
+
+        public OpenMonoLink(
+            SourcePoint sourcePoint,
+            OpenTargetBond openTargetBond)
+        {
+            SourcePoint = sourcePoint;
+            OpenTargetBond = openTargetBond;
+        }
+
+        public void ResetOpenTargetBond(OpenTargetBond bond)
+        {
+            OpenTargetBond = bond;
+        }           
     }
+
+
+    public class MultiLink
+    {
+        public IReadOnlyList<SourcePoint> Sources =>
+            _sources;
+
+        private List<SourcePoint> _sources;
+
+        public IReadOnlyList<TargetBond> Targets =>
+            _targets;
+
+        private List<TargetBond> _targets;
+
+        public MultiLink(List<SourcePoint> sources, List<TargetBond> targets)
+        {
+            _sources = sources;
+            _targets = targets;
+        }
+    }
+
+
+    public class SourceWord
+    {
+        public string ID { get; set; }
+        public string AltID { get; set; }
+        public string Text { get; set; }
+        public string Lemma { get; set; }
+        public string Strong { get; set; }
+    }
+
+
+    
+
+
+
 
     public class MappedGroup
     {
