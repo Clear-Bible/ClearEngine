@@ -490,13 +490,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             List<string> linkedTargets =
                 links
-                .Where(mw => !mw.OpenTargetBond.MaybeTargetPoint.IsNothing)
+                .Where(mw => mw.HasTargetPoint)
                 .Select(mw => mw.OpenTargetBond.MaybeTargetPoint.ID)
                 .ToList();
 
             Dictionary<string, OpenMonoLink> linksTable =
                 links
-                .Where(mw => !mw.OpenTargetBond.MaybeTargetPoint.IsNothing)
+                .Where(mw => mw.HasTargetPoint)
                 .ToDictionary(mw => mw.SourcePoint.MorphID, mw => mw);
 
             foreach (OpenMonoLink link in
