@@ -37,6 +37,47 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public int TreePosition { get; }
         public double RelativeTreePosition { get; }
         public int SourcePosition { get; }
+
+        public string MorphID =>
+            SourceID.AsCanonicalString;
+
+        public string Lemma =>
+            Terminal.Lemma();
+
+        public string English =>
+            Terminal.English();
+
+        public string Category =>
+            Terminal.Category();
+    }
+
+    public class SourcePoint2
+    {
+        public string MorphID { get; }
+        public string Lemma { get; }
+        public string English { get; }
+        public XElement Terminal { get; }
+        public int TreePosition { get; }
+        public double RelativeTreePosition { get; }
+        public string Category { get; }
+
+        public SourcePoint2(
+            string morphID,
+            string lemma,
+            string english,
+            XElement treeNode,
+            int treePosition,
+            double relativeTreePosition,
+            string category)
+        {
+            MorphID = morphID;
+            Lemma = lemma;
+            English = english;
+            Terminal = treeNode;
+            TreePosition = treePosition;
+            RelativeTreePosition = relativeTreePosition;
+            Category = category;
+        }
     }
 
 
@@ -153,34 +194,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-    public class SourcePoint2
-    {
-        public string MorphID { get; }
-        public string Lemma { get; }
-        public string English { get; }
-        public XElement TreeNode { get; }
-        public int TreePosition { get; }
-        public double RelativeTreePosition { get; }
-        public string Category { get; }
-
-        public SourcePoint2(
-            string morphID,
-            string lemma,
-            string english,
-            XElement treeNode,
-            int treePosition,
-            double relativeTreePosition,
-            string category)
-        {
-            MorphID = morphID;
-            Lemma = lemma;
-            English = english;
-            TreeNode = treeNode;
-            TreePosition = treePosition;
-            RelativeTreePosition = relativeTreePosition;
-            Category = category;
-        }
-    }
+    
 
 
 
