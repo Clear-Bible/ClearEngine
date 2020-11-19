@@ -284,56 +284,48 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 topCandidate,
                 assumptions);
 
-            List<MonoLink> linksWip = links
-                .Where(link => !link.LinkedWord.Word.IsNothing)
-                .Select(link => new MonoLink()
-                {
-                    SourceNode = link.SourceNode,
-                    LinkedWord = link.LinkedWord
-                }).ToList();
-
-            FixCrossingLinksWip(linksWip);
+            FixCrossingLinksWip(links);
 
 
 
 
-            SegBridgeTable segBridgeTable = new SegBridgeTable();
-            foreach (MonoLink mw in linksWip)
-            {
-                segBridgeTable.AddEntry(
-                    mw.SourceNode.MorphID,
-                    mw.LinkedWord.Word.ID,
-                    Math.Exp(mw.LinkedWord.Prob));
-            }
+            //SegBridgeTable segBridgeTable = new SegBridgeTable();
+            //foreach (MonoLink mw in linksWip)
+            //{
+            //    segBridgeTable.AddEntry(
+            //        mw.SourceNode.MorphID,
+            //        mw.LinkedWord.Word.ID,
+            //        Math.Exp(mw.LinkedWord.Prob));
+            //}
 
 
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
-            GroupTranslationsTable_Old groups_old =
-                new GroupTranslationsTable_Old();
-            foreach (var kvp in groups.Inner)
-                foreach (var x in kvp.Value)
-                    groups_old.AddEntry(
-                        kvp.Key.Text,
-                        x.Item1.Text,
-                        x.Item2.Int);
+            //GroupTranslationsTable_Old groups_old =
+            //    new GroupTranslationsTable_Old();
+            //foreach (var kvp in groups.Inner)
+            //    foreach (var x in kvp.Value)
+            //        groups_old.AddEntry(
+            //            kvp.Key.Text,
+            //            x.Item1.Text,
+            //            x.Item2.Int);
 
 
-            Dictionary<string, WordInfo> wordInfoTable =
-                AutoAlignUtility.BuildWordInfoTable(treeNode);
-            // sourceID => WordInfo
+            //Dictionary<string, WordInfo> wordInfoTable =
+            //    AutoAlignUtility.BuildWordInfoTable(treeNode);
+            //// sourceID => WordInfo
 
-            List<SourceWord> sourceWordList = MakeSourceWordList(
-                AutoAlignUtility.GetTerminalXmlNodes(treeNode)
-                .Select(node => node.SourceID().AsCanonicalString)
-                .OrderBy(sourceID => sourceID),
-                wordInfoTable);
+            //List<SourceWord> sourceWordList = MakeSourceWordList(
+            //    AutoAlignUtility.GetTerminalXmlNodes(treeNode)
+            //    .Select(node => node.SourceID().AsCanonicalString)
+            //    .OrderBy(sourceID => sourceID),
+            //    wordInfoTable);
 
-            List<XElement> terminals = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
+            //List<XElement> terminals = AutoAlignUtility.GetTerminalXmlNodes(treeNode);
 
-            Groups.AlignGroups(links2, sourceWordList, tWords, groups_old, terminals);
+            //Groups.AlignGroups(links2, sourceWordList, tWords, groups_old, terminals);
 
-            AlignStaging.FixCrossingLinks(ref links2);
+            // AlignStaging.FixCrossingLinks(ref links2);
 
             return links2;
 

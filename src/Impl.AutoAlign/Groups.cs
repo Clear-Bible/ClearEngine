@@ -37,6 +37,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        /// <summary>
+        /// Produces a list (x, ...) where x[0] is an array of source ID
+        /// strings and x[1] is 
+        /// </summary>
+        ///
         static List<string[][]> GetGroupLinks(
             SourceWord[] sourceWords,
             MaybeTargetPoint[] targetWords,
@@ -44,19 +49,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             List<string[][]> mappedGroups = new List<string[][]>();
 
+            // For each SourceWord sw:
             for (int i = 0; i < sourceWords.Length; i++)
             { 
-                SourceWord sw = (SourceWord)sourceWords[i];
-
+                SourceWord sw = sourceWords[i];
 
                 bool foundMatch = false;
-                if (sw.Lemma == "οὐ")
-                {
-                    ;
-                }
 
+                // if at least two positions away from the right edge:
                 if (i < sourceWords.Length - 2)
                 {
+                    // consider sw and the two following source words:
+
                     string trigram = sourceWords[i].Lemma + " " + sourceWords[i + 1].Lemma + " " + sourceWords[i + 2].Lemma;
                     string trigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID + " " + sourceWords[i + 2].ID;
                     if (groups.ContainsSourceGroupKey(trigram))
@@ -74,6 +78,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         }
                     }
                 }
+
+                // if at least one position away from the right edge
+                // and have not yet found a match:
                 if (!foundMatch && i < sourceWords.Length - 1)
                 {
                     string bigram = sourceWords[i].Lemma + " " + sourceWords[i + 1].Lemma;
@@ -93,6 +100,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         }
                     }
                 }
+
+                // if not yet found a match:
                 if (!foundMatch)
                 {
                     string unigram = sourceWords[i].Lemma;
@@ -116,12 +125,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return mappedGroups;
         }
 
+        /// <summary>
+        /// targetGroups is essentially a list of (TargetGroupAsText, PrimaryPosition)
+        /// returns a string with the list of targetIDs, or the empty string if no match found
+        /// </summary>
+        /// 
         static string FindTargetMatch(MaybeTargetPoint[] targetWords, GroupTranslations_Old targetGroups, int minLength)
         {
             string match = string.Empty;
 
-            bool isSplit = false;
-            int maxRange;
+            bool isSplit = false; // this means the target group has a ~ in it
+
+            int maxRange; // is the number of target words in the target group
+                          // or twice as much if isSplit
+
             foreach (GroupTranslation_Old targetGroup in targetGroups.AllTranslations)
             {
                 if (targetGroup.TargetGroupAsText.Contains("~"))
@@ -143,7 +160,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     MaybeTargetPoint targetWord = targetWords[i];
                     if (targetWord.InGroup) continue;
+
+                    // words are the target group words that I am looking for
                     string word = words[wordIndex].Trim();
+
                     if (targetWord.Lower == word)
                     {
                         match += targetWord.ID + " ";
