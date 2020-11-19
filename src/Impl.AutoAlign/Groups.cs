@@ -1,16 +1,73 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Linq;
 
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
-    using System.Linq;
+    using ClearBible.Clear3.API;
+    using ClearBible.Clear3.Impl.TreeService;
     using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Miscellaneous;
 
     public class Groups
     {
+        /// <summary>
+        /// Work in progress.
+        /// This code was removed from another function and put here
+        /// for safekeeping.  It is not currently being called by
+        /// anything.
+        /// This code is in an intermediate stage of being reworked
+        /// from Clear2 into Clear3.
+        /// This code has not been tested in its current form.
+        /// </summary>
+        /// 
+        public static List<MappedGroup> GroupAlignmentWip(
+            List<MonoLink> links,
+            GroupTranslationsTable groups,
+            XElement treeNode,
+            List<TargetPoint> targetPoints)
+        {
+            List<MappedGroup> links2 = Groups.WordsToGroups(links);
+
+            GroupTranslationsTable_Old groups_old =
+                new GroupTranslationsTable_Old();
+            foreach (var kvp in groups.Inner)
+                foreach (var x in kvp.Value)
+                    groups_old.AddEntry(
+                        kvp.Key.Text,
+                        x.Item1.Text,
+                        x.Item2.Int);
+
+            Dictionary<string, WordInfo> wordInfoTable =
+                AutoAlignUtility.BuildWordInfoTable(treeNode);
+            // sourceID => WordInfo
+
+            List<XElement> terminals =
+                AutoAlignUtility.GetTerminalXmlNodes(treeNode);
+
+            List<SourceWord> sourceWordList =
+                AutoAlignmentService.MakeSourceWordList(
+                    terminals
+                    .Select(node => node.SourceID().AsCanonicalString)
+                    .OrderBy(sourceID => sourceID),
+                    wordInfoTable);
+
+            List<MaybeTargetPoint> tWords =
+                targetPoints
+                .Select(tp => new MaybeTargetPoint(tp))
+                .ToList();
+
+            Groups.AlignGroups(links2, sourceWordList, tWords, groups_old, terminals);
+
+            AlignStaging.FixCrossingLinks(ref links2);
+
+            return links2;
+        }
+
+
+
         public static void AlignGroups(
             List<MappedGroup> links,
             List<SourceWord> sourceWords,
