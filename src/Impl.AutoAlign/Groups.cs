@@ -355,17 +355,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
         static SourcePoint2 GetSourceNode(string id, List<XElement> terminals)
-        {
-            SourcePoint2 sNode = new SourcePoint2();
+        {           
             XElement treeNode = LocateTreeNode(id, terminals);
-            
-            sNode.MorphID = id;
-            sNode.English = treeNode.Attribute("English").Value;
-            sNode.Lemma = treeNode.Attribute("UnicodeLemma").Value;
-            sNode.TreePosition = treeNode.AttrAsInt("Start");
-            sNode.RelativeTreePosition = (double)sNode.TreePosition / (double)terminals.Count;
-            sNode.Category = treeNode.Attribute("Cat").Value;
-            sNode.TreeNode = treeNode;
+            int treePosition = treeNode.AttrAsInt("Start");
+
+            SourcePoint2 sNode = new SourcePoint2(
+                morphID: id,
+                lemma: treeNode.Attribute("UnicodeLemma").Value,
+                english: treeNode.Attribute("English").Value,
+                treeNode: treeNode,
+                treePosition: treePosition,
+                relativeTreePosition: treePosition / (double)terminals.Count,
+                category: treeNode.Attribute("Cat").Value);
 
             return sNode;
         }
