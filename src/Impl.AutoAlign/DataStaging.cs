@@ -201,6 +201,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             _sources = sources;
             _targets = targets;
         }
+
+        public MultiLink(
+            SourcePoint sourcePoint,
+            TargetBond target)
+        {
+            _sources = new List<SourcePoint>() { sourcePoint };
+            _targets = new List<TargetBond>() { target };
+        }
     }
 
 
