@@ -77,7 +77,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public double RelativePosition { get; }
     }
 
-
+    /// <summary>
+    /// FIXME: Someday need to add more information for tracking
+    /// why a bond has been made.
+    /// </summary>
+    /// 
     public class TargetBond
     {
         public TargetBond(
@@ -95,7 +99,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class MonoLink
     {
-        
+        public SourcePoint SourcePoint { get; }
+        public TargetBond TargetBond { get; }
+
+        public MonoLink(
+            SourcePoint sourcePoint,
+            TargetBond targetBond)
+        {
+            SourcePoint = sourcePoint;
+            TargetBond = targetBond;
+        }
     }
 
 
@@ -158,6 +171,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public bool HasTargetPoint =>
             !MaybeTargetPoint.IsNothing;
+
+        public TargetBond MakeTargetBond()
+        {
+            if (!HasTargetPoint)
+            {
+                throw new InvalidOperationException(
+                    "no TargetPoint");
+            }
+
+            return new TargetBond(
+                targetPoint: MaybeTargetPoint.TargetPoint,
+                score: Score);
+        }
     }
 
 

@@ -105,7 +105,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 List<TargetPoint> targetPoints =
                     GetTargetPoints(translationPair.Targets);
 
-                List<MultiLink> multiLinks =
+                List<MonoLink> monoLinks =
                     AlignZone(
                         treeNode,
                         sourcePoints,
@@ -113,40 +113,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         maxPaths,
                         assumptions);
 
-                //---
-
-                //Dictionary<string, SourcePoint> sourceMap =
-                //    sourcePoints
-                //    .ToDictionary(
-                //        sp => sp.SourceID.AsCanonicalString,
-                //        sp => sp);
-
-                //Dictionary<string, TargetPoint> targetMap =
-                //    targetPoints
-                //    .ToDictionary(
-                //        tp => tp.TargetID.AsCanonicalString,
-                //        tp => tp);
-
-                //List<MultiLink> multiLinks =
-                //    links2
-                //    .Where(mappedGroup =>
-                //    !mappedGroup.TargetNodes.Any(
-                //        linkedWord => linkedWord.MaybeTargetPoint.IsNothing))
-                //    .Select(mappedGroup => new MultiLink(
-                //            sources:
-                //                mappedGroup.SourcePoints
-                //                .Select(sourceNode =>
-                //                    sourceMap[sourceNode.MorphID])
-                //                .ToList(),
-                //            targets:
-                //                mappedGroup.TargetNodes
-                //                .Select(targetNode => new TargetBond(
-                //                    targetMap[targetNode.MaybeTargetPoint.ID],
-                //                    targetNode.Score))
-                //                .ToList()))
-                //    .ToList();
-
-                //---
+                List<MultiLink> multiLinks =
+                    ConvertMonoToMultiLinks(monoLinks);                  
 
                 align.Lines[i] =
                     Output.GetLine(
@@ -233,7 +201,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<MultiLink> AlignZone(
+        public static List<MonoLink> AlignZone(
             XElement treeNode,
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
@@ -267,41 +235,56 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 maxPaths,
                 terminalCandidates);
 
-            List<OpenMonoLink> links =
+            List<OpenMonoLink> openMonoLinks =
                 MakeOpenMonoLinks(topCandidate, sourcePoints);
 
-            AlignStaging.ResolveConflicts(links, tryHarder: false);
+            AlignStaging.ResolveConflicts(openMonoLinks, tryHarder: false);
 
 
             #region Andi does not use this part anymore.
 
-            ImproveAlignment(links, targetPoints, assumptions);
+            ImproveAlignment(openMonoLinks, targetPoints, assumptions);
 
-            AlignStaging.ResolveConflicts(links, tryHarder: true);
+            AlignStaging.ResolveConflicts(openMonoLinks, tryHarder: true);
 
             #endregion
 
 
-            FixCrossingOpenMonoLinks(links);
+            FixCrossingOpenMonoLinks(openMonoLinks);
 
-            List<MultiLink> links2 =
-                links
-                .Where(link => link.HasTargetPoint)
-                .Select(link => new MultiLink(
-                    sourcePoint: link.SourcePoint,
-                    target: new TargetBond(
-                        link.OpenTargetBond.MaybeTargetPoint.TargetPoint,
-                        link.OpenTargetBond.Score)))
-                .ToList();
+            List<MonoLink> monoLinks = ResolveOpenMonoLinks(openMonoLinks);
 
-
-            //List<MappedGroup> links2 = Groups.WordsToGroups(links);
-
-            return links2;
+            return monoLinks;
         }
 
 
+
+        public static List<MonoLink> ResolveOpenMonoLinks(
+            List<OpenMonoLink> links)
+        {
+            return
+                links
+                .Where(link => link.HasTargetPoint)
+                .Select(link => new MonoLink(
+                    sourcePoint: link.SourcePoint,
+                    targetBond: link.OpenTargetBond.MakeTargetBond()))
+                .ToList();
+        }
+
+
+        public static List<MultiLink> ConvertMonoToMultiLinks(
+            List<MonoLink> monoLinks)
+        {
+            return
+                monoLinks
+                .Select(link => new MultiLink(
+                    link.SourcePoint,
+                    link.TargetBond))
+                .ToList();
+        }
+
         
+
 
 
 
