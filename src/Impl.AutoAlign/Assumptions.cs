@@ -203,7 +203,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             SourcePoint sn,
             out string targetID)
             =>
-            _preAlignment.TryGetValue(sn.MorphID, out targetID);
+            _preAlignment.TryGetValue(
+                sn.SourceID.AsCanonicalString,
+                out targetID);
 
 
         public Dictionary<string, Dictionary<string, int>> Strongs =>

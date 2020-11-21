@@ -10,106 +10,46 @@ using Newtonsoft.Json.Linq;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    using System.Net.Http.Headers;
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.TreeService;
 
 
-    public class SourcePoint
-    {
-        public SourcePoint(
-            XElement terminal,
-            string altID,
-            int treePosition,
-            int sourcePosition,
-            int totalPoints)
-        {
-            Terminal = terminal;
-            AltID = altID;
-            TreePosition = treePosition;
-            RelativeTreePosition = treePosition / (double)totalPoints;
-            SourceID = terminal.SourceID();
-            SourcePosition = sourcePosition;
-        }
-
-        public XElement Terminal { get; }
-        public SourceID SourceID { get; }
-        public string AltID { get; }
-        public int TreePosition { get; }
-        public double RelativeTreePosition { get; }
-        public int SourcePosition { get; }
-
-        public string MorphID =>
-            SourceID.AsCanonicalString;
-
-        public string Lemma =>
-            Terminal.Lemma();
-
-        public string English =>
-            Terminal.English();
-
-        public string Category =>
-            Terminal.Category();
-    }
+    public record SourcePoint(
+        string Lemma,
+        XElement Terminal,
+        SourceID SourceID,
+        string AltID,
+        int TreePosition,
+        double RelativeTreePosition,
+        int SourcePosition);
 
 
-    public class TargetPoint
-    {
-        public TargetPoint(
-            string text,
-            TargetID targetID,
-            string altID,
-            int position,
-            int totalPoints)
-        {
-            Text = text;
-            Lower = text.ToLower();
-            TargetID = targetID;
-            AltID = altID;
-            Position = position;
-            RelativePosition = position / (double)totalPoints;
-        }
-
-        public string Text { get; }
-        public string Lower { get; }
-        public TargetID TargetID { get; }
-        public string AltID { get; }
-        public int Position { get; }
-        public double RelativePosition { get; }
-    }
-
-    /// <summary>
-    /// FIXME: Someday need to add more information for tracking
-    /// why a bond has been made.
-    /// </summary>
-    /// 
-    public class TargetBond
-    {
-        public TargetBond(
-            TargetPoint targetPoint,
-            double score)
-        {
-            TargetPoint = targetPoint;
-            Score = score;
-        }
-
-        public TargetPoint TargetPoint { get; }
-        public double Score { get; }
-    }
+    public record TargetPoint(
+        string Text,
+        string Lower,
+        TargetID TargetID,
+        string AltID,
+        int Position,
+        double RelativePosition);
 
 
-    public class MonoLink
-    {
-        public SourcePoint SourcePoint { get; }
-        public TargetBond TargetBond { get; }
+    public record TargetBond(
+        TargetPoint TargetPoint,
+        double Score);
+        // FIXME: Someday may also need to track why a bond was made.
 
-        public MonoLink(
-            SourcePoint sourcePoint,
-            TargetBond targetBond)
-        {
-            SourcePoint = sourcePoint;
-            TargetBond = targetBond;
-        }
-    }
+
+    public record MonoLink(
+        SourcePoint SourcePoint,
+        TargetBond TargetBond);
+
+
+    public record MultiLink(
+        List<SourcePoint> Sources,
+        List<TargetBond> Targets);
+    
+    
 
 
     public class MaybeTargetPoint
@@ -153,38 +93,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-    public class OpenTargetBond
+
+    public record OpenTargetBond(
+        MaybeTargetPoint MaybeTargetPoint,
+        double Score)
     {
-        public OpenTargetBond(
-            MaybeTargetPoint maybeTargetPoint,
-            double score)
-        {
-            MaybeTargetPoint = maybeTargetPoint;
-            Score = score;
-        }
-
-        public MaybeTargetPoint MaybeTargetPoint { get; }
-        public double Score { get; }
-
-        public string Text =>
-            MaybeTargetPoint.Lower;
-
-        public bool HasTargetPoint =>
-            !MaybeTargetPoint.IsNothing;
-
-        public TargetBond MakeTargetBond()
-        {
-            if (!HasTargetPoint)
-            {
-                throw new InvalidOperationException(
-                    "no TargetPoint");
-            }
-
-            return new TargetBond(
-                targetPoint: MaybeTargetPoint.TargetPoint,
-                score: Score);
-        }
+        public bool HasTargetPoint => !MaybeTargetPoint.IsNothing;
     }
+
+
+
 
 
     public class OpenMonoLink
@@ -210,33 +128,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-    public class MultiLink
-    {
-        public IReadOnlyList<SourcePoint> Sources =>
-            _sources;
-
-        private List<SourcePoint> _sources;
-
-        public IReadOnlyList<TargetBond> Targets =>
-            _targets;
-
-        private List<TargetBond> _targets;
-
-        public MultiLink(List<SourcePoint> sources, List<TargetBond> targets)
-        {
-            _sources = sources;
-            _targets = targets;
-        }
-
-        public MultiLink(
-            SourcePoint sourcePoint,
-            TargetBond target)
-        {
-            _sources = new List<SourcePoint>() { sourcePoint };
-            _targets = new List<TargetBond>() { target };
-        }
-    }
-
 
     public class SourceWord
     {
@@ -246,12 +137,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public string Lemma { get; set; }
         public string Strong { get; set; }
     }
-
-
-    
-
-
-
 
     public class MappedGroup
     {
