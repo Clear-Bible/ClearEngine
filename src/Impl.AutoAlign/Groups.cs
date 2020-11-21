@@ -315,7 +315,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (SourcePoint sNode in mg.SourcePoints)
             {
-                if (sourceWordsInGroups.Contains(sNode.MorphID))
+                if (sourceWordsInGroups.Contains(
+                    sNode.SourceID.AsCanonicalString))
                 {
                     inGroup = true;
                 }
@@ -360,11 +361,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int treePosition = treeNode.AttrAsInt("Start");
 
             SourcePoint sNode = new SourcePoint(
-                terminal: treeNode,
-                altID: "",
-                treePosition: treePosition,
-                sourcePosition: 0,
-                totalPoints: terminals.Count);
+                Lemma: treeNode.Lemma(),
+                Terminal: treeNode,
+                SourceID: treeNode.SourceID(),
+                AltID: "",
+                TreePosition: treePosition,
+                SourcePosition: 0,
+                RelativeTreePosition: treePosition / (double)terminals.Count);
 
             // FIXME: altID and sourcePosition are dummy values, does it matter?
 
@@ -401,8 +404,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             MaybeTargetPoint tWord = LocateTargetword(id, targets);
 
             return new OpenTargetBond(
-                maybeTargetPoint: tWord,
-                score: 1.0);
+                MaybeTargetPoint: tWord,
+                Score: 1.0);
         }
 
         static MaybeTargetPoint LocateTargetword(string id, List<MaybeTargetPoint> targets)

@@ -43,7 +43,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             string idOfSoleSourceWord(MappedGroup g) =>
-                g.SourcePoints[0].MorphID;
+                g.SourcePoints[0].SourceID.AsCanonicalString;
 
             bool linkIsOneToOne(MappedGroup link) =>
                 link.SourcePoints.Count == 1 && link.TargetNodes.Count == 1;
@@ -130,8 +130,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 new OpenMonoLink(
                     sourcePoint: sourceNode,
                     openTargetBond: new OpenTargetBond(
-                        maybeTargetPoint: AutoAlignUtility.CreateFakeTargetWord(),
-                        score: -1000));
+                        MaybeTargetPoint: AutoAlignUtility.CreateFakeTargetWord(),
+                        Score: -1000));
         }
 
 

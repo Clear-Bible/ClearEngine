@@ -212,8 +212,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             if (path.Count == 0)
             {
                 links.Add(new OpenTargetBond(
-                    maybeTargetPoint: new MaybeTargetPoint(),
-                    score: -1000));
+                    MaybeTargetPoint: new MaybeTargetPoint(),
+                    Score: -1000));
             }
             else
             {
@@ -229,8 +229,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     foreach (MaybeTargetPoint tWord in path)
                     {
                         links.Add(new OpenTargetBond(
-                            maybeTargetPoint: tWord,
-                            score: prob));
+                            MaybeTargetPoint: tWord,
+                            Score: prob));
                     }
                 }
             }

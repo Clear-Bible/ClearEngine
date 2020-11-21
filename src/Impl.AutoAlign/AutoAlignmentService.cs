@@ -137,7 +137,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<XElement> terminals =
                     AutoAlignUtility.GetTerminalXmlNodes(treeNode);
 
-            int totalSourcePoints = terminals.Count();
+            double totalSourcePoints = terminals.Count();
 
             return
                 terminals
@@ -159,11 +159,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     }))
                 .OrderBy(x => x.sourceID.AsCanonicalString)
                 .Select((x, m) => new SourcePoint(
-                    x.term,
-                    x.altID,
-                    x.treePosition,
-                    m,
-                    totalSourcePoints))
+                    Lemma: x.term.Lemma(),
+                    Terminal: x.term,
+                    SourceID: x.term.SourceID(),
+                    AltID: x.altID,
+                    TreePosition: x.treePosition,
+                    RelativeTreePosition: x.treePosition / totalSourcePoints,
+                    SourcePosition: m))
                 .ToList();
         }
 
@@ -171,7 +173,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static List<TargetPoint> GetTargetPoints(
             IReadOnlyList<Target> targets)
         {
-            int totalTargetPoints = targets.Count();
+            double totalTargetPoints = targets.Count();
 
             return
                 targets
@@ -192,11 +194,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     }))
                 .OrderBy(x => x.position)
                 .Select(x => new TargetPoint(
-                    x.text,
-                    x.targetID,
-                    x.altID,
-                    x.position,
-                    totalTargetPoints))
+                    Text: x.text,
+                    Lower: x.text.ToLower(),
+                    TargetID: x.targetID,
+                    AltID: x.altID,
+                    Position: x.position,
+                    RelativePosition: x.position / totalTargetPoints))
                 .ToList();
         }
 
@@ -266,9 +269,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 links
                 .Where(link => link.HasTargetPoint)
                 .Select(link => new MonoLink(
-                    sourcePoint: link.SourcePoint,
-                    targetBond: link.OpenTargetBond.MakeTargetBond()))
+                    SourcePoint: link.SourcePoint,
+                    TargetBond: close(link.OpenTargetBond)))
                 .ToList();
+
+            TargetBond close(OpenTargetBond bond)
+            {
+                if (bond.MaybeTargetPoint.IsNothing)
+                    throw new InvalidOperationException("no target point");
+                return new TargetBond(
+                    TargetPoint: bond.MaybeTargetPoint.TargetPoint,
+                    Score: bond.Score);
+            }
         }
 
 
@@ -278,8 +290,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return
                 monoLinks
                 .Select(link => new MultiLink(
-                    link.SourcePoint,
-                    link.TargetBond))
+                    new List<SourcePoint>() { link.SourcePoint },
+                    new List<TargetBond>() { link.TargetBond }))
                 .ToList();
         }
 
@@ -491,7 +503,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, OpenMonoLink> linksTable =
                 links
                 .Where(mw => mw.HasTargetPoint)
-                .ToDictionary(mw => mw.SourcePoint.MorphID, mw => mw);
+                .ToDictionary(
+                    mw => mw.SourcePoint.SourceID.AsCanonicalString,
+                    mw => mw);
 
             foreach (OpenMonoLink link in
                 links.Where(link => link.OpenTargetBond.MaybeTargetPoint.IsNothing))
@@ -554,8 +568,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     !assumptions.IsStopWord(targetPoint.Lower))
                 {
                     return new OpenTargetBond(
-                        maybeTargetPoint: new MaybeTargetPoint(targetPoint),
-                        score: 0);
+                        MaybeTargetPoint: new MaybeTargetPoint(targetPoint),
+                        Score: 0);
                 }
             }
 
@@ -674,8 +688,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 MaybeTargetPoint topCandidate = candidates[0];
 
                 OpenTargetBond linkedWord = new OpenTargetBond(
-                    maybeTargetPoint: topCandidate,
-                    score: probs[topCandidate]);
+                    MaybeTargetPoint: topCandidate,
+                    Score: probs[topCandidate]);
                 
                 return linkedWord;
             }
