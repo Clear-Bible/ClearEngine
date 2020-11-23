@@ -164,9 +164,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public double GetTranslationModelScore(SourcePoint sn, MaybeTargetPoint tw)
         {
             if (_translationModel.Inner.TryGetValue(new Lemma(sn.Lemma),
-                out Dictionary<TargetMorph, Score> translations))
+                out Dictionary<TargetText, Score> translations))
             {
-                if (translations.TryGetValue(new TargetMorph(tw.Lower),
+                if (translations.TryGetValue(new TargetText(tw.Lower),
                     out Score score))
                 {
                     return score.Double;
@@ -239,13 +239,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             if (translationModel.Inner.TryGetValue(
                 new Lemma(lemma),
-                out Dictionary<TargetMorph, Score> translations))
+                out Dictionary<TargetText, Score> translations))
             {
                 tryGetScoreForTargetText =
                     (string targetText, out double score) =>
                     {
                         if (translations.TryGetValue(
-                            new TargetMorph(targetText),
+                            new TargetText(targetText),
                             out Score score2))
                         {
                             score = score2.Double;

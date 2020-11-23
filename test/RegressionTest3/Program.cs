@@ -97,7 +97,7 @@ namespace RegressionTest3
                     manTransModelOrig.ToDictionary(
                         kvp => new Lemma(kvp.Key),
                         kvp => kvp.Value.ToDictionary(
-                            kvp2 => new TargetMorph(kvp2.Key),
+                            kvp2 => new TargetText(kvp2.Key),
                             kvp2 => new Score(kvp2.Value.Prob))));
 
             Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
