@@ -37,9 +37,6 @@ namespace ClearBible.Clear3.Impl.Service
         public IAutoAlignmentService AutoAlignmentService { get; } =
             new AutoAlign.AutoAlignmentService();
 
-        public IDataService Data { get; } =
-            new Data.DataService();
-
         public IPhraseService PhraseService =>
             throw new NotImplementedException();
 
