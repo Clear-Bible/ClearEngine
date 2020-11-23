@@ -13,8 +13,15 @@ using Utilities;
 using GBI_Aligner;
 using Newtonsoft.Json;
 
-using ClearBible.Clear3.API;
+
 using ClearBible.Clear3.Impl.Data;
+
+using Gloss = ClearBible.Clear3.API.Gloss;
+using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
+using SourceLemmasAsText = ClearBible.Clear3.API.SourceLemmasAsText;
+using PrimaryPosition = ClearBible.Clear3.API.PrimaryPosition;
+using TargetGroupAsText = ClearBible.Clear3.API.TargetGroupAsText;
+
 
 namespace AlignmentTool
 {
