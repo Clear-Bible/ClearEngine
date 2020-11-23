@@ -66,11 +66,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             _preAlignment =
                 alignProbs.Inner.Keys
-                .GroupBy(pair => pair.Item1)
+                .GroupBy(bareLink => bareLink.SourceID)
                 .Where(group => group.Any())
                 .ToDictionary(
                     group => group.Key.AsCanonicalString,
-                    group => group.First().Item2.AsCanonicalString);
+                    group => group.First().TargetID.AsCanonicalString);
         }
 
 
@@ -182,7 +182,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string targetID,
             out double score)
         {
-            var key = Tuple.Create(
+            var key = new BareLink(
                 new SourceID(sourceID),
                 new TargetID(targetID));
 

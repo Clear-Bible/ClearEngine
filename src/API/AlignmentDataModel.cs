@@ -31,6 +31,16 @@ namespace ClearBible.Clear3.API
         VerseID LastSourceVerseID);
 
 
+    public record BareLink(
+        SourceID SourceID,
+        TargetID TargetID);
+
+    public record AlignmentModel(
+        Dictionary<BareLink, Score> Inner);
+
+    
+
+
     public record SourcePoint(
         string Lemma,
         XElement Terminal,

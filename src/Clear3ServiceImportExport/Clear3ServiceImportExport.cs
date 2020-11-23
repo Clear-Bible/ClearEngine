@@ -248,7 +248,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
                 @"^\s*(\d+)\s*-\s*(\d+)\s+(\S+)\s*$",
                 RegexOptions.Compiled);
 
-            Dictionary<Tuple<SourceID, TargetID>, Score>
+            Dictionary<BareLink, Score>
                 inner =
                 File.ReadLines(filePath)
                 .Select(interpretLine)
@@ -256,7 +256,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
 
             return new AlignmentModel(inner);
 
-            Tuple<Tuple<SourceID, TargetID>, Score> interpretLine(
+            (BareLink, Score) interpretLine(
                 string line, int index)
             {
                 Match m = regex.Match(line);
@@ -268,8 +268,8 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
                     error(index, "target ID must have 11 digits");
                 if (!double.TryParse(m.Groups[3].Value, out double score))
                     error(index, "third field must be a number");
-                return Tuple.Create(
-                    Tuple.Create(
+                return (
+                    new BareLink(
                         new SourceID(m.Groups[1].Value),
                         new TargetID(m.Groups[2].Value)),
                     new Score(score));
