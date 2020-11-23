@@ -11,67 +11,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class AlignStaging
     {
-        public static void FixCrossingLinks(ref List<MappedGroup> links)
-        {
-            var crossingLinks =
-                links
-                .Where(linkIsOneToOne)
-                .GroupBy(lemmaOfSoleSourceWord)
-                .Where(links => links.Count() == 2)
-                .Select(links => new
-                {
-                    Link1 = links.ElementAt(0),
-                    Link2 = links.ElementAt(1)
-                })
-                .Where(x => Crossing(x.Link1, x.Link2))
-                .Select(x => new
-                {
-                    Src1Id = idOfSoleSourceWord(x.Link1),
-                    Src2Id = idOfSoleSourceWord(x.Link2),
-                    Target1 = x.Link1.TargetNodes,
-                    Target2 = x.Link2.TargetNodes
-                });
-
-            foreach (var x in crossingLinks)
-            {
-                foreach (MappedGroup mp in links)
-                {
-                    string sourceId = idOfSoleSourceWord(mp);
-                    if (sourceId == x.Src1Id) mp.TargetNodes = x.Target2;
-                    if (sourceId == x.Src2Id) mp.TargetNodes = x.Target1;
-                }
-            }
-
-            string idOfSoleSourceWord(MappedGroup g) =>
-                g.SourcePoints[0].SourceID.AsCanonicalString;
-
-            bool linkIsOneToOne(MappedGroup link) =>
-                link.SourcePoints.Count == 1 && link.TargetNodes.Count == 1;
-
-            string lemmaOfSoleSourceWord(MappedGroup link) =>
-                link.SourcePoints[0].Lemma;
-        }
-
-
-        public static bool Crossing(MappedGroup link1, MappedGroup link2)
-        {
-            int tpos1 = positionOfSoleWordInTargetGroup(link1);
-            int tpos2 = positionOfSoleWordInTargetGroup(link2);
-
-            if (tpos1 < 0 || tpos2 < 0) return false;
-
-            int spos1 = positionOfSoleWordInSourceGroup(link1);
-            int spos2 = positionOfSoleWordInSourceGroup(link2);
-
-            return (spos1 < spos2 && tpos1 > tpos2) ||
-                (spos1 > spos2 && tpos1 < tpos2);
-
-            int positionOfSoleWordInSourceGroup(MappedGroup g) =>
-                g.SourcePoints[0].TreePosition;
-
-            int positionOfSoleWordInTargetGroup(MappedGroup g) =>
-                g.TargetNodes[0].MaybeTargetPoint.Position;
-        }
+        
            
 
         public static List<List<OpenMonoLink>> FindConflictingLinks(

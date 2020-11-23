@@ -12,15 +12,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class AutoAlignUtility
     {
-        public static Dictionary<string, WordInfo> BuildWordInfoTable(
-            XElement tree)
-        {           
-            return
-                GetTerminalXmlNodes(tree)
-                .ToDictionary(
-                    node => GetSourceIdFromTerminalXmlNode(node),
-                    node => GetWordInfoFromTerminalXmlNode(node));
-        }
+
 
         public static List<XElement> GetTerminalXmlNodes(XElement treeNode)
         {
@@ -30,34 +22,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .ToList();
         }
 
-        public static string GetSourceIdFromTerminalXmlNode(XElement node)
-        {
-            string sourceId = node.Attribute("morphId").Value;
-            if (sourceId.Length == 11) sourceId += "1";
-            return sourceId;
-        }
-
-        public static WordInfo GetWordInfoFromTerminalXmlNode(XElement node)
-        {
-            string language = node.Attribute("Language").Value;
-
-            string type =
-                node.AttrAsString(language == "G" ? "Type" : "NounType");
-
-            string category = node.Attribute("Cat").Value;
-            if (category == "noun" && type == "Proper")
-                category = "Name";
-
-            return new WordInfo()
-            {
-                Lang = language,
-                Strong = node.Attribute("StrongNumberX").Value,
-                Surface = node.Attribute("Unicode").Value,
-                Lemma = node.Attribute("UnicodeLemma").Value,
-                Cat = category,
-                Morph = node.Attribute("Analysis").Value
-            };               
-        }
+        
 
 
         
