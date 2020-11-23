@@ -52,20 +52,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     
 
 
-    public class MaybeTargetPoint
+    public record MaybeTargetPoint(
+        TargetPoint TargetPoint)
     {
-        public MaybeTargetPoint(TargetPoint targetPoint)
-        {
-            TargetPoint = targetPoint;
-        }
-
-        public MaybeTargetPoint()
-        {
-            TargetPoint = null;
-        }
-
-        public TargetPoint TargetPoint { get; }
-
         public string ID =>
             TargetPoint?.TargetID.AsCanonicalString ?? "0";
 
