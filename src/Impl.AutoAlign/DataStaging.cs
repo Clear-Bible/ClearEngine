@@ -78,16 +78,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-
     public record OpenTargetBond(
         MaybeTargetPoint MaybeTargetPoint,
         double Score)
     {
         public bool HasTargetPoint => !MaybeTargetPoint.IsNothing;
     }
-
-
-
 
 
     public class OpenMonoLink
@@ -112,22 +108,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }           
     }
 
-
-
-    public class SourceWord
-    {
-        public string ID { get; set; }
-        public string AltID { get; set; }
-        public string Text { get; set; }
-        public string Lemma { get; set; }
-        public string Strong { get; set; }
-    }
-
-    public class MappedGroup
-    {
-        public List<SourcePoint> SourcePoints = new List<SourcePoint>();
-        public List<OpenTargetBond> TargetNodes = new List<OpenTargetBond>();
-    }
 
 
     public class Candidate
@@ -339,13 +319,5 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
     }
 
-    public class WordInfo
-    {
-        public string Lang;
-        public string Strong;
-        public string Surface;
-        public string Lemma;
-        public string Cat;
-        public string Morph;
-    }
+ 
 }

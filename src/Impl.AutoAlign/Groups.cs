@@ -11,6 +11,35 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Miscellaneous;
 
+
+    public class MappedGroup
+    {
+        public List<SourcePoint> SourcePoints = new List<SourcePoint>();
+        public List<OpenTargetBond> TargetNodes = new List<OpenTargetBond>();
+    }
+
+
+    public class SourceWord
+    {
+        public string ID { get; set; }
+        public string AltID { get; set; }
+        public string Text { get; set; }
+        public string Lemma { get; set; }
+        public string Strong { get; set; }
+    }
+
+
+    public class WordInfo
+    {
+        public string Lang;
+        public string Strong;
+        public string Surface;
+        public string Lemma;
+        public string Cat;
+        public string Morph;
+    }
+
+
     public class Groups
     {
         /// <summary>
@@ -41,14 +70,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         x.Item2.Int);
 
             Dictionary<string, WordInfo> wordInfoTable =
-                AutoAlignUtility.BuildWordInfoTable(treeNode);
+                BuildWordInfoTable(treeNode);
             // sourceID => WordInfo
 
             List<XElement> terminals =
                 AutoAlignUtility.GetTerminalXmlNodes(treeNode);
 
             List<SourceWord> sourceWordList =
-                AutoAlignmentService.MakeSourceWordList(
+                MakeSourceWordList(
                     terminals
                     .Select(node => node.SourceID().AsCanonicalString)
                     .OrderBy(sourceID => sourceID),
@@ -61,7 +90,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Groups.AlignGroups(links2, sourceWordList, tWords, groups_old, terminals);
 
-            AlignStaging.FixCrossingLinks(ref links2);
+            FixCrossingLinks(ref links2);
 
             return links2;
         }
@@ -433,6 +462,134 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return groupLinks;
         }
-    }
 
+
+        public static void FixCrossingLinks(ref List<MappedGroup> links)
+        {
+            var crossingLinks =
+                links
+                .Where(linkIsOneToOne)
+                .GroupBy(lemmaOfSoleSourceWord)
+                .Where(links => links.Count() == 2)
+                .Select(links => new
+                {
+                    Link1 = links.ElementAt(0),
+                    Link2 = links.ElementAt(1)
+                })
+                .Where(x => Crossing(x.Link1, x.Link2))
+                .Select(x => new
+                {
+                    Src1Id = idOfSoleSourceWord(x.Link1),
+                    Src2Id = idOfSoleSourceWord(x.Link2),
+                    Target1 = x.Link1.TargetNodes,
+                    Target2 = x.Link2.TargetNodes
+                });
+
+            foreach (var x in crossingLinks)
+            {
+                foreach (MappedGroup mp in links)
+                {
+                    string sourceId = idOfSoleSourceWord(mp);
+                    if (sourceId == x.Src1Id) mp.TargetNodes = x.Target2;
+                    if (sourceId == x.Src2Id) mp.TargetNodes = x.Target1;
+                }
+            }
+
+            string idOfSoleSourceWord(MappedGroup g) =>
+                g.SourcePoints[0].SourceID.AsCanonicalString;
+
+            bool linkIsOneToOne(MappedGroup link) =>
+                link.SourcePoints.Count == 1 && link.TargetNodes.Count == 1;
+
+            string lemmaOfSoleSourceWord(MappedGroup link) =>
+                link.SourcePoints[0].Lemma;
+        }
+
+
+        public static bool Crossing(MappedGroup link1, MappedGroup link2)
+        {
+            int tpos1 = positionOfSoleWordInTargetGroup(link1);
+            int tpos2 = positionOfSoleWordInTargetGroup(link2);
+
+            if (tpos1 < 0 || tpos2 < 0) return false;
+
+            int spos1 = positionOfSoleWordInSourceGroup(link1);
+            int spos2 = positionOfSoleWordInSourceGroup(link2);
+
+            return (spos1 < spos2 && tpos1 > tpos2) ||
+                (spos1 > spos2 && tpos1 < tpos2);
+
+            int positionOfSoleWordInSourceGroup(MappedGroup g) =>
+                g.SourcePoints[0].TreePosition;
+
+            int positionOfSoleWordInTargetGroup(MappedGroup g) =>
+                g.TargetNodes[0].MaybeTargetPoint.Position;
+        }
+
+
+        public static List<SourceWord> MakeSourceWordList(
+             IEnumerable<string> sourceSegmentIds,
+             Dictionary<string, WordInfo> wordInfoTable)
+        {
+            return sourceSegmentIds
+                .Select((string id) => Tuple.Create(id, wordInfoTable[id]))
+                .WithVersionNumber(
+                    (Tuple<string, WordInfo> x) => x.Item2.Surface)
+                .Select((Tuple<Tuple<string, WordInfo>, int> y) =>
+                {
+                    WordInfo wi = y.Item1.Item2;
+                    return new SourceWord()
+                    {
+                        ID = y.Item1.Item1,
+                        Text = wi.Surface,
+                        Lemma = wi.Lemma,
+                        Strong = wi.Lang + wi.Strong,
+                        AltID = $"{wi.Surface}-{y.Item2}"
+                    };
+                })
+                .ToList();
+        }
+
+
+        public static Dictionary<string, WordInfo> BuildWordInfoTable(
+            XElement tree)
+        {
+            return
+                AutoAlignUtility.GetTerminalXmlNodes(tree)
+                .ToDictionary(
+                    node => GetSourceIdFromTerminalXmlNode(node),
+                    node => GetWordInfoFromTerminalXmlNode(node));
+        }
+
+
+        public static string GetSourceIdFromTerminalXmlNode(XElement node)
+        {
+            string sourceId = node.Attribute("morphId").Value;
+            if (sourceId.Length == 11) sourceId += "1";
+            return sourceId;
+        }
+
+
+        public static WordInfo GetWordInfoFromTerminalXmlNode(XElement node)
+        {
+            string language = node.Attribute("Language").Value;
+
+            string type =
+                node.AttrAsString(language == "G" ? "Type" : "NounType");
+
+            string category = node.Attribute("Cat").Value;
+            if (category == "noun" && type == "Proper")
+                category = "Name";
+
+            return new WordInfo()
+            {
+                Lang = language,
+                Strong = node.Attribute("StrongNumberX").Value,
+                Surface = node.Attribute("Unicode").Value,
+                Lemma = node.Attribute("UnicodeLemma").Value,
+                Cat = category,
+                Morph = node.Attribute("Analysis").Value
+            };
+        }
+    }
 }
