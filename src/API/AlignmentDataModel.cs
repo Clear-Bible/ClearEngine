@@ -31,6 +31,12 @@ namespace ClearBible.Clear3.API
         VerseID LastSourceVerseID);
 
 
+
+    public record TranslationModel(
+        Dictionary<Lemma, Dictionary<TargetText, Score>> Inner);
+
+
+
     public record BareLink(
         SourceID SourceID,
         TargetID TargetID);
