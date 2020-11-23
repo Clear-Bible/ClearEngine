@@ -19,7 +19,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, string> idMap,
             List<TargetPoint> targetPoints,
             Dictionary<string, string> existingLinks,
-            Assumptions assumptions)
+            AutoAlignAssumptions assumptions)
         {
             AlternativesForTerminals candidateTable =
                 new AlternativesForTerminals();
@@ -60,7 +60,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string strong,
             List<TargetPoint> targetPoints,
             Dictionary <string, string> existingLinks,
-            Assumptions assumptions)
+            AutoAlignAssumptions assumptions)
         {
             if (existingLinks.Count > 0 &&
                 altID != null &&

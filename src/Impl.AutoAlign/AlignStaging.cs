@@ -200,7 +200,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             OpenMonoLink anchorLink,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
-            Assumptions assumptions)
+            AutoAlignAssumptions assumptions)
         {
             int anchor = anchorLink.OpenTargetBond.MaybeTargetPoint.Position;
 
@@ -235,7 +235,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             OpenMonoLink rightAnchor,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
-            Assumptions assumptions)
+            AutoAlignAssumptions assumptions)
         {
             IEnumerable<int> span()
             {
@@ -259,7 +259,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             IEnumerable<int> positions,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
-            Assumptions assumptions)
+            AutoAlignAssumptions assumptions)
         {
             var ansr =
                 positions

@@ -11,7 +11,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Miscellaneous;
 
-    public class Assumptions
+    public class AutoAlignAssumptions
     {
         private TranslationModel _translationModel;
         private TranslationModel _manTransModel;
@@ -31,7 +31,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         private Dictionary<string, string> _preAlignment;
 
-        public Assumptions(
+        public AutoAlignAssumptions(
             TranslationModel translationModel,
             TranslationModel manTransModel,
             AlignmentModel alignProbs,

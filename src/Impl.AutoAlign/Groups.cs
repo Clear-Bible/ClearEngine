@@ -241,7 +241,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
                 if (words.Length == targetWordsInGroup.Count)
                 {
-                    SetInGroup2(targetWords, targetWordsInGroup);
+                    foreach (int n in targetWordsInGroup)
+                        targetWords[n].InGroup = true;
                     break;
                 }
                 else
@@ -251,20 +252,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             return match.Trim();
-        }
-
-
-
-        static void SetInGroup2(MaybeTargetPoint[] targetWords, List<int> targetWordsInGroup)
-        {
-            for (int i = 0; i < targetWords.Length; i++)
-            {
-                if (targetWordsInGroup.Contains(i))
-                {
-                    MaybeTargetPoint targetWord = targetWords[i];
-                    targetWord.InGroup = true;
-                }
-            }
         }
 
 
