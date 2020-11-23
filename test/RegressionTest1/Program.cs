@@ -15,7 +15,6 @@ using Gloss = ClearBible.Clear3.API.Gloss;
 using Line = GBI_Aligner.Line;
 
 using TranslationPair = ClearBible.Clear3.API.TranslationPair;
-using TranslationPairTable = ClearBible.Clear3.API.TranslationPairTable;
 using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
 using TranslationModel = ClearBible.Clear3.API.TranslationModel;
 using Lemma = ClearBible.Clear3.API.Lemma;
