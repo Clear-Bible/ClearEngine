@@ -6,6 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace ClearBible.Clear3.API
 {
+    // Data model for import/export of alignment data in the
+    // legacy format.
+
     public class ManuscriptWord
     {
         public long id;
