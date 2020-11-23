@@ -19,7 +19,7 @@ using TranslationPairTable = ClearBible.Clear3.API.TranslationPairTable;
 using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
 using TranslationModel = ClearBible.Clear3.API.TranslationModel;
 using Lemma = ClearBible.Clear3.API.Lemma;
-using TargetMorph = ClearBible.Clear3.API.TargetMorph;
+using TargetText = ClearBible.Clear3.API.TargetText;
 using Score = ClearBible.Clear3.API.Score;
 using AlignmentModel = ClearBible.Clear3.API.AlignmentModel;
 using IResourceService = ClearBible.Clear3.API.IResourceService;
@@ -186,7 +186,7 @@ namespace RegressionTest1
                     manTransModel.ToDictionary(
                         kvp => new Lemma(kvp.Key),
                         kvp => kvp.Value.ToDictionary(
-                            kvp2 => new TargetMorph(kvp2.Key),
+                            kvp2 => new TargetText(kvp2.Key),
                             kvp2 => new Score(kvp2.Value.Prob))));
 
 

@@ -65,14 +65,14 @@ namespace ClearBible.Clear3.API
             List<
                 Tuple<
                     List<Tuple<SourceID, Lemma>>,
-                    List<Tuple<TargetID, TargetMorph>>>>
+                    List<Tuple<TargetID, TargetText>>>>
             Inner { get; }
 
         public TranslationPairTable(
             List<
                 Tuple<
                     List<Tuple<SourceID, Lemma>>,
-                    List<Tuple<TargetID, TargetMorph>>>>
+                    List<Tuple<TargetID, TargetText>>>>
             inner)
         {
             Inner = inner;

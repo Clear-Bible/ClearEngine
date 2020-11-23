@@ -13,11 +13,11 @@ namespace ClearBible.Clear3.API
 
     public class TranslationModel
     {
-        public Dictionary<Lemma, Dictionary<TargetMorph, Score>>
+        public Dictionary<Lemma, Dictionary<TargetText, Score>>
             Inner { get; }
 
         public TranslationModel(
-            Dictionary<Lemma, Dictionary<TargetMorph, Score>> inner)
+            Dictionary<Lemma, Dictionary<TargetText, Score>> inner)
         {
             Inner = inner;
         }

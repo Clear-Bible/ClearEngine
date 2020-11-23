@@ -6,6 +6,7 @@ using System.Linq;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    using ClearBible.Clear3.API;
     using System.Runtime.CompilerServices;
     using ClearBible.Clear3.Miscellaneous;
 

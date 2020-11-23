@@ -95,7 +95,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
                         .Where(s => !String.IsNullOrWhiteSpace(s))
                         .Select(s => Tuple.Create(
                             new TargetID(getAfterLastUnderscore(s)),
-                            new TargetMorph(getBeforeLastUnderscore(s))))
+                            new TargetText(getBeforeLastUnderscore(s))))
                         .ToList()),
                     Tuple.Create)
                 .ToList());
@@ -130,15 +130,15 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
                         targetStrings = fields(targetLine);
 
                     return new TranslationPair(
-                        targets:
+                        Targets:
                             targetStrings
                             .Select(s => new Target(
                                 getTargetMorph(s),
                                 getTargetId(s)))
                             .ToList(),
-                        firstSourceVerseID:
+                        FirstSourceVerseID:
                             getSourceVerseID(sourceStrings.First()),
-                        lastSourceVerseID:
+                        LastSourceVerseID:
                             getSourceVerseID(sourceStrings.Last()));
                 })
                 .ToList();
@@ -149,8 +149,8 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
             IEnumerable<string> fields(string line) =>
                 line.Split(' ').Where(s => !String.IsNullOrWhiteSpace(s));
 
-            TargetMorph getTargetMorph(string s) =>
-                new TargetMorph(getBeforeLastUnderscore(s));
+            TargetText getTargetMorph(string s) =>
+                new TargetText(getBeforeLastUnderscore(s));
 
             TargetID getTargetId(string s) =>
                 new TargetID(getAfterLastUnderscore(s));
@@ -229,7 +229,7 @@ namespace ClearBible.Clear3.Impl.ServiceImportExport
                 .Select(fields => new
                 {
                     lemma = new Lemma(fields[0].Trim()),
-                    targetMorph = new TargetMorph(fields[1].Trim()),
+                    targetMorph = new TargetText(fields[1].Trim()),
                     score = new Score(Double.Parse(fields[2].Trim()))
                 })
                 .GroupBy(row => row.lemma)

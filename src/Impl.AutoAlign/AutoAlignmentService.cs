@@ -179,7 +179,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 targets
                 .Select((target, position) => new
                 {
-                    text = target.TargetMorph.Text,
+                    text = target.TargetText.Text,
                     targetID = target.TargetID,
                     position
                 })
