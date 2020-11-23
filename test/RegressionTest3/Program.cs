@@ -138,6 +138,23 @@ namespace RegressionTest3
 
             Console.WriteLine("Calling Auto Aligner.");
 
+            //AutoAlignAssumptions assumptions = new AutoAlignAssumptions(
+            //    transModel,
+            //    manTransModel,
+            //    alignmentModel,
+            //    useAlignModel,
+            //    puncs,
+            //    stopWords,
+            //    goodLinks,
+            //    goodLinkMinCount,
+            //    badLinks,
+            //    badLinkMinCount,
+            //    oldLinks,
+            //    sourceFuncWords,
+            //    targetFuncWords,
+            //    contentWordsOnly,
+            //    strongs);
+
             clearService.AutoAlignmentService.AutoAlign(
                 translationPairs,
                 jsonOutput,

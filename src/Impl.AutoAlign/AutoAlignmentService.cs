@@ -62,7 +62,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs
             )
         {
-            Assumptions assumptions = new Assumptions(
+            AutoAlignAssumptions assumptions = new AutoAlignAssumptions(
                 translationModel,
                 manTransModel,
                 alignProbs,
@@ -79,13 +79,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 contentWordsOnly,
                 strongs);
 
-
-           Alignment2 align = new Alignment2();  // The output goes here.
-
-            align.Lines = new Line[translationPairs.Count];
-
-            int i = 0;
-
             TreeService treeService = (TreeService)iTreeService;
 
             // Build map of group key to position of primary
@@ -93,7 +86,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, int> primaryPositions =
                 BuildPrimaryPositionTable(groups);
 
-            foreach (TranslationPair translationPair in translationPairs)
+            Alignment2 align = new Alignment2()
+            {
+                Lines = new Line[translationPairs.Count]
+            };
+
+
+            foreach ((TranslationPair translationPair, int i) in
+                translationPairs.Select((tp, j) => (tp, j)))
             {
 
                 XElement treeNode = treeService.GetTreeNode(
@@ -124,7 +124,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         glossTable,
                         primaryPositions);
 
-                i += 1;
+                // i += 1;
             }
 
             string json = JsonConvert.SerializeObject(align.Lines, Newtonsoft.Json.Formatting.Indented);
@@ -209,7 +209,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
             int maxPaths,
-            Assumptions assumptions
+            AutoAlignAssumptions assumptions
             )
         {
             Dictionary<string, string> sourceAltIdMap =
@@ -492,7 +492,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static void ImproveAlignment(
             List<OpenMonoLink> links,
             List<TargetPoint> targetPoints,
-            Assumptions assumptions)
+            AutoAlignAssumptions assumptions)
         {
             List<string> linkedTargets =
                 links
@@ -532,7 +532,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<TargetPoint> targetPoints,
             Dictionary<string, OpenMonoLink> linksTable,
             List<string> linkedTargets,
-            Assumptions assumptions)
+            AutoAlignAssumptions assumptions)
         {
             if (assumptions.IsSourceStopWord(sourceNode)) return null;
 
@@ -641,7 +641,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             SourcePoint sWord,
             List<MaybeTargetPoint> tWords,
             List<string> linkedTargets,
-            Assumptions assumptions
+            AutoAlignAssumptions assumptions
             )
         {
             Dictionary<MaybeTargetPoint, double> probs =
