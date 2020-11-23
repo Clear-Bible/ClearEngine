@@ -194,7 +194,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static MaybeTargetPoint CreateFakeTargetWord()
         {
-            return new MaybeTargetPoint();
+            return new MaybeTargetPoint(TargetPoint: null);
         }
 
 
@@ -212,7 +212,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             if (path.Count == 0)
             {
                 links.Add(new OpenTargetBond(
-                    MaybeTargetPoint: new MaybeTargetPoint(),
+                    MaybeTargetPoint: new MaybeTargetPoint(TargetPoint: null),
                     Score: -1000));
             }
             else
