@@ -57,13 +57,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public MaybeTargetPoint(TargetPoint targetPoint)
         {
             TargetPoint = targetPoint;
-            InGroup = false;
         }
 
         public MaybeTargetPoint()
         {
             TargetPoint = null;
-            InGroup = false;
         }
 
         public TargetPoint TargetPoint { get; }
@@ -88,8 +86,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public double RelativePos =>
             TargetPoint?.RelativePosition ?? 0.0;
-
-        public bool InGroup { get; set; }
     }
 
 

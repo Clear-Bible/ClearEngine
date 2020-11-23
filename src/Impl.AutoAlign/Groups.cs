@@ -106,6 +106,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             List<string[][]> mappedGroups = new List<string[][]>();
 
+            HashSet<MaybeTargetPoint> targetsAlreadyGrouped = new();
+
             // For each SourceWord sw:
             for (int i = 0; i < sourceWords.Length; i++)
             { 
@@ -123,7 +125,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     if (groups.ContainsSourceGroupKey(trigram))
                     {
                         GroupTranslations_Old targetGroups = groups.TranslationsForSourceGroup(trigram);
-                        string match = FindTargetMatch(targetWords, targetGroups, 1);
+                        string match = FindTargetMatch(targetWords, targetGroups, 1, targetsAlreadyGrouped);
                         if (match != string.Empty)
                         {
                             string[] sourceLinks = trigramIDs.Split(" ".ToCharArray());
@@ -145,7 +147,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     if (groups.ContainsSourceGroupKey(bigram))
                     {
                         GroupTranslations_Old targetGroups = groups.TranslationsForSourceGroup(bigram);
-                        string match = FindTargetMatch(targetWords, targetGroups, 1);
+                        string match = FindTargetMatch(targetWords, targetGroups, 1, targetsAlreadyGrouped);
                         if (match != string.Empty)
                         {
                             string[] sourceLinks = bigramIDs.Split(" ".ToCharArray());
@@ -166,7 +168,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     if (groups.ContainsSourceGroupKey(unigram))
                     {
                         GroupTranslations_Old targetGroups = groups.TranslationsForSourceGroup(unigram);
-                        string match = FindTargetMatch(targetWords, targetGroups, 2);
+                        string match = FindTargetMatch(targetWords, targetGroups, 2, targetsAlreadyGrouped);
                         if (match != string.Empty)
                         {
                             string[] sourceLinks = unigramIDs.Split(" ".ToCharArray());
@@ -187,7 +189,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// returns a string with the list of targetIDs, or the empty string if no match found
         /// </summary>
         /// 
-        static string FindTargetMatch(MaybeTargetPoint[] targetWords, GroupTranslations_Old targetGroups, int minLength)
+        static string FindTargetMatch(
+            MaybeTargetPoint[] targetWords,
+            GroupTranslations_Old targetGroups,
+            int minLength,
+            HashSet<MaybeTargetPoint> targetsAlreadyGrouped)
         {
             string match = string.Empty;
 
@@ -216,7 +222,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 for (int i = 0; i < targetWords.Length && wordIndex < words.Length; i++)
                 {
                     MaybeTargetPoint targetWord = targetWords[i];
-                    if (targetWord.InGroup) continue;
+                    if (targetsAlreadyGrouped.Contains(targetWord)) continue;
 
                     // words are the target group words that I am looking for
                     string word = words[wordIndex].Trim();
@@ -242,7 +248,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 if (words.Length == targetWordsInGroup.Count)
                 {
                     foreach (int n in targetWordsInGroup)
-                        targetWords[n].InGroup = true;
+                        targetsAlreadyGrouped.Add(targetWords[n]);
                     break;
                 }
                 else
