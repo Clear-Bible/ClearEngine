@@ -88,31 +88,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             Alignment2 align = new Alignment2()
             {
-                Lines = new Line[translationPairs.Count]
+                Lines =
+                    translationPairs
+                    .Select(translationPair =>
+                    {
+                        ZoneMonoAlignment zoneMonoAlignment =
+                            AlignZone(
+                                treeService,
+                                translationPair,
+                                maxPaths,
+                                assumptions);
+
+                        ZoneMultiAlignment zoneMultiAlignment =
+                            ConvertToZoneMultiAlignment(zoneMonoAlignment);
+
+                        return
+                            Output.GetLine(
+                                zoneMultiAlignment,
+                                glossTable,
+                                primaryPositions);
+                    })
+                    .ToArray()
             };
 
-
-            foreach ((TranslationPair translationPair, int i) in
-                translationPairs.Select((tp, j) => (tp, j)))
-            {
-                ZoneMonoAlignment zoneMonoAlignment =
-                    AlignZone(
-                        treeService,
-                        translationPair,
-                        maxPaths,
-                        assumptions);
-
-                ZoneMultiAlignment zoneMultiAlignment =
-                    ConvertToZoneMultiAlignment(zoneMonoAlignment);
-
-                align.Lines[i] =
-                    Output.GetLine(
-                        zoneMultiAlignment,
-                        glossTable,
-                        primaryPositions);
-            }
-
-            string json = JsonConvert.SerializeObject(align.Lines, Newtonsoft.Json.Formatting.Indented);
+            string json = JsonConvert.SerializeObject(
+                align.Lines,
+                Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(jsonOutput, json);
         }
 
