@@ -43,8 +43,27 @@ namespace ClearBible.Clear3.API
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
             bool contentWordsOnly,
-            Dictionary<string, Dictionary<string, int>> strongs
+            Dictionary<string, Dictionary<string, int>> strongs,
+            IAutoAlignAssumptions assumptions
             );
+
+        IAutoAlignAssumptions MakeStandardAssumptions(
+            TranslationModel translationModel,
+            TranslationModel manTransModel,
+            AlignmentModel alignProbs,
+            bool useAlignModel,
+            List<string> puncs,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
+            int goodLinkMinCount,
+            Dictionary<string, int> badLinks,
+            int badLinkMinCount,
+            Dictionary<string, Dictionary<string, string>> oldLinks,
+            List<string> sourceFuncWords,
+            List<string> targetFuncWords,
+            bool contentWordsOnly,
+            Dictionary<string, Dictionary<string, int>> strongs,
+            int maxPaths);
     }
 
     public interface AutoAlignmentResult

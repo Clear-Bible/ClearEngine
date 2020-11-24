@@ -23,9 +23,9 @@ namespace ClearBible.Clear3.API
             string lemma,
             string targetTextLower);
 
-        bool IsBadLink(string lemma, string targetText);
+        bool IsBadLink(string lemma, string targetTextLower);
 
-        bool IsGoodLink(string lemma, string targetText);
+        bool IsGoodLink(string lemma, string targetTextLower);
 
         bool IsPunctuation(string text);
 
@@ -33,7 +33,7 @@ namespace ClearBible.Clear3.API
 
         bool IsStopWord(string text);
 
-        bool IsTargetFunctionWord(string text);
+        bool IsTargetFunctionWord(string targetTextLower);
 
         Dictionary<string, string> OldLinksForVerse(
             string legacyVerseID);

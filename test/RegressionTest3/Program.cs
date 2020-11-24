@@ -138,22 +138,24 @@ namespace RegressionTest3
 
             Console.WriteLine("Calling Auto Aligner.");
 
-            //AutoAlignAssumptions assumptions = new AutoAlignAssumptions(
-            //    transModel,
-            //    manTransModel,
-            //    alignmentModel,
-            //    useAlignModel,
-            //    puncs,
-            //    stopWords,
-            //    goodLinks,
-            //    goodLinkMinCount,
-            //    badLinks,
-            //    badLinkMinCount,
-            //    oldLinks,
-            //    sourceFuncWords,
-            //    targetFuncWords,
-            //    contentWordsOnly,
-            //    strongs);
+            IAutoAlignAssumptions assumptions =
+                clearService.AutoAlignmentService.MakeStandardAssumptions(
+                    transModel,
+                    manTransModel,
+                    alignmentModel,
+                    useAlignModel,
+                    puncs,
+                    stopWords,
+                    goodLinks,
+                    goodLinkMinCount,
+                    badLinks,
+                    badLinkMinCount,
+                    oldLinks,
+                    sourceFuncWords,
+                    targetFuncWords,
+                    contentWordsOnly,
+                    strongs,
+                    maxPaths);
 
             clearService.AutoAlignmentService.AutoAlign(
                 translationPairs,
@@ -167,7 +169,8 @@ namespace RegressionTest3
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 glossTable,
                 oldLinks,
-                sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
+                sourceFuncWords, targetFuncWords, contentWordsOnly, strongs,
+                assumptions);
         }
     }
 }
