@@ -28,6 +28,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         private List<string> _targetFuncWords;
         private bool _contentWordsOnly;
         private Dictionary<string, Dictionary<string, int>> _strongs;
+        private int _maxPaths;
 
         private Dictionary<string, string> _preAlignment;
 
@@ -46,7 +47,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
             bool contentWordsOnly,
-            Dictionary<string, Dictionary<string, int>> strongs)
+            Dictionary<string, Dictionary<string, int>> strongs,
+            int maxPaths)
         {
             _translationModel = translationModel;
             _manTransModel = manTransModel;
@@ -63,6 +65,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             _targetFuncWords = targetFuncWords;
             _contentWordsOnly = contentWordsOnly;
             _strongs = strongs;
+            _maxPaths = maxPaths;
 
             _preAlignment =
                 alignProbs.Inner.Keys
@@ -80,7 +83,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public bool UseAlignModel => _useAlignModel;
 
 
-        public int MaxPaths { get; }
+        public int MaxPaths => _maxPaths;
 
 
         public bool IsPunctuation(string text) =>

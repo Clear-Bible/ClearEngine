@@ -41,44 +41,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public void AutoAlign(
             List<TranslationPair> translationPairs,
             string jsonOutput,
-            TranslationModel translationModel,
-            TranslationModel manTransModel,
             ITreeService iTreeService,
-            AlignmentModel alignProbs,
-            bool useAlignModel,
-            int maxPaths,
-            List<string> puncs,
             GroupTranslationsTable groups,
-            List<string> stopWords,
-            Dictionary<string, int> goodLinks,
-            int goodLinkMinCount,
-            Dictionary<string, int> badLinks,
-            int badLinkMinCount,
             Dictionary<string, Gloss> glossTable,
-            Dictionary<string, Dictionary<string, string>> oldLinks,
-            List<string> sourceFuncWords,
-            List<string> targetFuncWords,
-            bool contentWordsOnly,
-            Dictionary<string, Dictionary<string, int>> strongs,
             IAutoAlignAssumptions assumptions
             )
         {
-            //IAutoAlignAssumptions assumptions = new AutoAlignAssumptions(
-            //    translationModel,
-            //    manTransModel,
-            //    alignProbs,
-            //    useAlignModel,
-            //    puncs,
-            //    stopWords,
-            //    goodLinks,
-            //    goodLinkMinCount,
-            //    badLinks,
-            //    badLinkMinCount,
-            //    oldLinks,
-            //    sourceFuncWords,
-            //    targetFuncWords,
-            //    contentWordsOnly,
-            //    strongs);
 
             TreeService treeService = (TreeService)iTreeService;
 
@@ -97,7 +65,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             AlignZone(
                                 treeService,
                                 translationPair,
-                                maxPaths,
                                 assumptions);
 
                         ZoneMultiAlignment zoneMultiAlignment =
@@ -212,7 +179,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static ZoneMonoAlignment AlignZone(
             TreeService treeService,
             TranslationPair translationPair,
-            int maxPaths,
             IAutoAlignAssumptions autoAlignAssumptions)
         {
             XElement treeNode = treeService.GetTreeNode(
@@ -228,7 +194,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     treeNode,
                     zoneContext.SourcePoints,
                     zoneContext.TargetPoints,
-                    maxPaths,
                     autoAlignAssumptions);
 
             return new ZoneMonoAlignment(zoneContext, monoLinks);
@@ -239,7 +204,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             XElement treeNode,
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
-            int maxPaths,
             IAutoAlignAssumptions assumptions
             )
         {
@@ -266,7 +230,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Candidate topCandidate = AlignTree(
                 treeNode,
                 targetPoints.Count,
-                maxPaths,
+                assumptions.MaxPaths,
                 terminalCandidates);
 
             List<OpenMonoLink> openMonoLinks =
@@ -826,7 +790,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 sourceFuncWords,
                 targetFuncWords,
                 contentWordsOnly,
-                strongs);
+                strongs,
+                maxPaths);
         }
     }
 }
