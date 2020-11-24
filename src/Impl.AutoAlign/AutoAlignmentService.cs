@@ -40,7 +40,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public Alignment2 AutoAlign(
             List<TranslationPair> translationPairs,
-            // string jsonOutput,
             ITreeService iTreeService,
             GroupTranslationsTable groups,
             Dictionary<string, Gloss> glossTable,
@@ -80,11 +79,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             };
 
             return align;
-
-            //string json = JsonConvert.SerializeObject(
-            //    align.Lines,
-            //    Newtonsoft.Json.Formatting.Indented);
-            //File.WriteAllText(jsonOutput, json);
         }
 
 

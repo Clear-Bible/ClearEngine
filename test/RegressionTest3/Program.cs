@@ -145,7 +145,6 @@ namespace RegressionTest3
             Alignment2 alignment =
                 clearService.AutoAlignmentService.AutoAlign(
                     translationPairs,
-                    // jsonOutput,
                     treeService,
                     groups,
                     glossTable,
