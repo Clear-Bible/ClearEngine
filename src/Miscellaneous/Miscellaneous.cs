@@ -103,9 +103,4 @@ namespace ClearBible.Clear3.Miscellaneous
             y = temp;
         }
     }
-
-
-    public delegate bool TryGet<TKey, TValue>(
-        TKey key,
-        out TValue value);
 }
