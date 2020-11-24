@@ -44,4 +44,9 @@ namespace ClearBible.Clear3.API
 
         float PercentComplete { get; }
     }
+
+
+    public delegate bool TryGet<TKey, TValue>(
+        TKey key,
+        out TValue value);
 }
