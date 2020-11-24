@@ -66,6 +66,11 @@ namespace ClearBible.Clear3.API
         double RelativePosition);
 
 
+    public record ZoneContext(
+        List<SourcePoint> SourcePoints,
+        List<TargetPoint> TargetPoints);
+
+
     public record TargetBond(
         TargetPoint TargetPoint,
         double Score);
@@ -80,6 +85,20 @@ namespace ClearBible.Clear3.API
     public record MultiLink(
         List<SourcePoint> Sources,
         List<TargetBond> Targets);
+
+
+    public record ZoneMonoAlignment(
+        ZoneContext ZoneContext,
+        List<MonoLink> MonoLinks);
+
+
+    public record ZoneMultiAlignment(
+        ZoneContext ZoneContext,
+        List<MultiLink> MultiLinks);
+
+
+    public record ZoneMultiAlignments(
+        List<ZoneMultiAlignment> List);
 
 
 

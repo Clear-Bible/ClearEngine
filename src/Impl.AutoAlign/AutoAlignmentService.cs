@@ -95,40 +95,42 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             foreach ((TranslationPair translationPair, int i) in
                 translationPairs.Select((tp, j) => (tp, j)))
             {
-
-                XElement treeNode = treeService.GetTreeNode(
-                    translationPair.FirstSourceVerseID,
-                    translationPair.LastSourceVerseID);
-
-                List<SourcePoint> sourcePoints = GetSourcePoints(treeNode);
-
-                List<TargetPoint> targetPoints =
-                    GetTargetPoints(translationPair.Targets);
-
-                List<MonoLink> monoLinks =
+                ZoneMonoAlignment zoneMonoAlignment =
                     AlignZone(
-                        treeNode,
-                        sourcePoints,
-                        targetPoints,
+                        treeService,
+                        translationPair,
                         maxPaths,
                         assumptions);
 
-                List<MultiLink> multiLinks =
-                    ConvertMonoToMultiLinks(monoLinks);                  
+                ZoneMultiAlignment zoneMultiAlignment =
+                    ConvertToZoneMultiAlignment(zoneMonoAlignment);
 
                 align.Lines[i] =
                     Output.GetLine(
-                        multiLinks,
-                        sourcePoints,
-                        targetPoints,
+                        zoneMultiAlignment,
                         glossTable,
                         primaryPositions);
-
-                // i += 1;
             }
 
             string json = JsonConvert.SerializeObject(align.Lines, Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(jsonOutput, json);
+        }
+
+
+        public static ZoneMultiAlignment ConvertToZoneMultiAlignment(
+            ZoneMonoAlignment zoneMonoAlignment)
+        {
+            (ZoneContext zoneContext, List<MonoLink> monoLinks) =
+                zoneMonoAlignment;
+
+            return
+                new ZoneMultiAlignment(
+                    zoneContext,
+                    monoLinks
+                    .Select(link => new MultiLink(
+                        new List<SourcePoint>() { link.SourcePoint },
+                        new List<TargetBond>() { link.TargetBond }))
+                    .ToList());
         }
 
 
@@ -204,7 +206,34 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<MonoLink> AlignZone(
+
+        public static ZoneMonoAlignment AlignZone(
+            TreeService treeService,
+            TranslationPair translationPair,
+            int maxPaths,
+            AutoAlignAssumptions autoAlignAssumptions)
+        {
+            XElement treeNode = treeService.GetTreeNode(
+                    translationPair.FirstSourceVerseID,
+                    translationPair.LastSourceVerseID);
+
+            ZoneContext zoneContext = new ZoneContext(
+                GetSourcePoints(treeNode),
+                GetTargetPoints(translationPair.Targets));
+
+            List<MonoLink> monoLinks =
+                GetMonoLinks(
+                    treeNode,
+                    zoneContext.SourcePoints,
+                    zoneContext.TargetPoints,
+                    maxPaths,
+                    autoAlignAssumptions);
+
+            return new ZoneMonoAlignment(zoneContext, monoLinks);
+        }
+
+
+        public static List<MonoLink> GetMonoLinks(
             XElement treeNode,
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
@@ -284,16 +313,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<MultiLink> ConvertMonoToMultiLinks(
-            List<MonoLink> monoLinks)
-        {
-            return
-                monoLinks
-                .Select(link => new MultiLink(
-                    new List<SourcePoint>() { link.SourcePoint },
-                    new List<TargetBond>() { link.TargetBond }))
-                .ToList();
-        }
+ 
 
         
 

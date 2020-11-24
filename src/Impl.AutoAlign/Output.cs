@@ -11,12 +11,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     public class Output
     {
         public static Line GetLine(
-            List<MultiLink> multiLinks,
-            List<SourcePoint> sourcePoints,
-            List<TargetPoint> targetPoints,
+            ZoneMultiAlignment zoneMultiAlignment,
             Dictionary<string, Gloss> glossTable,
             Dictionary<string, int> primaryPositions)
         {
+            ((List<SourcePoint> sourcePoints, List<TargetPoint> targetPoints),
+             List<MultiLink> multiLinks)
+                = zoneMultiAlignment;          
+
             return new Line()
             {
                 manuscript = new Manuscript()
