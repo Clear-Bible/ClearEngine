@@ -18,6 +18,8 @@ using ClearBible.Clear3.ServiceImportExport;
 
 using ClearBible.Clear3.Impl.Data;
 
+using ClearBible.Clear3.SubTasks;
+
 namespace RegressionTest3
 {
     /// <summary>
@@ -43,9 +45,35 @@ namespace RegressionTest3
             string parallelTargetIdPath = InPath("target.id.txt");
             string transModelPath = InPath("transModel.txt");
             string alignModelPath = InPath("alignModel.txt");
-            string manTransModelPath = InPath("manTransModel.txt");
+
 
             string jsonOutput = OutPath("alignment.json");
+
+
+            (List<string> puncs,
+             List<string> stopWords,
+             List<string> sourceFunctionWords,
+             List<string> targetFunctionWords,
+             TranslationModel manTransModel,
+             Dictionary<string, int> goodLinks,
+             Dictionary<string, int> badLinks,
+             Dictionary<string, Gloss> glossTable,
+             GroupTranslationsTable groups,
+             Dictionary<string, Dictionary<string, string>> oldLinks,
+             Dictionary<string, Dictionary<string, int>> strongs)
+             =
+             ImportAuxAssumptionsSubTask.Run(
+                 puncsPath: InPath("puncs.txt"),
+                 stopWordsPath: InPath("stopWords.txt"),
+                 sourceFuncWordsPath: InPath("sourceFuncWords.txt"),
+                 targetFuncWordsPath: InPath("targetFuncWords.txt"),
+                 manTransModelPath: InPath("manTransModel.txt"),
+                 goodLinksPath: InPath("goodLinks.txt"),
+                 badLinksPath: InPath("badLinks.txt"),
+                 glossTablePath: InPath("Gloss.txt"),
+                 groupsPath: InPath("groups.txt"),
+                 oldAlignmentPath: InPath("oldAlignment.json"),
+                 strongsPath: InPath("strongs.txt"));
 
             IClear30ServiceAPI clearService =
                 Clear30Service.FindOrCreate();
@@ -76,10 +104,7 @@ namespace RegressionTest3
             // Clear3 uses the machine-readable metadata to download
             // resources when so requested.
 
-            //TranslationPairTable translationPairTable =
-            //    importExportService.ImportTranslationPairTableFromLegacy2(
-            //        parallelSourceIdLemmaPath,
-            //        parallelTargetIdPath);
+            
 
             List<TranslationPair> translationPairs =
                 importExportService.ImportTranslationPairsFromLegacy(
@@ -89,73 +114,31 @@ namespace RegressionTest3
             TranslationModel transModel =
                 importExportService.ImportTranslationModel(transModelPath);
 
-            Dictionary<string, Dictionary<string, Stats>> manTransModelOrig =
-                Data.GetTranslationModel2(manTransModelPath);
-
-            TranslationModel manTransModel =
-                new TranslationModel(
-                    manTransModelOrig.ToDictionary(
-                        kvp => new Lemma(kvp.Key),
-                        kvp => kvp.Value.ToDictionary(
-                            kvp2 => new TargetText(kvp2.Key),
-                            kvp2 => new Score(kvp2.Value.Prob))));
-
-            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
             AlignmentModel alignmentModel = importExportService.ImportAlignmentModel(
                 alignModelPath);
-
-            bool useAlignModel = true;
-            int maxPaths = 1000000;
-
-            List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
-
-            GroupTranslationsTable groups =
-                importExportService.ImportGroupTranslationsTable(
-                    InPath("groups.txt"));
-
-            List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
-
-            Dictionary<string, int> goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
-            int goodLinkMinCount = 3;
-            Dictionary<string, int> badLinks = Data.GetXLinks(InPath("badLinks.txt"));
-            int badLinkMinCount = 3;
-
-            Dictionary<string, Gloss> glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
-
-            Dictionary<string, Dictionary<string, string>> oldLinks =
-                Data.GetOldLinks(
-                    InPath("oldAlignment.json"),
-                    groups);
-
-            List<string> sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
-            List<string> targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));
-
-            bool contentWordsOnly = true;
-
-            Dictionary<string, Dictionary<string, int>> strongs =
-                Data.BuildStrongTable(InPath("strongs.txt"));
+            
 
             Console.WriteLine("Calling Auto Aligner.");
 
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
-                    transModel,
-                    manTransModel,
-                    alignmentModel,
-                    useAlignModel,
-                    puncs,
-                    stopWords,
-                    goodLinks,
-                    goodLinkMinCount,
-                    badLinks,
-                    badLinkMinCount,
-                    oldLinks,
-                    sourceFuncWords,
-                    targetFuncWords,
-                    contentWordsOnly,
-                    strongs,
-                    maxPaths);
+                    translationModel: transModel,
+                    manTransModel: manTransModel,
+                    alignProbs: alignmentModel,
+                    useAlignModel: true,
+                    puncs: puncs,
+                    stopWords: stopWords,
+                    goodLinks: goodLinks,
+                    goodLinkMinCount: 3,
+                    badLinks: badLinks,
+                    badLinkMinCount: 3,
+                    oldLinks: oldLinks,
+                    sourceFuncWords: sourceFunctionWords,
+                    targetFuncWords: targetFunctionWords,
+                    contentWordsOnly: true,
+                    strongs: strongs,
+                    maxPaths: 1000000);
 
             clearService.AutoAlignmentService.AutoAlign(
                 translationPairs,
