@@ -59,25 +59,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<string> sourceFuncWords,
             List<string> targetFuncWords,
             bool contentWordsOnly,
-            Dictionary<string, Dictionary<string, int>> strongs
+            Dictionary<string, Dictionary<string, int>> strongs,
+            IAutoAlignAssumptions assumptions
             )
         {
-            AutoAlignAssumptions assumptions = new AutoAlignAssumptions(
-                translationModel,
-                manTransModel,
-                alignProbs,
-                useAlignModel,
-                puncs,
-                stopWords,
-                goodLinks,
-                goodLinkMinCount,
-                badLinks,
-                badLinkMinCount,
-                oldLinks,
-                sourceFuncWords,
-                targetFuncWords,
-                contentWordsOnly,
-                strongs);
+            //IAutoAlignAssumptions assumptions = new AutoAlignAssumptions(
+            //    translationModel,
+            //    manTransModel,
+            //    alignProbs,
+            //    useAlignModel,
+            //    puncs,
+            //    stopWords,
+            //    goodLinks,
+            //    goodLinkMinCount,
+            //    badLinks,
+            //    badLinkMinCount,
+            //    oldLinks,
+            //    sourceFuncWords,
+            //    targetFuncWords,
+            //    contentWordsOnly,
+            //    strongs);
 
             TreeService treeService = (TreeService)iTreeService;
 
@@ -212,7 +213,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             TreeService treeService,
             TranslationPair translationPair,
             int maxPaths,
-            AutoAlignAssumptions autoAlignAssumptions)
+            IAutoAlignAssumptions autoAlignAssumptions)
         {
             XElement treeNode = treeService.GetTreeNode(
                     translationPair.FirstSourceVerseID,
@@ -239,7 +240,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<SourcePoint> sourcePoints,
             List<TargetPoint> targetPoints,
             int maxPaths,
-            AutoAlignAssumptions assumptions
+            IAutoAlignAssumptions assumptions
             )
         {
             Dictionary<string, string> sourceAltIdMap =
@@ -513,7 +514,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static void ImproveAlignment(
             List<OpenMonoLink> links,
             List<TargetPoint> targetPoints,
-            AutoAlignAssumptions assumptions)
+            IAutoAlignAssumptions assumptions)
         {
             List<string> linkedTargets =
                 links
@@ -553,19 +554,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<TargetPoint> targetPoints,
             Dictionary<string, OpenMonoLink> linksTable,
             List<string> linkedTargets,
-            AutoAlignAssumptions assumptions)
+            IAutoAlignAssumptions assumptions)
         {
-            if (assumptions.IsSourceStopWord(sourceNode)) return null;
+            if (assumptions.IsStopWord(sourceNode.Lemma)) return null;
 
             if (assumptions.ContentWordsOnly &&
-                assumptions.IsSourceFunctionWord(sourceNode))
+                assumptions.IsSourceFunctionWord(sourceNode.Lemma))
             {
                 return null;
             }
                 
             if (assumptions.UseAlignModel &&
                 assumptions.TryGetPreAlignment(
-                    sourceNode,
+                    sourceNode.SourceID.AsCanonicalString,
                     out string targetID))
             {
                 if (linkedTargets.Contains(targetID)) return null;
@@ -574,7 +575,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     targetPoints.First(
                         tp => tp.TargetID.AsCanonicalString == targetID);
 
-                if (assumptions.IsSourceStopWord(sourceNode) &&
+                if (assumptions.IsStopWord(sourceNode.Lemma) &&
                     !assumptions.IsGoodLink(
                         sourceNode.Lemma,
                         targetPoint.Lower))
@@ -662,7 +663,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             SourcePoint sWord,
             List<MaybeTargetPoint> tWords,
             List<string> linkedTargets,
-            AutoAlignAssumptions assumptions
+            IAutoAlignAssumptions assumptions
             )
         {
             Dictionary<MaybeTargetPoint, double> probs =
@@ -683,23 +684,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     x => Math.Log(x.score));
 
             bool notPunctuation(MaybeTargetPoint tw) =>
-                !assumptions.IsPunctuation(tw);
+                !assumptions.IsPunctuation(tw.Lower);
 
             bool notTargetStopWord(MaybeTargetPoint tw) =>
-                !assumptions.IsTargetStopWord(tw);
+                !assumptions.IsStopWord(tw.Lower);
 
             bool notAlreadyLinked(MaybeTargetPoint tw) =>
                 !linkedTargets.Contains(tw.ID);
 
             bool notBadLink(MaybeTargetPoint tw) =>
-                !assumptions.IsBadLink(sWord, tw);
+                !assumptions.IsBadLink(sWord.Lemma, tw.Lower);
 
             bool sourceStopWordImpliesIsGoodLink(MaybeTargetPoint tw) =>
-                !assumptions.IsSourceStopWord(sWord) ||
-                assumptions.IsGoodLink(sWord, tw);
+                !assumptions.IsStopWord(sWord.Lemma) ||
+                assumptions.IsGoodLink(sWord.Lemma, tw.Lower);
 
             double getTranslationModelScore(MaybeTargetPoint tw) =>
-                assumptions.GetTranslationModelScore(sWord, tw);
+                assumptions.GetTranslationModelScore(sWord.Lemma, tw.Lower);
             
 
             if (probs.Count > 0)
@@ -790,6 +791,42 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return
                 (sourcePos[0] < sourcePos[1] && targetPos[0] > targetPos[1]) ||
                 (sourcePos[0] > sourcePos[1] && targetPos[0] < targetPos[1]);
+        }
+
+        public IAutoAlignAssumptions MakeStandardAssumptions(
+            TranslationModel translationModel,
+            TranslationModel manTransModel,
+            AlignmentModel alignProbs,
+            bool useAlignModel,
+            List<string> puncs,
+            List<string> stopWords,
+            Dictionary<string, int> goodLinks,
+            int goodLinkMinCount,
+            Dictionary<string, int> badLinks,
+            int badLinkMinCount,
+            Dictionary<string, Dictionary<string, string>> oldLinks,
+            List<string> sourceFuncWords,
+            List<string> targetFuncWords,
+            bool contentWordsOnly,
+            Dictionary<string, Dictionary<string, int>> strongs,
+            int maxPaths)
+        {
+            return new AutoAlignAssumptions(
+                translationModel,
+                manTransModel,
+                alignProbs,
+                useAlignModel,
+                puncs,
+                stopWords,
+                goodLinks,
+                goodLinkMinCount,
+                badLinks,
+                badLinkMinCount,
+                oldLinks,
+                sourceFuncWords,
+                targetFuncWords,
+                contentWordsOnly,
+                strongs);
         }
     }
 }

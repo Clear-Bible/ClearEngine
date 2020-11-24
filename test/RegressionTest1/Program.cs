@@ -31,6 +31,8 @@ using Clear30Service = ClearBible.Clear3.Service.Clear30Service;
 using IClear30ServiceAPIImportExport = ClearBible.Clear3.APIImportExport.IClear30ServiceAPIImportExport;
 using Clear30ServiceImportExport = ClearBible.Clear3.ServiceImportExport.Clear30ServiceImportExport;
 
+using IAutoAlignAssumptions = ClearBible.Clear3.API.IAutoAlignAssumptions;
+
 namespace RegressionTest1
 {
     class Program
@@ -211,7 +213,26 @@ namespace RegressionTest1
             Dictionary<string, Dictionary<string, int>> strongs = Data.BuildStrongTable(common("strongs.txt"));
 
             Console.WriteLine("Auto Alignment");
-           
+
+            IAutoAlignAssumptions assumptions =
+                clearService.AutoAlignmentService.MakeStandardAssumptions(
+                transModel2,
+                manTransModel2,
+                alignProbs2,
+                useAlignModel,
+                puncs,
+                stopWords,
+                goodLinks,
+                goodLinkMinCount,
+                badLinks,
+                badLinkMinCount,
+                oldLinks,
+                sourceFuncWords,
+                targetFuncWords,
+                contentWordsOnly,
+                strongs,
+                maxPaths);
+
             clearService.AutoAlignmentService.AutoAlign(
                 translationPairs,
                 jsonOutput,
@@ -224,7 +245,8 @@ namespace RegressionTest1
                 goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
                 glossTable,
                 oldLinks,
-                sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
+                sourceFuncWords, targetFuncWords, contentWordsOnly, strongs,
+                assumptions);
 
             //string jsonOutputRef = reference("alignment.json");
 

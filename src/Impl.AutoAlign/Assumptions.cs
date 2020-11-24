@@ -11,7 +11,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Miscellaneous;
 
-    public class AutoAlignAssumptions
+    public class AutoAlignAssumptions : IAutoAlignAssumptions
     {
         private TranslationModel _translationModel;
         private TranslationModel _manTransModel;
@@ -80,66 +80,37 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public bool UseAlignModel => _useAlignModel;
 
 
+        public int MaxPaths { get; }
+
+
         public bool IsPunctuation(string text) =>
             _puncs.Contains(text);
-
-
-        public bool IsPunctuation(MaybeTargetPoint tw) =>
-            _puncs.Contains(tw.Lower);
 
 
         public bool IsStopWord(string text) =>
             _stopWords.Contains(text);
 
 
-        public bool IsTargetStopWord(MaybeTargetPoint tw) =>
-            _stopWords.Contains(tw.Lower);
-
-
         public bool IsTargetFunctionWord(string text) =>
             _targetFuncWords.Contains(text);
 
 
-        public bool IsSourceStopWord(SourcePoint sn) =>
-            _stopWords.Contains(sn.Lemma);
-
         public bool IsSourceFunctionWord(string lemma) =>
             _sourceFuncWords.Contains(lemma);
 
-        public bool IsSourceFunctionWord(SourcePoint sn) =>
-            _sourceFuncWords.Contains(sn.Lemma);
 
-
-        public bool IsBadLink(SourcePoint sn, MaybeTargetPoint tw)
+        public bool IsBadLink(string lemma, string targetTextLower)
         {
-            string link = $"{sn.Lemma}#{tw.Lower}";
+            string link = $"{lemma}#{targetTextLower}";
             return
                 _badLinks.ContainsKey(link) &&
                 _badLinks[link] >= _badLinkMinCount;
         }
 
 
-        public bool IsBadLink(string lemma, string targetText)
+        public bool IsGoodLink(string lemma, string targetTextLower)
         {
-            string link = $"{lemma}#{targetText}";
-            return
-                _badLinks.ContainsKey(link) &&
-                _badLinks[link] >= _badLinkMinCount;
-        }
-
-
-        public bool IsGoodLink(SourcePoint sn, MaybeTargetPoint tw)
-        {
-            string link = $"{sn.Lemma}#{tw.Lower}";
-            return
-                _goodLinks.ContainsKey(link) &&
-                _goodLinks[link] >= _goodLinkMinCount;
-        }
-
-
-        public bool IsGoodLink(string lemma, string targetText)
-        {
-            string link = $"{lemma}#{targetText}";
+            string link = $"{lemma}#{targetTextLower}";
             return
                 _goodLinks.ContainsKey(link) &&
                 _goodLinks[link] >= _goodLinkMinCount;
@@ -161,12 +132,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public double GetTranslationModelScore(SourcePoint sn, MaybeTargetPoint tw)
+        public double GetTranslationModelScore(
+            string lemma,
+            string targetTextLower)
         {
-            if (_translationModel.Inner.TryGetValue(new Lemma(sn.Lemma),
+            if (_translationModel.Inner.TryGetValue(new Lemma(lemma),
                 out Dictionary<TargetText, Score> translations))
             {
-                if (translations.TryGetValue(new TargetText(tw.Lower),
+                if (translations.TryGetValue(new TargetText(targetTextLower),
                     out Score score))
                 {
                     return score.Double;
@@ -200,12 +173,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public bool TryGetPreAlignment(
-            SourcePoint sn,
+            string sourceID,
             out string targetID)
             =>
-            _preAlignment.TryGetValue(
-                sn.SourceID.AsCanonicalString,
-                out targetID);
+            _preAlignment.TryGetValue(sourceID, out targetID);
 
 
         public Dictionary<string, Dictionary<string, int>> Strongs =>
