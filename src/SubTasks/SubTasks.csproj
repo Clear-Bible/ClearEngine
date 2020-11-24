@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\API\Api.csproj" />
+    <ProjectReference Include="..\ApiImportExport\ApiImportExport.csproj" />
+    <ProjectReference Include="..\Impl_Data\Impl.Data.csproj" />
+    <ProjectReference Include="..\Clear3ServiceImportExport\Clear3ServiceImportExport.csproj" />
+    <ProjectReference Include="..\AlignmentTool\AlignmentTool.csproj" />
+  </ItemGroup>
+</Project>
