@@ -38,9 +38,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 throw new NotImplementedException();
 
 
-        public void AutoAlign(
+        public Alignment2 AutoAlign(
             List<TranslationPair> translationPairs,
-            string jsonOutput,
+            // string jsonOutput,
             ITreeService iTreeService,
             GroupTranslationsTable groups,
             Dictionary<string, Gloss> glossTable,
@@ -79,10 +79,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .ToArray()
             };
 
-            string json = JsonConvert.SerializeObject(
-                align.Lines,
-                Newtonsoft.Json.Formatting.Indented);
-            File.WriteAllText(jsonOutput, json);
+            return align;
+
+            //string json = JsonConvert.SerializeObject(
+            //    align.Lines,
+            //    Newtonsoft.Json.Formatting.Indented);
+            //File.WriteAllText(jsonOutput, json);
         }
 
 
