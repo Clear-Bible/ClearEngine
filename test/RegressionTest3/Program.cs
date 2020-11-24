@@ -160,16 +160,9 @@ namespace RegressionTest3
             clearService.AutoAlignmentService.AutoAlign(
                 translationPairs,
                 jsonOutput,
-                transModel,
-                manTransModel,
                 treeService,
-                alignmentModel, useAlignModel,
-                maxPaths,
-                puncs, groups, stopWords,
-                goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
+                groups,
                 glossTable,
-                oldLinks,
-                sourceFuncWords, targetFuncWords, contentWordsOnly, strongs,
                 assumptions);
         }
     }

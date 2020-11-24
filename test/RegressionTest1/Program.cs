@@ -236,16 +236,9 @@ namespace RegressionTest1
             clearService.AutoAlignmentService.AutoAlign(
                 translationPairs,
                 jsonOutput,
-                transModel2,
-                manTransModel2,
                 treeService,
-                alignProbs2, useAlignModel,
-                maxPaths,
-                puncs, groups, stopWords,
-                goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
+                groups,
                 glossTable,
-                oldLinks,
-                sourceFuncWords, targetFuncWords, contentWordsOnly, strongs,
                 assumptions);
 
             //string jsonOutputRef = reference("alignment.json");
