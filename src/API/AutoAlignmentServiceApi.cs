@@ -24,7 +24,6 @@ namespace ClearBible.Clear3.API
 
         Alignment2 AutoAlign(
             List<TranslationPair> translationPairs,
-            // string jsonOutput,
             ITreeService treeService,
             GroupTranslationsTable groups,
             Dictionary<string, Gloss> glossTable,
