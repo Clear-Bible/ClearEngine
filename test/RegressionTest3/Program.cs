@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
+using Newtonsoft.Json;
+
 using Data = AlignmentTool.Data;
 using Gloss = ClearBible.Clear3.API.Gloss;
 using BookTables = Utilities.BookTables;
@@ -140,13 +142,19 @@ namespace RegressionTest3
                     strongs: strongs,
                     maxPaths: 1000000);
 
-            clearService.AutoAlignmentService.AutoAlign(
-                translationPairs,
-                jsonOutput,
-                treeService,
-                groups,
-                glossTable,
-                assumptions);
+            Alignment2 alignment =
+                clearService.AutoAlignmentService.AutoAlign(
+                    translationPairs,
+                    // jsonOutput,
+                    treeService,
+                    groups,
+                    glossTable,
+                    assumptions);
+
+            string json = JsonConvert.SerializeObject(
+                alignment.Lines,
+                Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText(jsonOutput, json);
         }
     }
 }

@@ -15,4 +15,7 @@
     <ProjectReference Include="..\..\src\API\Api.csproj" />
     <ProjectReference Include="..\..\src\SubTasks\SubTasks.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
 </Project>

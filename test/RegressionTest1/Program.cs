@@ -32,6 +32,7 @@ using IClear30ServiceAPIImportExport = ClearBible.Clear3.APIImportExport.IClear3
 using Clear30ServiceImportExport = ClearBible.Clear3.ServiceImportExport.Clear30ServiceImportExport;
 
 using IAutoAlignAssumptions = ClearBible.Clear3.API.IAutoAlignAssumptions;
+using Alignment2 = ClearBible.Clear3.API.Alignment2;
 
 namespace RegressionTest1
 {
@@ -233,13 +234,18 @@ namespace RegressionTest1
                 strongs,
                 maxPaths);
 
-            clearService.AutoAlignmentService.AutoAlign(
-                translationPairs,
-                jsonOutput,
-                treeService,
-                groups,
-                glossTable,
-                assumptions);
+            Alignment2 alignment = 
+                clearService.AutoAlignmentService.AutoAlign(
+                    translationPairs,
+                    treeService,
+                    groups,
+                    glossTable,
+                    assumptions);
+
+            string json = JsonConvert.SerializeObject(
+                alignment.Lines,
+                Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText(jsonOutput, json);
 
             //string jsonOutputRef = reference("alignment.json");
 
@@ -267,7 +273,7 @@ namespace RegressionTest1
             //}
             //Console.WriteLine($"Different lines: {differentLines}");
             //;
-            
+
 
 
             //Console.WriteLine("Comparing JSON Output Files");
