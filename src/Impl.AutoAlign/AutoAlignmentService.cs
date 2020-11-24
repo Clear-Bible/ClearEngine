@@ -40,19 +40,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public Alignment2 AutoAlign(
             List<TranslationPair> translationPairs,
-            ITreeService iTreeService,
+            ITreeService treeService,
             GroupTranslationsTable groups,
             Dictionary<string, Gloss> glossTable,
             IAutoAlignAssumptions assumptions
             )
         {
 
-            TreeService treeService = (TreeService)iTreeService;
+
 
             // Build map of group key to position of primary
             // word within group.
             Dictionary<string, int> primaryPositions =
-                BuildPrimaryPositionTable(groups);
+                // BuildPrimaryPositionTable(groups);
+                new Dictionary<string, int>();
 
             Alignment2 align = new Alignment2()
             {
@@ -173,10 +174,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static ZoneMonoAlignment AlignZone(
-            TreeService treeService,
+            ITreeService iTreeService,
             TranslationPair translationPair,
             IAutoAlignAssumptions autoAlignAssumptions)
         {
+            TreeService treeService = (TreeService)iTreeService;
+
             XElement treeNode = treeService.GetTreeNode(
                     translationPair.FirstSourceVerseID,
                     translationPair.LastSourceVerseID);
