@@ -30,6 +30,11 @@ namespace ClearBible.Clear3.API
             IAutoAlignAssumptions assumptions
             );
 
+        ZoneMonoAlignment AlignZone(
+            ITreeService iTreeService,
+            TranslationPair translationPair,
+            IAutoAlignAssumptions autoAlignAssumptions);
+
         IAutoAlignAssumptions MakeStandardAssumptions(
             TranslationModel translationModel,
             TranslationModel manTransModel,
