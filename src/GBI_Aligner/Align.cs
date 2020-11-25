@@ -13,7 +13,7 @@ using Utilities;
 
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Impl.Data;
-using Stats = ClearBible.Clear3.Impl.Data.Stats;
+using Stats2 = DeadEndWip.Stats2;
 
 
 namespace GBI_Aligner
@@ -26,7 +26,7 @@ namespace GBI_Aligner
             string sourceLemma,  // name of file with source lemma IDs
             string target, // name of tokens.txt file, after alignment
             TranslationModel_Old model,  
-            Dictionary<string, Dictionary<string, Stats>> manModel, 
+            Dictionary<string, Dictionary<string, Stats2>> manModel, 
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
             bool useAlignModel,
@@ -100,7 +100,7 @@ namespace GBI_Aligner
             string targetVerse,  // tokens, lowercase (text_ID)
             string targetVerse2, // tokens, original_case (text_ID)
             TranslationModel_Old model, // translation model, (source => (target => probability))
-            Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
+            Dictionary<string, Dictionary<string, Stats2>> manModel, // manually checked alignments
                                 // (source => (target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             Dictionary<string, string> preAlignment, // (bbcccvvvwwwn => bbcccvvvwww)
@@ -278,7 +278,7 @@ namespace GBI_Aligner
             SourceWord sWord,
             List<TargetWord> tWords,
             TranslationModel_Old model,
-            Dictionary<string, Dictionary<string, Stats>> manModel,
+            Dictionary<string, Dictionary<string, Stats2>> manModel,
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
             int n, // number of target tokens (not actually used)
@@ -329,14 +329,14 @@ namespace GBI_Aligner
 
             if (manModel.ContainsKey(sWord.Lemma))
             {
-                Dictionary<string, Stats> translations = manModel[sWord.Lemma];
+                Dictionary<string, Stats2> translations = manModel[sWord.Lemma];
 
                 for (int i = 0; i < tWords.Count; i++)
                 {
                     TargetWord tWord = tWords[i];
                     if (translations.ContainsKey(tWord.Text))
                     {
-                        Stats s = translations[tWord.Text];
+                        Stats2 s = translations[tWord.Text];
                         if (s.Prob < 0.2) s.Prob = 0.2;
                         probs.Add(tWord, Math.Log(s.Prob));
                     }

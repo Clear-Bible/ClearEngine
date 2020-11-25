@@ -18,7 +18,7 @@ using ParallelFiles;
 
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Impl.Data;
-using Stats = ClearBible.Clear3.Impl.Data.Stats;
+using Stats2 = DeadEndWip.Stats2;
 
 namespace GBI_Aligner
 {
@@ -32,7 +32,7 @@ namespace GBI_Aligner
             string target, // name of tokens.txt file, after alignment
             string jsonOutput, // output of aligner, alignment.json file
             TranslationModel_Old transModel, // source => target => probability
-            Dictionary<string, Dictionary<string, Stats>> manTransModel, // translation model from manually checked alignments
+            Dictionary<string, Dictionary<string, Stats2>> manTransModel, // translation model from manually checked alignments
                                      // comes from Data.GetTranslationModel2(manTransModelFile)
                                      // of the form: (source => (target => Stats{ count, probability})
                                      // source = strongs, target = lower-cased translated text
@@ -422,7 +422,7 @@ namespace GBI_Aligner
                 while (transEnum.MoveNext())
                 {
                     string translation = (string)transEnum.Key;
-                    Stats s = (Stats)transEnum.Value;
+                    Stats2 s = (Stats2)transEnum.Value;
                     sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0} {1} {2} {3}", source, translation, s.Count, s.Prob));
                 }
             }
@@ -497,13 +497,13 @@ namespace GBI_Aligner
                 Hashtable translations = (Hashtable)manTransModel[source];
                 if (translations.ContainsKey(target))
                 {
-                    Stats s = (Stats)translations[target];
+                    Stats2 s = (Stats2)translations[target];
                     s.Count = s.Count + 1;
                     translations[target] = s;
                 }
                 else
                 {
-                    Stats s = new Stats();
+                    Stats2 s = new Stats2();
                     s.Count = 1;
                     s.Prob = 1.0;
                     translations.Add(target, s);
@@ -516,7 +516,7 @@ namespace GBI_Aligner
                 while (transEnum.MoveNext())
                 {
                     string translation = (string)transEnum.Key;
-                    Stats s = (Stats)transEnum.Value;
+                    Stats2 s = (Stats2)transEnum.Value;
                     s.Prob = (double)s.Count / (double)totalCount;
                     transProbs.Add(translation, s);
                 }
@@ -526,7 +526,7 @@ namespace GBI_Aligner
             else
             {
                 Hashtable translations = new Hashtable();
-                Stats s = new Stats();
+                Stats2 s = new Stats2();
                 s.Count = 1;
                 s.Prob = 1.0;
                 translations.Add(target, s);
@@ -1133,7 +1133,7 @@ namespace GBI_Aligner
 
             while (transEnum.MoveNext())
             {
-                Stats s = (Stats)transEnum.Value;
+                Stats2 s = (Stats2)transEnum.Value;
                 totalCount += s.Count;
             }
 
