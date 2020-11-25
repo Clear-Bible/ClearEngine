@@ -28,8 +28,6 @@ using ClearBible.Clear3.Impl.Data;
 
 using IClear30ServiceAPI = ClearBible.Clear3.API.IClear30ServiceAPI;
 using Clear30Service = ClearBible.Clear3.Service.Clear30Service;
-using IClear30ServiceAPIImportExport = ClearBible.Clear3.APIImportExport.IClear30ServiceAPIImportExport;
-using Clear30ServiceImportExport = ClearBible.Clear3.ServiceImportExport.Clear30ServiceImportExport;
 
 using IAutoAlignAssumptions = ClearBible.Clear3.API.IAutoAlignAssumptions;
 using Alignment2 = ClearBible.Clear3.API.Alignment2;
