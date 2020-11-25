@@ -5,8 +5,7 @@ using System.Linq;
 namespace ClearBible.Clear3.SubTasks
 {
     using ClearBible.Clear3.API;
-    using ClearBible.Clear3.APIImportExport;
-    using ClearBible.Clear3.ServiceImportExport;
+    using ClearBible.Clear3.Service;
 
     // FIXME: Put this in the API.
     using Stats = ClearBible.Clear3.Impl.Data.Stats;
@@ -45,8 +44,11 @@ namespace ClearBible.Clear3.SubTasks
             //IClear30ServiceAPI clearService =
             //    Clear30Service.FindOrCreate();
 
-            IClear30ServiceAPIImportExport importExportService =
-                Clear30ServiceImportExport.Create();
+            //IClear30ServiceAPIImportExport importExportService =
+            //    Clear30ServiceImportExport.Create();
+
+            IImportExportService importExportService =
+                Clear30Service.FindOrCreate().ImportExportService;
 
 
             List<string> puncs = Data.GetWordList(puncsPath);
