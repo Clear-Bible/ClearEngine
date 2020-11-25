@@ -17,7 +17,7 @@ namespace ClearBible.Clear3.API
     public record GroupTranslationsTable(
         Dictionary<
                 SourceLemmasAsText,
-                HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
+                HashSet<TargetGroup>>
         Dictionary);
 
     public record SourceLemmasAsText(string Text);

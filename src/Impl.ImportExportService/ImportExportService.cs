@@ -140,7 +140,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         {
             Dictionary<
                 SourceLemmasAsText,
-                HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
+                HashSet<TargetGroup>>
                 inner =
                     File.ReadLines(filePath)
                     .Select(line =>
@@ -157,7 +157,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                         group => group.Key,
                         group => group
                             .Select(record =>
-                                Tuple.Create(record.targ, record.pos))
+                                new TargetGroup(record.targ, record.pos))
                             .ToHashSet());
 
             return new GroupTranslationsTable(inner);
@@ -389,17 +389,16 @@ namespace ClearBible.Clear3.Impl.ImportExportService
 
             Dictionary<
                 SourceLemmasAsText,
-                HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
+                HashSet<TargetGroup>>
                 inner = groups.Dictionary;
 
             if (!inner.TryGetValue(source, out var targets))
             {
-                targets = new HashSet<
-                    Tuple<TargetGroupAsText, PrimaryPosition>>();
+                targets = new HashSet<TargetGroup>();
                 inner[source] = targets;
             }
 
-            targets.Add(Tuple.Create(targetGroupAsText, primaryPosition));
+            targets.Add(new TargetGroup(targetGroupAsText, primaryPosition));
         }
 
 

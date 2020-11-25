@@ -24,6 +24,7 @@ using TargetGroupAsText = ClearBible.Clear3.API.TargetGroupAsText;
 using Stats2 = DeadEndWip.Stats2;
 using TranslationModel_Old = DeadEndWip.TranslationModel_Old;
 using Translations = DeadEndWip.Translations;
+using TargetGroup = ClearBible.Clear3.API.TargetGroup;
 
 
 namespace AlignmentTool
@@ -459,17 +460,16 @@ namespace AlignmentTool
 
             Dictionary<
                 SourceLemmasAsText,
-                HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
+                HashSet<TargetGroup>>
                 inner = groups.Dictionary;
 
             if (!inner.TryGetValue(source, out var targets))
             {
-                targets = new HashSet<
-                    Tuple<TargetGroupAsText, PrimaryPosition>> ();
+                targets = new HashSet<TargetGroup>();
                 inner[source] = targets;
             }
 
-            targets.Add(Tuple.Create(targetGroupAsText, primaryPosition));            
+            targets.Add(new TargetGroup(targetGroupAsText, primaryPosition));            
         }
          
 
