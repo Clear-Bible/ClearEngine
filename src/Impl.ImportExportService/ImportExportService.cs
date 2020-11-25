@@ -403,7 +403,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         }
 
 
-        public static Dictionary<string, Dictionary<string, int>> BuildStrongTable(string strongFile)
+        public Dictionary<string, Dictionary<string, int>> BuildStrongTable(string strongFile)
         {
             Dictionary<string, Dictionary<string, int>> strongTable =
                 new Dictionary<string, Dictionary<string, int>>();
