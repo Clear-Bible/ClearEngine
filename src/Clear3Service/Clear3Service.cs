@@ -31,6 +31,9 @@ namespace ClearBible.Clear3.Impl.Service
         public IResourceService ResourceService { get; } =
             new ResourceService.ResourceService();
 
+        public IImportExportService ImportExportService { get; } =
+            new ImportExportService.ImportExportService();
+
         public SMTService SMTService =>
             throw new NotImplementedException();
 

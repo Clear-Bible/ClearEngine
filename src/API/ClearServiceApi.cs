@@ -11,6 +11,8 @@ namespace ClearBible.Clear3.API
     {
         IResourceService ResourceService { get; }
 
+        IImportExportService ImportExportService { get; }
+
         SMTService SMTService { get; }
 
         IAutoAlignmentService AutoAlignmentService { get; }
