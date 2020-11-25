@@ -41,12 +41,6 @@ namespace ClearBible.Clear3.SubTasks
             string oldAlignmentPath,
             string strongsPath)
         {
-            //IClear30ServiceAPI clearService =
-            //    Clear30Service.FindOrCreate();
-
-            //IClear30ServiceAPIImportExport importExportService =
-            //    Clear30ServiceImportExport.Create();
-
             IImportExportService importExportService =
                 Clear30Service.FindOrCreate().ImportExportService;
 
