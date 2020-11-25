@@ -7,19 +7,11 @@ using System.Xml.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+using ClearBible.Clear3.API;
+
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
-    using System.Net.Http.Headers;
-    using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Impl.TreeService;
-
-
-    
-    
-    
-
-
     public record MaybeTargetPoint(
         TargetPoint TargetPoint)
     {

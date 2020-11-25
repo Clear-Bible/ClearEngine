@@ -1,8 +1,10 @@
 
 To Do
 
-Move ServiceImportExport into Service.
-Move AlignmentTool.Data methods being used into import/export API.
 Make AlignZone launch a task.
 Catch specific exceptions in tree alignment.
-Get rid of Impl.Data I think.
+Expose a not-implemented Groups Alignment function in the API.
+Reorganize code in Impl.AutoAlign.
+Go through and add comments.
+Expand to complete auto-alignment scenario.
+Move 'using' to top level.
