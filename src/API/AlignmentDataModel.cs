@@ -33,7 +33,7 @@ namespace ClearBible.Clear3.API
 
 
     public record TranslationModel(
-        Dictionary<Lemma, Dictionary<TargetText, Score>> Inner);
+        Dictionary<Lemma, Dictionary<TargetText, Score>> Dictionary);
 
 
 
@@ -42,7 +42,7 @@ namespace ClearBible.Clear3.API
         TargetID TargetID);
 
     public record AlignmentModel(
-        Dictionary<BareLink, Score> Inner);
+        Dictionary<BareLink, Score> Dictionary);
 
     
 

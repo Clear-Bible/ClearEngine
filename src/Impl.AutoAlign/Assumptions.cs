@@ -67,7 +67,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             _maxPaths = maxPaths;
 
             _preAlignment =
-                alignProbs.Inner.Keys
+                alignProbs.Dictionary.Keys
                 .GroupBy(bareLink => bareLink.SourceID)
                 .Where(group => group.Any())
                 .ToDictionary(
@@ -138,7 +138,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string lemma,
             string targetTextLower)
         {
-            if (_translationModel.Inner.TryGetValue(new Lemma(lemma),
+            if (_translationModel.Dictionary.TryGetValue(new Lemma(lemma),
                 out Dictionary<TargetText, Score> translations))
             {
                 if (translations.TryGetValue(new TargetText(targetTextLower),
@@ -161,7 +161,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 new SourceID(sourceID),
                 new TargetID(targetID));
 
-            if (_alignProbs.Inner.TryGetValue(key, out Score score2))
+            if (_alignProbs.Dictionary.TryGetValue(key, out Score score2))
             {
                 score = score2.Double;
                 return true;
@@ -210,7 +210,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string lemma,
             out TryGet<string, double> tryGetScoreForTargetText)
         {
-            if (translationModel.Inner.TryGetValue(
+            if (translationModel.Dictionary.TryGetValue(
                 new Lemma(lemma),
                 out Dictionary<TargetText, Score> translations))
             {
