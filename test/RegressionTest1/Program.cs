@@ -24,7 +24,6 @@ using AlignmentModel = ClearBible.Clear3.API.AlignmentModel;
 using IResourceService = ClearBible.Clear3.API.IResourceService;
 using ITreeService = ClearBible.Clear3.API.ITreeService;
 
-using ClearBible.Clear3.Impl.Data;
 
 using IClear30ServiceAPI = ClearBible.Clear3.API.IClear30ServiceAPI;
 using Clear30Service = ClearBible.Clear3.Service.Clear30Service;
@@ -35,6 +34,8 @@ using IImportExportService = ClearBible.Clear3.API.IImportExportService;
 
 using ClearBible.Clear3.SubTasks;
 using Stats2 = DeadEndWip.Stats2;
+
+using GroupTranslationsTable_Old = DeadEndWip.GroupTranslationsTable_Old;
 
 namespace RegressionTest1
 {

@@ -12,7 +12,6 @@ using Trees;
 using Newtonsoft.Json;
 using System.IO;
 
-using ClearBible.Clear3.Impl.Data;
 using System.Xml.Linq;
 
 using TranslationModel_Old = DeadEndWip.TranslationModel_Old;
