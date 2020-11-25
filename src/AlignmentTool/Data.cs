@@ -22,6 +22,8 @@ using SourceLemmasAsText = ClearBible.Clear3.API.SourceLemmasAsText;
 using PrimaryPosition = ClearBible.Clear3.API.PrimaryPosition;
 using TargetGroupAsText = ClearBible.Clear3.API.TargetGroupAsText;
 using Stats2 = DeadEndWip.Stats2;
+using TranslationModel_Old = DeadEndWip.TranslationModel_Old;
+using Translations = DeadEndWip.Translations;
 
 
 namespace AlignmentTool

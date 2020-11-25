@@ -11,6 +11,7 @@ using Trees;
 
 using ClearBible.Clear3.Impl.Data;
 using Stats2 = DeadEndWip.Stats2;
+using TranslationModel_Old = DeadEndWip.TranslationModel_Old;
 
 namespace GBI_Aligner
 {

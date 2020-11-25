@@ -14,6 +14,8 @@ using Utilities;
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Impl.Data;
 using Stats2 = DeadEndWip.Stats2;
+using TranslationModel_Old = DeadEndWip.TranslationModel_Old;
+using Translations = DeadEndWip.Translations;
 
 
 namespace GBI_Aligner

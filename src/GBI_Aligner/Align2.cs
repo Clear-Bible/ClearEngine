@@ -15,6 +15,9 @@ using System.IO;
 using ClearBible.Clear3.Impl.Data;
 using System.Xml.Linq;
 
+using TranslationModel_Old = DeadEndWip.TranslationModel_Old;
+using Translations = DeadEndWip.Translations;
+
 namespace GBI_Aligner
 {
     public class Align2
