@@ -111,13 +111,40 @@ namespace RegressionTest1
                 reference = prefix(referenceFolder);
 
 
+            // Import auxiliary assumptions from files: punctuation,
+            // stop words, function words, manual translation model,
+            // good and bad links, old alignment, glossary table,
+            // and Strongs data.
 
+            (List<string> puncs,
+             List<string> stopWords,
+             List<string> sourceFunctionWords,
+             List<string> targetFunctionWords,
+             TranslationModel manTransModel,
+             Dictionary<string, int> goodLinks,
+             Dictionary<string, int> badLinks,
+             Dictionary<string, Gloss> glossTable,
+             GroupTranslationsTable groups,
+             Dictionary<string, Dictionary<string, string>> oldLinks,
+             Dictionary<string, Dictionary<string, int>> strongs)
+             =
+             ImportAuxAssumptionsSubTask.Run(
+                 puncsPath: common("puncs.txt"),
+                 stopWordsPath: common("stopWords.txt"),
+                 sourceFuncWordsPath: common("sourceFuncWords.txt"),
+                 targetFuncWordsPath: common("targetFuncWords.txt"),
+                 manTransModelPath: common("manTransModel.txt"),
+                 goodLinksPath: common("goodLinks.txt"),
+                 badLinksPath: common("badLinks.txt"),
+                 glossTablePath: common("Gloss.txt"),
+                 groupsPath: common("groups.txt"),
+                 oldAlignmentPath: common("oldAlignment.json"),
+                 strongsPath: common("strongs.txt"));
 
 
             string versePath = input("Verse.txt");
             string tokPath = output("target.punc.txt");
             string lang = "English";
-            List<string> puncs = Data.GetWordList(common("puncs.txt"));
 
             Console.WriteLine("Tokenizing");
             Tokens.Tokenize(versePath, tokPath, puncs, lang);
@@ -180,45 +207,22 @@ namespace RegressionTest1
             TranslationModel transModel2 =
                 importExportService.ImportTranslationModel(transModelPath);
 
-            Dictionary<string, Dictionary<string, Stats2>> manTransModel =
-                Data.GetTranslationModel2(common("manTransModel.txt"));
-
-            TranslationModel manTransModel2 =
-                new TranslationModel(
-                    manTransModel.ToDictionary(
-                        kvp => new Lemma(kvp.Key),
-                        kvp => kvp.Value.ToDictionary(
-                            kvp2 => new TargetText(kvp2.Key),
-                            kvp2 => new Score(kvp2.Value.Prob))));
-
-
             AlignmentModel alignProbs2 =
                 importExportService.ImportAlignmentModel(alignModelPath);
 
+
             bool useAlignModel = true;
             int maxPaths = 1000000;
-
-            GroupTranslationsTable_Old groups_old = Data.LoadGroups(common("groups.txt"));
-            GroupTranslationsTable groups = 
-                importExportService.ImportGroupTranslationsTable(
-                    common("groups.txt"));
-
-            List<string> stopWords = Data.GetStopWords(common("stopWords.txt"));
-            Dictionary<string, int> goodLinks = Data.GetXLinks(common("goodLinks.txt"));
             int goodLinkMinCount = 3;
-            Dictionary<string, int> badLinks = Data.GetXLinks(common("badLinks.txt"));
             int badLinkMinCount = 3;
-            Dictionary<string, Gloss> glossTable = Data.BuildGlossTableFromFile(common("Gloss.txt"));
-            Dictionary<string, Dictionary<string, string>> oldLinks = Data.GetOldLinks(common("oldAlignment.json"), groups);
             bool contentWordsOnly = true;
-            Dictionary<string, Dictionary<string, int>> strongs = Data.BuildStrongTable(common("strongs.txt"));
 
             Console.WriteLine("Auto Alignment");
 
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
                 transModel2,
-                manTransModel2,
+                manTransModel,
                 alignProbs2,
                 useAlignModel,
                 puncs,
