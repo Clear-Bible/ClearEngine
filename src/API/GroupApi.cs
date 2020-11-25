@@ -14,55 +14,22 @@ namespace ClearBible.Clear3.API
     }
 
 
-
-    public class GroupTranslationsTable
-    {
-        public
-            Dictionary<
+    public record GroupTranslationsTable(
+        Dictionary<
                 SourceLemmasAsText,
                 HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
-            Inner { get; }
+        Dictionary);
 
-        public GroupTranslationsTable(
-            Dictionary<
-                SourceLemmasAsText,
-                HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
-            inner)
-        {
-            Inner = inner;
-        }
-    }
+    public record SourceLemmasAsText(string Text);
 
+    public record TargetGroup(
+        TargetGroupAsText TargetGroupAsText,
+        PrimaryPosition PrimaryPosition);
 
-    public readonly struct SourceLemmasAsText
-    {
-        public readonly string Text;
+    public record TargetGroupAsText(string Text);
 
-        public SourceLemmasAsText(string text)
-        {
-            Text = text;
-        }
-    }
+    public record PrimaryPosition(int Int);
 
 
-    public readonly struct TargetGroupAsText
-    {
-        public readonly string Text;
 
-        public TargetGroupAsText(string text)
-        {
-            Text = text;
-        }
-    }
-
-
-    public readonly struct PrimaryPosition
-    {
-        public readonly int Int;
-
-        public PrimaryPosition(int primaryPosition)
-        {
-            Int = primaryPosition;
-        }
-    }
 }

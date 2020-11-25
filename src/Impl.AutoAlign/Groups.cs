@@ -62,7 +62,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             GroupTranslationsTable_Old groups_old =
                 new GroupTranslationsTable_Old();
-            foreach (var kvp in groups.Inner)
+            foreach (var kvp in groups.Dictionary)
                 foreach (var x in kvp.Value)
                     groups_old.AddEntry(
                         kvp.Key.Text,
