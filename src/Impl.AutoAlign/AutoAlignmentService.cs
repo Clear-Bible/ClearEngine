@@ -68,7 +68,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                                 assumptions);
 
                         ZoneMultiAlignment zoneMultiAlignment =
-                            ConvertToZoneMultiAlignment(zoneMonoAlignment);
+                            StaticConvertToZoneMultiAlignment(zoneMonoAlignment);
 
                         return
                             Output.GetLine(
@@ -83,7 +83,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static ZoneMultiAlignment ConvertToZoneMultiAlignment(
+        public static ZoneMultiAlignment StaticConvertToZoneMultiAlignment(
             ZoneMonoAlignment zoneMonoAlignment)
         {
             (ZoneContext zoneContext, List<MonoLink> monoLinks) =
@@ -98,6 +98,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         new List<TargetBond>() { link.TargetBond }))
                     .ToList());
         }
+
+
+        public ZoneMultiAlignment ConvertToZoneMultiAlignment(
+            ZoneMonoAlignment zoneMonoAlignment)
+        {
+            (ZoneContext zoneContext, List<MonoLink> monoLinks) =
+                zoneMonoAlignment;
+
+            return
+                new ZoneMultiAlignment(
+                    zoneContext,
+                    monoLinks
+                    .Select(link => new MultiLink(
+                        new List<SourcePoint>() { link.SourcePoint },
+                        new List<TargetBond>() { link.TargetBond }))
+                    .ToList());
+        }
+
 
 
         public static List<SourcePoint> GetSourcePoints(XElement treeNode)

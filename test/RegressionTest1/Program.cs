@@ -34,6 +34,8 @@ using Clear30ServiceImportExport = ClearBible.Clear3.ServiceImportExport.Clear30
 using IAutoAlignAssumptions = ClearBible.Clear3.API.IAutoAlignAssumptions;
 using Alignment2 = ClearBible.Clear3.API.Alignment2;
 
+using ClearBible.Clear3.SubTasks;
+
 namespace RegressionTest1
 {
     class Program
@@ -234,11 +236,10 @@ namespace RegressionTest1
                 strongs,
                 maxPaths);
 
-            Alignment2 alignment = 
-                clearService.AutoAlignmentService.AutoAlign(
+            Alignment2 alignment =
+                AutoAlignFromModelsNoGroupsSubTask.Run(
                     translationPairs,
                     treeService,
-                    groups,
                     glossTable,
                     assumptions);
 
@@ -246,46 +247,6 @@ namespace RegressionTest1
                 alignment.Lines,
                 Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(jsonOutput, json);
-
-            //string jsonOutputRef = reference("alignment.json");
-
-            //string jsonText = File.ReadAllText(output("alignment.json"));
-            //Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
-            //string jsonTextR = File.ReadAllText(reference("alignment.json"));
-            //Line[] linesR = JsonConvert.DeserializeObject<Line[]>(jsonTextR);
-            //int n = lines.Length;
-            //int nR = linesR.Length;
-            //if (n != nR)
-            //{
-            //    Console.WriteLine("Unequal numbers of lines.");
-            //    return;
-            //}
-            //int differentLines = 0;
-            //for (int i = 0; i < n; i++)
-            //{
-            //    Line line = lines[i];
-            //    Line lineR = linesR[i];
-            //    if (line.links.Count != lineR.links.Count)
-            //    {
-            //        Console.WriteLine($"Line {i} links {line.links.Count} ref {lineR.links.Count}");
-            //        differentLines++;
-            //    }
-            //}
-            //Console.WriteLine($"Different lines: {differentLines}");
-            //;
-
-
-
-            //Console.WriteLine("Comparing JSON Output Files");
-            //if (FilesMatch(jsonOutput, jsonOutputRef))
-            //{
-            //    Console.WriteLine("*** OK ***");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("*** JSON output differs from reference. ***");
-            //}
-            //Console.WriteLine("End of Regression Test 1");
         }
 
         static bool FilesMatch(string path1, string path2)

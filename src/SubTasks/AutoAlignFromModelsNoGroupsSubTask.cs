@@ -6,6 +6,7 @@ namespace ClearBible.Clear3.SubTasks
 {
     using System.Net.Http.Headers;
     using ClearBible.Clear3.API;
+    using ClearBible.Clear3.Service;
 
     public class AutoAlignFromModelsNoGroupsSubTask
     {
@@ -15,39 +16,48 @@ namespace ClearBible.Clear3.SubTasks
             Dictionary<string, Gloss> glossTable,
             IAutoAlignAssumptions assumptions)
         {
+            IClear30ServiceAPI clearService =
+                Clear30Service.FindOrCreate();
+
+            IAutoAlignmentService autoAlignmentService =
+                clearService.AutoAlignmentService;
+
+            IOutputService outputService =
+                clearService.OutputService;
+
+
             // This map of group key to position of primary
             // word within group is required for output; just
             // use an empty Dictionary.
             Dictionary<string, int> primaryPositions =
                 new Dictionary<string, int>();
 
-            //Alignment2 align = new Alignment2()
-            //{
-            //    Lines =
-            //        translationPairs
-            //        .Select(translationPair =>
-            //        {
-            //            ZoneMonoAlignment zoneMonoAlignment =
-            //                AlignZone(
-            //                    treeService,
-            //                    translationPair,
-            //                    assumptions);
+            Alignment2 align = new Alignment2()
+            {
+                Lines =
+                    translationPairs
+                    .Select(translationPair =>
+                    {
+                        ZoneMonoAlignment zoneMonoAlignment =
+                            autoAlignmentService.AlignZone(
+                                treeService,
+                                translationPair,
+                                assumptions);
 
-            //            ZoneMultiAlignment zoneMultiAlignment =
-            //                ConvertToZoneMultiAlignment(zoneMonoAlignment);
+                        ZoneMultiAlignment zoneMultiAlignment =
+                            autoAlignmentService.ConvertToZoneMultiAlignment(
+                                zoneMonoAlignment);
 
-            //            return
-            //                Output.GetLine(
-            //                    zoneMultiAlignment,
-            //                    glossTable,
-            //                    primaryPositions);
-            //        })
-            //        .ToArray()
-            //};
+                        return
+                            outputService.GetLine(
+                                zoneMultiAlignment,
+                                glossTable,
+                                primaryPositions);
+                    })
+                    .ToArray()
+            };
 
-            //return align;
-
-            throw new NotImplementedException(); 
+            return align;
         }
     }
 }
