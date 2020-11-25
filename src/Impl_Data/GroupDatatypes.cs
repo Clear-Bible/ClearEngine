@@ -39,7 +39,7 @@ namespace ClearBible.Clear3.Impl.Data
     }
 
 
-    public class GroupTranslationsTable_Old : IGroupTranslationsTable
+    public class GroupTranslationsTable_Old
     {
         private Dictionary<string, GroupTranslations_Old> _inner =
             new Dictionary<string, GroupTranslations_Old>();

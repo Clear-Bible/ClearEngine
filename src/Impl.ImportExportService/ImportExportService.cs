@@ -141,7 +141,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             Dictionary<
                 SourceLemmasAsText,
                 HashSet<TargetGroup>>
-                inner =
+                dictionary =
                     File.ReadLines(filePath)
                     .Select(line =>
                         line.Split('#').Select(s => s.Trim()).ToList())
@@ -160,7 +160,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                                 new TargetGroup(record.targ, record.pos))
                             .ToHashSet());
 
-            return new GroupTranslationsTable(inner);
+            return new GroupTranslationsTable(dictionary);
         }
 
 
