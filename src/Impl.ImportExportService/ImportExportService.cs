@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using ClearBible.Clear3.API;
@@ -158,6 +159,75 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                             .ToHashSet());
 
             return new GroupTranslationsTable(inner);
+        }
+
+
+        public List<string> GetWordList(string file)
+        {
+            List<string> wordList = new List<string>();
+
+            string[] lines = File.ReadAllLines(file);
+            foreach (string line in lines)
+            {
+                wordList.Add(line.Trim());
+            }
+
+            return wordList;
+        }
+
+
+        public static List<string> GetStopWords(string file)
+        {
+            List<string> wordList = new List<string>();
+
+            using (StreamReader sr = new StreamReader(file, Encoding.UTF8))
+            {
+                string line = string.Empty;
+
+                while ((line = sr.ReadLine()) != null)
+                {
+                    wordList.Add(line.Trim());
+                }
+            }
+
+            return wordList;
+        }
+
+
+        public static Dictionary<string, Dictionary<string, Stats>> GetTranslationModel2(string file)
+        {
+            Dictionary<string, Dictionary<string, Stats>> transModel =
+                new Dictionary<string, Dictionary<string, Stats>>();
+
+            string[] lines = File.ReadAllLines(file);
+            foreach (string line in lines)
+            {
+                string[] groups = line.Split(" ".ToCharArray());
+                if (groups.Length == 4)
+                {
+                    string source = groups[0].Trim();
+                    string target = groups[1].Trim();
+                    string sCount = groups[2].Trim();
+                    string sProb = groups[3].Trim();
+                    Stats s = new Stats();
+                    s.Count = Int32.Parse(sCount);
+                    s.Prob = Double.Parse(sProb);
+
+                    if (transModel.ContainsKey(source))
+                    {
+                        Dictionary<string, Stats> translations = transModel[source];
+                        translations.Add(target, s);
+                    }
+                    else
+                    {
+                        Dictionary<string, Stats> translations = new Dictionary<string, Stats>();
+                        translations.Add(target, s);
+                        transModel.Add(source, translations);
+                    }
+                }
+            }
+
+            return transModel;
         }
     }
 }

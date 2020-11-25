@@ -13,6 +13,8 @@ using Utilities;
 
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Impl.Data;
+using Stats = ClearBible.Clear3.Impl.Data.Stats;
+
 
 namespace GBI_Aligner
 {

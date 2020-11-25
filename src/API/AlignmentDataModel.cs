@@ -102,11 +102,19 @@ namespace ClearBible.Clear3.API
 
 
 
-    // Move this somewhere else ...
+    // FIXME -- Move this somewhere else ...
     // FIXME -- exactly two glosses?
     public class Gloss
     {
         public string Gloss1;
         public string Gloss2;
+    }
+
+
+    // FIXME -- where should this go really
+    public class Stats
+    {
+        public int Count;
+        public double Prob;
     }
 }
