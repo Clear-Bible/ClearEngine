@@ -7,17 +7,9 @@ using System.Linq;
 
 using Newtonsoft.Json;
 
-using Data = AlignmentTool.Data;
-using Gloss = ClearBible.Clear3.API.Gloss;
-using BookTables = Utilities.BookTables;
-
 
 using ClearBible.Clear3.API;
-
 using ClearBible.Clear3.Service;
-
-using ClearBible.Clear3.Impl.Data;
-
 using ClearBible.Clear3.SubTasks;
 
 namespace RegressionTest3
@@ -105,7 +97,6 @@ namespace RegressionTest3
             // resources when so requested.
 
             
-
             List<TranslationPair> translationPairs =
                 importExportService.ImportTranslationPairsFromLegacy(
                     parallelSourceIdLemmaPath,
@@ -114,13 +105,9 @@ namespace RegressionTest3
             TranslationModel transModel =
                 importExportService.ImportTranslationModel(transModelPath);
 
-
-            AlignmentModel alignmentModel = importExportService.ImportAlignmentModel(
-                alignModelPath);
+            AlignmentModel alignmentModel =
+                importExportService.ImportAlignmentModel(alignModelPath);
             
-
-            Console.WriteLine("Calling Auto Aligner.");
-
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
                     translationModel: transModel,
@@ -140,6 +127,8 @@ namespace RegressionTest3
                     strongs: strongs,
                     maxPaths: 1000000);
 
+            Console.WriteLine("Calling Auto Aligner.");
+
             Alignment2 alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
                     translationPairs,
@@ -151,6 +140,8 @@ namespace RegressionTest3
                 alignment.Lines,
                 Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(jsonOutput, json);
+
+            Console.WriteLine("Done.");
         }
     }
 }
