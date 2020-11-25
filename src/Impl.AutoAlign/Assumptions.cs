@@ -8,7 +8,6 @@ using System.Xml.Linq;
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Impl.Data;
     using ClearBible.Clear3.Miscellaneous;
 
     public class AutoAlignAssumptions : IAutoAlignAssumptions

@@ -14,8 +14,6 @@ using GBI_Aligner;
 using Newtonsoft.Json;
 
 
-using ClearBible.Clear3.Impl.Data;
-
 using Gloss = ClearBible.Clear3.API.Gloss;
 using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
 using SourceLemmasAsText = ClearBible.Clear3.API.SourceLemmasAsText;
@@ -25,6 +23,10 @@ using Stats2 = DeadEndWip.Stats2;
 using TranslationModel_Old = DeadEndWip.TranslationModel_Old;
 using Translations = DeadEndWip.Translations;
 using TargetGroup = ClearBible.Clear3.API.TargetGroup;
+
+using GroupTranslationsTable_Old = DeadEndWip.GroupTranslationsTable_Old;
+using GroupTranslations_Old = DeadEndWip.GroupTranslations_Old;
+using GroupTranslation_Old = DeadEndWip.GroupTranslation_Old;
 
 
 namespace AlignmentTool

@@ -11,7 +11,10 @@ using Utilities;
 using Trees;
 
 using ClearBible.Clear3.API;
-using ClearBible.Clear3.Impl.Data;
+
+using GroupTranslationsTable_Old = DeadEndWip.GroupTranslationsTable_Old;
+using GroupTranslations_Old = DeadEndWip.GroupTranslations_Old;
+using GroupTranslation_Old = DeadEndWip.GroupTranslation_Old;
 
 namespace GBI_Aligner
 {
