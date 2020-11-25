@@ -60,15 +60,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             List<MappedGroup> links2 = Groups.WordsToGroups(links);
 
-            GroupTranslationsTable_Old groups_old =
-                new GroupTranslationsTable_Old();
-            foreach (var kvp in groups.Dictionary)
-                foreach (var x in kvp.Value)
-                    groups_old.AddEntry(
-                        kvp.Key.Text,
-                        x.TargetGroupAsText.Text,
-                        x.PrimaryPosition.Int);
-
             Dictionary<string, WordInfo> wordInfoTable =
                 BuildWordInfoTable(treeNode);
             // sourceID => WordInfo
@@ -88,7 +79,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select(tp => new MaybeTargetPoint(tp))
                 .ToList();
 
-            Groups.AlignGroups(links2, sourceWordList, tWords, groups_old, terminals);
+            Groups.AlignGroups(links2, sourceWordList, tWords, groups, terminals);
 
             FixCrossingLinks(ref links2);
 
@@ -101,7 +92,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<MappedGroup> links,
             List<SourceWord> sourceWords,
             List<MaybeTargetPoint> targetWords,
-            GroupTranslationsTable_Old groups,
+            GroupTranslationsTable groups,
             List<XElement> terminals
             )
         {
@@ -131,7 +122,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         static List<string[][]> GetGroupLinks(
             SourceWord[] sourceWords,
             MaybeTargetPoint[] targetWords,
-            GroupTranslationsTable_Old groups)
+            GroupTranslationsTable groups)
         {
             List<string[][]> mappedGroups = new List<string[][]>();
 
@@ -149,11 +140,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     // consider sw and the two following source words:
 
-                    string trigram = sourceWords[i].Lemma + " " + sourceWords[i + 1].Lemma + " " + sourceWords[i + 2].Lemma;
+                    SourceLemmasAsText trigram =
+                        new SourceLemmasAsText(sourceWords[i].Lemma + " " + sourceWords[i + 1].Lemma + " " + sourceWords[i + 2].Lemma);
                     string trigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID + " " + sourceWords[i + 2].ID;
-                    if (groups.ContainsSourceGroupKey(trigram))
+                    if (groups.Dictionary.ContainsKey(trigram))
                     {
-                        GroupTranslations_Old targetGroups = groups.TranslationsForSourceGroup(trigram);
+                        HashSet<TargetGroup> targetGroups = groups.Dictionary[trigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 1, targetsAlreadyGrouped);
                         if (match != string.Empty)
                         {
@@ -171,11 +163,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // and have not yet found a match:
                 if (!foundMatch && i < sourceWords.Length - 1)
                 {
-                    string bigram = sourceWords[i].Lemma + " " + sourceWords[i + 1].Lemma;
+                    SourceLemmasAsText bigram =
+                        new SourceLemmasAsText(sourceWords[i].Lemma + " " + sourceWords[i + 1].Lemma);
                     string bigramIDs = sourceWords[i].ID + " " + sourceWords[i + 1].ID;
-                    if (groups.ContainsSourceGroupKey(bigram))
+                    if (groups.Dictionary.ContainsKey(bigram))
                     {
-                        GroupTranslations_Old targetGroups = groups.TranslationsForSourceGroup(bigram);
+                        HashSet<TargetGroup> targetGroups = groups.Dictionary[bigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 1, targetsAlreadyGrouped);
                         if (match != string.Empty)
                         {
@@ -192,11 +185,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // if not yet found a match:
                 if (!foundMatch)
                 {
-                    string unigram = sourceWords[i].Lemma;
+                    SourceLemmasAsText unigram = new SourceLemmasAsText(sourceWords[i].Lemma);
                     string unigramIDs = sourceWords[i].ID;
-                    if (groups.ContainsSourceGroupKey(unigram))
+                    if (groups.Dictionary.ContainsKey(unigram))
                     {
-                        GroupTranslations_Old targetGroups = groups.TranslationsForSourceGroup(unigram);
+                        HashSet<TargetGroup> targetGroups = groups.Dictionary[unigram];
                         string match = FindTargetMatch(targetWords, targetGroups, 2, targetsAlreadyGrouped);
                         if (match != string.Empty)
                         {
@@ -220,7 +213,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// 
         static string FindTargetMatch(
             MaybeTargetPoint[] targetWords,
-            GroupTranslations_Old targetGroups,
+            HashSet<TargetGroup> targetGroups,
             int minLength,
             HashSet<MaybeTargetPoint> targetsAlreadyGrouped)
         {
@@ -231,17 +224,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int maxRange; // is the number of target words in the target group
                           // or twice as much if isSplit
 
-            foreach (GroupTranslation_Old targetGroup in targetGroups.AllTranslations)
+            foreach (TargetGroup targetGroup in targetGroups)
             {
-                if (targetGroup.TargetGroupAsText.Contains("~"))
-                {
-                    isSplit = true;
-                    targetGroup.TargetGroupAsText = targetGroup.TargetGroupAsText.Replace(" ~ ", " ");
-                }
+                string text = targetGroup.TargetGroupAsText.Text;
 
-                string[] words = targetGroup.TargetGroupAsText.Split(" ".ToCharArray());
-                if (isSplit) maxRange = words.Length * 2;
-                else maxRange = words.Length;
+                isSplit = text.Contains("~");
+
+                string textNoTildes = isSplit ? text.Replace(" ~ ", " ") : text;
+
+                string[] words = textNoTildes.Split(" ".ToCharArray());
+
+                maxRange = isSplit ? words.Length * 2 : words.Length;
 
                 int wordIndex = 0;
                 int currRange = 0;
