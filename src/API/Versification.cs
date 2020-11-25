@@ -5,19 +5,19 @@ namespace ClearBible.Clear3.API
 {
     public interface Versification
     {
-        string Key { get; }
+        //string Key { get; }
 
-        PlaceSet Apply(IZone targetZone);
+        //PlaceSet Apply(IZone targetZone);
 
-        Versification Override(
-            IZone targetZone,
-            PlaceSet placeSet);
+        //Versification Override(
+        //    IZone targetZone,
+        //    PlaceSet placeSet);
 
-        Versification OverrideWithFunction(
-            Func<IZone, PlaceSet> maybeOverride);
+        //Versification OverrideWithFunction(
+        //    Func<IZone, PlaceSet> maybeOverride);
 
-        Versification OverrideWithVerseOffset(
-            int book, int chapter, int verseOffset);
+        //Versification OverrideWithVerseOffset(
+        //    int book, int chapter, int verseOffset);
     }
 }
 

@@ -8,17 +8,7 @@ namespace ClearBible.Clear3.API
     public interface IAutoAlignmentService
     {
         //Task<AutoAlignmentResult> LaunchAutoAlignmentAsync_Idea1(
-        //    ITreeService_Old treeService,
-        //    ITranslationPairTable_Old translationPairTable,
-        //    IPhraseTranslationModel smtTransModel,
-        //    PlaceAlignmentModel smtAlignModel,
-        //    IPhraseTranslationModel manualTransModel,
-        //    PlaceAlignmentModel manualAlignModel,
-        //    Corpus manualCorpus,
-        //    HashSet<string> sourceFunctionWords,
-        //    HashSet<string> targetFunctionWords,
-        //    HashSet<string> punctuation,
-        //    HashSet<string> stopWords,
+        //    ...
         //    IProgress<ProgressReport> progress,
         //    CancellationToken cancellationToken);
 
@@ -48,13 +38,4 @@ namespace ClearBible.Clear3.API
             Dictionary<string, Dictionary<string, int>> strongs,
             int maxPaths);
     }
-
-    //public interface AutoAlignmentResult
-    //{
-    //    string Key { get; }
-
-    //    PlaceAlignmentModel AutoAlignmentModel { get; }
-
-    //    PlaceAlignmentModel ManualAlignmentModel { get; }
-    //}
 }
