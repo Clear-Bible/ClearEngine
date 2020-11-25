@@ -35,6 +35,9 @@ namespace ClearBible.Clear3.API
             TranslationPair translationPair,
             IAutoAlignAssumptions autoAlignAssumptions);
 
+        ZoneMultiAlignment ConvertToZoneMultiAlignment(
+            ZoneMonoAlignment zoneMonoAlignment);
+
         IAutoAlignAssumptions MakeStandardAssumptions(
             TranslationModel translationModel,
             TranslationModel manTransModel,

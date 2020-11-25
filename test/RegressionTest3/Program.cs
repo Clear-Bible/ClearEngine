@@ -143,10 +143,9 @@ namespace RegressionTest3
                     maxPaths: 1000000);
 
             Alignment2 alignment =
-                clearService.AutoAlignmentService.AutoAlign(
+                AutoAlignFromModelsNoGroupsSubTask.Run(
                     translationPairs,
                     treeService,
-                    groups,
                     glossTable,
                     assumptions);
 
