@@ -34,6 +34,7 @@ using Alignment2 = ClearBible.Clear3.API.Alignment2;
 using IImportExportService = ClearBible.Clear3.API.IImportExportService;
 
 using ClearBible.Clear3.SubTasks;
+using Stats2 = DeadEndWip.Stats2;
 
 namespace RegressionTest1
 {
@@ -181,7 +182,7 @@ namespace RegressionTest1
             TranslationModel transModel2 =
                 importExportService.ImportTranslationModel(transModelPath);
 
-            Dictionary<string, Dictionary<string, Stats>> manTransModel =
+            Dictionary<string, Dictionary<string, Stats2>> manTransModel =
                 Data.GetTranslationModel2(common("manTransModel.txt"));
 
             TranslationModel manTransModel2 =

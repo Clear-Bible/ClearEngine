@@ -21,6 +21,7 @@ using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
 using SourceLemmasAsText = ClearBible.Clear3.API.SourceLemmasAsText;
 using PrimaryPosition = ClearBible.Clear3.API.PrimaryPosition;
 using TargetGroupAsText = ClearBible.Clear3.API.TargetGroupAsText;
+using Stats2 = DeadEndWip.Stats2;
 
 
 namespace AlignmentTool
@@ -107,10 +108,10 @@ namespace AlignmentTool
         // Reading the file produces a data structure of the form
         //   Hashtable(source => Hashtable(target => Stats{count, probability})
         //
-        public static Dictionary<string, Dictionary<string, Stats>> GetTranslationModel2(string file)
+        public static Dictionary<string, Dictionary<string, Stats2>> GetTranslationModel2(string file)
         {
-            Dictionary<string, Dictionary<string, Stats>> transModel =
-                new Dictionary<string, Dictionary<string, Stats>>();
+            Dictionary<string, Dictionary<string, Stats2>> transModel =
+                new Dictionary<string, Dictionary<string, Stats2>>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -122,18 +123,18 @@ namespace AlignmentTool
                     string target = groups[1].Trim();
                     string sCount = groups[2].Trim();
                     string sProb = groups[3].Trim();
-                    Stats s = new Stats();
+                    Stats2 s = new Stats2();
                     s.Count = Int32.Parse(sCount);
                     s.Prob = Double.Parse(sProb);
 
                     if (transModel.ContainsKey(source))
                     {
-                        Dictionary<string, Stats> translations = transModel[source];
+                        Dictionary<string, Stats2> translations = transModel[source];
                         translations.Add(target, s);
                     }
                     else
                     {
-                        Dictionary<string, Stats> translations = new Dictionary<string, Stats>();
+                        Dictionary<string, Stats2> translations = new Dictionary<string, Stats2>();
                         translations.Add(target, s);
                         transModel.Add(source, translations);
                     }

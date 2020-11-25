@@ -10,6 +10,7 @@ using Utilities;
 using Trees;
 
 using ClearBible.Clear3.Impl.Data;
+using Stats2 = DeadEndWip.Stats2;
 
 namespace GBI_Aligner
 {
@@ -20,7 +21,7 @@ namespace GBI_Aligner
             XmlNode treeNode, // syntax tree for current verse
             List<TargetWord> tWords, // ArrayList(TargetWord)
             TranslationModel_Old model,
-            Dictionary<string, Dictionary<string, Stats>> manModel, // manually checked alignments
+            Dictionary<string, Dictionary<string, Stats2>> manModel, // manually checked alignments
                                 // (source => (target => Stats{ count, probability})
             Dictionary<string, double> alignProbs, // ("bbcccvvvwwwn-bbcccvvvwww" => probability)
             bool useAlignModel,
