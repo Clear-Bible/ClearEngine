@@ -6,8 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API\Api.csproj" />
-    <ProjectReference Include="..\Impl_Data\Impl.Data.csproj" />
-    <ProjectReference Include="..\AlignmentTool\AlignmentTool.csproj" />
     <ProjectReference Include="..\Clear3Service\Clear3Service.csproj" />
   </ItemGroup>
 </Project>

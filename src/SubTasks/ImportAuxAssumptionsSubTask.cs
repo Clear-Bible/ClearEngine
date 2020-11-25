@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using ClearBible.Clear3.API;
+using ClearBible.Clear3.Service;
+
 namespace ClearBible.Clear3.SubTasks
 {
-    using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Service;
-
-    // FIXME: Put this in the API.
-    using Stats = ClearBible.Clear3.Impl.Data.Stats;
-
-    // FIXME: Get rid of this dependency on AlignmentTool.
-    using Data = AlignmentTool.Data;
-
     public class ImportAuxAssumptionsSubTask
     {
         public record Result(
@@ -53,7 +47,7 @@ namespace ClearBible.Clear3.SubTasks
             List<string> targetFuncWords = importExportService.GetWordList(targetFuncWordsPath);
 
             Dictionary<string, Dictionary<string, Stats>> manTransModelOrig =
-                Data.GetTranslationModel2(manTransModelPath);
+                importExportService.GetTranslationModel2(manTransModelPath);
            
             TranslationModel manTransModel =
                 new TranslationModel(
