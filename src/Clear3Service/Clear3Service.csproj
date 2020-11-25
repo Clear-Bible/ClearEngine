@@ -10,5 +10,6 @@
     <ProjectReference Include="..\Impl_Data\Impl.Data.csproj" />
     <ProjectReference Include="..\Impl.AutoAlign\Impl.AutoAlign.csproj" />
     <ProjectReference Include="..\Impl.ResourceService\Impl.ResourceService.csproj" />
+    <ProjectReference Include="..\..\Impl.OutputService\Impl.OutputService.csproj" />
   </ItemGroup>
 </Project>

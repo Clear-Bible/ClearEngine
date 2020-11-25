@@ -62,7 +62,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(translationPair =>
                     {
                         ZoneMonoAlignment zoneMonoAlignment =
-                            AlignZone(
+                            StaticAlignZone(
                                 treeService,
                                 translationPair,
                                 assumptions);
@@ -173,7 +173,33 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static ZoneMonoAlignment AlignZone(
+        public static ZoneMonoAlignment StaticAlignZone(
+            ITreeService iTreeService,
+            TranslationPair translationPair,
+            IAutoAlignAssumptions autoAlignAssumptions)
+        {
+            TreeService treeService = (TreeService)iTreeService;
+
+            XElement treeNode = treeService.GetTreeNode(
+                    translationPair.FirstSourceVerseID,
+                    translationPair.LastSourceVerseID);
+
+            ZoneContext zoneContext = new ZoneContext(
+                GetSourcePoints(treeNode),
+                GetTargetPoints(translationPair.Targets));
+
+            List<MonoLink> monoLinks =
+                GetMonoLinks(
+                    treeNode,
+                    zoneContext.SourcePoints,
+                    zoneContext.TargetPoints,
+                    autoAlignAssumptions);
+
+            return new ZoneMonoAlignment(zoneContext, monoLinks);
+        }
+
+
+        public ZoneMonoAlignment AlignZone(
             ITreeService iTreeService,
             TranslationPair translationPair,
             IAutoAlignAssumptions autoAlignAssumptions)

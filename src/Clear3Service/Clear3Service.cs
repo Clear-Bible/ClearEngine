@@ -42,5 +42,8 @@ namespace ClearBible.Clear3.Impl.Service
 
         public ZoneService ZoneService =>
             throw new NotImplementedException();
+
+        public IOutputService OutputService =>
+            new OutputService.OutputService();
     }
 }

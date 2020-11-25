@@ -15,6 +15,8 @@ namespace ClearBible.Clear3.API
 
         IAutoAlignmentService AutoAlignmentService { get; }
 
+        IOutputService OutputService { get; }
+
         IPhraseService PhraseService { get; }
     }
 }
