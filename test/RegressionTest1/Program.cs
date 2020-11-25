@@ -90,15 +90,8 @@ namespace RegressionTest1
             Console.WriteLine(Directory.GetCurrentDirectory());
             Console.WriteLine();
 
-            Console.WriteLine("Option: 1 Brief, 2 Long");
-            Console.Write("? ");
-            if (!int.TryParse(Console.ReadLine(), out int option) ||
-                option != 1 && option != 2)
-            {
-                Console.WriteLine("Unrecognized Option");
-                return;
-            }
-            option -= 1;
+            // option = 0 for Brief, 1 for Long.
+            int option = 0;
 
             string[] inputFolders = { "InputBrief", "InputLong" };
             string[] outputFolders = { "OutputBrief", "OutputLong" };
@@ -116,6 +109,10 @@ namespace RegressionTest1
                 output = prefix(outputFolder),
                 common = prefix(commonFolder),
                 reference = prefix(referenceFolder);
+
+
+
+
 
             string versePath = input("Verse.txt");
             string tokPath = output("target.punc.txt");
@@ -248,11 +245,6 @@ namespace RegressionTest1
                 alignment.Lines,
                 Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(jsonOutput, json);
-        }
-
-        static bool FilesMatch(string path1, string path2)
-        {
-            return true;
         }
     }
 }
