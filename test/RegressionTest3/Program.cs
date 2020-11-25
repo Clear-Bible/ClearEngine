@@ -80,8 +80,8 @@ namespace RegressionTest3
             IClear30ServiceAPI clearService =
                 Clear30Service.FindOrCreate();
 
-            IClear30ServiceAPIImportExport importExportService =
-                Clear30ServiceImportExport.Create();
+            IImportExportService importExportService =
+                clearService.ImportExportService;
 
             IResourceService resourceService = clearService.ResourceService;
             resourceService.SetLocalResourceFolder("Resources");

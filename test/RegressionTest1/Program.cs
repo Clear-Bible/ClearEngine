@@ -33,6 +33,7 @@ using Clear30ServiceImportExport = ClearBible.Clear3.ServiceImportExport.Clear30
 
 using IAutoAlignAssumptions = ClearBible.Clear3.API.IAutoAlignAssumptions;
 using Alignment2 = ClearBible.Clear3.API.Alignment2;
+using IImportExportService = ClearBible.Clear3.API.IImportExportService;
 
 using ClearBible.Clear3.SubTasks;
 
@@ -57,8 +58,8 @@ namespace RegressionTest1
             IClear30ServiceAPI clearService =
                 Clear30Service.FindOrCreate();
 
-            IClear30ServiceAPIImportExport importExportService =
-                Clear30ServiceImportExport.Create();
+            IImportExportService importExportService =
+                clearService.ImportExportService;
 
             IResourceService resourceService = clearService.ResourceService;
             resourceService.SetLocalResourceFolder("Resources");
