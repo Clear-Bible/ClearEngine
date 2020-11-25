@@ -648,8 +648,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .SelectMany(groupTranslations =>
                     groupTranslations.Select(tg => new
                     {
-                        text = tg.Item1.Text.Replace(" ~ ", " "),
-                        position = tg.Item2.Int
+                        text = tg.TargetGroupAsText.Text.Replace(" ~ ", " "),
+                        position = tg.PrimaryPosition.Int
                     }))
                 .GroupBy(x => x.text)
                 .ToDictionary(

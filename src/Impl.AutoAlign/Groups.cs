@@ -66,8 +66,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 foreach (var x in kvp.Value)
                     groups_old.AddEntry(
                         kvp.Key.Text,
-                        x.Item1.Text,
-                        x.Item2.Int);
+                        x.TargetGroupAsText.Text,
+                        x.PrimaryPosition.Int);
 
             Dictionary<string, WordInfo> wordInfoTable =
                 BuildWordInfoTable(treeNode);
