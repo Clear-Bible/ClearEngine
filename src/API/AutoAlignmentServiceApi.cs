@@ -7,28 +7,20 @@ namespace ClearBible.Clear3.API
 {
     public interface IAutoAlignmentService
     {
-        Task<AutoAlignmentResult> LaunchAutoAlignmentAsync_Idea1(
-            ITreeService_Old treeService,
-            ITranslationPairTable_Old translationPairTable,
-            IPhraseTranslationModel smtTransModel,
-            PlaceAlignmentModel smtAlignModel,
-            IPhraseTranslationModel manualTransModel,
-            PlaceAlignmentModel manualAlignModel,
-            Corpus manualCorpus,
-            HashSet<string> sourceFunctionWords,
-            HashSet<string> targetFunctionWords,
-            HashSet<string> punctuation,
-            HashSet<string> stopWords,
-            IProgress<ProgressReport> progress,
-            CancellationToken cancellationToken);
-
-        Alignment2 AutoAlign(
-            List<TranslationPair> translationPairs,
-            ITreeService treeService,
-            GroupTranslationsTable groups,
-            Dictionary<string, Gloss> glossTable,
-            IAutoAlignAssumptions assumptions
-            );
+        //Task<AutoAlignmentResult> LaunchAutoAlignmentAsync_Idea1(
+        //    ITreeService_Old treeService,
+        //    ITranslationPairTable_Old translationPairTable,
+        //    IPhraseTranslationModel smtTransModel,
+        //    PlaceAlignmentModel smtAlignModel,
+        //    IPhraseTranslationModel manualTransModel,
+        //    PlaceAlignmentModel manualAlignModel,
+        //    Corpus manualCorpus,
+        //    HashSet<string> sourceFunctionWords,
+        //    HashSet<string> targetFunctionWords,
+        //    HashSet<string> punctuation,
+        //    HashSet<string> stopWords,
+        //    IProgress<ProgressReport> progress,
+        //    CancellationToken cancellationToken);
 
         ZoneMonoAlignment AlignZone(
             ITreeService iTreeService,
@@ -57,12 +49,12 @@ namespace ClearBible.Clear3.API
             int maxPaths);
     }
 
-    public interface AutoAlignmentResult
-    {
-        string Key { get; }
+    //public interface AutoAlignmentResult
+    //{
+    //    string Key { get; }
 
-        PlaceAlignmentModel AutoAlignmentModel { get; }
+    //    PlaceAlignmentModel AutoAlignmentModel { get; }
 
-        PlaceAlignmentModel ManualAlignmentModel { get; }
-    }
+    //    PlaceAlignmentModel ManualAlignmentModel { get; }
+    //}
 }
