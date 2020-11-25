@@ -45,12 +45,12 @@ namespace ClearBible.Clear3.SubTasks
                 Clear30Service.FindOrCreate().ImportExportService;
 
 
-            List<string> puncs = Data.GetWordList(puncsPath);
+            List<string> puncs = importExportService.GetWordList(puncsPath);
 
-            List<string> stopWords = Data.GetStopWords(stopWordsPath);
+            List<string> stopWords = importExportService.GetStopWords(stopWordsPath);
 
-            List<string> sourceFuncWords = Data.GetWordList(sourceFuncWordsPath);
-            List<string> targetFuncWords = Data.GetWordList(targetFuncWordsPath);
+            List<string> sourceFuncWords = importExportService.GetWordList(sourceFuncWordsPath);
+            List<string> targetFuncWords = importExportService.GetWordList(targetFuncWordsPath);
 
             Dictionary<string, Dictionary<string, Stats>> manTransModelOrig =
                 Data.GetTranslationModel2(manTransModelPath);
@@ -63,20 +63,20 @@ namespace ClearBible.Clear3.SubTasks
                             kvp2 => new TargetText(kvp2.Key),
                             kvp2 => new Score(kvp2.Value.Prob))));
 
-            Dictionary<string, int> goodLinks = Data.GetXLinks(goodLinksPath);
-            Dictionary<string, int> badLinks = Data.GetXLinks(badLinksPath);
+            Dictionary<string, int> goodLinks = importExportService.GetXLinks(goodLinksPath);
+            Dictionary<string, int> badLinks = importExportService.GetXLinks(badLinksPath);
            
             Dictionary<string, Gloss> glossTable =
-                Data.BuildGlossTableFromFile(glossTablePath);
+                importExportService.BuildGlossTableFromFile(glossTablePath);
 
             GroupTranslationsTable groups =
                 importExportService.ImportGroupTranslationsTable(groupsPath);
 
             Dictionary<string, Dictionary<string, string>> oldLinks =
-                Data.GetOldLinks(oldAlignmentPath, groups);
+                importExportService.GetOldLinks(oldAlignmentPath, groups);
 
             Dictionary<string, Dictionary<string, int>> strongs =
-                Data.BuildStrongTable(strongsPath);
+                importExportService.BuildStrongTable(strongsPath);
 
             return new Result(
                 puncs,
