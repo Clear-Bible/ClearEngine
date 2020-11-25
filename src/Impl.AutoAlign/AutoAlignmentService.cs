@@ -21,82 +21,29 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class AutoAlignmentService : IAutoAlignmentService
     {
-        public Task<AutoAlignmentResult> LaunchAutoAlignmentAsync_Idea1(
-            ITreeService_Old treeService,
-            ITranslationPairTable_Old translationPairTable,
-            IPhraseTranslationModel smtTransModel,
-            PlaceAlignmentModel smtAlignModel,
-            IPhraseTranslationModel manualTransModel,
-            PlaceAlignmentModel manualAlignModel,
-            Corpus manualCorpus,
-            HashSet<string> sourceFunctionWords,
-            HashSet<string> targetFunctionWords,
-            HashSet<string> punctuation,
-            HashSet<string> stopWords,
-            IProgress<ProgressReport> progress,
-            CancellationToken cancellationToken) =>
-                throw new NotImplementedException();
-
-
-        public Alignment2 AutoAlign(
-            List<TranslationPair> translationPairs,
-            ITreeService treeService,
-            GroupTranslationsTable groups,
-            Dictionary<string, Gloss> glossTable,
-            IAutoAlignAssumptions assumptions
-            )
+        public ZoneMonoAlignment AlignZone(
+            ITreeService iTreeService,
+            TranslationPair translationPair,
+            IAutoAlignAssumptions autoAlignAssumptions)
         {
+            TreeService treeService = (TreeService)iTreeService;
 
+            XElement treeNode = treeService.GetTreeNode(
+                    translationPair.FirstSourceVerseID,
+                    translationPair.LastSourceVerseID);
 
+            ZoneContext zoneContext = new ZoneContext(
+                GetSourcePoints(treeNode),
+                GetTargetPoints(translationPair.Targets));
 
-            // Build map of group key to position of primary
-            // word within group.
-            Dictionary<string, int> primaryPositions =
-                // BuildPrimaryPositionTable(groups);
-                new Dictionary<string, int>();
+            List<MonoLink> monoLinks =
+                GetMonoLinks(
+                    treeNode,
+                    zoneContext.SourcePoints,
+                    zoneContext.TargetPoints,
+                    autoAlignAssumptions);
 
-            Alignment2 align = new Alignment2()
-            {
-                Lines =
-                    translationPairs
-                    .Select(translationPair =>
-                    {
-                        ZoneMonoAlignment zoneMonoAlignment =
-                            StaticAlignZone(
-                                treeService,
-                                translationPair,
-                                assumptions);
-
-                        ZoneMultiAlignment zoneMultiAlignment =
-                            StaticConvertToZoneMultiAlignment(zoneMonoAlignment);
-
-                        return
-                            Output.GetLine(
-                                zoneMultiAlignment,
-                                glossTable,
-                                primaryPositions);
-                    })
-                    .ToArray()
-            };
-
-            return align;
-        }
-
-
-        public static ZoneMultiAlignment StaticConvertToZoneMultiAlignment(
-            ZoneMonoAlignment zoneMonoAlignment)
-        {
-            (ZoneContext zoneContext, List<MonoLink> monoLinks) =
-                zoneMonoAlignment;
-
-            return
-                new ZoneMultiAlignment(
-                    zoneContext,
-                    monoLinks
-                    .Select(link => new MultiLink(
-                        new List<SourcePoint>() { link.SourcePoint },
-                        new List<TargetBond>() { link.TargetBond }))
-                    .ToList());
+            return new ZoneMonoAlignment(zoneContext, monoLinks);
         }
 
 
@@ -115,7 +62,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         new List<TargetBond>() { link.TargetBond }))
                     .ToList());
         }
-
 
 
         public static List<SourcePoint> GetSourcePoints(XElement treeNode)
@@ -187,59 +133,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     Position: x.position,
                     RelativePosition: x.position / totalTargetPoints))
                 .ToList();
-        }
-
-
-
-        public static ZoneMonoAlignment StaticAlignZone(
-            ITreeService iTreeService,
-            TranslationPair translationPair,
-            IAutoAlignAssumptions autoAlignAssumptions)
-        {
-            TreeService treeService = (TreeService)iTreeService;
-
-            XElement treeNode = treeService.GetTreeNode(
-                    translationPair.FirstSourceVerseID,
-                    translationPair.LastSourceVerseID);
-
-            ZoneContext zoneContext = new ZoneContext(
-                GetSourcePoints(treeNode),
-                GetTargetPoints(translationPair.Targets));
-
-            List<MonoLink> monoLinks =
-                GetMonoLinks(
-                    treeNode,
-                    zoneContext.SourcePoints,
-                    zoneContext.TargetPoints,
-                    autoAlignAssumptions);
-
-            return new ZoneMonoAlignment(zoneContext, monoLinks);
-        }
-
-
-        public ZoneMonoAlignment AlignZone(
-            ITreeService iTreeService,
-            TranslationPair translationPair,
-            IAutoAlignAssumptions autoAlignAssumptions)
-        {
-            TreeService treeService = (TreeService)iTreeService;
-
-            XElement treeNode = treeService.GetTreeNode(
-                    translationPair.FirstSourceVerseID,
-                    translationPair.LastSourceVerseID);
-
-            ZoneContext zoneContext = new ZoneContext(
-                GetSourcePoints(treeNode),
-                GetTargetPoints(translationPair.Targets));
-
-            List<MonoLink> monoLinks =
-                GetMonoLinks(
-                    treeNode,
-                    zoneContext.SourcePoints,
-                    zoneContext.TargetPoints,
-                    autoAlignAssumptions);
-
-            return new ZoneMonoAlignment(zoneContext, monoLinks);
         }
 
 
