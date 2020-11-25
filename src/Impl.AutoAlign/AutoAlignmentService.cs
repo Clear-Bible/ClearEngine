@@ -643,7 +643,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             GroupTranslationsTable groups)
         {
             return
-                groups.Inner
+                groups.Dictionary
                 .Select(kvp => kvp.Value)
                 .SelectMany(groupTranslations =>
                     groupTranslations.Select(tg => new

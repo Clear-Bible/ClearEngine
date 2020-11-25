@@ -390,7 +390,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             Dictionary<
                 SourceLemmasAsText,
                 HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
-                inner = groups.Inner;
+                inner = groups.Dictionary;
 
             if (!inner.TryGetValue(source, out var targets))
             {
