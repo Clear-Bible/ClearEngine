@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using Newtonsoft.Json;
+
 using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.ImportExportService
@@ -176,7 +178,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         }
 
 
-        public static List<string> GetStopWords(string file)
+        public List<string> GetStopWords(string file)
         {
             List<string> wordList = new List<string>();
 
@@ -194,7 +196,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         }
 
 
-        public static Dictionary<string, Dictionary<string, Stats>> GetTranslationModel2(string file)
+        public Dictionary<string, Dictionary<string, Stats>> GetTranslationModel2(string file)
         {
             Dictionary<string, Dictionary<string, Stats>> transModel =
                 new Dictionary<string, Dictionary<string, Stats>>();
@@ -228,6 +230,207 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             }
 
             return transModel;
+        }
+
+
+        // Input file has lines of the form:
+        //   link count
+        // Output datum is of the form
+        //   Hashtable(link => count)
+        //
+        public Dictionary<string, int> GetXLinks(string file)
+        {
+            Dictionary<string, int> xLinks = new Dictionary<string, int>();
+
+            string[] lines = File.ReadAllLines(file);
+            foreach (string line in lines)
+            {
+                string[] groups = line.Split(" ".ToCharArray());
+                if (groups.Length == 2)
+                {
+                    string badLink = groups[0].Trim();
+                    int count = Int32.Parse(groups[1]);
+                    xLinks.Add(badLink, count);
+                }
+            }
+
+            return xLinks;
+        }
+
+
+        public Dictionary<string, Gloss> BuildGlossTableFromFile(string glossFile)
+        {
+            Dictionary<string, Gloss> glossTable = new Dictionary<string, Gloss>();
+
+            string[] lines = File.ReadAllLines(glossFile);
+            foreach (string line in lines)
+            {
+                string[] groups = line.Split("#".ToCharArray());
+
+                if (groups.Length == 3)
+                {
+                    string morphID = groups[0].Trim();
+
+                    Gloss g = new Gloss();
+                    g.Gloss1 = groups[1].Trim();
+                    g.Gloss2 = groups[2].Trim();
+
+                    glossTable.Add(morphID, g);
+                }
+            }
+
+            return glossTable;
+        }
+
+
+        // Deserializes the JSON in the input file into a Line[] with
+        // types as above.
+        // Returns a datum of the form:
+        //   Hashtable(verseId => Hashtable(manuscriptWord.AltId => translationWord.AltId))
+        //   where the verseId is the first 8 characters of the manuscriptWord.Id
+        //   and the entries come from the one-to-one links
+        //
+        // In addition, this routine calls UpdateGroups() whenever it encounters
+        // a link that is not one-to-one.
+        //
+        public Dictionary<string, Dictionary<string, string>> GetOldLinks(string jsonFile, GroupTranslationsTable groups)
+        {
+            Dictionary<string, Dictionary<string, string>> oldLinks =
+                new Dictionary<string, Dictionary<string, string>>();
+
+            string jsonText = File.ReadAllText(jsonFile);
+            Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
+            if (lines == null) return oldLinks;
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                Line line = lines[i];
+
+                for (int j = 0; j < line.links.Count; j++)
+                {
+                    Link link = line.links[j];
+                    int[] sourceLinks = link.source;
+                    int[] targetLinks = link.target;
+
+                    if (sourceLinks.Length > 1 || targetLinks.Length > 1)
+                    {
+                        UpdateGroups(groups, sourceLinks, targetLinks, line.manuscript, line.translation);
+                    }
+                    else
+                    {
+                        int sourceLink = sourceLinks[0];
+                        int targetLink = targetLinks[0];
+                        ManuscriptWord mWord = line.manuscript.words[sourceLink];
+                        TranslationWord tWord = line.translation.words[targetLink];
+
+                        string verseID = mWord.id.ToString().PadLeft(12, '0').Substring(0, 8);
+
+                        if (oldLinks.ContainsKey(verseID))
+                        {
+                            Dictionary<string, string> verseLinks = oldLinks[verseID];
+                            verseLinks.Add(mWord.altId, tWord.altId);
+                        }
+                        else
+                        {
+                            Dictionary<string, string> verseLinks = new Dictionary<string, string>();
+                            verseLinks.Add(mWord.altId, tWord.altId);
+                            oldLinks.Add(verseID, verseLinks);
+                        }
+                    }
+                }
+            }
+
+            return oldLinks;
+        }
+
+
+        private void UpdateGroups(
+            GroupTranslationsTable groups,
+            int[] sourceLinks,
+            int[] targetLinks,
+            Manuscript manuscript,
+            Translation translation)
+        {
+            SourceLemmasAsText source = new SourceLemmasAsText(
+                String.Join(
+                    " ",
+                    sourceLinks.Select(link => manuscript.words[link].lemma))
+                .Trim());
+
+            int firstTargetLink = targetLinks[0];
+
+            int[] sortedTargetLinks = targetLinks.OrderBy(x => x).ToArray();
+
+            PrimaryPosition primaryPosition = new PrimaryPosition(
+                sortedTargetLinks
+                .Select((link, newIndex) => Tuple.Create(link, newIndex))
+                .First(x => x.Item1 == firstTargetLink)
+                .Item2);
+
+            TargetGroupAsText targetGroupAsText = new TargetGroupAsText(
+                sortedTargetLinks
+                .Aggregate(
+                    Tuple.Create(-1, string.Empty),
+                    (state, targetLink) =>
+                    {
+                        int prevIndex = state.Item1;
+                        string text = state.Item2;
+                        string sep =
+                          (prevIndex >= 0 && (targetLink - prevIndex) > 1)
+                              ? " ~ "
+                              : " ";
+                        return Tuple.Create(
+                            targetLink,
+                            text + sep + translation.words[targetLink].text);
+                    })
+                .Item2
+                .Trim()
+                .ToLower());
+
+            Dictionary<
+                SourceLemmasAsText,
+                HashSet<Tuple<TargetGroupAsText, PrimaryPosition>>>
+                inner = groups.Inner;
+
+            if (!inner.TryGetValue(source, out var targets))
+            {
+                targets = new HashSet<
+                    Tuple<TargetGroupAsText, PrimaryPosition>>();
+                inner[source] = targets;
+            }
+
+            targets.Add(Tuple.Create(targetGroupAsText, primaryPosition));
+        }
+
+
+        public static Dictionary<string, Dictionary<string, int>> BuildStrongTable(string strongFile)
+        {
+            Dictionary<string, Dictionary<string, int>> strongTable =
+                new Dictionary<string, Dictionary<string, int>>();
+
+            string[] strongLines = File.ReadAllLines(strongFile);
+
+            foreach (string strongLine in strongLines)
+            {
+                string[] items = strongLine.Split(" ".ToCharArray());
+
+                string wordId = items[0].Trim();
+                string strong = items[1].Trim();
+
+                if (strongTable.ContainsKey(strong))
+                {
+                    Dictionary<String, int> wordIds = strongTable[strong];
+                    wordIds.Add(wordId, 1);
+                }
+                else
+                {
+                    Dictionary<string, int> wordIds = new Dictionary<string, int>();
+                    wordIds.Add(wordId, 1);
+                    strongTable.Add(strong, wordIds);
+                }
+            }
+
+            return strongTable;
         }
     }
 }

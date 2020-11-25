@@ -5,4 +5,4 @@ Move ServiceImportExport into Service.
 Move AlignmentTool.Data methods being used into import/export API.
 Make AlignZone launch a task.
 Catch specific exceptions in tree alignment.
-Move Stats datum into the API.
+Get rid of Impl.Data I think.
