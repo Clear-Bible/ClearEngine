@@ -11,7 +11,7 @@ namespace ClearBible.Clear3.SubTasks
     public class AutoAlignFromModelsNoGroupsSubTask
     {
         public static Alignment2 Run(
-            List<TranslationPair> translationPairs,
+            List<ZoneAlignmentFacts> zoneAlignmentFactsList,
             ITreeService treeService,
             Dictionary<string, Gloss> glossTable,
             IAutoAlignAssumptions assumptions)
@@ -35,13 +35,13 @@ namespace ClearBible.Clear3.SubTasks
             Alignment2 align = new Alignment2()
             {
                 Lines =
-                    translationPairs
-                    .Select(translationPair =>
+                    zoneAlignmentFactsList
+                    .Select(zoneAlignmentFacts =>
                     {
                         ZoneMonoAlignment zoneMonoAlignment =
                             autoAlignmentService.AlignZone(
                                 treeService,
-                                translationPair,
+                                zoneAlignmentFacts,
                                 assumptions);
 
                         ZoneMultiAlignment zoneMultiAlignment =

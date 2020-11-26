@@ -25,8 +25,11 @@ namespace ClearBible.Clear3.API
         TargetText TargetText,
         TargetID TargetID);
 
-    public record TranslationPair(
-        List<Target> Targets,
+    public record Targets(
+        List<Target> List);
+
+    public record ZoneAlignmentFacts(
+        Targets Targets,
         VerseID FirstSourceVerseID,
         VerseID LastSourceVerseID);
 

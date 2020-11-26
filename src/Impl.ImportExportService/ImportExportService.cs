@@ -13,7 +13,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
 {
     public class ImportExportService : IImportExportService
     {
-        public List<TranslationPair> ImportTranslationPairsFromLegacy(
+        public List<ZoneAlignmentFacts> ImportZoneAlignmentFactsFromLegacy(
             string parallelSourcePath,
             string parallelTargetPath)
         {
@@ -33,13 +33,14 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                         sourceStrings = fields(sourceLine),
                         targetStrings = fields(targetLine);
 
-                    return new TranslationPair(
+                    return new ZoneAlignmentFacts(
                         Targets:
-                            targetStrings
-                            .Select(s => new Target(
-                                getTargetMorph(s),
-                                getTargetId(s)))
-                            .ToList(),
+                            new Targets(
+                                targetStrings
+                                .Select(s => new Target(
+                                    getTargetMorph(s),
+                                    getTargetId(s)))
+                                .ToList()),
                         FirstSourceVerseID:
                             getSourceVerseID(sourceStrings.First()),
                         LastSourceVerseID:
