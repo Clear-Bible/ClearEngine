@@ -22,18 +22,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     {
         public ZoneMonoAlignment AlignZone(
             ITreeService iTreeService,
-            TranslationPair translationPair,
+            ZoneAlignmentFacts zoneAlignmentFacts,
             IAutoAlignAssumptions autoAlignAssumptions)
         {
             TreeService treeService = (TreeService)iTreeService;
 
             XElement treeNode = treeService.GetTreeNode(
-                    translationPair.FirstSourceVerseID,
-                    translationPair.LastSourceVerseID);
+                    zoneAlignmentFacts.FirstSourceVerseID,
+                    zoneAlignmentFacts.LastSourceVerseID);
 
             ZoneContext zoneContext = new ZoneContext(
                 GetSourcePoints(treeNode),
-                GetTargetPoints(translationPair.Targets));
+                GetTargetPoints(zoneAlignmentFacts.Targets.List));
 
             List<MonoLink> monoLinks =
                 GetMonoLinks(

@@ -14,7 +14,7 @@ namespace ClearBible.Clear3.API
         GroupTranslationsTable ImportGroupTranslationsTable(
             string filePath);
 
-        List<TranslationPair> ImportTranslationPairsFromLegacy(
+        List<ZoneAlignmentFacts> ImportZoneAlignmentFactsFromLegacy(
             string parallelSourcePath,
             string parallelTargetPath);
 

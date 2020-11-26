@@ -14,7 +14,7 @@ namespace ClearBible.Clear3.API
 
         ZoneMonoAlignment AlignZone(
             ITreeService iTreeService,
-            TranslationPair translationPair,
+            ZoneAlignmentFacts zoneAlignmentFacts,
             IAutoAlignAssumptions autoAlignAssumptions);
 
         ZoneMultiAlignment ConvertToZoneMultiAlignment(

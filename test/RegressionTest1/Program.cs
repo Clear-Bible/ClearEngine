@@ -13,7 +13,7 @@ using Utilities;
 using Data = AlignmentTool.Data;
 using Gloss = ClearBible.Clear3.API.Gloss;
 
-using TranslationPair = ClearBible.Clear3.API.TranslationPair;
+using ZoneAlignmentFacts = ClearBible.Clear3.API.ZoneAlignmentFacts;
 using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
 using TranslationModel = ClearBible.Clear3.API.TranslationModel;
 using AlignmentModel = ClearBible.Clear3.API.AlignmentModel;
@@ -217,8 +217,8 @@ namespace RegressionTest1
 
             string jsonOutput = output("alignment.json");
 
-            List<TranslationPair> translationPairs =
-                importExportService.ImportTranslationPairsFromLegacy(
+            List<ZoneAlignmentFacts> zoneAlignmentFactsList =
+                importExportService.ImportZoneAlignmentFactsFromLegacy(
                     parallelSourceIdLemmaPath,
                     parallelTargetIdPath);
 
@@ -258,7 +258,7 @@ namespace RegressionTest1
 
             Alignment2 alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
-                    translationPairs,
+                    zoneAlignmentFactsList,
                     treeService,
                     glossTable,
                     assumptions);
