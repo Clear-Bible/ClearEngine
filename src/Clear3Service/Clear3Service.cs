@@ -34,6 +34,9 @@ namespace ClearBible.Clear3.Impl.Service
         public IImportExportService ImportExportService { get; } =
             new ImportExportService.ImportExportService();
 
+        public ISegmenter DefaultSegmenter { get; } =
+            new DefaultSegmenter.DefaultSegmenter();
+
         public SMTService SMTService =>
             throw new NotImplementedException();
 

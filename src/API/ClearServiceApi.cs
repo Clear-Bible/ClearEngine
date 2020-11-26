@@ -13,10 +13,21 @@ namespace ClearBible.Clear3.API
 
         IImportExportService ImportExportService { get; }
 
+        ISegmenter DefaultSegmenter { get; }
+
         SMTService SMTService { get; }
 
         IAutoAlignmentService AutoAlignmentService { get; }
 
         IOutputService OutputService { get; }
+    }
+
+
+    public interface ISegmenter
+    {
+        string[] GetSegments(
+            string text,
+            List<string> puncs,
+            string lang);
     }
 }
