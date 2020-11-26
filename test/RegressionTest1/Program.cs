@@ -6,20 +6,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Tokenizer;
+using System.Text;
 using TransModels;
 using Utilities;
 
 using Data = AlignmentTool.Data;
 using Gloss = ClearBible.Clear3.API.Gloss;
-using Line = GBI_Aligner.Line;
 
 using TranslationPair = ClearBible.Clear3.API.TranslationPair;
 using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
 using TranslationModel = ClearBible.Clear3.API.TranslationModel;
-using Lemma = ClearBible.Clear3.API.Lemma;
-using TargetText = ClearBible.Clear3.API.TargetText;
-using Score = ClearBible.Clear3.API.Score;
 using AlignmentModel = ClearBible.Clear3.API.AlignmentModel;
 using IResourceService = ClearBible.Clear3.API.IResourceService;
 using ITreeService = ClearBible.Clear3.API.ITreeService;
@@ -33,9 +29,7 @@ using Alignment2 = ClearBible.Clear3.API.Alignment2;
 using IImportExportService = ClearBible.Clear3.API.IImportExportService;
 
 using ClearBible.Clear3.SubTasks;
-using Stats2 = DeadEndWip.Stats2;
 
-using GroupTranslationsTable_Old = DeadEndWip.GroupTranslationsTable_Old;
 
 namespace RegressionTest1
 {
@@ -147,7 +141,31 @@ namespace RegressionTest1
             string lang = "English";
 
             Console.WriteLine("Tokenizing");
-            Tokens.Tokenize(versePath, tokPath, puncs, lang);
+
+            {
+                StreamWriter sw = new StreamWriter(tokPath, false, Encoding.UTF8);
+
+                using (StreamReader sr = new StreamReader(versePath, Encoding.UTF8))
+                {
+                    string line = string.Empty;
+
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        if (line.Trim().Length < 9) continue;
+                        string verseID = line.Substring(0, line.IndexOf(" "));
+                        string verseText = line.Substring(line.IndexOf(" ") + 1);
+
+                        string[] segments = clearService.DefaultSegmenter.GetSegments(verseText, puncs, lang);
+                        sw.Write("{0}", verseID);
+                        foreach (string s in segments) sw.Write(" {0}", s);
+                        sw.WriteLine();
+                    }
+                }
+
+                sw.Close();
+            }
+
+
 
             string versificationPath = common("Versification.xml");
             ArrayList versificationList =
