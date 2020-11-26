@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace Tokenizer
+using ClearBible.Clear3.API;
+
+
+namespace ClearBible.Clear3.Impl.DefaultSegmenter
 {
-    public class Tokens
+    public class DefaultSegmenter : ISegmenter
     {
-        public static string[] GetSegments(
+        public string[] GetSegments(
             string text,
             List<string> puncs,
             string lang)
@@ -21,35 +20,8 @@ namespace Tokenizer
             return tokens.Split(" ");
         }
 
-        public static void Tokenize(
-            string rawFile, // the original verse text file in verse-per-line format
-            string tokFile, // the tokenized file in original case
-            List<string> puncs, // list of punctuation marks
-            string lang // language of the verse text
-            )
-        {
-            StreamWriter sw = new StreamWriter(tokFile, false, Encoding.UTF8);
 
-            using (StreamReader sr = new StreamReader(rawFile, Encoding.UTF8))
-            {
-                string line = string.Empty;
-
-                while ((line = sr.ReadLine()) != null)
-                {
-                    if (line.Trim().Length < 9) continue;
-                    string verseID = line.Substring(0, line.IndexOf(" "));
-                    string verseText = line.Substring(line.IndexOf(" ") + 1);
-                    string puncText = string.Empty;
-                    string puncLowerText = string.Empty;
-                    SegPuncs(ref puncText, ref puncLowerText, verseText.Trim(), puncs, lang);
-                    sw.WriteLine("{0} {1}", verseID, puncText);
-                }
-            }
-
-            sw.Close();
-        }
-
-        static void SegPuncs(ref string puncText, ref string puncLowerText, string verseText, List<string> puncs, string lang)
+        private void SegPuncs(ref string puncText, ref string puncLowerText, string verseText, List<string> puncs, string lang)
         {
             verseText = verseText.Replace("—", " — ");
             verseText = verseText.Replace("-", " - ");
@@ -80,7 +52,29 @@ namespace Tokenizer
             }
         }
 
-        static void SepPuncs(ref string puncText, ref string puncLowerText, string word, List<string> puncs, string lang)
+
+        private char FindPunc(string word, List<string> puncs)
+        {
+            Regex r = new Regex("[0-9]+.+[0-9]+");
+            Match m = r.Match(word);
+            if (m.Success)
+            {
+                return (char)0;
+            }
+            char[] chars = word.ToCharArray();
+            for (int i = 1; i < chars.Length - 1; i++) // excluding puncs on the peripheral
+            {
+                if (puncs.Contains(chars[i].ToString()) && chars[i].ToString() != "’" && chars[i].ToString() != "'")
+                {
+                    return chars[i];
+                }
+            }
+
+            return (char)0;
+        }
+
+
+        private void SepPuncs(ref string puncText, ref string puncLowerText, string word, List<string> puncs, string lang)
         {
             ArrayList postPuncs = new ArrayList();
 
@@ -156,7 +150,8 @@ namespace Tokenizer
             puncLowerText = puncLowerText.Trim();
         }
 
-        static bool StartsWithPunc(string word, List<string> puncs)
+
+        private bool StartsWithPunc(string word, List<string> puncs)
         {
             string firstChar = word.Substring(0, 1);
             if (puncs.Contains(firstChar))
@@ -169,7 +164,8 @@ namespace Tokenizer
             }
         }
 
-        static bool StartsWithPunc2(string word, List<string> puncs)
+
+        private bool StartsWithPunc2(string word, List<string> puncs)
         {
             if (word.Length > 1)
             {
@@ -187,7 +183,14 @@ namespace Tokenizer
             return false;
         }
 
-        static bool EndsWithPunc(string word, List<string> puncs)
+
+        private string GetContractedWord(string word, string apostraphe)
+        {
+            return word.Substring(0, word.IndexOf(apostraphe) + 1);
+        }
+
+
+        private bool EndsWithPunc(string word, List<string> puncs)
         {
             string lastChar = word.Substring(word.Length - 1);
             if (puncs.Contains(lastChar))
@@ -200,7 +203,8 @@ namespace Tokenizer
             }
         }
 
-        static bool EndsWithPunc2(string word, List<string> puncs)
+
+        private bool EndsWithPunc2(string word, List<string> puncs)
         {
             if (word.Length > 1)
             {
@@ -216,48 +220,6 @@ namespace Tokenizer
             }
 
             return false;
-        }
-
-        static char FindPunc(string word, List<string> puncs)
-        {
-            Regex r = new Regex("[0-9]+.+[0-9]+");
-            Match m = r.Match(word);
-            if (m.Success)
-            {
-                return (char) 0 ;
-            }
-            char[] chars = word.ToCharArray();
-            for (int i = 1; i < chars.Length - 1; i++) // excluding puncs on the peripheral
-            {
-                if (puncs.Contains(chars[i].ToString()) && chars[i].ToString() != "’" && chars[i].ToString() != "'")
-                {
-                    return chars[i];
-                }
-            }
-
-            return (char) 0;
-        }
-
-        static string GetContractedWord(string word, string apostraphe)
-        {
-            return word.Substring(0, word.IndexOf(apostraphe) + 1);
-        }
-
-        static ArrayList GetWordList(string file)
-        {
-            ArrayList wordList = new ArrayList();
-
-            using (StreamReader sr = new StreamReader(file, Encoding.UTF8))
-            {
-                string line = string.Empty;
-
-                while ((line = sr.ReadLine()) != null)
-                {
-                    wordList.Add(line.Trim());
-                }
-            }
-
-            return wordList;
         }
     }
 }

@@ -11,5 +11,6 @@
     <ProjectReference Include="..\Impl.ResourceService\Impl.ResourceService.csproj" />
     <ProjectReference Include="..\..\Impl.OutputService\Impl.OutputService.csproj" />
     <ProjectReference Include="..\Impl.ImportExportService\Impl.ImportExportService.csproj" />
+    <ProjectReference Include="..\Impl.Segmenter\Impl.Segmenter.csproj" />
   </ItemGroup>
 </Project>
