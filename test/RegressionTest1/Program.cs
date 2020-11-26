@@ -29,7 +29,7 @@ using Alignment2 = ClearBible.Clear3.API.Alignment2;
 using IImportExportService = ClearBible.Clear3.API.IImportExportService;
 
 using ClearBible.Clear3.SubTasks;
-
+using ClearBible.Clear3.API;
 
 namespace RegressionTest1
 {
@@ -142,24 +142,22 @@ namespace RegressionTest1
 
             Console.WriteLine("Tokenizing");
 
+            TargetCorpus targetCorpus =
+                importExportService.ImportTargetCorpusFromLegacy(
+                    versePath,
+                    clearService.DefaultSegmenter,
+                    puncs,
+                    lang);
+
             {
                 StreamWriter sw = new StreamWriter(tokPath, false, Encoding.UTF8);
 
-                using (StreamReader sr = new StreamReader(versePath, Encoding.UTF8))
+                foreach (TargetZone targets in targetCorpus.List)
                 {
-                    string line = string.Empty;
+                    sw.Write("{0}", targets.List[0].TargetID.VerseID.AsCanonicalString);
 
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        if (line.Trim().Length < 9) continue;
-                        string verseID = line.Substring(0, line.IndexOf(" "));
-                        string verseText = line.Substring(line.IndexOf(" ") + 1);
-
-                        string[] segments = clearService.DefaultSegmenter.GetSegments(verseText, puncs, lang);
-                        sw.Write("{0}", verseID);
-                        foreach (string s in segments) sw.Write(" {0}", s);
-                        sw.WriteLine();
-                    }
+                    foreach (Target t in targets.List) sw.Write(" {0}", t.TargetText.Text);
+                    sw.WriteLine();
                 }
 
                 sw.Close();
@@ -169,7 +167,7 @@ namespace RegressionTest1
 
             string versificationPath = common("Versification.xml");
             ArrayList versificationList =
-                Versification.LoadVersificationList(versificationPath,
+                Utilities.Versification.LoadVersificationList(versificationPath,
                 "S1", "id");
 
             string sourcePath = common("source.txt");

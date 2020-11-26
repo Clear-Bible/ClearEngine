@@ -33,7 +33,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             ZoneContext zoneContext = new ZoneContext(
                 GetSourcePoints(treeNode),
-                GetTargetPoints(zoneAlignmentFacts.Targets.List));
+                GetTargetPoints(zoneAlignmentFacts.TargetZone.List));
 
             List<MonoLink> monoLinks =
                 GetMonoLinks(

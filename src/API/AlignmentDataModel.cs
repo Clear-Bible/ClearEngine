@@ -25,11 +25,17 @@ namespace ClearBible.Clear3.API
         TargetText TargetText,
         TargetID TargetID);
 
-    public record Targets(
+
+    public record TargetZone(
         List<Target> List);
 
+
+    public record TargetCorpus(
+        List<TargetZone> List);
+
+
     public record ZoneAlignmentFacts(
-        Targets Targets,
+        TargetZone TargetZone,
         VerseID FirstSourceVerseID,
         VerseID LastSourceVerseID);
 

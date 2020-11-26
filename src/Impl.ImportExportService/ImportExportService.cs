@@ -13,6 +13,46 @@ namespace ClearBible.Clear3.Impl.ImportExportService
 {
     public class ImportExportService : IImportExportService
     {
+        public TargetCorpus ImportTargetCorpusFromLegacy(
+            string path,
+            ISegmenter segmenter,
+            List<string> puncs,
+            string lang)
+        {
+            List<TargetZone> targetsList2 = new();
+
+            using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
+            {
+                string line = string.Empty;
+
+                while ((line = sr.ReadLine()) != null)
+                {
+                    if (line.Trim().Length < 9) continue;
+
+                    string canonicalVerseIDString = line.Substring(0, line.IndexOf(" "));
+
+                    VerseID verseID = new VerseID(canonicalVerseIDString);
+
+                    string verseText = line.Substring(line.IndexOf(" ") + 1);
+
+                    string[] segments = segmenter.GetSegments(verseText, puncs, lang);
+
+                    TargetZone targets = new TargetZone(
+                        segments
+                        .Select((segment, j) =>
+                            new Target(
+                                new TargetText(segment),
+                                new TargetID(verseID, j + 1)))
+                        .ToList());
+
+                    targetsList2.Add(targets);
+                }
+            }
+
+            return new TargetCorpus(targetsList2);
+        }
+
+
         public List<ZoneAlignmentFacts> ImportZoneAlignmentFactsFromLegacy(
             string parallelSourcePath,
             string parallelTargetPath)
@@ -34,8 +74,8 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                         targetStrings = fields(targetLine);
 
                     return new ZoneAlignmentFacts(
-                        Targets:
-                            new Targets(
+                        TargetZone:
+                            new TargetZone(
                                 targetStrings
                                 .Select(s => new Target(
                                     getTargetMorph(s),
