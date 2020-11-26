@@ -54,6 +54,13 @@ namespace ClearBible.Clear3.API
             _tag = $"{book:D2}{chapter:D3}{verse:D3}{word:D3}";
         }
 
+        public TargetID(
+            VerseID verseID,
+            int word)
+        {
+            _tag = $"{verseID.AsCanonicalString}{word:D3}";
+        }
+
         public string AsCanonicalString => _tag;
     }
 
