@@ -204,11 +204,50 @@ namespace RegressionTest1
             string transModelPath = output("transModel.txt");
             string alignModelPath = output("alignModel.txt");
 
+
             Console.WriteLine("Building Models");
-            BuildTransModels.BuildModels(
-                parallelCwSourcePath, parallelCwTargetPath, parallelCwSourceIdPath, parallelCwTargetIdPath,
-                "1:10;H:5", 0.1,
-                transModelPath, alignModelPath);
+            {
+                string workFolderPath = Path.Combine(
+                    Path.GetTempPath(),
+                    Path.GetRandomFileName());
+                Directory.CreateDirectory(workFolderPath);
+
+                string tempPath(string name)
+                    => Path.Combine(workFolderPath, name);
+                string
+                    tempSourcePath = tempPath("source"),
+                    tempTargetPath = tempPath("target"),
+                    tempSourceIdPath = tempPath("sourceId"),
+                    tempTargetIdPath = tempPath("targetId"),
+                    tempTransModelPath = tempPath("transModel"),
+                    tempAlignModelPath = tempPath("alignModel");
+
+                File.Copy(parallelCwSourcePath, tempSourcePath);
+                File.Copy(parallelCwSourceIdPath, tempSourceIdPath);
+                File.Copy(parallelCwTargetPath, tempTargetPath);
+                File.Copy(parallelCwTargetIdPath, tempTargetIdPath);
+
+
+                //BuildTransModels.BuildModels(
+                //    parallelCwSourcePath, parallelCwTargetPath, parallelCwSourceIdPath, parallelCwTargetIdPath,
+                //    "1:10;H:5", 0.1,
+                //    transModelPath, alignModelPath);
+
+                BuildTransModels.BuildModels(
+                    tempSourcePath,
+                    tempTargetPath,
+                    tempSourceIdPath,
+                    tempTargetIdPath,
+                    "1:10;H:5",
+                    0.1,
+                    tempTransModelPath,
+                    tempAlignModelPath);
+
+                File.Copy(tempTransModelPath, transModelPath, true);
+                File.Copy(tempAlignModelPath, alignModelPath, true);
+
+                Directory.Delete(workFolderPath, true);
+            }
 
             Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
