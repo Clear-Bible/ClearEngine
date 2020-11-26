@@ -56,18 +56,6 @@ namespace ParallelFiles
                 string sText = string.Empty;
                 string sTextWithID = string.Empty;
                 string sTextWithIDLemma = string.Empty;
-                string mVersesId = GetVersesID(vp.Mverses);
-
-               
-                if (vp.Mverses.Count > 1 && vp.Tverses.Count > 1 )
-                {
-                    string mVerse = (string)vp.Mverses[0];
-                    string tVerse = (string)vp.Tverses[0];   
-                    if (mVerse.Substring(5) != tVerse.Substring(5))
-                    {
-                        ;
-                    }
-                }
 
                 foreach (string mVerse in vp.Mverses)
                 {
@@ -83,8 +71,6 @@ namespace ParallelFiles
 
                 string tText = string.Empty;
                 string tTextWithID = string.Empty;
-                string tTextLowerWithID = string.Empty;
-                string tVersesId = GetVersesID(vp.Tverses);
 
                 foreach (string tVerse in vp.Tverses)
                 {
@@ -92,7 +78,6 @@ namespace ParallelFiles
                     {
                         tText += (string)targetTable[tVerse] + " ";
                         tTextWithID += (string)targetIdTable[tVerse] + " ";
- //                       tTextLowerWithID += (string)targetLowerIdTable[tVerse] + " ";
                     }
                 }
 
@@ -104,7 +89,6 @@ namespace ParallelFiles
                     swSourceId.WriteLine(sTextWithID.Trim().Replace("  ", " "));
                     swSourceIdLemma.WriteLine(sTextWithIDLemma.Trim().Replace("  ", " "));
                     swTarget.WriteLine(tText.Trim().Replace("  ", " "));
-//                    swTargetLowerId.WriteLine(tTextLowerWithID.Trim().Replace("  ", " "));
                     swTargetId.WriteLine(tTextWithID.Trim().Replace("  ", " "));
                 }
             }
