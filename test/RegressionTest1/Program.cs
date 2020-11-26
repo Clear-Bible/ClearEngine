@@ -167,13 +167,12 @@ namespace RegressionTest1
 
             string versificationPath = common("Versification.xml");
             ArrayList versificationList =
-                Utilities.Versification.LoadVersificationList(versificationPath,
-                "S1", "id");
+                Versification2.LoadVersificationList(versificationPath, "S1");
 
             string sourcePath = common("source.txt");
             string sourceIdPath = common("source.id.txt");
             string sourceIdLemmaPath = common("source.id.lemma.txt");
-            string targetPath = output("target.punc.txt");
+            string targetPath = output("target.punc.txt");  // tokPath
             string parallelSourcePath = output("source.txt");
             string parallelSourceIdPath = output("source.id.txt");
             string parallelSourceIdLemmaPath = output("source.id.lemma.txt");
@@ -181,7 +180,7 @@ namespace RegressionTest1
             string parallelTargetIdPath = output("target.id.txt");
 
             Console.WriteLine("Creating Parallel Files");
-            GroupVerses.CreateParallelFiles(
+            GroupVerses2.CreateParallelFiles(
                 sourcePath, sourceIdPath, sourceIdLemmaPath,
                 targetPath,
                 parallelSourcePath,
