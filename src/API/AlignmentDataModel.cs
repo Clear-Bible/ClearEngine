@@ -8,6 +8,15 @@ namespace ClearBible.Clear3.API
     // Data Model for Alignment
 
 
+    public record SimpleZoneSpec(
+        List<VerseID> SourceVerses,
+        List<VerseID> TargetVerses);
+
+
+    public record SimpleVersification(
+        List<SimpleZoneSpec> List);
+
+
     public record TargetText(string Text);
 
     public record SourceText(string Text);
@@ -21,6 +30,28 @@ namespace ClearBible.Clear3.API
     public record CountThreshold(int Int);
 
 
+    public record Source(
+        SourceText SourceText,
+        Lemma Lemma,
+        SourceID SourceID);
+
+
+    public record SourceVerse(
+        List<Source> List);
+
+
+    public record SourceZone(
+        List<Source> List);
+
+
+    public record SourceVerseCorpus(
+        List<SourceVerse> List);
+
+
+    public record SourceCorpus(
+        List<SourceZone> List);
+
+
     public record Target(
         TargetText TargetText,
         TargetID TargetID);
@@ -30,16 +61,17 @@ namespace ClearBible.Clear3.API
         List<Target> List);
 
 
-    public record TargetVerseCorpus(
-        List<TargetVerse> List);
-
-
     public record TargetZone(
         List<Target> List);
 
 
+    public record TargetVerseCorpus(
+        List<TargetVerse> List);
+
+
     public record TargetCorpus(
         List<TargetZone> List);
+
 
 
     public record ZoneAlignmentFacts(
@@ -53,10 +85,10 @@ namespace ClearBible.Clear3.API
         Dictionary<Lemma, Dictionary<TargetText, Score>> Dictionary);
 
 
-
     public record BareLink(
         SourceID SourceID,
         TargetID TargetID);
+
 
     public record AlignmentModel(
         Dictionary<BareLink, Score> Dictionary);
