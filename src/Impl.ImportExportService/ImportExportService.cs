@@ -13,13 +13,13 @@ namespace ClearBible.Clear3.Impl.ImportExportService
 {
     public class ImportExportService : IImportExportService
     {
-        public TargetCorpus ImportTargetCorpusFromLegacy(
+        public TargetVerseCorpus ImportTargetVerseCorpusFromLegacy(
             string path,
             ISegmenter segmenter,
             List<string> puncs,
             string lang)
         {
-            List<TargetZone> targetsList2 = new();
+            List<TargetVerse> targetsList2 = new();
 
             using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
             {
@@ -37,7 +37,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
 
                     string[] segments = segmenter.GetSegments(verseText, puncs, lang);
 
-                    TargetZone targets = new TargetZone(
+                    TargetVerse targets = new TargetVerse(
                         segments
                         .Select((segment, j) =>
                             new Target(
@@ -49,7 +49,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                 }
             }
 
-            return new TargetCorpus(targetsList2);
+            return new TargetVerseCorpus(targetsList2);
         }
 
 

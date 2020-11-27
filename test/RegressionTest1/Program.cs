@@ -142,8 +142,8 @@ namespace RegressionTest1
 
             Console.WriteLine("Tokenizing");
 
-            TargetCorpus targetCorpus =
-                importExportService.ImportTargetCorpusFromLegacy(
+            TargetVerseCorpus targetVerseCorpus =
+                importExportService.ImportTargetVerseCorpusFromLegacy(
                     versePath,
                     clearService.DefaultSegmenter,
                     puncs,
@@ -152,11 +152,11 @@ namespace RegressionTest1
             {
                 StreamWriter sw = new StreamWriter(tokPath, false, Encoding.UTF8);
 
-                foreach (TargetZone targets in targetCorpus.List)
+                foreach (TargetVerse targetVerse in targetVerseCorpus.List)
                 {
-                    sw.Write("{0}", targets.List[0].TargetID.VerseID.AsCanonicalString);
+                    sw.Write("{0}", targetVerse.List[0].TargetID.VerseID.AsCanonicalString);
 
-                    foreach (Target t in targets.List) sw.Write(" {0}", t.TargetText.Text);
+                    foreach (Target t in targetVerse.List) sw.Write(" {0}", t.TargetText.Text);
                     sw.WriteLine();
                 }
 
@@ -181,8 +181,8 @@ namespace RegressionTest1
 
             Console.WriteLine("Creating Parallel Files");
             GroupVerses2.CreateParallelFiles(
+                targetVerseCorpus,
                 sourcePath, sourceIdPath, sourceIdLemmaPath,
-                targetPath,
                 parallelSourcePath,
                 parallelSourceIdPath, parallelSourceIdLemmaPath,
                 parallelTargetPath, parallelTargetIdPath,

@@ -26,6 +26,14 @@ namespace ClearBible.Clear3.API
         TargetID TargetID);
 
 
+    public record TargetVerse(
+        List<Target> List);
+
+
+    public record TargetVerseCorpus(
+        List<TargetVerse> List);
+
+
     public record TargetZone(
         List<Target> List);
 

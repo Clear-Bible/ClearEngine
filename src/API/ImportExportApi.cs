@@ -5,7 +5,7 @@ namespace ClearBible.Clear3.API
 {
     public interface IImportExportService
     {
-        TargetCorpus ImportTargetCorpusFromLegacy(
+        TargetVerseCorpus ImportTargetVerseCorpusFromLegacy(
             string path,
             ISegmenter segmenter,
             List<string> puncs,
