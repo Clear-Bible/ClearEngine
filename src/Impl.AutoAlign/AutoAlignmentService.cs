@@ -22,7 +22,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     {
         public ZoneMonoAlignment AlignZone(
             ITreeService iTreeService,
-            ZoneAlignmentFacts zoneAlignmentFacts,
+            ZoneAlignmentProblem zoneAlignmentFacts,
             IAutoAlignAssumptions autoAlignAssumptions)
         {
             TreeService treeService = (TreeService)iTreeService;

@@ -19,13 +19,18 @@ namespace ClearBible.Clear3.API
 
     public record TargetText(string Text);
 
+
     public record SourceText(string Text);
+
 
     public record Lemma(string Text);
 
+
     public record Score(double Double);
 
+
     public record Count(int Int);
+
 
     public record CountThreshold(int Int);
 
@@ -42,14 +47,6 @@ namespace ClearBible.Clear3.API
 
     public record SourceZone(
         List<Source> List);
-
-
-    public record SourceVerseCorpus(
-        List<SourceVerse> List);
-
-
-    public record SourceCorpus(
-        List<SourceZone> List);
 
 
     public record Target(
@@ -69,12 +66,18 @@ namespace ClearBible.Clear3.API
         List<TargetVerse> List);
 
 
-    public record TargetCorpus(
-        List<TargetZone> List);
+
+    public record ZonePair(
+        SourceZone SourceZone,
+        TargetZone TargetZone);
+
+
+    public record ParallelCorpora(
+        List<ZonePair> List);
 
 
 
-    public record ZoneAlignmentFacts(
+    public record ZoneAlignmentProblem(
         TargetZone TargetZone,
         VerseID FirstSourceVerseID,
         VerseID LastSourceVerseID);
