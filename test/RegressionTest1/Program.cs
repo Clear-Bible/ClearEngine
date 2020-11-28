@@ -169,12 +169,7 @@ namespace RegressionTest1
                     "S1");
                     
 
-            string sourcePath = common("source.txt");
-            string sourceIdPath = common("source.id.txt");
-            string sourceIdLemmaPath = common("source.id.lemma.txt");
-            string targetPath = output("target.punc.txt");  // tokPath
             string parallelSourcePath = output("source.txt");
-            string parallelSourceIdPath = output("source.id.txt");
             string parallelSourceIdLemmaPath = output("source.id.lemma.txt");
             string parallelTargetPath = output("target.txt");
             string parallelTargetIdPath = output("target.id.txt");
@@ -185,8 +180,9 @@ namespace RegressionTest1
                 treeService,
                 simpleVersification,
                 parallelSourcePath,
-                parallelSourceIdPath, parallelSourceIdLemmaPath,
-                parallelTargetPath, parallelTargetIdPath);
+                parallelSourceIdLemmaPath,
+                parallelTargetPath,
+                parallelTargetIdPath);
 
             List<string> sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
             List<string> targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));

@@ -16,15 +16,13 @@ namespace RegressionTest1
             TargetVerseCorpus targetVerseCorpus,
             ITreeService treeService,
             SimpleVersification simpleVersification,
-            string parallelSourceFile, // source file with grouped verses
-            string parallelSourceIdFile, // source ID file with grouped verses        
+            string parallelSourceFile, // source file with grouped verses     
             string parallelSourceIdLemmaFile, // source ID lemma file with grouped verses         
             string parallelTargetFile, // target file with grouped verses
             string parallelTargetIdFile // target ID file with grouped verses
             )
         {
             StreamWriter swSource = new StreamWriter(parallelSourceFile, false, Encoding.UTF8);
-            StreamWriter swSourceId = new StreamWriter(parallelSourceIdFile, false, Encoding.UTF8);
             StreamWriter swSourceIdLemma = new StreamWriter(parallelSourceIdLemmaFile, false, Encoding.UTF8);
 
             StreamWriter swTarget = new StreamWriter(parallelTargetFile, false, Encoding.UTF8);
@@ -65,10 +63,6 @@ namespace RegressionTest1
                             sources
                             .Select(s => s.Lemma.Text)));
 
-                        swSourceId.WriteLine(string.Join(" ",
-                            sources
-                            .Select(s => $"{s.SourceText.Text}_{s.SourceID.AsCanonicalString}")));
-
                         swSourceIdLemma.WriteLine(string.Join(" ",
                             sources
                             .Select(s => $"{s.Lemma.Text}_{s.SourceID.AsCanonicalString}")));
@@ -85,7 +79,6 @@ namespace RegressionTest1
             }
 
             swSource.Close();
-            swSourceId.Close();
             swSourceIdLemma.Close();
             swTarget.Close();
             swTargetId.Close();
