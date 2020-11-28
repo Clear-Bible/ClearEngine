@@ -105,6 +105,8 @@ namespace RegressionTest1
         public static void CreateParallelFiles(
             TargetVerseCorpus targetVerseCorpus,
             ITreeService treeService,
+            SimpleVersification simpleVersification,
+
             string sourceFile, // original source file
             string sourceIdFile, // original source file with word IDs
             string sourceIdLemmaFile, // original source file in lemmas and with IDs
@@ -137,8 +139,16 @@ namespace RegressionTest1
                     tv => tv.List[0].TargetID.VerseID,
                     tv => tv);
 
-            foreach (VersePair2 vp in versificationList)  // VersePair = { ArrayList MVerses, TVerses }
+            foreach (SimpleZoneSpec zoneSpec in simpleVersification.List)
+            // foreach (VersePair2 vp in versificationList)  // VersePair = { ArrayList MVerses, TVerses }
             {
+                VersePair2 vp = new VersePair2()
+                {
+                    Mverses = new ArrayList(zoneSpec.SourceVerses.Select(id => id.AsCanonicalString).ToList()),
+                    Tverses = new ArrayList(zoneSpec.TargetVerses.Select(id => id.AsCanonicalString).ToList())
+                };
+
+
                 string sText = string.Empty;
                 string sTextWithID = string.Empty;
                 string sTextWithIDLemma = string.Empty;
