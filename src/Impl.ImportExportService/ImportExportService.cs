@@ -8,6 +8,10 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
 using ClearBible.Clear3.API;
+using ClearBible.Clear3.Miscellaneous;
+
+using System.Xml.Linq;
+using System.Diagnostics;
 
 namespace ClearBible.Clear3.Impl.ImportExportService
 {
@@ -471,6 +475,74 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             }
 
             return strongTable;
+        }
+
+
+        public SimpleVersification ImportSimpleVersificationFromLegacy(
+            string path,
+            string versificationType)
+        {
+            XElement legacyVersification = XElement.Load(path);
+
+            List<VerseID>
+                currentSourceVerses = new(),
+                currentTargetVerses = new();
+
+            List<SimpleZoneSpec> specs = new();
+
+            void step()
+            {
+                if (currentSourceVerses.Any() ||
+                    currentTargetVerses.Any())
+                {
+                    specs.Add(
+                        new SimpleZoneSpec(
+                            currentSourceVerses,
+                            currentTargetVerses));
+
+                    currentSourceVerses = new();
+                    currentTargetVerses = new();
+                }
+            }
+
+            foreach(XElement entry in
+                legacyVersification.Elements()
+                .First(e =>
+                    e.Name.LocalName == "Type" &&
+                    e.Attribute("Switch").Value == versificationType)
+                .Elements())
+            {
+                int mb = entry.AttrAsInt("MB");
+                int mc = entry.AttrAsInt("MC");
+                int mv = entry.AttrAsInt("MV");
+                int tb = entry.AttrAsInt("TB");
+                int tc = entry.AttrAsInt("TC");
+                int tv = entry.AttrAsInt("TV");
+
+                VerseID
+                    sourceVerse = new VerseID(mb, mc, mv),
+                    targetVerse = new VerseID(tb, tc, tv);
+
+                if (currentSourceVerses.Contains(sourceVerse))
+                {
+                    currentTargetVerses.Add(targetVerse);
+                }
+                else if (currentTargetVerses.Contains(targetVerse))
+                {
+                    currentSourceVerses.Add(sourceVerse);
+                }
+                else
+                {
+                    step();
+
+                    currentSourceVerses.Add(sourceVerse);
+                    currentTargetVerses.Add(targetVerse);
+                }
+            }
+
+            step();
+
+            return new SimpleVersification(specs);
         }
     }
 }

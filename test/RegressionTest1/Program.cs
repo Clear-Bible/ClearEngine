@@ -169,6 +169,30 @@ namespace RegressionTest1
             ArrayList versificationList =
                 Versification2.LoadVersificationList(versificationPath, "S1");
 
+            SimpleVersification simpleVersification =
+                importExportService.ImportSimpleVersificationFromLegacy(
+                    common("Versification.xml"),
+                    "S1");
+
+            //var uhoh =
+            //    versificationList.Cast<VersePair2>()
+            //    .Zip(simpleVersification.List, (a, b) => 
+            //    {
+            //        var aSources = a.Mverses.Cast<string>().ToHashSet();
+            //        var bSources = b.SourceVerses.Select(x => x.AsCanonicalString).ToHashSet();
+            //        var aTargets = a.Tverses.Cast<string>().ToHashSet();
+            //        var bTargets = b.TargetVerses.Select(x => x.AsCanonicalString).ToHashSet();
+            //        return new
+            //        {
+            //            flag1 = !aSources.SetEquals(bSources),
+            //            flag2 = !aTargets.SetEquals(bTargets),
+            //            a,
+            //            b
+            //        };           
+            //    })
+            //    .FirstOrDefault(x => x.flag1 || x.flag2);
+                    
+
             string sourcePath = common("source.txt");
             string sourceIdPath = common("source.id.txt");
             string sourceIdLemmaPath = common("source.id.lemma.txt");
