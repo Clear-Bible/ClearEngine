@@ -15,20 +15,9 @@ namespace RegressionTest1
         public static ParallelCorpora CreateParallelFiles(
             TargetVerseCorpus targetVerseCorpus,
             ITreeService treeService,
-            SimpleVersification simpleVersification,
-            string parallelSourceFile, // source file with grouped verses     
-            string parallelSourceIdLemmaFile, // source ID lemma file with grouped verses         
-            string parallelTargetFile, // target file with grouped verses
-            string parallelTargetIdFile // target ID file with grouped verses
-            )
+            SimpleVersification simpleVersification)
         {
             List<ZonePair> zonePairs = new();
-
-            StreamWriter swSource = new StreamWriter(parallelSourceFile, false, Encoding.UTF8);
-            StreamWriter swSourceIdLemma = new StreamWriter(parallelSourceIdLemmaFile, false, Encoding.UTF8);
-
-            StreamWriter swTarget = new StreamWriter(parallelTargetFile, false, Encoding.UTF8);
-            StreamWriter swTargetId = new StreamWriter(parallelTargetIdFile, false, Encoding.UTF8);
 
             Dictionary<VerseID, TargetVerse> targetVerseTable =
                 targetVerseCorpus.List
@@ -61,22 +50,6 @@ namespace RegressionTest1
 
                     if (sources.Any())
                     {
-                        swSource.WriteLine(string.Join(" ",
-                            sources
-                            .Select(s => s.Lemma.Text)));
-
-                        swSourceIdLemma.WriteLine(string.Join(" ",
-                            sources
-                            .Select(s => $"{s.Lemma.Text}_{s.SourceID.AsCanonicalString}")));
-
-                        swTarget.WriteLine(string.Join(" ",
-                            targets
-                            .Select(t => t.TargetText.Text.ToLower())));
-
-                        swTargetId.WriteLine(string.Join(" ",
-                            targets
-                            .Select(t => $"{t.TargetText.Text}_{t.TargetID.AsCanonicalString}")));
-
                         zonePairs.Add(
                             new ZonePair(
                                 new SourceZone(sources),
@@ -84,11 +57,6 @@ namespace RegressionTest1
                     }                   
                 }
             }
-
-            swSource.Close();
-            swSourceIdLemma.Close();
-            swTarget.Close();
-            swTargetId.Close();
 
             return new ParallelCorpora(zonePairs);
         }

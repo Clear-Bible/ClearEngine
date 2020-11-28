@@ -137,7 +137,6 @@ namespace RegressionTest1
 
 
             string versePath = input("Verse.txt");
-            string tokPath = output("target.punc.txt");
             string lang = "English";
 
             Console.WriteLine("Tokenizing");
@@ -149,40 +148,17 @@ namespace RegressionTest1
                     puncs,
                     lang);
 
-            {
-                StreamWriter sw = new StreamWriter(tokPath, false, Encoding.UTF8);
-
-                foreach (TargetVerse targetVerse in targetVerseCorpus.List)
-                {
-                    sw.Write("{0}", targetVerse.List[0].TargetID.VerseID.AsCanonicalString);
-
-                    foreach (Target t in targetVerse.List) sw.Write(" {0}", t.TargetText.Text);
-                    sw.WriteLine();
-                }
-
-                sw.Close();
-            }
-
             SimpleVersification simpleVersification =
                 importExportService.ImportSimpleVersificationFromLegacy(
                     common("Versification.xml"),
                     "S1");
                     
 
-            string parallelSourcePath = output("source.txt");
-            string parallelSourceIdLemmaPath = output("source.id.lemma.txt");
-            string parallelTargetPath = output("target.txt");
-            string parallelTargetIdPath = output("target.id.txt");
-
             Console.WriteLine("Creating Parallel Files");
             ParallelCorpora parallelCorpora = GroupVerses2.CreateParallelFiles(
                 targetVerseCorpus,
                 treeService,
-                simpleVersification,
-                parallelSourcePath,
-                parallelSourceIdLemmaPath,
-                parallelTargetPath,
-                parallelTargetIdPath);
+                simpleVersification);
 
             List<string> sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
             List<string> targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
@@ -292,11 +268,6 @@ namespace RegressionTest1
             Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
             string jsonOutput = output("alignment.json");
-
-            //List<ZoneAlignmentProblem> zoneAlignmentProblems =
-            //    importExportService.ImportZoneAlignmentFactsFromLegacy(
-            //        parallelSourceIdLemmaPath,
-            //        parallelTargetIdPath);
 
             List<ZoneAlignmentProblem> zoneAlignmentProblems =
                 parallelCorpora.List
