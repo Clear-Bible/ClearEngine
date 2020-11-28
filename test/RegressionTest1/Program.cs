@@ -175,7 +175,7 @@ namespace RegressionTest1
             string parallelTargetIdPath = output("target.id.txt");
 
             Console.WriteLine("Creating Parallel Files");
-            GroupVerses2.CreateParallelFiles(
+            ParallelCorpora parallelCorpora = GroupVerses2.CreateParallelFiles(
                 targetVerseCorpus,
                 treeService,
                 simpleVersification,
@@ -196,6 +196,60 @@ namespace RegressionTest1
             Data.FilterOutFunctionWords(parallelSourceIdLemmaPath, parallelCwSourceIdPath, sourceFuncWords);
             Data.FilterOutFunctionWords(parallelTargetPath, parallelCwTargetPath, targetFuncWords);
             Data.FilterOutFunctionWords(parallelTargetIdPath, parallelCwTargetIdPath, targetFuncWords);
+
+            ParallelCorpora parallelCorporaCW =
+                new ParallelCorpora(
+                    parallelCorpora.List
+                    .Select(zonePair =>
+                        new ZonePair(
+                            new SourceZone(
+                                zonePair.SourceZone.List
+                                .Where(source => !sourceFuncWords.Contains(source.Lemma.Text))
+                                .ToList()),
+                            new TargetZone(
+                                zonePair.TargetZone.List
+                                .Where(target => !targetFuncWords.Contains(target.TargetText.Text.ToLower()))
+                                .ToList())))
+                    .ToList());
+
+            var uhoh1 =
+                File.ReadLines(parallelCwSourcePath)
+                .Zip(parallelCorporaCW.List, (line, zonePair) =>
+                {
+                    string line2 = string.Join(" ", zonePair.SourceZone.List.Select(s => s.Lemma.Text));
+                    return new { line, line2, flag = line != line2 };
+                })
+                .FirstOrDefault(x => x.flag);
+
+            var uhoh2 =
+                File.ReadLines(parallelCwSourceIdPath)
+                .Zip(parallelCorporaCW.List, (line, zonePair) =>
+                {
+                    string line2 = string.Join(" ",
+                        zonePair.SourceZone.List.Select(s => $"{s.Lemma.Text}_{s.SourceID.AsCanonicalString}"));
+                    return new { line, line2, flag = line != line2 };
+                })
+                .FirstOrDefault(x => x.flag);
+
+            var uhoh3 =
+                File.ReadLines(parallelCwTargetPath)
+                .Zip(parallelCorporaCW.List, (line, zonePair) =>
+                {
+                    string line2 = string.Join(" ", zonePair.TargetZone.List.Select(t => t.TargetText.Text.ToLower()));
+                    return new { line, line2, flag = line != line2 };
+                })
+                .FirstOrDefault(x => x.flag);
+
+            var uhoh4 =
+                File.ReadLines(parallelCwTargetIdPath)
+                .Zip(parallelCorporaCW.List, (line, zonePair) =>
+                {
+                    string line2 = string.Join(" ",
+                        zonePair.TargetZone.List.Select(t => $"{t.TargetText.Text.ToLower()}_{t.TargetID.AsCanonicalString}"));
+                    return new { line, line2, flag = line != line2 };
+                })
+                .FirstOrDefault(x => x.flag);
+
 
             string transModelPath = output("transModel.txt");
             string alignModelPath = output("alignModel.txt");
@@ -294,10 +348,19 @@ namespace RegressionTest1
 
             string jsonOutput = output("alignment.json");
 
-            List<ZoneAlignmentProblem> zoneAlignmentFactsList =
-                importExportService.ImportZoneAlignmentFactsFromLegacy(
-                    parallelSourceIdLemmaPath,
-                    parallelTargetIdPath);
+            //List<ZoneAlignmentProblem> zoneAlignmentProblems =
+            //    importExportService.ImportZoneAlignmentFactsFromLegacy(
+            //        parallelSourceIdLemmaPath,
+            //        parallelTargetIdPath);
+
+            List<ZoneAlignmentProblem> zoneAlignmentProblems =
+                parallelCorpora.List
+                .Select(zonePair =>
+                    new ZoneAlignmentProblem(
+                        zonePair.TargetZone,
+                        zonePair.SourceZone.List.First().SourceID.VerseID,
+                        zonePair.SourceZone.List.Last().SourceID.VerseID))
+                .ToList();
 
             TranslationModel transModel2 =
                 importExportService.ImportTranslationModel(transModelPath);
@@ -335,7 +398,7 @@ namespace RegressionTest1
 
             Alignment2 alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
-                    zoneAlignmentFactsList,
+                    zoneAlignmentProblems,
                     treeService,
                     glossTable,
                     assumptions);
