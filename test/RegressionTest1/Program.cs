@@ -163,34 +163,10 @@ namespace RegressionTest1
                 sw.Close();
             }
 
-
-
-            string versificationPath = common("Versification.xml");
-            ArrayList versificationList =
-                Versification2.LoadVersificationList(versificationPath, "S1");
-
             SimpleVersification simpleVersification =
                 importExportService.ImportSimpleVersificationFromLegacy(
                     common("Versification.xml"),
                     "S1");
-
-            //var uhoh =
-            //    versificationList.Cast<VersePair2>()
-            //    .Zip(simpleVersification.List, (a, b) => 
-            //    {
-            //        var aSources = a.Mverses.Cast<string>().ToHashSet();
-            //        var bSources = b.SourceVerses.Select(x => x.AsCanonicalString).ToHashSet();
-            //        var aTargets = a.Tverses.Cast<string>().ToHashSet();
-            //        var bTargets = b.TargetVerses.Select(x => x.AsCanonicalString).ToHashSet();
-            //        return new
-            //        {
-            //            flag1 = !aSources.SetEquals(bSources),
-            //            flag2 = !aTargets.SetEquals(bTargets),
-            //            a,
-            //            b
-            //        };           
-            //    })
-            //    .FirstOrDefault(x => x.flag1 || x.flag2);
                     
 
             string sourcePath = common("source.txt");
@@ -211,8 +187,7 @@ namespace RegressionTest1
                 sourcePath, sourceIdPath, sourceIdLemmaPath,
                 parallelSourcePath,
                 parallelSourceIdPath, parallelSourceIdLemmaPath,
-                parallelTargetPath, parallelTargetIdPath,
-                versificationList);
+                parallelTargetPath, parallelTargetIdPath);
 
             List<string> sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
             List<string> targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
