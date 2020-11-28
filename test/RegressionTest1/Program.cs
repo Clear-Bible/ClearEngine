@@ -182,6 +182,7 @@ namespace RegressionTest1
             Console.WriteLine("Creating Parallel Files");
             GroupVerses2.CreateParallelFiles(
                 targetVerseCorpus,
+                treeService,
                 sourcePath, sourceIdPath, sourceIdLemmaPath,
                 parallelSourcePath,
                 parallelSourceIdPath, parallelSourceIdLemmaPath,
@@ -197,7 +198,7 @@ namespace RegressionTest1
             string parallelCwTargetIdPath = output("targetFile.id.cw.txt");
 
             Data.FilterOutFunctionWords(parallelSourcePath, parallelCwSourcePath, sourceFuncWords);
-            Data.FilterOutFunctionWords(parallelSourceIdPath, parallelCwSourceIdPath, sourceFuncWords);
+            Data.FilterOutFunctionWords(parallelSourceIdLemmaPath, parallelCwSourceIdPath, sourceFuncWords);
             Data.FilterOutFunctionWords(parallelTargetPath, parallelCwTargetPath, targetFuncWords);
             Data.FilterOutFunctionWords(parallelTargetIdPath, parallelCwTargetIdPath, targetFuncWords);
 
@@ -223,9 +224,54 @@ namespace RegressionTest1
                     tempAlignModelPath = tempPath("alignModel");
 
                 File.Copy(parallelCwSourcePath, tempSourcePath);
-                File.Copy(parallelCwSourceIdPath, tempSourceIdPath);
+
+                //File.Copy(parallelCwSourceIdPath, tempSourceIdPath);
+                {
+                    using (StreamWriter sw =
+                        new StreamWriter(tempSourceIdPath, false, Encoding.UTF8))
+                    {
+                        foreach (string transformedLine in
+                            File.ReadLines(parallelCwSourceIdPath)
+                            .Select(line =>
+                                string.Join(" ",
+                                    line.Split(" ")
+                                    .Where(field => !string.IsNullOrWhiteSpace(field))
+                                    .Select(field =>
+                                    {
+                                        int n = field.LastIndexOf("_");
+                                        string id = field.Substring(n + 1);
+                                        return $"x_{id}";
+                                    }))))
+                        {
+                            sw.WriteLine(transformedLine);
+                        }
+                    }
+                }
+
                 File.Copy(parallelCwTargetPath, tempTargetPath);
+
                 File.Copy(parallelCwTargetIdPath, tempTargetIdPath);
+                //{
+                //    using (StreamWriter sw =
+                //        new StreamWriter(tempTargetIdPath, false, Encoding.UTF8))
+                //    {
+                //        foreach (string transformedLine in
+                //            File.ReadLines(parallelCwTargetIdPath)
+                //            .Select(line =>
+                //                string.Join(" ",
+                //                    line.Split(" ")
+                //                    .Where(field => !string.IsNullOrWhiteSpace(field))
+                //                    .Select(field =>
+                //                    {
+                //                        int n = field.LastIndexOf("_");
+                //                        string id = field.Substring(n + 1);
+                //                        return $"x_{id}";
+                //                    }))))
+                //        {
+                //            sw.WriteLine(transformedLine);
+                //        }
+                //    }
+                //}
 
 
                 //BuildTransModels.BuildModels(
