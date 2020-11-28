@@ -187,16 +187,6 @@ namespace RegressionTest1
             List<string> sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
             List<string> targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
 
-            string parallelCwSourcePath = output("sourceFile.cw.txt");
-            string parallelCwSourceIdPath = output("sourceFile.id.cw.txt");
-            string parallelCwTargetPath = output("targetFile.cw.txt");
-            string parallelCwTargetIdPath = output("targetFile.id.cw.txt");
-
-            Data.FilterOutFunctionWords(parallelSourcePath, parallelCwSourcePath, sourceFuncWords);
-            Data.FilterOutFunctionWords(parallelSourceIdLemmaPath, parallelCwSourceIdPath, sourceFuncWords);
-            Data.FilterOutFunctionWords(parallelTargetPath, parallelCwTargetPath, targetFuncWords);
-            Data.FilterOutFunctionWords(parallelTargetIdPath, parallelCwTargetIdPath, targetFuncWords);
-
             ParallelCorpora parallelCorporaCW =
                 new ParallelCorpora(
                     parallelCorpora.List
@@ -211,44 +201,6 @@ namespace RegressionTest1
                                 .Where(target => !targetFuncWords.Contains(target.TargetText.Text.ToLower()))
                                 .ToList())))
                     .ToList());
-
-            var uhoh1 =
-                File.ReadLines(parallelCwSourcePath)
-                .Zip(parallelCorporaCW.List, (line, zonePair) =>
-                {
-                    string line2 = string.Join(" ", zonePair.SourceZone.List.Select(s => s.Lemma.Text));
-                    return new { line, line2, flag = line != line2 };
-                })
-                .FirstOrDefault(x => x.flag);
-
-            var uhoh2 =
-                File.ReadLines(parallelCwSourceIdPath)
-                .Zip(parallelCorporaCW.List, (line, zonePair) =>
-                {
-                    string line2 = string.Join(" ",
-                        zonePair.SourceZone.List.Select(s => $"{s.Lemma.Text}_{s.SourceID.AsCanonicalString}"));
-                    return new { line, line2, flag = line != line2 };
-                })
-                .FirstOrDefault(x => x.flag);
-
-            var uhoh3 =
-                File.ReadLines(parallelCwTargetPath)
-                .Zip(parallelCorporaCW.List, (line, zonePair) =>
-                {
-                    string line2 = string.Join(" ", zonePair.TargetZone.List.Select(t => t.TargetText.Text.ToLower()));
-                    return new { line, line2, flag = line != line2 };
-                })
-                .FirstOrDefault(x => x.flag);
-
-            var uhoh4 =
-                File.ReadLines(parallelCwTargetIdPath)
-                .Zip(parallelCorporaCW.List, (line, zonePair) =>
-                {
-                    string line2 = string.Join(" ",
-                        zonePair.TargetZone.List.Select(t => $"{t.TargetText.Text.ToLower()}_{t.TargetID.AsCanonicalString}"));
-                    return new { line, line2, flag = line != line2 };
-                })
-                .FirstOrDefault(x => x.flag);
 
 
             string transModelPath = output("transModel.txt");
@@ -272,61 +224,54 @@ namespace RegressionTest1
                     tempTransModelPath = tempPath("transModel"),
                     tempAlignModelPath = tempPath("alignModel");
 
-                File.Copy(parallelCwSourcePath, tempSourcePath);
-
-                //File.Copy(parallelCwSourceIdPath, tempSourceIdPath);
                 {
                     using (StreamWriter sw =
-                        new StreamWriter(tempSourceIdPath, false, Encoding.UTF8))
+                        new StreamWriter(tempSourcePath, false, Encoding.UTF8))
                     {
-                        foreach (string transformedLine in
-                            File.ReadLines(parallelCwSourceIdPath)
-                            .Select(line =>
-                                string.Join(" ",
-                                    line.Split(" ")
-                                    .Where(field => !string.IsNullOrWhiteSpace(field))
-                                    .Select(field =>
-                                    {
-                                        int n = field.LastIndexOf("_");
-                                        string id = field.Substring(n + 1);
-                                        return $"x_{id}";
-                                    }))))
+                        foreach (ZonePair zp in parallelCorporaCW.List)
                         {
-                            sw.WriteLine(transformedLine);
+                            sw.WriteLine(string.Join(" ",
+                                zp.SourceZone.List.Select(s => s.Lemma.Text)));
                         }
                     }
                 }
 
-                File.Copy(parallelCwTargetPath, tempTargetPath);
+                {
+                    using (StreamWriter sw =
+                        new StreamWriter(tempSourceIdPath, false, Encoding.UTF8))
+                    {
+                        foreach (ZonePair zp in parallelCorporaCW.List)
+                        {
+                            sw.WriteLine(string.Join(" ",
+                                zp.SourceZone.List.Select(s => $"x_{s.SourceID.AsCanonicalString}")));
+                        }
+                    }
+                }
 
-                File.Copy(parallelCwTargetIdPath, tempTargetIdPath);
-                //{
-                //    using (StreamWriter sw =
-                //        new StreamWriter(tempTargetIdPath, false, Encoding.UTF8))
-                //    {
-                //        foreach (string transformedLine in
-                //            File.ReadLines(parallelCwTargetIdPath)
-                //            .Select(line =>
-                //                string.Join(" ",
-                //                    line.Split(" ")
-                //                    .Where(field => !string.IsNullOrWhiteSpace(field))
-                //                    .Select(field =>
-                //                    {
-                //                        int n = field.LastIndexOf("_");
-                //                        string id = field.Substring(n + 1);
-                //                        return $"x_{id}";
-                //                    }))))
-                //        {
-                //            sw.WriteLine(transformedLine);
-                //        }
-                //    }
-                //}
+                {
+                    using (StreamWriter sw =
+                        new StreamWriter(tempTargetPath, false, Encoding.UTF8))
+                    {
+                        foreach (ZonePair zp in parallelCorporaCW.List)
+                        {
+                            sw.WriteLine(string.Join(" ",
+                                zp.TargetZone.List.Select(t => t.TargetText.Text.ToLower())));
+                        }
+                    }
+                }
 
+                {
+                    using (StreamWriter sw =
+                        new StreamWriter(tempTargetIdPath, false, Encoding.UTF8))
+                    {
+                        foreach (ZonePair zp in parallelCorporaCW.List)
+                        {
+                            sw.WriteLine(string.Join(" ",
+                                zp.TargetZone.List.Select(t => $"x_{t.TargetID.AsCanonicalString}")));
+                        }
+                    }
+                }
 
-                //BuildTransModels.BuildModels(
-                //    parallelCwSourcePath, parallelCwTargetPath, parallelCwSourceIdPath, parallelCwTargetIdPath,
-                //    "1:10;H:5", 0.1,
-                //    transModelPath, alignModelPath);
 
                 BuildTransModels.BuildModels(
                     tempSourcePath,
