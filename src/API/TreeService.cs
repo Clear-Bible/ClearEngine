@@ -5,12 +5,12 @@ namespace ClearBible.Clear3.API
 {
     
     /// <summary>
-    /// As far as the API is concerned, a tree service is a completely
+    /// As far as the API is concerned, a tree service is a mostly
     /// abstract datum right now.
     /// </summary>
     /// 
     public interface ITreeService
     {
-
+        SourceVerse GetSourceVerse(VerseID verseID);
     }
 }

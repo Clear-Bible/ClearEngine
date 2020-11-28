@@ -104,6 +104,7 @@ namespace RegressionTest1
 
         public static void CreateParallelFiles(
             TargetVerseCorpus targetVerseCorpus,
+            ITreeService treeService,
             string sourceFile, // original source file
             string sourceIdFile, // original source file with word IDs
             string sourceIdLemmaFile, // original source file in lemmas and with IDs
@@ -172,6 +173,23 @@ namespace RegressionTest1
 
                         tText += verseText + " ";
                         tTextWithID += verseIDText + " ";
+                    }
+                }
+
+                if (tText != "")
+                {
+                    SourceVerse sourceVerse = treeService.GetSourceVerse(new VerseID((string)vp.Mverses[0]));
+
+                    string verseText = string.Join(" ",
+                        sourceVerse.List.Select(s => s.Lemma.Text));
+
+                    string verseIDText = string.Join(" ",
+                        sourceVerse.List.Select(s =>
+                            $"{s.SourceText.Text}_{s.SourceID.AsCanonicalString}"));
+
+                    if (verseIDText != sTextWithID.Trim())
+                    {
+                        ;
                     }
                 }
 

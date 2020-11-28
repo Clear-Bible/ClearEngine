@@ -263,6 +263,34 @@ namespace ClearBible.Clear3.Impl.TreeService
                     new XAttribute("Length", totalLength.ToString()),
                     subTrees);
         }
+
+
+        public SourceVerse GetSourceVerse(VerseID verseID)
+        {
+            PreloadTreesForChapter(verseID.ChapterID);
+
+            return new SourceVerse(
+                GetChapterSubrange(
+                    verseID.Book,
+                    verseID.Chapter,
+                    startVerse: verseID.Verse,
+                    endVerse: verseID.Verse)
+                .SelectMany(treeNode =>
+                    treeNode.Descendants()
+                    .Where(e => e.FirstNode is XText)
+                    .Select(e => new
+                    {
+                        text = e.Surface(),
+                        lemma = e.Lemma(),
+                        sourceID = e.SourceID()
+                    }))
+                .OrderBy(x => x.sourceID.AsCanonicalString)
+                .Select(x => new Source(
+                    new SourceText(x.text),
+                    new Lemma(x.lemma),
+                    x.sourceID))
+                .ToList());
+        }
     }
 
 
