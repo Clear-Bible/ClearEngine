@@ -12,7 +12,7 @@ namespace RegressionTest1
 {
     public class GroupVerses2
     {
-        public static void CreateParallelFiles(
+        public static ParallelCorpora CreateParallelFiles(
             TargetVerseCorpus targetVerseCorpus,
             ITreeService treeService,
             SimpleVersification simpleVersification,
@@ -22,6 +22,8 @@ namespace RegressionTest1
             string parallelTargetIdFile // target ID file with grouped verses
             )
         {
+            List<ZonePair> zonePairs = new();
+
             StreamWriter swSource = new StreamWriter(parallelSourceFile, false, Encoding.UTF8);
             StreamWriter swSourceIdLemma = new StreamWriter(parallelSourceIdLemmaFile, false, Encoding.UTF8);
 
@@ -74,6 +76,11 @@ namespace RegressionTest1
                         swTargetId.WriteLine(string.Join(" ",
                             targets
                             .Select(t => $"{t.TargetText.Text}_{t.TargetID.AsCanonicalString}")));
+
+                        zonePairs.Add(
+                            new ZonePair(
+                                new SourceZone(sources),
+                                new TargetZone(targets)));
                     }                   
                 }
             }
@@ -82,6 +89,8 @@ namespace RegressionTest1
             swSourceIdLemma.Close();
             swTarget.Close();
             swTargetId.Close();
+
+            return new ParallelCorpora(zonePairs);
         }
     }
 }
