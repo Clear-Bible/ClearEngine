@@ -11,6 +11,10 @@ namespace ClearBible.Clear3.API
             List<string> puncs,
             string lang);
 
+        SimpleVersification ImportSimpleVersificationFromLegacy(
+            string path,
+            string versificationType);
+
         TranslationModel ImportTranslationModel(
             string filePath);
 
