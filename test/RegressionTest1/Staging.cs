@@ -140,16 +140,7 @@ namespace RegressionTest1
 
             foreach (SimpleZoneSpec zoneSpec in simpleVersification.List)
             {
-                VersePair2 vp = new VersePair2()
-                {
-                    Mverses = new ArrayList(zoneSpec.SourceVerses.Select(id => id.AsCanonicalString).ToList()),
-                    Tverses = new ArrayList(zoneSpec.TargetVerses.Select(id => id.AsCanonicalString).ToList())
-                };
-
                 List<Target> targets = new();
-
-                // string tText = string.Empty;
-                // string tTextWithID = string.Empty;
 
                 foreach (VerseID tVerseID in zoneSpec.TargetVerses)
                 {
@@ -157,79 +148,39 @@ namespace RegressionTest1
                         out TargetVerse targetVerse))
                     {
                         targets.AddRange(targetVerse.List);
-                        //string verseText = string.Join(" ",
-                        //    targetVerse.List.Select(t =>
-                        //        t.TargetText.Text.ToLower()));
-
-                        //string verseIDText = string.Join(" ",
-                        //    targetVerse.List.Select(t =>
-                        //        $"{t.TargetText.Text}_{t.TargetID.AsCanonicalString}"));
-
-                        //tText += verseText + " ";
-                        //tTextWithID += verseIDText + " ";
                     }
                 }
 
-                // if (tText != string.Empty)
                 if (targets.Any())
                 {
-                    string sText = string.Empty;
-                    string sTextWithID = string.Empty;
-                    string sTextWithIDLemma = string.Empty;
+                    List<Source> sources = new();
 
                     foreach (VerseID mVerseID in zoneSpec.SourceVerses)
                     {
-                        string mVerse = mVerseID.AsCanonicalString;
-                        if (sourceTable.ContainsKey(mVerse))
-                        {
-                            sText += (string)sourceTable[mVerse] + " ";
-                            sTextWithID += (string)sourceIdTable[mVerse] + " ";
-                            sTextWithIDLemma += (string)sourceIdLemmaTable[mVerse] + " ";
-                        }
+                        sources.AddRange(treeService.GetSourceVerse(mVerseID).List);
                     }
 
-                    if (sText != string.Empty)
+                    if (sources.Any())
                     {
-                        //if (tText != "")
-                        //{
-                        //    SourceVerse sourceVerse = treeService.GetSourceVerse(new VerseID((string)vp.Mverses[0]));
+                        swSource.WriteLine(string.Join(" ",
+                            sources
+                            .Select(s => s.Lemma.Text)));
 
-                        //    string verseText = string.Join(" ",
-                        //        sourceVerse.List.Select(s => s.Lemma.Text));
+                        swSourceId.WriteLine(string.Join(" ",
+                            sources
+                            .Select(s => $"{s.SourceText.Text}_{s.SourceID.AsCanonicalString}")));
 
-                        //    string verseIDText = string.Join(" ",
-                        //        sourceVerse.List.Select(s =>
-                        //            $"{s.SourceText.Text}_{s.SourceID.AsCanonicalString}"));
+                        swSourceIdLemma.WriteLine(string.Join(" ",
+                            sources
+                            .Select(s => $"{s.Lemma.Text}_{s.SourceID.AsCanonicalString}")));
 
-                        //    if (verseIDText != sTextWithID.Trim())
-                        //    {
-                        //        ;
-                        //    }
-                        //}
+                        swTarget.WriteLine(string.Join(" ",
+                            targets
+                            .Select(t => t.TargetText.Text.ToLower())));
 
-
-                        if (sText.Trim().Length > 1
-                            // && tText.Trim().Length > 1
-                            )
-                        {
-                            swSource.WriteLine(sText.Trim().Replace("  ", " "));
-                            swSourceId.WriteLine(sTextWithID.Trim().Replace("  ", " "));
-                            swSourceIdLemma.WriteLine(sTextWithIDLemma.Trim().Replace("  ", " "));
-
-                            //string verseText = string.Join(" ",
-                            //    targetVerse.List.Select(t =>
-                            //        t.TargetText.Text.ToLower()));
-
-                            //swTarget.WriteLine(tText.Trim().Replace("  ", " "));
-                            swTarget.WriteLine(string.Join(" ",
-                                targets
-                                .Select(t => t.TargetText.Text.ToLower())));
-
-                            //swTargetId.WriteLine(tTextWithID.Trim().Replace("  ", " "));
-                            swTargetId.WriteLine(string.Join(" ",
-                                targets
-                                .Select(t => $"{t.TargetText.Text}_{t.TargetID.AsCanonicalString}")));
-                        }
+                        swTargetId.WriteLine(string.Join(" ",
+                            targets
+                            .Select(t => $"{t.TargetText.Text}_{t.TargetID.AsCanonicalString}")));
                     }                   
                 }
             }
