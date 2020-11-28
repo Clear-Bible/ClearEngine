@@ -184,7 +184,6 @@ namespace RegressionTest1
                 targetVerseCorpus,
                 treeService,
                 simpleVersification,
-                sourcePath, sourceIdPath, sourceIdLemmaPath,
                 parallelSourcePath,
                 parallelSourceIdPath, parallelSourceIdLemmaPath,
                 parallelTargetPath, parallelTargetIdPath);
