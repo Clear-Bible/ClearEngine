@@ -80,7 +80,7 @@ namespace RegressionTest3
 
             // Import translation pairs from a file.
 
-            List<ZoneAlignmentFacts> zoneAlignmentFactsList =
+            List<ZoneAlignmentProblem> zoneAlignmentFactsList =
                 importExportService.ImportZoneAlignmentFactsFromLegacy(
                     parallelSourcePath: InPath("source.id.lemma.txt"),
                     parallelTargetPath: InPath("target.id.txt"));

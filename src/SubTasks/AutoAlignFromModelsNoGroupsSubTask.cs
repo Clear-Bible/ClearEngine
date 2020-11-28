@@ -11,7 +11,7 @@ namespace ClearBible.Clear3.SubTasks
     public class AutoAlignFromModelsNoGroupsSubTask
     {
         public static Alignment2 Run(
-            List<ZoneAlignmentFacts> zoneAlignmentFactsList,
+            List<ZoneAlignmentProblem> zoneAlignmentFactsList,
             ITreeService treeService,
             Dictionary<string, Gloss> glossTable,
             IAutoAlignAssumptions assumptions)
