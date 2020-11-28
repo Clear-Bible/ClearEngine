@@ -207,6 +207,7 @@ namespace RegressionTest1
             GroupVerses2.CreateParallelFiles(
                 targetVerseCorpus,
                 treeService,
+                simpleVersification,
                 sourcePath, sourceIdPath, sourceIdLemmaPath,
                 parallelSourcePath,
                 parallelSourceIdPath, parallelSourceIdLemmaPath,
