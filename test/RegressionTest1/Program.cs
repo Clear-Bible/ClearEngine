@@ -160,8 +160,6 @@ namespace RegressionTest1
                 treeService,
                 simpleVersification);
 
-            List<string> sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
-            List<string> targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
 
             ParallelCorpora parallelCorporaCW =
                 new ParallelCorpora(
@@ -170,11 +168,11 @@ namespace RegressionTest1
                         new ZonePair(
                             new SourceZone(
                                 zonePair.SourceZone.List
-                                .Where(source => !sourceFuncWords.Contains(source.Lemma.Text))
+                                .Where(source => !sourceFunctionWords.Contains(source.Lemma.Text))
                                 .ToList()),
                             new TargetZone(
                                 zonePair.TargetZone.List
-                                .Where(target => !targetFuncWords.Contains(target.TargetText.Text.ToLower()))
+                                .Where(target => !targetFunctionWords.Contains(target.TargetText.Text.ToLower()))
                                 .ToList())))
                     .ToList());
 
@@ -201,22 +199,22 @@ namespace RegressionTest1
 
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
-                transModel2,
-                manTransModel,
-                alignProbs2,
-                useAlignModel,
-                puncs,
-                stopWords,
-                goodLinks,
-                goodLinkMinCount,
-                badLinks,
-                badLinkMinCount,
-                oldLinks,
-                sourceFuncWords,
-                targetFuncWords,
-                contentWordsOnly,
-                strongs,
-                maxPaths);
+                    transModel2,
+                    manTransModel,
+                    alignProbs2,
+                    useAlignModel,
+                    puncs,
+                    stopWords,
+                    goodLinks,
+                    goodLinkMinCount,
+                    badLinks,
+                    badLinkMinCount,
+                    oldLinks,
+                    sourceFunctionWords,
+                    targetFunctionWords,
+                    contentWordsOnly,
+                    strongs,
+                    maxPaths);
 
             Console.WriteLine("Auto Alignment");
 
