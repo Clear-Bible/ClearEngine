@@ -4,21 +4,11 @@ using System.Threading.Tasks;
 
 namespace ClearBible.Clear3.API
 {
-    public interface SMTService
+    public interface ISMTService
     {
-         Task<SMTResult> LaunchAsync(
-            object translationPairTable,
-            IProgress<ProgressReport> progress,
-            CancellationToken cancellationToken);
-    }
-
-
-    public interface SMTResult
-    {
-        string Key { get; }
-
-        DateTime CreationDate { get; }
-
-        // more ...
+        (TranslationModel, AlignmentModel) DefaultSMT(
+            ParallelCorpora parallelCorpora,
+            string runSpec = "1:10;H:5",
+            double epsilon = 0.1);
     }
 }
