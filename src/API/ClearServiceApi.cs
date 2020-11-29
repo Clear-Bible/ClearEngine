@@ -15,7 +15,7 @@ namespace ClearBible.Clear3.API
 
         ISegmenter DefaultSegmenter { get; }
 
-        SMTService SMTService { get; }
+        ISMTService SMTService { get; }
 
         IAutoAlignmentService AutoAlignmentService { get; }
 

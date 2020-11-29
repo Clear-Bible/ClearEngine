@@ -37,8 +37,8 @@ namespace ClearBible.Clear3.Impl.Service
         public ISegmenter DefaultSegmenter { get; } =
             new DefaultSegmenter.DefaultSegmenter();
 
-        public SMTService SMTService =>
-            throw new NotImplementedException();
+        public ISMTService SMTService { get; } =
+            new SMTService.SMTService();
 
         public IAutoAlignmentService AutoAlignmentService { get; } =
             new AutoAlign.AutoAlignmentService();

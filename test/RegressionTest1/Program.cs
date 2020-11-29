@@ -178,96 +178,11 @@ namespace RegressionTest1
                                 .ToList())))
                     .ToList());
 
-
-            string transModelPath = output("transModel.txt");
-            string alignModelPath = output("alignModel.txt");
-
-
             Console.WriteLine("Building Models");
-            {
-                string workFolderPath = Path.Combine(
-                    Path.GetTempPath(),
-                    Path.GetRandomFileName());
-                Directory.CreateDirectory(workFolderPath);
-
-                string tempPath(string name)
-                    => Path.Combine(workFolderPath, name);
-                string
-                    tempSourcePath = tempPath("source"),
-                    tempTargetPath = tempPath("target"),
-                    tempSourceIdPath = tempPath("sourceId"),
-                    tempTargetIdPath = tempPath("targetId"),
-                    tempTransModelPath = tempPath("transModel"),
-                    tempAlignModelPath = tempPath("alignModel");
-
-                {
-                    using (StreamWriter sw =
-                        new StreamWriter(tempSourcePath, false, Encoding.UTF8))
-                    {
-                        foreach (ZonePair zp in parallelCorporaCW.List)
-                        {
-                            sw.WriteLine(string.Join(" ",
-                                zp.SourceZone.List.Select(s => s.Lemma.Text)));
-                        }
-                    }
-                }
-
-                {
-                    using (StreamWriter sw =
-                        new StreamWriter(tempSourceIdPath, false, Encoding.UTF8))
-                    {
-                        foreach (ZonePair zp in parallelCorporaCW.List)
-                        {
-                            sw.WriteLine(string.Join(" ",
-                                zp.SourceZone.List.Select(s => $"x_{s.SourceID.AsCanonicalString}")));
-                        }
-                    }
-                }
-
-                {
-                    using (StreamWriter sw =
-                        new StreamWriter(tempTargetPath, false, Encoding.UTF8))
-                    {
-                        foreach (ZonePair zp in parallelCorporaCW.List)
-                        {
-                            sw.WriteLine(string.Join(" ",
-                                zp.TargetZone.List.Select(t => t.TargetText.Text.ToLower())));
-                        }
-                    }
-                }
-
-                {
-                    using (StreamWriter sw =
-                        new StreamWriter(tempTargetIdPath, false, Encoding.UTF8))
-                    {
-                        foreach (ZonePair zp in parallelCorporaCW.List)
-                        {
-                            sw.WriteLine(string.Join(" ",
-                                zp.TargetZone.List.Select(t => $"x_{t.TargetID.AsCanonicalString}")));
-                        }
-                    }
-                }
-
-
-                BuildTransModels.BuildModels(
-                    tempSourcePath,
-                    tempTargetPath,
-                    tempSourceIdPath,
-                    tempTargetIdPath,
-                    "1:10;H:5",
-                    0.1,
-                    tempTransModelPath,
-                    tempAlignModelPath);
-
-                File.Copy(tempTransModelPath, transModelPath, true);
-                File.Copy(tempAlignModelPath, alignModelPath, true);
-
-                Directory.Delete(workFolderPath, true);
-            }
-
-            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
-
-            string jsonOutput = output("alignment.json");
+ 
+            (TranslationModel transModel2, AlignmentModel alignProbs2) =
+                clearService.SMTService.DefaultSMT(
+                    parallelCorporaCW);
 
             List<ZoneAlignmentProblem> zoneAlignmentProblems =
                 parallelCorpora.List
@@ -278,20 +193,11 @@ namespace RegressionTest1
                         zonePair.SourceZone.List.Last().SourceID.VerseID))
                 .ToList();
 
-            TranslationModel transModel2 =
-                importExportService.ImportTranslationModel(transModelPath);
-
-            AlignmentModel alignProbs2 =
-                importExportService.ImportAlignmentModel(alignModelPath);
-
-
             bool useAlignModel = true;
             int maxPaths = 1000000;
             int goodLinkMinCount = 3;
             int badLinkMinCount = 3;
             bool contentWordsOnly = true;
-
-            Console.WriteLine("Auto Alignment");
 
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
@@ -312,6 +218,8 @@ namespace RegressionTest1
                 strongs,
                 maxPaths);
 
+            Console.WriteLine("Auto Alignment");
+
             Alignment2 alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
                     zoneAlignmentProblems,
@@ -322,7 +230,7 @@ namespace RegressionTest1
             string json = JsonConvert.SerializeObject(
                 alignment.Lines,
                 Newtonsoft.Json.Formatting.Indented);
-            File.WriteAllText(jsonOutput, json);
+            File.WriteAllText(output("alignment.json"), json);
         }
     }
 }

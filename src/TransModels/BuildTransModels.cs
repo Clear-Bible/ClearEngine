@@ -158,7 +158,7 @@ namespace TransModels
             return alignModel;
         }
 
-        static ArrayList GetTexts(string file)
+        public static ArrayList GetTexts(string file)
         {
             ArrayList texts = new ArrayList();
 
