@@ -8,14 +8,12 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 
-using Utilities;
 
 
 namespace ClearBible.Clear3.Impl.TreeService
 {
-    using System.Runtime.CompilerServices;
     using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Miscellaneous;
+
 
     /// <summary>
     /// Represents a treebank.

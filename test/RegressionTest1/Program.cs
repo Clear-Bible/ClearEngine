@@ -1,35 +1,14 @@
 ﻿
-using Newtonsoft.Json;
-using ParallelFiles;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using TransModels;
-using Utilities;
 
-using Data = AlignmentTool.Data;
-using Gloss = ClearBible.Clear3.API.Gloss;
+using Newtonsoft.Json;
 
-using ZoneAlignmentProblem = ClearBible.Clear3.API.ZoneAlignmentProblem;
-using GroupTranslationsTable = ClearBible.Clear3.API.GroupTranslationsTable;
-using TranslationModel = ClearBible.Clear3.API.TranslationModel;
-using AlignmentModel = ClearBible.Clear3.API.AlignmentModel;
-using IResourceService = ClearBible.Clear3.API.IResourceService;
-using ITreeService = ClearBible.Clear3.API.ITreeService;
-
-
-using IClear30ServiceAPI = ClearBible.Clear3.API.IClear30ServiceAPI;
-using Clear30Service = ClearBible.Clear3.Service.Clear30Service;
-
-using IAutoAlignAssumptions = ClearBible.Clear3.API.IAutoAlignAssumptions;
-using Alignment2 = ClearBible.Clear3.API.Alignment2;
-using IImportExportService = ClearBible.Clear3.API.IImportExportService;
-
-using ClearBible.Clear3.SubTasks;
 using ClearBible.Clear3.API;
+using ClearBible.Clear3.Service;
+using ClearBible.Clear3.SubTasks;
 
 namespace RegressionTest1
 {
