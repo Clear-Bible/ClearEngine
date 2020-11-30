@@ -7,6 +7,8 @@ namespace ClearBible.Clear3.API
     /// The caller of AlignZone must supply an object that implements
     /// this interface, in order to express the assumptions that the
     /// auto-alignment algorithm should use.
+    /// You can define and use your own object that implements this
+    /// interface if desired.
     /// </summary>
     /// 
     public interface IAutoAlignAssumptions

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace ClearBible.Clear3.API
 {
+    // Data Model for Groups
+    //----------------------
+
     /// <summary>
     /// A group translations table is mapping from a sequence of source
     /// lemmas to a set of target groups.

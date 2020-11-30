@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace ClearBible.Clear3.API
 {
     /// <summary>
-    /// Clear 3.0 Top Level Interface
+    /// Top Level Interface to Clear 3.0 Service
     /// </summary>
     /// 
     public interface IClear30ServiceAPI
@@ -88,7 +88,11 @@ namespace ClearBible.Clear3.API
 
     /// <remarks>
     /// As far as the API is concerned, a tree service is mostly
-    /// an abstract datum right now.
+    /// an abstract datum right now.  You have to obtain an
+    /// ITreeService from the resource manager to use with those
+    /// entry points that need a tree service.  Such an entry point
+    /// will convert the abstract datum that you pass into a
+    /// concrete class that the entry point can use.
     /// </remarks>
     /// 
     public interface ITreeService
@@ -98,6 +102,10 @@ namespace ClearBible.Clear3.API
 
 
     /// <remarks>
+    /// Work in progress, not yet implemented.
+    /// 
+    /// DEVELOPMENT NOTES
+    /// 
     /// References:
     /// https://github.com/ubsicap/versification_json
     /// Mark Howe
@@ -123,7 +131,6 @@ namespace ClearBible.Clear3.API
     /// 
     public interface Versification
     {
-        // (Not yet implemented.)
     }
 
 
@@ -172,6 +179,13 @@ namespace ClearBible.Clear3.API
     }
 
 
+    public class Stats
+    {
+        public int Count;
+        public double Prob;
+    }
+
+
     public interface ISegmenter
     {
         string[] GetSegments(
@@ -183,6 +197,12 @@ namespace ClearBible.Clear3.API
 
     public interface ISMTService
     {
+        // FIXME: Add parameters
+        //    IProgress<ProgressReport> progress
+        //    CancellationToken cancellationToken
+        // and return Task<(TranslationModel, AlignmentModel)>
+        // to enable parallel implementation strategies.
+        //
         (TranslationModel, AlignmentModel) DefaultSMT(
             ParallelCorpora parallelCorpora,
             string runSpec = "1:10;H:5",
@@ -197,6 +217,20 @@ namespace ClearBible.Clear3.API
         //    IProgress<ProgressReport> progress,
         //    CancellationToken cancellationToken);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="iTreeService"></param>
+        /// <param name="zoneAlignmentFacts"></param>
+        /// <param name="autoAlignAssumptions"></param>
+        /// <returns></returns>
+        //
+        // FIXME: Add parameters
+        //    IProgress<ProgressReport> progress
+        //    CancellationToken cancellationToken
+        // and return Task<ZoneMonoAlignment>
+        // to enable parallel implementation strategies.
+        //
         ZoneMonoAlignment AlignZone(
             ITreeService iTreeService,
             ZoneAlignmentProblem zoneAlignmentFacts,
@@ -231,6 +265,15 @@ namespace ClearBible.Clear3.API
             ZoneMultiAlignment zoneMultiAlignment,
             Dictionary<string, Gloss> glossTable,
             Dictionary<string, int> primaryPositions);
+    }
+
+
+    // FIXME -- exactly two glosses seems restrictive
+    //
+    public class Gloss
+    {
+        public string Gloss1;
+        public string Gloss2;
     }
 
 
