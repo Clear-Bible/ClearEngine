@@ -227,7 +227,7 @@ namespace ClearBible.Clear3.API
 
     public interface IPersistence
     {
-        Line GetLine(
+        LpaLine GetLpaLine(
             ZoneMultiAlignment zoneMultiAlignment,
             Dictionary<string, Gloss> glossTable,
             Dictionary<string, int> primaryPositions);

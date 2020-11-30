@@ -10,7 +10,7 @@ namespace ClearBible.Clear3.SubTasks
 
     public class AutoAlignFromModelsNoGroupsSubTask
     {
-        public static Alignment2 Run(
+        public static LegacyPersistentAlignment Run(
             List<ZoneAlignmentProblem> zoneAlignmentFactsList,
             ITreeService treeService,
             Dictionary<string, Gloss> glossTable,
@@ -32,7 +32,7 @@ namespace ClearBible.Clear3.SubTasks
             Dictionary<string, int> primaryPositions =
                 new Dictionary<string, int>();
 
-            Alignment2 align = new Alignment2()
+            LegacyPersistentAlignment align = new LegacyPersistentAlignment()
             {
                 Lines =
                     zoneAlignmentFactsList
@@ -49,7 +49,7 @@ namespace ClearBible.Clear3.SubTasks
                                 zoneMonoAlignment);
 
                         return
-                            outputService.GetLine(
+                            outputService.GetLpaLine(
                                 zoneMultiAlignment,
                                 glossTable,
                                 primaryPositions);

@@ -12,7 +12,7 @@ namespace ClearBible.Clear3.Impl.Persistence
 
     public class Persistence : IPersistence
     {
-        public Line GetLine(
+        public LpaLine GetLpaLine(
             ZoneMultiAlignment zoneMultiAlignment,
             Dictionary<string, Gloss> glossTable,
             Dictionary<string, int> primaryPositions)
@@ -21,9 +21,9 @@ namespace ClearBible.Clear3.Impl.Persistence
              List<MultiLink> multiLinks)
                 = zoneMultiAlignment;
 
-            return new Line()
+            return new LpaLine()
             {
-                manuscript = new Manuscript()
+                manuscript = new LpaManuscript()
                 {
                     words =
                         sourcePoints
@@ -32,7 +32,7 @@ namespace ClearBible.Clear3.Impl.Persistence
                             string ID = sp.SourceID.AsCanonicalString;
                             Gloss gloss = glossTable[ID];
 
-                            return new ManuscriptWord()
+                            return new LpaManuscriptWord()
                             {
                                 id = long.Parse(ID),
                                 altId = sp.AltID,
@@ -48,11 +48,11 @@ namespace ClearBible.Clear3.Impl.Persistence
                         .ToArray()
                 },
 
-                translation = new Translation()
+                translation = new LpaTranslation()
                 {
                     words =
                         targetPoints
-                        .Select(tp => new TranslationWord()
+                        .Select(tp => new LpaTranslationWord()
                         {
                             id = long.Parse(tp.TargetID.AsCanonicalString),
                             altId = tp.AltID,
@@ -63,7 +63,7 @@ namespace ClearBible.Clear3.Impl.Persistence
 
                 links =
                     multiLinks
-                    .Select(multiLink => new Link()
+                    .Select(multiLink => new LpaLink()
                     {
                         source =
                             multiLink.Sources

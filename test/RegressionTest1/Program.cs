@@ -225,7 +225,7 @@ namespace RegressionTest1
 
             Console.WriteLine("Auto Alignment");
 
-            Alignment2 alignment =
+            LegacyPersistentAlignment alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
                     zoneAlignmentProblems,
                     treeService,

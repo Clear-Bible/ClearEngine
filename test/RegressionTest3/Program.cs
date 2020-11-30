@@ -138,7 +138,7 @@ namespace RegressionTest3
             // glossary, and assumptions, to produce an alignment expressed
             // in the Alignment2 format.
 
-            Alignment2 alignment =
+            LegacyPersistentAlignment alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
                     zoneAlignmentFactsList,
                     treeService,
