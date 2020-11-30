@@ -36,41 +36,26 @@ namespace RegressionTest1
     class Program
     {
         /// <summary>
-        /// Regression Test 1.  Checks for expected Clear3 behavior in
-        /// a simple representative complete auto-alignment example.
+        /// Regression test that imports a translation, uses a legacy
+        /// versification to determine parallel zones, trains a statistical
+        /// translation model, performs tree-based auto-alignment, and
+        /// writes the result to a file in the legacy format.
         /// </summary>
         /// <remarks>
-        /// 2020-sep-08 tims  Current form of this test is to support
-        /// initial development;  expecting some rework of file locations
-        /// before first production release.
+        /// This test was used during the initial development as Clear2 was
+        /// incrementally transformed into the Clear3 prototype.  Some of these
+        /// transformation steps changed the results slightly, thought to be
+        /// because of issues being fixed and slight differences in the way
+        /// that some of the algorithms are breaking ties.
         /// </remarks>
         /// 
         static void Main(string[] args)
         {
             Console.WriteLine("Regression Test 1");
 
-            IClear30ServiceAPI clearService =
-                Clear30Service.FindOrCreate();
-
-            IImportExportService importExportService =
-                clearService.ImportExportService;
-
-            IResourceService resourceService = clearService.ResourceService;
-            resourceService.SetLocalResourceFolder("Resources");
-
-            Uri treebankUri =
-                new Uri("https://id.clear.bible/treebank/Clear3Dev");
-
-            if (!resourceService.QueryLocalResources()
-                .Any(r => r.Id.Equals(treebankUri)))
-            {
-                resourceService.DownloadResource(treebankUri);
-            }
-
-            ITreeService treeService =
-                resourceService.GetTreeService(treebankUri);
 
             // Check that current directory is reasonable.
+
             DirectoryInfo dir = new DirectoryInfo(".");
             if (!dir.Name.Equals("TestSandbox1"))
             {
@@ -84,6 +69,9 @@ namespace RegressionTest1
             Console.WriteLine(Directory.GetCurrentDirectory());
             Console.WriteLine();
 
+
+            // Prepare for input and output.
+
             // option = 0 for Brief, 1 for Long.
             int option = 0;
 
@@ -91,18 +79,34 @@ namespace RegressionTest1
             string[] outputFolders = { "OutputBrief", "OutputLong" };
             string[] referenceFolders = { "ReferenceBrief", "ReferenceLong" };
 
-            string inputFolder = inputFolders[option];            
+            string inputFolder = inputFolders[option];
             string outputFolder = outputFolders[option];
             string referenceFolder = referenceFolders[option];
             string commonFolder = "InputCommon";
 
-            Func<string,Func<string, string>> prefix =
-                pre => s => Path.Combine(pre, s);
+            Func<string, string> prefix(string pre) =>
+                s => Path.Combine(pre, s);
+
             Func<string, string>
                 input = prefix(inputFolder),
                 output = prefix(outputFolder),
                 common = prefix(commonFolder),
                 reference = prefix(referenceFolder);
+
+
+            // Get ready to use the Clear3 API.
+
+            IClear30ServiceAPI clearService =
+                Clear30Service.FindOrCreate();
+
+            IImportExportService importExportService =
+                clearService.ImportExportService;
+
+
+            // Get the standard tree service.
+
+            ITreeService treeService = GetStandardTreeServiceSubtask.Run(
+                resourceFolder: "Resources");
 
 
             // Import auxiliary assumptions from files: punctuation,
@@ -136,6 +140,8 @@ namespace RegressionTest1
                  strongsPath: common("strongs.txt"));
 
 
+            // Get the translation that is to be aligned.
+
             string versePath = input("Verse.txt");
             string lang = "English";
 
@@ -148,18 +154,29 @@ namespace RegressionTest1
                     puncs,
                     lang);
 
+
+            // Import the versification.
+
             SimpleVersification simpleVersification =
                 importExportService.ImportSimpleVersificationFromLegacy(
                     common("Versification.xml"),
                     "S1");
                     
 
-            Console.WriteLine("Creating Parallel Files");
+            // Use the versification with the target verses to line up
+            // translated zones with sourced zones.
+
+            Console.WriteLine("Creating Parallel Corpora");
+
             ParallelCorpora parallelCorpora = GroupVerses2.CreateParallelFiles(
                 targetVerseCorpus,
                 treeService,
                 simpleVersification);
 
+
+            // Remove functions words from the parallel corpora, leaving
+            // only the content words for the SMT step to follow.
+            // FIXME: Should there be a Clear3 entry point for this algorithm?
 
             ParallelCorpora parallelCorporaCW =
                 new ParallelCorpora(
@@ -176,11 +193,21 @@ namespace RegressionTest1
                                 .ToList())))
                     .ToList());
 
+
+            // Train a statistical translation model using the parallel
+            // corpora with content words only, producing an estimated
+            // translation model and estimated alignment.
+
             Console.WriteLine("Building Models");
  
             (TranslationModel transModel2, AlignmentModel alignProbs2) =
                 clearService.SMTService.DefaultSMT(
                     parallelCorporaCW);
+
+
+            // Use the parallel corpora (with both the function words and
+            // the content words included) to state the zone alignment
+            // problems for the tree-based auto-aligner.
 
             List<ZoneAlignmentProblem> zoneAlignmentProblems =
                 parallelCorpora.List
@@ -190,6 +217,10 @@ namespace RegressionTest1
                         zonePair.SourceZone.List.First().SourceID.VerseID,
                         zonePair.SourceZone.List.Last().SourceID.VerseID))
                 .ToList();
+
+
+            // Specify the assumptions to be used during the
+            // tree-based auto-alignment.
 
             bool useAlignModel = true;
             int maxPaths = 1000000;
@@ -218,12 +249,20 @@ namespace RegressionTest1
 
             Console.WriteLine("Auto Alignment");
 
+
+            // Apply a tree-based auto-alignment to each of the zone
+            // alignment problems, producing an alignment datum in the
+            // persistent format.
+
             Alignment2 alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
                     zoneAlignmentProblems,
                     treeService,
                     glossTable,
                     assumptions);
+
+
+            // Export the persistent-format datum to a file.
 
             string json = JsonConvert.SerializeObject(
                 alignment.Lines,
