@@ -6,7 +6,8 @@ using Newtonsoft.Json.Linq;
 
 namespace ClearBible.Clear3.API
 {
-    // Data Models for Persistence
+    // Data Model for Persistence
+    //---------------------------
 
     // At present only contains the legacy data model for persisting
     // an alignment.

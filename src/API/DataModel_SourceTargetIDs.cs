@@ -3,8 +3,9 @@
 
 namespace ClearBible.Clear3.API
 {
-    // Source and Target IDs
-    // 
+    // Data Model for Source and Target IDs
+    //-------------------------------------
+
     // Ways of identifying locations in source and target corpora
     // by book, chapter, verse, word, and (in case of a source) subsegment.
 
