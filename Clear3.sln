@@ -21,8 +21,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.ResourceService", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubTasks", "src\SubTasks\SubTasks.csproj", "{F1C60762-E7F4-4E9B-BBCB-4C604376E79D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.OutputService", "Impl.OutputService\Impl.OutputService.csproj", "{4FD76E29-3A00-48F0-B96A-85501F43047B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.ImportExportService", "src\Impl.ImportExportService\Impl.ImportExportService.csproj", "{563A6D76-4C46-4485-ABF4-C8B381FDA705}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.Segmenter", "src\Impl.Segmenter\Impl.Segmenter.csproj", "{E62A3953-76E1-485F-8125-23D129B90954}"
@@ -32,6 +30,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.Miscellaneous", "src\Impl.Miscellaneous\Impl.Miscellaneous.csproj", "{D22230BF-6568-44FD-8C99-D32943971E06}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.Utility", "src\Impl.Utility\Impl.Utility.csproj", "{F5D752E3-7516-4EE0-81B9-8119CEA20691}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.Persistence", "src\Impl.Persistence\Impl.Persistence.csproj", "{6B26989E-7144-493D-BC36-2C693FAB2813}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -163,18 +163,6 @@ Global
 		{F1C60762-E7F4-4E9B-BBCB-4C604376E79D}.Debug|x64.Build.0 = Debug|Any CPU
 		{F1C60762-E7F4-4E9B-BBCB-4C604376E79D}.Release|x64.ActiveCfg = Release|Any CPU
 		{F1C60762-E7F4-4E9B-BBCB-4C604376E79D}.Release|x64.Build.0 = Release|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Debug|x86.Build.0 = Debug|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Release|x86.ActiveCfg = Release|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Release|x86.Build.0 = Release|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Debug|x64.Build.0 = Debug|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Release|x64.ActiveCfg = Release|Any CPU
-		{4FD76E29-3A00-48F0-B96A-85501F43047B}.Release|x64.Build.0 = Release|Any CPU
 		{563A6D76-4C46-4485-ABF4-C8B381FDA705}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{563A6D76-4C46-4485-ABF4-C8B381FDA705}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{563A6D76-4C46-4485-ABF4-C8B381FDA705}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -235,5 +223,17 @@ Global
 		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Debug|x64.Build.0 = Debug|Any CPU
 		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Release|x64.ActiveCfg = Release|Any CPU
 		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Release|x64.Build.0 = Release|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Debug|x86.Build.0 = Debug|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Release|x86.ActiveCfg = Release|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Release|x86.Build.0 = Release|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Debug|x64.Build.0 = Debug|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Release|x64.ActiveCfg = Release|Any CPU
+		{6B26989E-7144-493D-BC36-2C693FAB2813}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

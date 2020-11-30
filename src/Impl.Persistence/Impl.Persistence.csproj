@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\API\Api.csproj" />
-    <ProjectReference Include="..\src\Impl.TreeService\Impl.TreeService.csproj" />
+    <ProjectReference Include="..\API\Api.csproj" />
+    <ProjectReference Include="..\Impl.TreeService\Impl.TreeService.csproj" />
   </ItemGroup>
 </Project>
