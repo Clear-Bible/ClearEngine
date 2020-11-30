@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\API\Api.csproj" />
-    <ProjectReference Include="..\GBI_Aligner\GBI_Aligner.csproj" />
     <ProjectReference Include="..\Impl.AutoAlign\Impl.AutoAlign.csproj" />
     <ProjectReference Include="..\Impl.ResourceService\Impl.ResourceService.csproj" />
     <ProjectReference Include="..\..\Impl.OutputService\Impl.OutputService.csproj" />

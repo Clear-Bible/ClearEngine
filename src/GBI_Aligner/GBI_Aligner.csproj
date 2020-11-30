@@ -13,6 +13,7 @@
     <ProjectReference Include="..\Tokenizer\Tokenizer.csproj" />
     <ProjectReference Include="..\DeadEndWip\DeadEndWip.csproj" />
     <ProjectReference Include="..\API\Api.csproj" />
+    <ProjectReference Include="..\Miscellaneous\Miscellaneous.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
