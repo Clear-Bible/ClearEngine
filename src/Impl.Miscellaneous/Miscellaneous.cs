@@ -5,7 +5,7 @@ using System.Runtime.InteropServices.ComTypes;
 using System.Xml;
 using System.Xml.Linq;
 
-namespace ClearBible.Clear3.Miscellaneous
+namespace ClearBible.Clear3.Impl.Miscellaneous
 {
     public static class XmlExtensions
     {

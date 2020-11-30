@@ -8,7 +8,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 {
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.TreeService;
-    using ClearBible.Clear3.Miscellaneous;
+    using ClearBible.Clear3.Impl.Miscellaneous;
 
 
     public class MappedGroup
