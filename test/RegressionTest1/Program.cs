@@ -81,6 +81,8 @@ namespace RegressionTest1
             IImportExportService importExportService =
                 clearService.ImportExportService;
 
+            IUtility utility = clearService.Utility;
+
 
             // Get the standard tree service.
 
@@ -147,7 +149,7 @@ namespace RegressionTest1
 
             Console.WriteLine("Creating Parallel Corpora");
 
-            ParallelCorpora parallelCorpora = GroupVerses2.CreateParallelFiles(
+            ParallelCorpora parallelCorpora = utility.CreateParallelCorpora(
                 targetVerseCorpus,
                 treeService,
                 simpleVersification);
@@ -155,22 +157,12 @@ namespace RegressionTest1
 
             // Remove functions words from the parallel corpora, leaving
             // only the content words for the SMT step to follow.
-            // FIXME: Should there be a Clear3 entry point for this algorithm?
 
             ParallelCorpora parallelCorporaCW =
-                new ParallelCorpora(
-                    parallelCorpora.List
-                    .Select(zonePair =>
-                        new ZonePair(
-                            new SourceZone(
-                                zonePair.SourceZone.List
-                                .Where(source => !sourceFunctionWords.Contains(source.Lemma.Text))
-                                .ToList()),
-                            new TargetZone(
-                                zonePair.TargetZone.List
-                                .Where(target => !targetFunctionWords.Contains(target.TargetText.Text.ToLower()))
-                                .ToList())))
-                    .ToList());
+               utility.FilterFunctionWordsFromParallelCorpora(
+                   parallelCorpora,
+                   sourceFunctionWords,
+                   targetFunctionWords);
 
 
             // Train a statistical translation model using the parallel
@@ -226,12 +218,12 @@ namespace RegressionTest1
                     strongs,
                     maxPaths);
 
-            Console.WriteLine("Auto Alignment");
-
-
+            
             // Apply a tree-based auto-alignment to each of the zone
             // alignment problems, producing an alignment datum in the
             // persistent format.
+
+            Console.WriteLine("Auto Alignment");
 
             Alignment2 alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
@@ -247,6 +239,9 @@ namespace RegressionTest1
                 alignment.Lines,
                 Newtonsoft.Json.Formatting.Indented);
             File.WriteAllText(output("alignment.json"), json);
+
+
+            Console.WriteLine("Done");
         }
     }
 }

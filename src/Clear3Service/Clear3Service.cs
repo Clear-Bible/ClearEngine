@@ -45,5 +45,8 @@ namespace ClearBible.Clear3.Impl.Service
 
         public IOutputService OutputService =>
             new OutputService.OutputService();
+
+        public IUtility Utility { get; } =
+            new Utility.Utility();
     }
 }

@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.SMTService", "src\Impl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.Miscellaneous", "src\Impl.Miscellaneous\Impl.Miscellaneous.csproj", "{D22230BF-6568-44FD-8C99-D32943971E06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.Utility", "src\Impl.Utility\Impl.Utility.csproj", "{F5D752E3-7516-4EE0-81B9-8119CEA20691}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -221,5 +223,17 @@ Global
 		{D22230BF-6568-44FD-8C99-D32943971E06}.Debug|x64.Build.0 = Debug|Any CPU
 		{D22230BF-6568-44FD-8C99-D32943971E06}.Release|x64.ActiveCfg = Release|Any CPU
 		{D22230BF-6568-44FD-8C99-D32943971E06}.Release|x64.Build.0 = Release|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Debug|x86.Build.0 = Debug|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Release|x86.ActiveCfg = Release|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Release|x86.Build.0 = Release|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Debug|x64.Build.0 = Debug|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Release|x64.ActiveCfg = Release|Any CPU
+		{F5D752E3-7516-4EE0-81B9-8119CEA20691}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
