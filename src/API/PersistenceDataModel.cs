@@ -6,10 +6,50 @@ using Newtonsoft.Json.Linq;
 
 namespace ClearBible.Clear3.API
 {
-    // Data model for import/export of alignment data in the
-    // legacy format.
+    // Data Models for Persistence
 
-    public class ManuscriptWord
+    // At present only contains the legacy data model for persisting
+    // an alignment.
+
+    // FIXME: Adopt newer model being developed by Dirk and Charles.
+
+    // FIXME: Do we need to design a persistent translation model?
+
+    // FIXME: What else should be part of persistence?
+
+
+    // Legacy data model for persisting an alignment.
+
+    public class LegacyPersistentAlignment
+    {
+        public LpaLine[] Lines;
+    }
+
+
+    public class LpaLine
+    {
+        public LpaManuscript manuscript;
+        public LpaTranslation translation;
+
+        //public int[][][] links;
+        [JsonConverter(typeof(LpaLinkJsonConverter))]
+        public List<LpaLink> links;
+    }
+
+
+    public class LpaManuscript
+    {
+        public LpaManuscriptWord[] words;
+    }
+
+
+    public class LpaTranslation
+    {
+        public LpaTranslationWord[] words;
+    }
+
+
+    public class LpaManuscriptWord
     {
         public long id;
         public string altId;
@@ -22,24 +62,17 @@ namespace ClearBible.Clear3.API
         public string morph;
     }
 
-    public class TranslationWord
+
+    public class LpaTranslationWord
     {
         public long id;
         public string altId;
         public string text;
     }
 
-    public class Manuscript
-    {
-        public ManuscriptWord[] words;
-    }
+    
 
-    public class Translation
-    {
-        public TranslationWord[] words;
-    }
-
-    public class Link
+    public class LpaLink
     {
         public int[] source;
         public int[] target;
@@ -47,46 +80,31 @@ namespace ClearBible.Clear3.API
 
     }
 
-    public class Line
+    
+    public class LegacyPersistentAlignmentWithGateway
     {
-        public Manuscript manuscript;
-        public Translation translation;
-
-        //public int[][][] links;
-        [JsonConverter(typeof(LinkJsonConverter))]
-        public List<Link> links;
-    }
-
-    public class Alignment2
-    {
-        public Line[] Lines;
-    }
-
-    public class Line3
-    {
-        public Manuscript manuscript;
-        public Translation gtranslation;
+        public LpaManuscript manuscript;
+        public LpaTranslation gtranslation;
         public int[][][] glinks;
 
-        public Translation translation;
+        public LpaTranslation translation;
         //public int[][][] links;
 
-        [JsonConverter(typeof(LinkJsonConverter))]
-        public List<Link> links;
+        [JsonConverter(typeof(LpaLinkJsonConverter))]
+        public List<LpaLink> links;
     }
 
 
-
-    public class LinkJsonConverter : JsonConverter
+    public class LpaLinkJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(Link).IsAssignableFrom(objectType);
+            return typeof(LpaLink).IsAssignableFrom(objectType);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            var links = new List<Link>();
+            var links = new List<LpaLink>();
 
             if (reader.TokenType == JsonToken.Null)
             {
@@ -107,7 +125,7 @@ namespace ClearBible.Clear3.API
                         cscore = attr.cscore;
                     }
 
-                    links.Add(new Link() { source = source, target = target, cscore = cscore });
+                    links.Add(new LpaLink() { source = source, target = target, cscore = cscore });
                 }
             }
 
@@ -116,7 +134,7 @@ namespace ClearBible.Clear3.API
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            var links = value as List<Link>;
+            var links = value as List<LpaLink>;
             var linksobj = new List<dynamic>();
 
             foreach (var link in links)

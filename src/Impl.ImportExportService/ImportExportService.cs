@@ -344,16 +344,16 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                 new Dictionary<string, Dictionary<string, string>>();
 
             string jsonText = File.ReadAllText(jsonFile);
-            Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
+            LpaLine[] lines = JsonConvert.DeserializeObject<LpaLine[]>(jsonText);
             if (lines == null) return oldLinks;
 
             for (int i = 0; i < lines.Length; i++)
             {
-                Line line = lines[i];
+                LpaLine line = lines[i];
 
                 for (int j = 0; j < line.links.Count; j++)
                 {
-                    Link link = line.links[j];
+                    LpaLink link = line.links[j];
                     int[] sourceLinks = link.source;
                     int[] targetLinks = link.target;
 
@@ -365,8 +365,8 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                     {
                         int sourceLink = sourceLinks[0];
                         int targetLink = targetLinks[0];
-                        ManuscriptWord mWord = line.manuscript.words[sourceLink];
-                        TranslationWord tWord = line.translation.words[targetLink];
+                        LpaManuscriptWord mWord = line.manuscript.words[sourceLink];
+                        LpaTranslationWord tWord = line.translation.words[targetLink];
 
                         string verseID = mWord.id.ToString().PadLeft(12, '0').Substring(0, 8);
 
@@ -393,8 +393,8 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             GroupTranslationsTable groups,
             int[] sourceLinks,
             int[] targetLinks,
-            Manuscript manuscript,
-            Translation translation)
+            LpaManuscript manuscript,
+            LpaTranslation translation)
         {
             SourceLemmasAsText source = new SourceLemmasAsText(
                 String.Join(
