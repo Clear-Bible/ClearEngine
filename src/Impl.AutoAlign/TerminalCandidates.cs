@@ -33,7 +33,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 string altID = idMap[sourceID];
 
                 AlternativeCandidates topCandidates =
-                    GetTopCandidates(
+                    GetTerminalCandidatesForWord(
                         sourceID,
                         altID,
                         lemma,
@@ -53,7 +53,46 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static AlternativeCandidates GetTopCandidates(
+        /// <summary>
+        /// Get the alternative candidate target words that a particular
+        /// source word can be linked to.
+        /// The rules are (in summary):
+        /// (1) If there is an old link, use it.
+        /// (2) If it is a function word, there are no alternatives.
+        /// (3) If there is a Strong's definition, use all the target words
+        /// in the current zone that are possible meanings.
+        /// (4) If it is a stop word, there are no alternatives.
+        /// (5) If there is a definition in the manual translation model,
+        /// use the target words in the current zone that are possible
+        /// meanings, but keeping only those of maximal score.
+        /// (6) If there is a definition in the estimated translation model,
+        /// use the target words in the current zone that are possible
+        /// translations and not stop words, bad links, or punctuation,
+        /// but keeping only those of maximal score.
+        /// (7) Otherwise there are no alternatives.
+        /// </summary>
+        /// <param name="sourceID">ID of the source word</param>
+        /// <param name="altID">
+        /// Alternate ID of the source word, as computed from the position
+        /// of the source word in the zone. See also SourcePoint.
+        /// </param>
+        /// <param name="lemma">Lemma of the source word.</param>
+        /// <param name="strong">Strong number of the source word.</param>
+        /// <param name="targetPoints">
+        /// The target words in the current zone.
+        /// </param>
+        /// <param name="existingLinks">
+        /// Old links to be considered for this zone.
+        /// </param>
+        /// <param name="assumptions">
+        /// The assumptions that constrain the tree-based auto-alignment
+        /// process.
+        /// </param>
+        /// <returns>
+        /// A list of alternative candidate target words for the source word.
+        /// </returns>
+        /// 
+        public static AlternativeCandidates GetTerminalCandidatesForWord(
             string sourceID,
             string altID,
             string lemma,
@@ -62,6 +101,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary <string, string> existingLinks,
             IAutoAlignAssumptions assumptions)
         {
+            // If there is an existing link for the source word:
+            //
             if (existingLinks.Count > 0 &&
                 altID != null &&
                 existingLinks.ContainsKey(altID))
@@ -73,8 +114,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Where(tp => targetAltID == tp.AltID)
                     .FirstOrDefault();
 
+                // If the target word for the existing link can
+                // be found:
+                //
                 if (targetPoint != null)
                 {
+                    // The alternatives consist of just that
+                    // target word.
+                    //
                     return new AlternativeCandidates(new[]
                     {
                         new Candidate(
@@ -84,15 +131,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
+            // If the source point is a function word:
+            //
             if (assumptions.IsSourceFunctionWord(lemma))
             {
+                // There are no alternatives.
+                //
                 return new AlternativeCandidates();
             }
 
+            // If the Strong's database has a definition for
+            // the source word:
+            //
             if (assumptions.Strongs.ContainsKey(strong))
             {
                 Dictionary<string, int> wordIds = assumptions.Strongs[strong];
 
+                // The alternatives are all of those target points in the
+                // current zone that occur as a possible meaning in the Strong's
+                // database.
+                //
                 return new AlternativeCandidates(
                     targetPoints
                     .Where(tp =>
@@ -101,14 +159,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(mtp => new Candidate(mtp, 0.0)));
             }
 
+            // If the source point is a stop word:
+            //
             if (assumptions.IsStopWord(lemma))
             {
+                // There are no alternatives.
+                //
                 return new AlternativeCandidates();
             }
 
+            // If the manual translation model has any definitions for
+            // the source point:
+            //
             if (assumptions.TryGetManTranslations(lemma,
                 out TryGet<string, double> tryGetManScoreForTargetText))
             {
+                // The candidates are the possibly empty set of target words
+                // in the current zone that are possible translations, keeping
+                // only the candidates of maximal score (as given by the manual
+                // translation model).
+                //
                 return new AlternativeCandidates(
                     targetPoints
                     .Select(targetPoint =>
@@ -134,9 +204,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                                 new MaybeTargetPoint(x.targetPoint),
                                 x.score))));
             }
-            else if (assumptions.TryGetTranslations(lemma,
+
+            // If the estimated translation model has any translations
+            // for the source word:
+            //
+            if (assumptions.TryGetTranslations(lemma,
                 out TryGet<string, double> tryGetScoreForTargetText))
             {
+                // The alternatives are the possibly empty set of target
+                // words in the current zone that are not bad links,
+                // punctuation, or stop words and that occur as possible
+                // translations, keeping only the candidates of maximal score
+                // (as given by the estimated translation model modified
+                // by the estimated alignment).
+                //
                 return new AlternativeCandidates(
                     targetPoints
                     .Where(tp => !assumptions.IsBadLink(lemma, tp.Lower))
@@ -169,9 +250,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             x.score))));
             }
 
+            // Otherwise, there are no alternatives.
+            //
             return new AlternativeCandidates();
 
 
+            // Auxiliary helper function to adjust the score from
+            // the estimated translation model by using the estimated
+            // alignment model.
+            //
             double getAdjustedScore(double score, string targetID)
             {
                 if (assumptions.UseAlignModel)
