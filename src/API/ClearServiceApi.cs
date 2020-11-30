@@ -19,7 +19,7 @@ namespace ClearBible.Clear3.API
 
         IAutoAlignmentService AutoAlignmentService { get; }
 
-        IOutputService OutputService { get; }
+        IPersistence Persistence { get; }
 
         IUtility Utility { get; }
     }
@@ -225,7 +225,7 @@ namespace ClearBible.Clear3.API
     }
 
 
-    public interface IOutputService
+    public interface IPersistence
     {
         Line GetLine(
             ZoneMultiAlignment zoneMultiAlignment,

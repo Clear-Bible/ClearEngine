@@ -22,8 +22,8 @@ namespace ClearBible.Clear3.SubTasks
             IAutoAlignmentService autoAlignmentService =
                 clearService.AutoAlignmentService;
 
-            IOutputService outputService =
-                clearService.OutputService;
+            IPersistence outputService =
+                clearService.Persistence;
 
 
             // This map of group key to position of primary

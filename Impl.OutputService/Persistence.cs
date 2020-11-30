@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 
-namespace ClearBible.Clear3.Impl.OutputService
+namespace ClearBible.Clear3.Impl.Persistence
 {
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.TreeService;
 
-    public class OutputService : IOutputService
+    public class Persistence : IPersistence
     {
         public Line GetLine(
             ZoneMultiAlignment zoneMultiAlignment,
