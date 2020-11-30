@@ -43,8 +43,8 @@ namespace ClearBible.Clear3.Impl.Service
         public IAutoAlignmentService AutoAlignmentService { get; } =
             new AutoAlign.AutoAlignmentService();
 
-        public IOutputService OutputService =>
-            new OutputService.OutputService();
+        public IPersistence Persistence =>
+            new Persistence.Persistence();
 
         public IUtility Utility { get; } =
             new Utility.Utility();
