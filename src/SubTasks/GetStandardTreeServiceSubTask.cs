@@ -4,7 +4,7 @@ using System.Linq;
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Service;
 
-namespace ClearBible.Clear3.Subtasks
+namespace ClearBible.Clear3.SubTasks
 {
     public class GetStandardTreeServiceSubtask
     {

@@ -11,15 +11,24 @@ using Newtonsoft.Json;
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Service;
 using ClearBible.Clear3.SubTasks;
-using ClearBible.Clear3.Subtasks;
 
 namespace RegressionTest3
 {
     /// <summary>
     /// Regression test that exercises the tree-based auto-aligner
-    /// using input files.  Intended for study, rework, and smoke
-    /// test.
+    /// using input files.  This test assumes that the alignment problem
+    /// has already been stated and the statistical translation model has
+    /// already been trained, and imports the appropriate collateral from
+    /// instead of computing it again.
     /// </summary>
+    /// <remarks>
+    /// This test was used during the initial development as Clear2 was
+    /// incrementally transformed into the Clear3 prototype.  Some of these
+    /// transformation steps changed the results slightly, thought to be
+    /// because of issues being fixed and slight differences in the way
+    /// that some of the algorithms are breaking ties.
+    /// </remarks>
+    /// 
     /// 
     class Program
     {
@@ -39,6 +48,7 @@ namespace RegressionTest3
             // stop words, function words, manual translation model,
             // good and bad links, old alignment, glossary table,
             // and Strongs data.
+
 
             (List<string> puncs,
              List<string> stopWords,
@@ -65,10 +75,12 @@ namespace RegressionTest3
                  oldAlignmentPath: InPath("oldAlignment.json"),
                  strongsPath: InPath("strongs.txt"));
 
+
             // Get the standard tree service.
 
             ITreeService treeService = GetStandardTreeServiceSubtask.Run(
                 resourceFolder: "Resources");
+
 
             // Get ready to use the Clear3 API.
 
@@ -78,12 +90,13 @@ namespace RegressionTest3
                 clearService.ImportExportService;
 
 
-            // Import translation pairs from a file.
+            // Import the translation that is to be aligned.
 
             List<ZoneAlignmentProblem> zoneAlignmentFactsList =
                 importExportService.ImportZoneAlignmentFactsFromLegacy(
                     parallelSourcePath: InPath("source.id.lemma.txt"),
                     parallelTargetPath: InPath("target.id.txt"));
+
 
             // Import the translation model and alignment model, as
             // produced from a prior STM step, from files.
@@ -95,6 +108,7 @@ namespace RegressionTest3
             AlignmentModel alignmentModel =
                 importExportService.ImportAlignmentModel(
                     InPath("alignModel.txt"));
+
 
             // Specify the assumptions to be used during the
             // auto-alignment.
