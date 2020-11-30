@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Xml;
+
 using ClearBible.Clear3.API;
 
-namespace RegressionTest1
+namespace ClearBible.Clear3.Impl.Utility
 {
-    public class GroupVerses2
+    public class Utility : IUtility
     {
-        public static ParallelCorpora CreateParallelFiles(
+        public ParallelCorpora CreateParallelCorpora(
             TargetVerseCorpus targetVerseCorpus,
             ITreeService treeService,
             SimpleVersification simpleVersification)
@@ -54,11 +50,33 @@ namespace RegressionTest1
                             new ZonePair(
                                 new SourceZone(sources),
                                 new TargetZone(targets)));
-                    }                   
+                    }
                 }
             }
 
             return new ParallelCorpora(zonePairs);
+        }
+
+
+        public ParallelCorpora FilterFunctionWordsFromParallelCorpora(
+            ParallelCorpora toBeFiltered,
+            List<string> sourceFunctionWords,
+            List<string> targetFunctionWords)
+        {
+            return
+                new ParallelCorpora(
+                    toBeFiltered.List
+                    .Select(zonePair =>
+                        new ZonePair(
+                            new SourceZone(
+                                zonePair.SourceZone.List
+                                .Where(source => !sourceFunctionWords.Contains(source.Lemma.Text))
+                                .ToList()),
+                            new TargetZone(
+                                zonePair.TargetZone.List
+                                .Where(target => !targetFunctionWords.Contains(target.TargetText.Text.ToLower()))
+                                .ToList())))
+                    .ToList());
         }
     }
 }

@@ -20,6 +20,8 @@ namespace ClearBible.Clear3.API
         IAutoAlignmentService AutoAlignmentService { get; }
 
         IOutputService OutputService { get; }
+
+        IUtility Utility { get; }
     }
 
 
@@ -229,5 +231,20 @@ namespace ClearBible.Clear3.API
             ZoneMultiAlignment zoneMultiAlignment,
             Dictionary<string, Gloss> glossTable,
             Dictionary<string, int> primaryPositions);
+    }
+
+
+
+    public interface IUtility
+    {
+        ParallelCorpora CreateParallelCorpora(
+            TargetVerseCorpus targetVerseCorpus,
+            ITreeService treeService,
+            SimpleVersification simpleVersification);
+
+        public ParallelCorpora FilterFunctionWordsFromParallelCorpora(
+            ParallelCorpora toBeFiltered,
+            List<string> sourceFunctionWords,
+            List<string> targetFunctionWords);
     }
 }
