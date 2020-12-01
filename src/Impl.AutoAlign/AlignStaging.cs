@@ -10,9 +10,90 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     public class AlignStaging
     {
-        
-           
+        /// <summary>
+        /// Find the conflicting links (which are those that link
+        /// to the same target word as some other link in the list),
+        /// and strike out all but one in each group of conflicting
+        /// links.
+        /// </summary>
+        /// <param name="links">
+        /// The list of links to examine for conflicts.  Striking out
+        /// a link means replacing it in this list with a fake link.
+        /// </param>
+        /// <param name="tryHarder">
+        /// If true, then use a more sophisticated algorithm for
+        /// choosing which links to keep.
+        /// </param>
+        /// 
+        public static void ResolveConflicts(
+            List<OpenMonoLink> links,
+            bool tryHarder)
+        {
+            // Find the links that conflict with one another.
+            //
+            List<List<OpenMonoLink>> conflicts =
+                FindConflictingLinks(links);
 
+            // If there are no conflicts, there is nothing
+            // more to do.
+            //
+            if (conflicts.Count == 0) return;
+
+            // The links to remove are all of the conflicting links
+            // except for a winner from each conflicting group.
+            //
+            List<OpenMonoLink> linksToRemove =
+                conflicts.
+                SelectMany(conflict =>
+                    conflict.Except(
+                        FindWinners(conflict, tryHarder).Take(1)))
+                .ToList();
+
+            // Find the indices of those links to be removed.
+            //
+            List<int> toStrikeOut =
+                links
+                .Select((link, index) => new { link, index })
+                .Where(x => linksToRemove.Contains(x.link))
+                .Select(x => x.index)
+                .ToList();
+
+            // Strike out all of the links to be removed.
+            //
+            foreach (int i in toStrikeOut)
+            {               
+                strikeOut(i);
+            }
+
+            // Striking out a link means replacing it in the list
+            // with a fake link.
+            //
+            void strikeOut(int i) =>
+                links[i] = makeFakeLink(links[i].SourcePoint);
+
+            // How to make a fake link:
+            //
+            OpenMonoLink makeFakeLink(SourcePoint sourceNode) =>
+                new OpenMonoLink(
+                    sourcePoint: sourceNode,
+                    openTargetBond: new OpenTargetBond(
+                        MaybeTargetPoint: AutoAlignUtility.CreateFakeTargetWord(),
+                        Score: -1000));
+        }
+
+
+        /// <summary>
+        /// Find those links in a specified list that are linked to
+        /// the same target word as some other link in the list.
+        /// </summary>
+        /// <param name="links">
+        /// The list of links to be examined.
+        /// </param>
+        /// <returns>
+        /// The list of conflicts, where each conflict is a list
+        /// of links that share the same target word.
+        /// </returns>
+        /// 
         public static List<List<OpenMonoLink>> FindConflictingLinks(
             List<OpenMonoLink> links)
         {
@@ -33,47 +114,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static void ResolveConflicts(
-            // List<List<OpenMonoLink>> conflicts,
-            List<OpenMonoLink> links,
-            bool tryHarder)
-        {
-            List<List<OpenMonoLink>> conflicts =
-                FindConflictingLinks(links);
 
-            if (conflicts.Count == 0) return;
-
-            List<OpenMonoLink> linksToRemove =
-                conflicts.
-                SelectMany(conflict =>
-                    conflict.Except(
-                        FindWinners(conflict, tryHarder).Take(1)))
-                .ToList();
-
-            List<int> toStrikeOut =
-                links
-                .Select((link, index) => new { link, index })
-                .Where(x => linksToRemove.Contains(x.link))
-                .Select(x => x.index)
-                .ToList();
-
-            foreach (int i in toStrikeOut)
-            {               
-                strikeOut(i);
-            }
-
-            void strikeOut(int i) =>
-                links[i] = makeFakeLink(links[i].SourcePoint);
-
-            OpenMonoLink makeFakeLink(SourcePoint sourceNode) =>
-                new OpenMonoLink(
-                    sourcePoint: sourceNode,
-                    openTargetBond: new OpenTargetBond(
-                        MaybeTargetPoint: AutoAlignUtility.CreateFakeTargetWord(),
-                        Score: -1000));
-        }
-
-
+        /// <summary>
+        /// Find the winning links in a group of conflicting links.
+        /// </summary>
+        /// <param name="conflict">
+        /// The list of conflicting links.
+        /// </param>
+        /// <param name="tryHarder">
+        /// Use a more sophisticated algorithm to identify a single
+        /// winner if possible.
+        /// </param>
+        /// <returns>
+        /// A list of the winning links.
+        /// </returns>
+        /// 
         public static List<OpenMonoLink> FindWinners(
             List<OpenMonoLink> conflict,
             bool tryHarder)
@@ -114,7 +169,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-
+        /// <summary>
+        /// Get the lower-cased text of the target word, by looking it up
+        /// in a list of target points by the target ID of the word.
+        /// </summary>
+        /// <param name="targetID">
+        /// The target ID as a canonical string.
+        /// </param>
+        /// <param name="targetWords">
+        /// The list of target words to examine.
+        /// </param>
+        /// <returns>
+        /// The target text, or "" if the word could not be found in the
+        /// list of target words.
+        /// </returns>
+        /// 
         public static string GetTargetWordTextFromID(string targetID, List<MaybeTargetPoint> targetWords)
         {
             return targetWords
@@ -125,6 +194,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        /// <summary>
+        /// Get the 0-based position of the target word within a list,
+        /// where the word is identified by its target ID.
+        /// </summary>
+        /// <param name="targetID">
+        /// The target ID of the word as a canonical string.
+        /// </param>
+        /// <param name="targetWords">
+        /// The list of target words to examine.
+        /// </param>
+        /// <returns>
+        /// The position, or 0 if the word could not be found in the
+        /// list of target words.
+        /// </returns>
+        /// 
         public static int GetTargetPositionFromID(string targetID, List<MaybeTargetPoint> targetWords)
         {
             return targetWords
