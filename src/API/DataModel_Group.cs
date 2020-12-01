@@ -50,7 +50,4 @@ namespace ClearBible.Clear3.API
     /// </summary>
     /// 
     public record PrimaryPosition(int Int);
-
-
-
 }

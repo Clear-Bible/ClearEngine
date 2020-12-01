@@ -19,14 +19,23 @@ namespace ClearBible.Clear3.API
     // FIXME: What else should be part of persistence?
 
 
-    // Legacy data model for persisting an alignment.
-
+    
+    /// <summary>
+    /// Clear2 data model for persisting an alignment.
+    /// </summary>
+    /// 
     public class LegacyPersistentAlignment
     {
         public LpaLine[] Lines;
     }
 
 
+    /// <summary>
+    /// Alignment data for a single zone, consisting of a database of
+    /// information about the source and translation words, and a collection
+    /// of many-to-many links between source and translation words.
+    /// </summary>
+    /// 
     public class LpaLine
     {
         public LpaManuscript manuscript;
@@ -38,41 +47,117 @@ namespace ClearBible.Clear3.API
     }
 
 
+    /// <summary>
+    /// Information about the manuscript words that occur in
+    /// a zone.
+    /// </summary>
+    /// 
     public class LpaManuscript
     {
         public LpaManuscriptWord[] words;
     }
 
 
+    /// <summary>
+    /// Information about the translated words that occur in
+    /// a zone.
+    /// </summary>
+    /// 
     public class LpaTranslation
     {
         public LpaTranslationWord[] words;
     }
 
 
+    /// <summary>
+    /// Information about a single manuscript word.
+    /// </summary>
+    /// 
     public class LpaManuscriptWord
     {
+        /// <summary>
+        /// Source ID as a canonical string (which contains only decimal
+        /// digits) and then converted to a long integer.
+        /// </summary>
+        /// 
         public long id;
+
+        /// <summary>
+        /// Alternate ID of the form, for example, "λόγος-2" to mean the
+        /// second occurence of the lemma "λόγος" within this zone
+        /// </summary>
+        /// 
         public string altId;
+
+        /// <summary>
+        /// Surface text.
+        /// </summary>
+        /// 
         public string text;
+
+        /// <summary>
+        /// Strong number, with prefix such as "G" or "H" to indicate
+        /// language, as obtained from the treebank.
+        /// </summary>
+        /// 
         public string strong;
+
         public string gloss;
         public string gloss2;
+
         public string lemma;
+
+        /// <summary>
+        /// Part of speech, as obtained from the treebank.
+        /// </summary>
+        /// 
         public string pos;
+
+        /// <summary>
+        /// Morphology, a string that encodes the linguistic morphological
+        /// analysis of this word, as obtained from the treebank.
+        /// </summary>
+        /// 
         public string morph;
     }
 
 
+    /// <summary>
+    /// Information about a single translation word.
+    /// </summary>
+    /// 
     public class LpaTranslationWord
     {
+        /// <summary>
+        /// TargetID as a canonical string (which contains only digits) and
+        /// then converted to a long integer.
+        /// </summary>
+        /// 
         public long id;
+
+        /// <summary>
+        /// Alternate ID of the form, for example, "word-2" to mean the
+        /// second occurence of the lowercased text "word" within this zone.
+        /// </summary>
+        /// 
         public string altId;
+
+        /// <summary>
+        /// Text, not lowercased.
+        /// </summary>
+        /// 
         public string text;
     }
 
-    
 
+    /// <summary>
+    /// Link, expressed as an association between a set of source words
+    /// and a set of target words.  The particular words are specified by
+    /// their array indices within the LpaManuscriptWord[] and
+    /// LpaTranslationWord[] that are given for this zone.  There might
+    /// be an associated score for this link.
+    /// </summary>
+    /// 
     public class LpaLink
     {
         public int[] source;
@@ -81,7 +166,13 @@ namespace ClearBible.Clear3.API
 
     }
 
-    
+
+    /// <summary>
+    /// Clear2 data structure used for persisting an alignment when there
+    /// is a gateway translation involved.
+    /// </summary>
+    /// FIXME: Maybe refactor.
+    /// 
     public class LegacyPersistentAlignmentWithGateway
     {
         public LpaManuscript manuscript;
@@ -96,6 +187,12 @@ namespace ClearBible.Clear3.API
     }
 
 
+    /// <summary>
+    /// Helper class for JSON import and export of the list of LpaLink
+    /// objects.
+    /// </summary>
+    /// FIXME: Maybe consider alternatives.
+    /// 
     public class LpaLinkJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType)
