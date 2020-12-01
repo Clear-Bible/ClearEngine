@@ -12,6 +12,15 @@ using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    // Internal Data Model for Tree-based Auto Alignment Algorithm
+    //------------------------------------------------------------
+
+
+    /// <summary>
+    /// Something that might be a TargetPoint or might
+    /// be nothing.
+    /// </summary>
+    /// 
     public record MaybeTargetPoint(
         TargetPoint TargetPoint)
     {
@@ -38,6 +47,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
+    /// <summary>
+    /// A TargetBond that might not have a TargetPoint.
+    /// </summary>
+    /// 
     public record OpenTargetBond(
         MaybeTargetPoint MaybeTargetPoint,
         double Score)
@@ -46,6 +59,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
+    /// <summary>
+    /// A MonoLink with an OpenTargetBond instead of a
+    /// TargetBond, and whose OpenTargetBond can be reset.
+    /// </summary>
+    /// 
     public class OpenMonoLink
     {
         public SourcePoint SourcePoint { get; }
@@ -69,23 +87,52 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-
+    /// <summary>
+    /// A Candidate represents a sequence of zero or more choices
+    /// of MaybeTargetPoint objects, with also a probability associated with
+    /// this sequence.
+    /// </summary>
+    /// 
     public class Candidate
     {
+        /// <summary>
+        /// The sequence of choices represented by this Candidate.
+        /// </summary>
+        /// 
         public CandidateChain Chain;
+
+        /// <summary>
+        /// The overall probability of the sequence of choices
+        /// represented by this Candidate.
+        /// </summary>
+        /// 
         public double Prob;
 
+        /// <summary>
+        /// Constructs a Candidate with a sequence of zero choices.
+        /// </summary>
+        /// 
         public Candidate()
         {
             Chain = new CandidateChain();
         }
 
+        /// <summary>
+        /// Constructs a Candidate with a sequence of exactly
+        /// one MaybeTargetPoint, which is given.
+        /// </summary>
+        /// 
         public Candidate(MaybeTargetPoint tw, double probability)
         {
             Chain = new CandidateChain(Enumerable.Repeat(tw, 1));
             Prob = probability;
         }
 
+        /// <summary>
+        /// Constructs a Candidate with a sequence of choices
+        /// that is given.
+        /// </summary>
+        ///
         public Candidate(CandidateChain chain, double probability)
         {
             Chain = chain;
@@ -94,7 +141,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
     /// <summary>
-    /// A CandidateChain is a sequence of TargetWord objects
+    /// A CandidateChain is a sequence of MaybeTargetPoint objects
     /// or a sequence of Candidate objects.
     /// </summary>
     /// 
@@ -137,8 +184,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
     /// <summary>
-    /// An AlternativesForTerminals object is a mapping:
-    /// SourceWord.ID => AlternativeCandidates.
+    /// An AlternativesForTerminals object maps a SourceID (as a canonical
+    /// string) to a list of Candidates for that are alternatives for
+    /// that source word.
     /// </summary>
     /// 
     public class AlternativesForTerminals : Dictionary<string, List<Candidate>>

@@ -40,19 +40,27 @@ namespace ClearBible.Clear3.API
         Dictionary<string, string> OldLinksForVerse(
             string legacyVerseID);
 
+        // FIXME: Maybe change this to TryGetEstimatedTranslations
+        //
         bool TryGetTranslations(
             string lemma,
             out TryGet<string, double> tryGetScoreForTargetText);
 
+        // FIXME: Maybe change this to TryGetConfirmedTranslations
+        //
         bool TryGetManTranslations(
             string lemma,
             out TryGet<string, double> tryGetScoreForTargetText);
 
+        // FIXME: Maybe change this to TryGetEstimatedAlignment
+        //
         bool TryGetAlignment(
             string sourceID,
             string targetID,
             out double score);
 
+        // FIXME: Maybe change this to TryGetSomeEstimatedAlignment
+        //
         bool TryGetPreAlignment(
             string sourceID,
             out string targetID);
