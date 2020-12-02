@@ -173,7 +173,7 @@ namespace ClearBible.Clear3.Impl.ResourceService
         public string IndexFile =>
             Path.Combine(ResourceFolder, "index");
 
-        public Segmenter CreateSegmenter(Uri segmenterAlgorithmUri)
+        public ISegmenter CreateSegmenter(Uri segmenterAlgorithmUri)
         {
             throw new NotImplementedException();
         }
@@ -191,7 +191,7 @@ namespace ClearBible.Clear3.Impl.ResourceService
         }
 
 
-        public Versification GetVersification(Uri versificationUri)
+        public IVersification GetVersification(Uri versificationUri)
         {
             throw new NotImplementedException();
         }
