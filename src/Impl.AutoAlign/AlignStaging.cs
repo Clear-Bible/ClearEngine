@@ -219,40 +219,98 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        /// <summary>
+        /// Get candidate target points for linking to an unlinked source
+        /// point the lie in the region surrounding an anchor link.
+        /// </summary>
+        /// <param name="anchorLink">
+        /// The anchoring link that determines the region to be searched.
+        /// </param>
+        /// <param name="targetPoints">
+        /// The target points in the zone.
+        /// </param>
+        /// <param name="linkedTargets">
+        /// The source IDs (as canonical strings) for those target points
+        /// that are already linked.
+        /// </param>
+        /// <param name="assumptions">
+        /// Assumptions that constrain the auto alignment.
+        /// </param>
+        /// <returns>
+        /// Candidate target points for linking to the unlinked source
+        /// point.
+        /// </returns>
+        /// 
         public static List<MaybeTargetPoint> GetTargetCandidates(
             OpenMonoLink anchorLink,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
             IAutoAlignAssumptions assumptions)
         {
+            // Get the anchor position as an index into the list of
+            // target points.
             int anchor = anchorLink.OpenTargetBond.MaybeTargetPoint.Position;
 
+            // Helper function to generate an enumeration that starts to
+            // the left of the anchor position and goes down for three steps.
             IEnumerable<int> down()
             {
                 for (int i = anchor - 1; i >= anchor - 3; i--)
                     yield return i;
             }
 
+            // Helper function to generate an enumeration that goes to
+            // the right of the anchor position and goes up for three steps.
             IEnumerable<int> up()
             {
                 for (int i = anchor + 1; i <= anchor + 3; i++)
                     yield return i;
             }
 
+            // Search for suitable target words to the left and to the
+            // right of the anchor position.
             return
                 getWords(down())
                 .Concat(getWords(up()))
                 .ToList();
 
-            IEnumerable<MaybeTargetPoint> getWords(IEnumerable<int> positions) =>
-                PositionsToTargetCandidates(
-                    positions,
-                    targetPoints,
-                    linkedTargets,
-                    assumptions);
+            // Helper function that looks for suitable target words within
+            // an enumeration of index positions.
+            IEnumerable<MaybeTargetPoint> getWords(
+                IEnumerable<int> positions) =>
+                    PositionsToTargetCandidates(
+                        positions,
+                        targetPoints,
+                        linkedTargets,
+                        assumptions);
         }
 
 
+        /// <summary>
+        /// Get candidate target points for linking to an unlinked source
+        /// point between a link on the left and a link on the right.
+        /// </summary>
+        /// <param name="leftAnchor">
+        /// The neighboring link on the left.
+        /// </param>
+        /// <param name="rightAnchor">
+        /// The neighboring link on the right.
+        /// </param>
+        /// <param name="targetPoints">
+        /// The target points in the zone.
+        /// </param>
+        /// <param name="linkedTargets">
+        /// The source IDs (as canonical strings) for those target points
+        /// that are already linked.
+        /// </param>
+        /// <param name="assumptions">
+        /// Assumptions that constrain the auto alignment.
+        /// </param>
+        /// <returns>
+        /// Candidate target points for linking to the unlinked source
+        /// point.
+        /// </returns>
+        /// 
         public static List<MaybeTargetPoint> GetTargetCandidates(
             OpenMonoLink leftAnchor,
             OpenMonoLink rightAnchor,
@@ -260,6 +318,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<string> linkedTargets,
             IAutoAlignAssumptions assumptions)
         {
+            // Helper function that enumerates the indices of target points
+            // between the left and right neighbors.
             IEnumerable<int> span()
             {
                 for (int i = leftAnchor.OpenTargetBond.MaybeTargetPoint.Position;
@@ -270,6 +330,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
+            // Convert the enumeration to a list of target candidates.
             return PositionsToTargetCandidates(
                 span(),
                 targetPoints,
@@ -278,12 +339,41 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        /// <summary>
+        /// Find target points in a specified enumeration of target point
+        /// positions that are suitable for linking to an unlinked source
+        /// point.
+        /// </summary>
+        /// <param name="positions">
+        /// Enumeration of the target point positions to be considered.
+        /// </param>
+        /// <param name="targetPoints">
+        /// Target points for the zone.
+        /// </param>
+        /// <param name="linkedTargets">
+        /// Target IDs (as canonical strings) of target points that are
+        /// already linked.
+        /// </param>
+        /// <param name="assumptions">
+        /// Assumptions that constrain the auto-alignment.
+        /// </param>
+        /// <returns>
+        /// Suitable target points, as a list of MaybeTargetPoint objects.
+        /// </returns>
+        /// 
         public static IEnumerable<MaybeTargetPoint> PositionsToTargetCandidates(
             IEnumerable<int> positions,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
             IAutoAlignAssumptions assumptions)
         {
+            // Starting from the enumerated positions and keeping only those
+            // that are valid indices, look up the target point for each index,
+            // get the lower-cased text of the target point, if assuming
+            // content words only then remove those that are function words,
+            // keep only those not already linked, take the resulting
+            // sequence only until punctuation is found, and convert to
+            // MaybeTargetPoint objects.
             var ansr =
                 positions
                 .Where(n => n >= 0 && n < targetPoints.Count)
@@ -302,12 +392,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return ansr;
 
+            // Helper function to check for a content word.
             bool isContentWord(string text) =>
                 !assumptions.IsTargetFunctionWord(text);
 
+            // Helper function to check that a target point is not
+            // linked already.
             bool isNotLinkedAlready(string text) =>
                 !linkedTargets.Contains(text);
 
+            // Helper function to check for punctuation.
             bool isNotPunctuation(string text) =>
                 !assumptions.IsPunctuation(text);
         }
