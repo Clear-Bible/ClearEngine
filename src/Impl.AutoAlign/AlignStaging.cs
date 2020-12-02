@@ -429,10 +429,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        /// <summary>
+        /// Given a table of candidate alignments for a syntax tree
+        /// subnode together with the probabilities for each
+        /// alignment, return a revised table with the probabilities
+        /// adjusted in certain ways.
+        /// </summary>
+        /// <param name="pathProbs">
+        /// The table to be examined.  The key is the candidate and the
+        /// value is the (log) probability of that candidate.
+        /// </param>
+        /// 
         public static Dictionary<CandidateChain, double>
             AdjustProbsByDistanceAndOrder(
                 Dictionary<CandidateChain, double> pathProbs)
         {
+            // Find the minimum value of the ComputeDistance metric
+            // as applied to the candidates.
             int minimalDistance =
                 pathProbs.Keys
                 .Select(ComputeDistance)
@@ -441,9 +454,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             if (minimalDistance > 0)
             {
+                // Helper function to compute a new probability
+                // from the result of the ComputeDistance metric.
                 double getDistanceProb(double distance) =>
                     Math.Log(minimalDistance / distance);
 
+                // Considering each entry in the pathProbs table,
+                // make a new table with revised probabilities based
+                // on the ComputeDistance and ComputeOrderProb metrics
+                // for the chain.
                 return
                     pathProbs
                     .Select(kvp => new { Chain = kvp.Key, Prob = kvp.Value })
@@ -455,6 +474,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
             else
             {
+                // The minimum value of the ComputeDistance metric
+                // was zero; in this case, just use the original table
+                // without modification.
                 return pathProbs;
             }
         }

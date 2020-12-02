@@ -95,6 +95,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// represents the assignment of the MaybeTargetPoint to the corresponding
     /// SourcePoint.)
     /// </summary>
+    ///
+    /// FIXME: Would like to consider ways to rework Candidate,
+    /// CandidateChain, and associated data structures in the tree-based
+    /// alignment algorithm to simplify and make understanding easier.
+    /// Would it help somehow to use maps instead of lists in some places?
+    /// Would like to get rid of the untyped ArrayList that shows up as
+    /// the base class of CandidateChain.
+    /// Would it help to use OpenTargetBond earlier in the process?
+    /// Is there a way to make the meaning inherent in Candidate and
+    /// Candidate chain without a matching sequence of SourcePoint
+    /// objects that is implicit?
     /// 
     public class Candidate
     {
@@ -152,6 +163,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// candidate represents the assignment of the MaybeTargetPoint to
     /// the corresponding SourcePoint.)
     /// </summary>
+    ///
+    /// FIXME: See FIXME notes for Candidate.
     /// 
     public class CandidateChain : ArrayList
     {
