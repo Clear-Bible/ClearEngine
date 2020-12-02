@@ -822,17 +822,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // If any such links were found:
             if (linkedSiblings.Count > 0)
             {
-
+                // Get the nearest such link before the unlinked source point.
                 OpenMonoLink preNeighbor =
                     AutoAlignUtility.GetPreNeighbor(sourceNode, linkedSiblings);
 
+                // Get the nearest such link after the unlinked source point.
                 OpenMonoLink postNeighbor =
                     AutoAlignUtility.GetPostNeighbor(sourceNode, linkedSiblings);
 
+                // Prepare to collect candidate target points.
                 List<MaybeTargetPoint> targetCandidates = new List<MaybeTargetPoint>();
 
+                // If there are neighboring links on both sides:
                 if (preNeighbor != null && postNeighbor != null)
                 {
+                    // Find suitable candidate target points that lie
+                    // between the neighboring links.
                     targetCandidates =
                         AlignStaging.GetTargetCandidates(
                             preNeighbor,
@@ -841,8 +846,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             linkedTargets,
                             assumptions);
                 }
+                // Otherwise if there is (only) a neighboring link to
+                // the left:
                 else if (preNeighbor != null)
                 {
+                    // Find suitable candidate target points that lie
+                    // in the region surrounding the left neighbor.
                     targetCandidates =
                         AlignStaging.GetTargetCandidates(
                             preNeighbor,
@@ -850,8 +859,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             linkedTargets,
                             assumptions);
                 }
+                // Otherwise if there is (only) a neighboring link to
+                // the right:
                 else if (postNeighbor != null)
                 {
+                    // Find suitable candidate target points that lie
+                    // in the region surrounding the right neighbor.
                     targetCandidates =
                         AlignStaging.GetTargetCandidates(
                             postNeighbor,
@@ -860,14 +873,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             assumptions);
                 }
 
+                // If any target candidates were found:
                 if (targetCandidates.Count > 0)
                 {
+                    // Perform further analysis to determine the best
+                    // candidate from among the target candidates.
                     OpenTargetBond newTarget = GetTopCandidate(
                         sourceNode,
                         targetCandidates,
                         linkedTargets,
                         assumptions);
 
+                    // If a best candidate was found:
                     if (newTarget != null)
                     {
                         return newTarget;
@@ -875,11 +892,35 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
+            // No suitable candidate was found by any of the strategies
+            // above.
             return null;
         }
 
 
-
+        /// <summary>
+        /// Examine the candidate target points that have been identified
+        /// for possible linking to an unlinked source point during the
+        /// ImproveAlignment() phase, and find the best one.
+        /// </summary>
+        /// <param name="sWord">
+        /// The unlinked source point.
+        /// </param>
+        /// <param name="tWords">
+        /// The candidate target points, as a list of MaybeTargetPoint.
+        /// </param>
+        /// <param name="linkedTargets">
+        /// List of target ID (as a canonical string) for those target
+        /// points that are already linked.
+        /// </param>
+        /// <param name="assumptions">
+        /// Assumptions that constrain the auto-alignment.
+        /// </param>
+        /// <returns>
+        /// An OpenTargetBond for the best candidate, or null if there
+        /// is no suitable candidate.
+        /// </returns>
+        /// 
         public static OpenTargetBond GetTopCandidate(
             SourcePoint sWord,
             List<MaybeTargetPoint> tWords,
@@ -887,6 +928,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             IAutoAlignAssumptions assumptions
             )
         {
+            // Make a table of probabilities for suitable
+            // target points.
+            // Starting with the candidate target points,
+            // filter out those that are unsuitable, get
+            // the score from the estimated translation model,
+            // keep only those with a score of at least 0.17,
+            // and make a table for the results.
+            // The table maps the candidate to the log of
+            // its score.
+            // A candidate is unsuitable if:
+            // the target word is punctuation;
+            // the target point is a stopword;
+            // it has been identified as a bad link;
+            // the source point is a stop word and the
+            // candidate has not been identified as a
+            // good link;
+            // or the target word is already linked.
             Dictionary<MaybeTargetPoint, double> probs =
                 tWords
                 .Where(notPunctuation)
@@ -904,49 +962,83 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     x => x.tWord,
                     x => Math.Log(x.score));
 
+            // Helper function to test that target point is not punctuation.
             bool notPunctuation(MaybeTargetPoint tw) =>
                 !assumptions.IsPunctuation(tw.Lower);
 
+            // Helper function to test that target point is not a stopword.
             bool notTargetStopWord(MaybeTargetPoint tw) =>
                 !assumptions.IsStopWord(tw.Lower);
 
+            // Helper function to test that target point is not already linked.
             bool notAlreadyLinked(MaybeTargetPoint tw) =>
                 !linkedTargets.Contains(tw.ID);
 
+            // Helper function to test that candidate is not a bad link.
             bool notBadLink(MaybeTargetPoint tw) =>
                 !assumptions.IsBadLink(sWord.Lemma, tw.Lower);
 
+            // Helper function to test that if source point is a stopword
+            // then candidate is a good link.
             bool sourceStopWordImpliesIsGoodLink(MaybeTargetPoint tw) =>
                 !assumptions.IsStopWord(sWord.Lemma) ||
                 assumptions.IsGoodLink(sWord.Lemma, tw.Lower);
 
+            // Helper function to obtain the score for a candidate
+            // from the estimated translation model.
             double getTranslationModelScore(MaybeTargetPoint tw) =>
                 assumptions.GetTranslationModelScore(sWord.Lemma, tw.Lower);
-            
 
+            // If the probabilities table has any entries:
             if (probs.Count > 0)
             {
-                List<MaybeTargetPoint> candidates = SortWordCandidates(probs);
+                // Sort the candidates by their probabilities in
+                // descending order, with a special auxiliary hashing
+                // function to break ties:
+                List<MaybeTargetPoint> candidates =
+                    SortWordCandidates(probs);
 
+                // Get the first candidate in the result.
                 MaybeTargetPoint topCandidate = candidates[0];
 
+                // Express the candidate as an OpenTargetBond.
                 OpenTargetBond linkedWord = new OpenTargetBond(
                     MaybeTargetPoint: topCandidate,
                     Score: probs[topCandidate]);
-                
+
                 return linkedWord;
             }
 
+            // No suitable candidates were found; give up.
             return null;
         }
 
 
+        /// <summary>
+        /// Sort target word candidates by their probabilities, using
+        /// a special hashing function to break ties.
+        /// </summary>
+        /// <param name="pathProbs">
+        /// Table mapping the candidates to their probabilities.
+        /// </param>
+        /// <returns>
+        /// The sorted candidates.
+        /// </returns>
+        /// 
         public static List<MaybeTargetPoint> SortWordCandidates(
             Dictionary<MaybeTargetPoint, double> pathProbs)
         {
+            // Helper function to compute auxiliary hash code:
+            // construct a string mentioning the lower-cased
+            // text and position of the candidate, and call the
+            // standard hashing function on this string.
             int hashCodeOfWordAndPosition(MaybeTargetPoint tw) =>
                 $"{tw.Lower}-{tw.Position}".GetHashCode();
 
+            // Starting from the candidates table, order the
+            // entries by probability in descending order and
+            // then by the auxiliary hash code, and return the
+            // candidates for the resulting sorted entries.
             return
                 pathProbs
                     .OrderByDescending(kvp => kvp.Value)
@@ -957,39 +1049,36 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
- 
-
-
-        static Dictionary<string, int> BuildPrimaryPositionTable(
-            GroupTranslationsTable groups)
-        {
-            return
-                groups.Dictionary
-                .Select(kvp => kvp.Value)
-                .SelectMany(groupTranslations =>
-                    groupTranslations.Select(tg => new
-                    {
-                        text = tg.TargetGroupAsText.Text.Replace(" ~ ", " "),
-                        position = tg.PrimaryPosition.Int
-                    }))
-                .GroupBy(x => x.text)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.First().position);
-        }
-
-
+        /// <summary>
+        /// Interchange bonds in an alignment to avoid crossings.
+        /// A crossing occurs where there are links between the same
+        /// source lemma and target lowercased text, but the order
+        /// of the source and target points are such that the link
+        /// lines would cross over each other in a picture.
+        /// </summary>
+        /// <param name="links">
+        /// The alignment to be examined, expressed as a list of
+        /// OpenMonoLink objects.
+        /// </param>
+        /// 
         public static void FixCrossingOpenMonoLinks(
             List<OpenMonoLink> links)
         {
+            // Group the links by the lemma of the source point,
+            // find those groups that have two members and test
+            // positive for crossing, and then swap the target
+            // bonds between the two OpenMonoLink objects in
+            // the group.
             foreach (OpenMonoLink[] cross in links
                 .GroupBy(link => link.SourcePoint.Lemma)
-                .Where(group => group.Count() == 2 && CrossingWip(group))
+                .Where(group => group.Count() == 2 && CrossingMono(group))
                 .Select(group => group.ToArray()))
             {
                 swapTargetBonds(cross[0], cross[1]);
             }
 
+            // Helper function to swap the target bonds between two
+            // OpenMonoLink objects.
             void swapTargetBonds(OpenMonoLink link1, OpenMonoLink link2)
             {
                 OpenTargetBond temp = link1.OpenTargetBond;
@@ -999,21 +1088,45 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static bool CrossingWip(IEnumerable<OpenMonoLink> mappedWords)
+        /// <summary>
+        /// Test whether a pair of OpenMonoLink objects is crossing.
+        /// </summary>
+        /// <param name="mappedWords">
+        /// The pair to be tested, as an enumeration of OpenMonoLink
+        /// objects with two members.
+        /// </param>
+        /// <returns>
+        /// True if crossing and false if not.
+        /// </returns>
+        /// 
+        public static bool CrossingMono(IEnumerable<OpenMonoLink> mappedWords)
         {
+            // Get the source positions as the tree positions of the source
+            // points in the links.
             int[] sourcePos =
                 mappedWords.Select(mw => mw.SourcePoint.TreePosition).ToArray();
 
+            // Get the target positions as the positions of the target points
+            // in the links.
             int[] targetPos =
                 mappedWords.Select(mw => mw.OpenTargetBond.MaybeTargetPoint.Position).ToArray();
 
+            // If any target position is negative, the links are not crossing.
+            // (This happens when a source point is not linked to anything.)
             if (targetPos.Any(i => i < 0)) return false;
 
+            // The links are crossing if the order of the source points
+            // does not match the order of the target points.
             return
                 (sourcePos[0] < sourcePos[1] && targetPos[0] > targetPos[1]) ||
                 (sourcePos[0] > sourcePos[1] && targetPos[0] < targetPos[1]);
         }
 
+
+        /// <summary>
+        /// (Implementation of IAutoAlignmentService.MakeStandardAssumptions.)
+        /// </summary>
+        /// 
         public IAutoAlignAssumptions MakeStandardAssumptions(
             TranslationModel translationModel,
             TranslationModel manTransModel,
@@ -1032,6 +1145,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, Dictionary<string, int>> strongs,
             int maxPaths)
         {
+            // Delegate to the AutoAlignAssumptions class.
             return new AutoAlignAssumptions(
                 translationModel,
                 manTransModel,
