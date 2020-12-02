@@ -57,7 +57,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         }
 
 
-        public List<ZoneAlignmentProblem> ImportZoneAlignmentFactsFromLegacy(
+        public List<ZoneAlignmentProblem> ImportZoneAlignmentProblemsFromLegacy(
             string parallelSourcePath,
             string parallelTargetPath)
         {

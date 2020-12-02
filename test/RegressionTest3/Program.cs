@@ -93,7 +93,7 @@ namespace RegressionTest3
             // Import the translation that is to be aligned.
 
             List<ZoneAlignmentProblem> zoneAlignmentFactsList =
-                importExportService.ImportZoneAlignmentFactsFromLegacy(
+                importExportService.ImportZoneAlignmentProblemsFromLegacy(
                     parallelSourcePath: InPath("source.id.lemma.txt"),
                     parallelTargetPath: InPath("target.id.txt"));
 
