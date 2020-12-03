@@ -8,6 +8,11 @@ using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.DefaultSegmenter
 {
+    /// <summary>
+    /// Implementation of ISegmenter.  The code here was taken from Clear2
+    /// with very little change.
+    /// </summary>
+    /// 
     public class DefaultSegmenter : ISegmenter
     {
         public string[] GetSegments(

@@ -12,17 +12,32 @@ using BuildTransModels = TransModels.BuildTransModels;
 
 namespace ClearBible.Clear3.Impl.SMTService
 {
+    /// <summary>
+    /// (Implementation of ISMTService.)
+    /// </summary>
+    /// 
     public class SMTService : ISMTService
     {
+        /// <summary>
+        /// Implementation of ISMTService.DefaultSMT.
+        /// The code here wraps the statistical machine translation
+        /// functions from Clear2, which have not otherwise been touched.
+        /// </summary>
+        /// 
         public (TranslationModel, AlignmentModel) DefaultSMT(
             ParallelCorpora parallelCorpora,
             string runSpec = "1:10;H:5",
             double epsilon = 0.1)
         {
+            // Create a temporary work folder.
+
             string workFolderPath = Path.Combine(
                     Path.GetTempPath(),
                     Path.GetRandomFileName());
             Directory.CreateDirectory(workFolderPath);
+
+
+            // Prepare to use files in the temporary work folder.
 
             string tempPath(string name)
                 => Path.Combine(workFolderPath, name);
@@ -33,6 +48,15 @@ namespace ClearBible.Clear3.Impl.SMTService
                 tempTargetIdPath = tempPath("targetId"),
                 tempTransModelPath = tempPath("transModel"),
                 tempAlignModelPath = tempPath("alignModel");
+
+
+            // Prepare input files in the temporary folder from the
+            // input data.
+
+            // Note that the wrapped code only uses the source and target
+            // IDs from the sourceId and targetId files, and does not care
+            // about the lemma or the target text that would be there in
+            // Clear2.
 
             using (StreamWriter sw =
                         new StreamWriter(tempSourcePath, false, Encoding.UTF8))
@@ -74,6 +98,9 @@ namespace ClearBible.Clear3.Impl.SMTService
                 }
             }
 
+
+            // Train the model and write out the translation model
+            // and alignment model.
             BuildTransModels.BuildModels(
                     tempSourcePath,
                     tempTargetPath,
@@ -84,6 +111,10 @@ namespace ClearBible.Clear3.Impl.SMTService
                     tempTransModelPath,
                     tempAlignModelPath);
 
+
+            // Import the translation model and alignment model from the
+            // temporary files that received the data.
+
             ImportExportService.ImportExportService importExportService =
                 new ImportExportService.ImportExportService();
 
@@ -93,7 +124,11 @@ namespace ClearBible.Clear3.Impl.SMTService
             AlignmentModel alignModel =
                 importExportService.ImportAlignmentModel(tempAlignModelPath);
 
+
+            // Delete the temporary work folder and its contents.
+
             Directory.Delete(workFolderPath, true);
+
 
             return (transModel, alignModel);
         }

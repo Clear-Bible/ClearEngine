@@ -180,10 +180,12 @@ namespace ClearBible.Clear3.Impl.ResourceService
 
         
 
-        public Dictionary<string, string> GetStringsDictionary(Uri stringsDictionaryUri)
+        public Dictionary<string, string> GetStringsDictionary(
+            Uri stringsDictionaryUri)
         {
             throw new NotImplementedException();
         }
+
 
         public HashSet<string> GetStringSet(Uri stringSetUri)
         {
