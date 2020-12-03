@@ -14,9 +14,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     public class AutoAlignUtility
     {
 
-
+        /// <summary>
+        /// Get the terminal nodes underneath a syntax tree node.
+        /// </summary>
+        /// <param name="treeNode">
+        /// The syntax tree node to be examined.
+        /// </param>
+        /// <returns>
+        /// The list of terminal nodes in syntax tree order.
+        /// </returns>
+        /// 
         public static List<XElement> GetTerminalXmlNodes(XElement treeNode)
         {
+            // Starting from the treeNode, get all of its descendants in
+            // tree order, and keep only those nodes whose first child as
+            // a Text node in XML.
             return treeNode
                 .Descendants()
                 .Where(e => e.FirstNode is XText)
@@ -173,6 +185,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        /// <summary>
+        /// Create a list containing just one empty candidate.
+        /// </summary>
+        /// 
         public static List<Candidate> CreateEmptyCandidate()
         {
             return new List<Candidate>()
@@ -182,8 +198,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        // returns "text1-posn1 text2-posn2 ..."
-        //
+        /// <summary>
+        /// Get a string that expresses the sequence of target words implied
+        /// by a Candidate.  See also GetWordsInPath().
+        /// </summary>
+        /// <param name="c">
+        /// The Candidate to be examined.
+        /// </param>
+        /// <returns>
+        /// A string of the form "text1-posn1 text2-posn2 ..." consisting of
+        /// space separated fields, where each field combines the lower-cased
+        /// target text with the position of the target point within the zone.
+        /// </returns>
+        /// 
         public static string GetWords(Candidate c)
         {
             List<MaybeTargetPoint> wordsInPath = GetTargetWordsInPath(c.Chain);
@@ -198,31 +225,67 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return words.Trim();
         }
 
-
-        public static List<MaybeTargetPoint> GetTargetWordsInPath(CandidateChain path)
+        /// <summary>
+        /// Get the sequence of MaybeTargetPoint objects implied by a
+        /// CandidateChain.
+        /// </summary>
+        /// 
+        public static List<MaybeTargetPoint> GetTargetWordsInPath(
+            CandidateChain path)
         {
+            // Helper function for converting the CandidateChain
+            // as an ArrayList into an enumeration of MaybeTargetPoint
+            // objects.
             IEnumerable<MaybeTargetPoint> helper(ArrayList path)
             {
+                // If the ArrayList is empty:
                 if (path.Count == 0)
                 {
+                    // Return an enumeration with just one MaybeTargetPoint
+                    // that does not have any TargetPoint inside of it.
                     return new MaybeTargetPoint[] { CreateFakeTargetWord() };
                 }
+                // Otherwise if the ArrayList contains Candidate objects:
                 else if (path[0] is Candidate)
                 {
+                    // Interpret the ArrayList as a sequence of Candidate
+                    // objects, get the CandidateChain from each Candidate in
+                    // the sequence, call this helper function recursively on
+                    // each of the CandidateChain objects, and then flatten
+                    // the result.
                     return path
                         .Cast<Candidate>()
                         .SelectMany(c => helper(c.Chain));
                 }
                 else
                 {
+                    // Otherwise the ArrayList contains TargetPoint objects.
+                    // The result is just an enumeration of those objects.
                     return path.Cast<MaybeTargetPoint>();
                 }
             }
 
+            // The result is found by converting the enumeration produced
+            // the the helper function into a list.
             return helper(path).ToList();
+
+            // FIXME: see FIXME notes under Candidate.
         }
 
 
+        /// <summary>
+        /// Get a string that expresses the sequence of target words implied
+        /// by a CandidateChain.  See also GetWords().
+        /// </summary>
+        /// <param name="path">
+        /// The CandidateChain to be examined.
+        /// </param>
+        /// <returns>
+        /// A string of the form "text1-posn1 text2-posn2 ..." consisting of
+        /// space separated fields, where each field combines the lower-cased
+        /// target text with the position of the target point within the zone.
+        /// </returns>
+        /// 
         public static string GetWordsInPath(CandidateChain path)
         {
             List<MaybeTargetPoint> wordsInPath = GetTargetWordsInPath(path);
@@ -238,34 +301,78 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-
+        /// <summary>
+        /// Create a MaybeTargetPoint that does not really have a
+        /// target point inside of it.
+        /// </summary>
+        /// 
         public static MaybeTargetPoint CreateFakeTargetWord()
         {
             return new MaybeTargetPoint(TargetPoint: null);
         }
 
 
-
-        public static List<OpenTargetBond> GetOpenTargetBonds(Candidate candidate)
+        /// <summary>
+        /// Get the list of OpenTargetBond objects implied by a Candidate.
+        /// </summary>
+        /// 
+        public static List<OpenTargetBond> GetOpenTargetBonds(
+            Candidate candidate)
         {
+            // Prepare to collect OpenTargetBond objects.
             List<OpenTargetBond> linkedWords = new List<OpenTargetBond>();
+
+            // Call the helper function to traverse the CandidateChain of
+            // the Candidate, using the probability of the candidate in
+            // the those of the OpenTargetBond objects that correspond to
+            // MaybeTargetPoints in the CandidateChain.  (There will also
+            // be OpenTargetBond objects corresponding to empty
+            // sub-CandidateChain objects; these OpenTargetBond objects will
+            // have no TargetPoint and a probability of -1000).
             GetLinkedWordsHelper(candidate.Chain, linkedWords, candidate.Prob);
+
             return linkedWords;
         }
 
 
-        public static void GetLinkedWordsHelper(ArrayList path, List<OpenTargetBond> links, double prob)
+        /// <summary>
+        /// Generate OpenTargetBond objects corresponding to
+        /// a CandidateChain that is expressed as an ArrayList,
+        /// adding the OpenTargetBond objects found to a collection
+        /// </summary>
+        /// <param name="path">
+        /// The CandidateChain that is to be examined.
+        /// </param>
+        /// <param name="links">
+        /// The collection to which the OpenTargetBond objects are
+        /// to be appended.
+        /// </param>
+        /// <param name="prob">
+        /// The probability that is to be used for those OpenTargetBond
+        /// objects corresponding to any MaybeTargetPoint objects found.
+        /// </param>
+        /// 
+        public static void GetLinkedWordsHelper(
+            ArrayList path,
+            List<OpenTargetBond> links,
+            double prob)
         {
+            // If the ArrayList is empty:
             if (path.Count == 0)
             {
+                // Append an OpenTargetBond that does not really contain
+                // a TargetPoint, with a probability of -1000.
                 links.Add(new OpenTargetBond(
                     MaybeTargetPoint: new MaybeTargetPoint(TargetPoint: null),
                     Score: -1000));
             }
             else
             {
+                // If the ArrayList contains Candidate objects:
                 if (path[0] is Candidate)
                 {
+                    // Call this function recursively on the CandidateChain
+                    // of each Candidate in the ArrayList, in order.
                     foreach (Candidate c in path)
                     {
                         GetLinkedWordsHelper(c.Chain, links, c.Prob);
@@ -273,6 +380,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
                 else
                 {
+                    // The ArrayList contains MaybeTargetPoint objects.
+
+                    // For each MaybeTargetPoint, add an OpenTargetBond
+                    // made from the MaybeTargetPoint and the probability
+                    // parameter.
                     foreach (MaybeTargetPoint tWord in path)
                     {
                         links.Add(new OpenTargetBond(
