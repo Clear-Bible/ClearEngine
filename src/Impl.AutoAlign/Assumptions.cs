@@ -10,6 +10,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.Miscellaneous;
 
+    /// <summary>
+    /// (Implementation of IAutoAlignAssumptions.)
+    /// </summary>
+    /// 
     public class AutoAlignAssumptions : IAutoAlignAssumptions
     {
         private TranslationModel _translationModel;

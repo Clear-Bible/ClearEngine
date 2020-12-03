@@ -11,6 +11,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.Impl.Miscellaneous;
 
 
+    // This file is work in progress.
+    // The functions here have not yet been exposed through the API.
+
+
     public class MappedGroup
     {
         public List<SourcePoint> SourcePoints = new List<SourcePoint>();
