@@ -1,10 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\API\Api.csproj" />
+    <ProjectReference Include="..\Impl.AutoAlign\Impl.AutoAlign.csproj" />
+    <ProjectReference Include="..\Impl.ResourceService\Impl.ResourceService.csproj" />
+    <ProjectReference Include="..\Impl.ImportExportService\Impl.ImportExportService.csproj" />
+    <ProjectReference Include="..\Impl.Segmenter\Impl.Segmenter.csproj" />
+    <ProjectReference Include="..\Impl.SMTService\Impl.SMTService.csproj" />
+    <ProjectReference Include="..\Impl.Utility\Impl.Utility.csproj" />
+    <ProjectReference Include="..\Impl.Persistence\Impl.Persistence.csproj" />
   </ItemGroup>
 </Project>

@@ -1,17 +1,34 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
-using AlignmentTool;
-using GBI_Aligner;
-using Utilities;
+using Newtonsoft.Json;
+
+
+using ClearBible.Clear3.API;
+using ClearBible.Clear3.Service;
+using ClearBible.Clear3.SubTasks;
 
 namespace RegressionTest3
 {
     /// <summary>
-    /// Test that exercises GBI_Aligner as a basis for study and rework.
+    /// Regression test that exercises the tree-based auto-aligner
+    /// using input files.  This test assumes that the alignment problem
+    /// has already been stated and the statistical translation model has
+    /// already been trained, and imports the appropriate collateral from
+    /// instead of computing it again.
     /// </summary>
+    /// <remarks>
+    /// This test was used during the initial development as Clear2 was
+    /// incrementally transformed into the Clear3 prototype.  Some of these
+    /// transformation steps changed the results slightly, thought to be
+    /// because of issues being fixed and slight differences in the way
+    /// that some of the algorithms are breaking ties.
+    /// </remarks>
+    /// 
     /// 
     class Program
     {
@@ -19,75 +36,123 @@ namespace RegressionTest3
         {
             Console.WriteLine("Starting Regression Test 3.");
 
+            // Establish input and output folders.
+
             string inputFolder = Path.Combine(".", "Input");
             string outputFolder = Path.Combine(".", "Output");
-            string treeFolder =
-                Path.Combine("..", "TestSandbox1", "SyntaxTrees");
 
             string InPath(string path) => Path.Combine(inputFolder, path);
             string OutPath(string path) => Path.Combine(outputFolder, path);
 
-            string parallelSourceIdPath = InPath("source.id.txt");
-            string parallelSourceIdLemmaPath = InPath("source.id.lemma.txt");
-            string parallelTargetIdPath = InPath("target.id.txt");
-            string transModelPath = InPath("transModel.txt");
-            string alignModelPath = InPath("alignModel.txt");
-            string manTransModelPath = InPath("manTransModel.txt");
+            // Import auxiliary assumptions from files: punctuation,
+            // stop words, function words, manual translation model,
+            // good and bad links, old alignment, glossary table,
+            // and Strongs data.
 
-            string jsonOutput = OutPath("alignment.json");
 
-            Dictionary<string, Dictionary<string, double>> transModel =
-                Data.GetTranslationModel(transModelPath);
-            Dictionary<string, Dictionary<string, Stats>> manTransModel =
-                Data.GetTranslationModel2(manTransModelPath);
+            (List<string> puncs,
+             List<string> stopWords,
+             List<string> sourceFunctionWords,
+             List<string> targetFunctionWords,
+             TranslationModel manTransModel,
+             Dictionary<string, int> goodLinks,
+             Dictionary<string, int> badLinks,
+             Dictionary<string, Gloss> glossTable,
+             GroupTranslationsTable groups,
+             Dictionary<string, Dictionary<string, string>> oldLinks,
+             Dictionary<string, Dictionary<string, int>> strongs)
+             =
+             ImportAuxAssumptionsSubTask.Run(
+                 puncsPath: InPath("puncs.txt"),
+                 stopWordsPath: InPath("stopWords.txt"),
+                 sourceFuncWordsPath: InPath("sourceFuncWords.txt"),
+                 targetFuncWordsPath: InPath("targetFuncWords.txt"),
+                 manTransModelPath: InPath("manTransModel.txt"),
+                 goodLinksPath: InPath("goodLinks.txt"),
+                 badLinksPath: InPath("badLinks.txt"),
+                 glossTablePath: InPath("Gloss.txt"),
+                 groupsPath: InPath("groups.txt"),
+                 oldAlignmentPath: InPath("oldAlignment.json"),
+                 strongsPath: InPath("strongs.txt"));
 
-            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
-            Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
-            Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
+            // Get the standard tree service.
 
-            bool useAlignModel = true;
-            int maxPaths = 1000000;
+            ITreeService treeService = GetStandardTreeServiceSubtask.Run(
+                resourceFolder: "Resources");
 
-            List<string> puncs = Data.GetWordList(InPath("puncs.txt"));
-            Dictionary<string, List<TargetGroup>> groups = Data.LoadGroups(InPath("groups.txt"));           
-            List<string> stopWords = Data.GetStopWords(InPath("stopWords.txt"));
 
-            Dictionary<string, int> goodLinks = Data.GetXLinks(InPath("goodLinks.txt"));
-            int goodLinkMinCount = 3;
-            Dictionary<string, int> badLinks = Data.GetXLinks(InPath("badLinks.txt"));
-            int badLinkMinCount = 3;
+            // Get ready to use the Clear3 API.
 
-            Dictionary<string, Gloss> glossTable = Data.BuildGlossTableFromFile(InPath("Gloss.txt"));
+            IClear30ServiceAPI clearService = Clear30Service.FindOrCreate();
 
-            Dictionary<string, Dictionary<string, string>> oldLinks =
-                Data.GetOldLinks(InPath("oldAlignment.json"), groups);
+            IImportExportService importExportService =
+                clearService.ImportExportService;
 
-            List<string> sourceFuncWords = Data.GetWordList(InPath("sourceFuncWords.txt"));
-            List<string> targetFuncWords = Data.GetWordList(InPath("targetFuncWords.txt"));
 
-            bool contentWordsOnly = true;
+            // Import the translation that is to be aligned.
 
-            Dictionary<string, Dictionary<string, int>> strongs =
-                Data.BuildStrongTable(InPath("strongs.txt"));
+            List<ZoneAlignmentProblem> zoneAlignmentFactsList =
+                importExportService.ImportZoneAlignmentProblemsFromLegacy(
+                    parallelSourcePath: InPath("source.id.lemma.txt"),
+                    parallelTargetPath: InPath("target.id.txt"));
 
+
+            // Import the translation model and alignment model, as
+            // produced from a prior STM step, from files.
+
+            TranslationModel transModel =
+                importExportService.ImportTranslationModel(
+                    InPath("transModel.txt"));
+
+            AlignmentModel alignmentModel =
+                importExportService.ImportAlignmentModel(
+                    InPath("alignModel.txt"));
+
+
+            // Specify the assumptions to be used during the
+            // auto-alignment.
+            
+            IAutoAlignAssumptions assumptions =
+                clearService.AutoAlignmentService.MakeStandardAssumptions(
+                    translationModel: transModel,
+                    manTransModel: manTransModel,
+                    alignProbs: alignmentModel,
+                    useAlignModel: true,
+                    puncs: puncs,
+                    stopWords: stopWords,
+                    goodLinks: goodLinks,
+                    goodLinkMinCount: 3,
+                    badLinks: badLinks,
+                    badLinkMinCount: 3,
+                    oldLinks: oldLinks,
+                    sourceFuncWords: sourceFunctionWords,
+                    targetFuncWords: targetFunctionWords,
+                    contentWordsOnly: true,
+                    strongs: strongs,
+                    maxPaths: 1000000);
 
             Console.WriteLine("Calling Auto Aligner.");
 
-            AutoAligner.AutoAlign(
-                parallelSourceIdPath, parallelSourceIdLemmaPath,
-                parallelTargetIdPath,
-                jsonOutput,
-                transModel, manTransModel,
-                treeFolder,
-                bookNames,
-                alignProbs, preAlignment, useAlignModel,
-                maxPaths,
-                puncs, groups, stopWords,
-                goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
-                glossTable,
-                oldLinks,
-                sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
+            // Auto-align the translation pairs, using the tree service,
+            // glossary, and assumptions, to produce an alignment expressed
+            // in the Alignment2 format.
+
+            LegacyPersistentAlignment alignment =
+                AutoAlignFromModelsNoGroupsSubTask.Run(
+                    zoneAlignmentFactsList,
+                    treeService,
+                    glossTable,
+                    assumptions);
+
+            // Export from the Alignment2 format to a file.
+
+            string json = JsonConvert.SerializeObject(
+                alignment.Lines,
+                Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText(OutPath("alignment.json"), json);
+
+            Console.WriteLine("Done.");
         }
     }
 }

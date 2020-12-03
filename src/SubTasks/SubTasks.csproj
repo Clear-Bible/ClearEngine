@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\API\Api.csproj" />
+    <ProjectReference Include="..\Clear3Service\Clear3Service.csproj" />
+  </ItemGroup>
+</Project>

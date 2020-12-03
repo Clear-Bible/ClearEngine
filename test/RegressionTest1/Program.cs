@@ -1,35 +1,40 @@
 ﻿
-using AlignmentTool;
-using GBI_Aligner;
-using Newtonsoft.Json;
-using ParallelFiles;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Tokenizer;
-using TransModels;
-using Utilities;
+using System.Linq;
+
+using Newtonsoft.Json;
+
+using ClearBible.Clear3.API;
+using ClearBible.Clear3.Service;
+using ClearBible.Clear3.SubTasks;
 
 namespace RegressionTest1
 {
     class Program
     {
         /// <summary>
-        /// Regression Test 1.  Checks for expected Clear3 behavior in
-        /// a simple representative complete auto-alignment example.
+        /// Regression test that imports a translation, uses a legacy
+        /// versification to determine parallel zones, trains a statistical
+        /// translation model, performs tree-based auto-alignment, and
+        /// writes the result to a file in the legacy format.
         /// </summary>
         /// <remarks>
-        /// 2020-sep-08 tims  Current form of this test is to support
-        /// initial development;  expecting some rework of file locations
-        /// before first production release.
+        /// This test was used during the initial development as Clear2 was
+        /// incrementally transformed into the Clear3 prototype.  Some of these
+        /// transformation steps changed the results slightly, thought to be
+        /// because of issues being fixed and slight differences in the way
+        /// that some of the algorithms are breaking ties.
         /// </remarks>
         /// 
         static void Main(string[] args)
         {
             Console.WriteLine("Regression Test 1");
 
+
             // Check that current directory is reasonable.
+
             DirectoryInfo dir = new DirectoryInfo(".");
             if (!dir.Name.Equals("TestSandbox1"))
             {
@@ -43,171 +48,200 @@ namespace RegressionTest1
             Console.WriteLine(Directory.GetCurrentDirectory());
             Console.WriteLine();
 
-            Console.WriteLine("Option: 1 Brief, 2 Long");
-            Console.Write("? ");
-            if (!int.TryParse(Console.ReadLine(), out int option) ||
-                option != 1 && option != 2)
-            {
-                Console.WriteLine("Unrecognized Option");
-                return;
-            }
-            option -= 1;
+
+            // Prepare for input and output.
+
+            // option = 0 for Brief, 1 for Long.
+            int option = 0;
 
             string[] inputFolders = { "InputBrief", "InputLong" };
             string[] outputFolders = { "OutputBrief", "OutputLong" };
             string[] referenceFolders = { "ReferenceBrief", "ReferenceLong" };
 
-            string inputFolder = inputFolders[option];            
+            string inputFolder = inputFolders[option];
             string outputFolder = outputFolders[option];
             string referenceFolder = referenceFolders[option];
             string commonFolder = "InputCommon";
-            string treeFolder = "SyntaxTrees";
 
-            Func<string,Func<string, string>> prefix =
-                pre => s => Path.Combine(pre, s);
+            Func<string, string> prefix(string pre) =>
+                s => Path.Combine(pre, s);
+
             Func<string, string>
                 input = prefix(inputFolder),
                 output = prefix(outputFolder),
                 common = prefix(commonFolder),
                 reference = prefix(referenceFolder);
 
+
+            // Get ready to use the Clear3 API.
+
+            IClear30ServiceAPI clearService =
+                Clear30Service.FindOrCreate();
+
+            IImportExportService importExportService =
+                clearService.ImportExportService;
+
+            IUtility utility = clearService.Utility;
+
+
+            // Get the standard tree service.
+
+            ITreeService treeService = GetStandardTreeServiceSubtask.Run(
+                resourceFolder: "Resources");
+
+
+            // Import auxiliary assumptions from files: punctuation,
+            // stop words, function words, manual translation model,
+            // good and bad links, old alignment, glossary table,
+            // and Strongs data.
+
+            (List<string> puncs,
+             List<string> stopWords,
+             List<string> sourceFunctionWords,
+             List<string> targetFunctionWords,
+             TranslationModel manTransModel,
+             Dictionary<string, int> goodLinks,
+             Dictionary<string, int> badLinks,
+             Dictionary<string, Gloss> glossTable,
+             GroupTranslationsTable groups,
+             Dictionary<string, Dictionary<string, string>> oldLinks,
+             Dictionary<string, Dictionary<string, int>> strongs)
+             =
+             ImportAuxAssumptionsSubTask.Run(
+                 puncsPath: common("puncs.txt"),
+                 stopWordsPath: common("stopWords.txt"),
+                 sourceFuncWordsPath: common("sourceFuncWords.txt"),
+                 targetFuncWordsPath: common("targetFuncWords.txt"),
+                 manTransModelPath: common("manTransModel.txt"),
+                 goodLinksPath: common("goodLinks.txt"),
+                 badLinksPath: common("badLinks.txt"),
+                 glossTablePath: common("Gloss.txt"),
+                 groupsPath: common("groups.txt"),
+                 oldAlignmentPath: common("oldAlignment.json"),
+                 strongsPath: common("strongs.txt"));
+
+
+            // Get the translation that is to be aligned.
+
             string versePath = input("Verse.txt");
-            string tokPath = output("target.punc.txt");
             string lang = "English";
-            List<string> puncs = Data.GetWordList(common("puncs.txt"));
 
             Console.WriteLine("Tokenizing");
-            Tokens.Tokenize(versePath, tokPath, puncs, lang);
 
-            string versificationPath = common("Versification.xml");
-            ArrayList versificationList =
-                Versification.LoadVersificationList(versificationPath,
-                "S1", "id");
+            TargetVerseCorpus targetVerseCorpus =
+                importExportService.ImportTargetVerseCorpusFromLegacy(
+                    versePath,
+                    clearService.DefaultSegmenter,
+                    puncs,
+                    lang);
 
-            string sourcePath = common("source.txt");
-            string sourceIdPath = common("source.id.txt");
-            string sourceIdLemmaPath = common("source.id.lemma.txt");
-            string targetPath = output("target.punc.txt");
-            string parallelSourcePath = output("source.txt");
-            string parallelSourceIdPath = output("source.id.txt");
-            string parallelSourceIdLemmaPath = output("source.id.lemma.txt");
-            string parallelTargetPath = output("target.txt");
-            string parallelTargetIdPath = output("target.id.txt");
 
-            Console.WriteLine("Creating Parallel Files");
-            GroupVerses.CreateParallelFiles(
-                sourcePath, sourceIdPath, sourceIdLemmaPath,
-                targetPath,
-                parallelSourcePath,
-                parallelSourceIdPath, parallelSourceIdLemmaPath,
-                parallelTargetPath, parallelTargetIdPath,
-                versificationList);
+            // Import the versification.
 
-            List<string> sourceFuncWords = Data.GetWordList(common("sourceFuncWords.txt"));
-            List<string> targetFuncWords = Data.GetWordList(common("targetFuncWords.txt"));
+            SimpleVersification simpleVersification =
+                importExportService.ImportSimpleVersificationFromLegacy(
+                    common("Versification.xml"),
+                    "S1");
+                    
 
-            string parallelCwSourcePath = output("sourceFile.cw.txt");
-            string parallelCwSourceIdPath = output("sourceFile.id.cw.txt");
-            string parallelCwTargetPath = output("targetFile.cw.txt");
-            string parallelCwTargetIdPath = output("targetFile.id.cw.txt");
+            // Use the versification with the target verses to line up
+            // translated zones with sourced zones.
 
-            Data.FilterOutFunctionWords(parallelSourcePath, parallelCwSourcePath, sourceFuncWords);
-            Data.FilterOutFunctionWords(parallelSourceIdPath, parallelCwSourceIdPath, sourceFuncWords);
-            Data.FilterOutFunctionWords(parallelTargetPath, parallelCwTargetPath, targetFuncWords);
-            Data.FilterOutFunctionWords(parallelTargetIdPath, parallelCwTargetIdPath, targetFuncWords);
+            Console.WriteLine("Creating Parallel Corpora");
 
-            string transModelPath = output("transModel.txt");
-            string alignModelPath = output("alignModel.txt");
+            ParallelCorpora parallelCorpora = utility.CreateParallelCorpora(
+                targetVerseCorpus,
+                treeService,
+                simpleVersification);
+
+
+            // Remove functions words from the parallel corpora, leaving
+            // only the content words for the SMT step to follow.
+
+            ParallelCorpora parallelCorporaCW =
+               utility.FilterFunctionWordsFromParallelCorpora(
+                   parallelCorpora,
+                   sourceFunctionWords,
+                   targetFunctionWords);
+
+
+            // Train a statistical translation model using the parallel
+            // corpora with content words only, producing an estimated
+            // translation model and estimated alignment.
 
             Console.WriteLine("Building Models");
-            BuildTransModels.BuildModels(
-                parallelCwSourcePath, parallelCwTargetPath, parallelCwSourceIdPath, parallelCwTargetIdPath,
-                "1:10;H:5", 0.1,
-                transModelPath, alignModelPath);
+ 
+            (TranslationModel transModel2, AlignmentModel alignProbs2) =
+                clearService.SMTService.DefaultSMT(
+                    parallelCorporaCW);
 
-            Dictionary<string, string> bookNames = BookTables.LoadBookNames3();
 
-            string jsonOutput = output("alignment.json");
+            // Use the parallel corpora (with both the function words and
+            // the content words included) to state the zone alignment
+            // problems for the tree-based auto-aligner.
 
-            Dictionary<string, Dictionary<string, double>> transModel =
-                Data.GetTranslationModel(transModelPath);
-            Dictionary<string, Dictionary<string, Stats>> manTransModel =
-                Data.GetTranslationModel2(common("manTransModel.txt"));
-            Dictionary<string, double> alignProbs = Data.GetAlignmentModel(alignModelPath);
-            Dictionary<string, string> preAlignment = Data.BuildPreAlignmentTable(alignProbs);
+            List<ZoneAlignmentProblem> zoneAlignmentProblems =
+                parallelCorpora.List
+                .Select(zonePair =>
+                    new ZoneAlignmentProblem(
+                        zonePair.TargetZone,
+                        zonePair.SourceZone.List.First().SourceID.VerseID,
+                        zonePair.SourceZone.List.Last().SourceID.VerseID))
+                .ToList();
+
+
+            // Specify the assumptions to be used during the
+            // tree-based auto-alignment.
+
             bool useAlignModel = true;
             int maxPaths = 1000000;
-            Dictionary<string, List<TargetGroup>> groups = Data.LoadGroups(common("groups.txt"));
-            List<string> stopWords = Data.GetStopWords(common("stopWords.txt"));
-            Dictionary<string, int> goodLinks = Data.GetXLinks(common("goodLinks.txt"));
             int goodLinkMinCount = 3;
-            Dictionary<string, int> badLinks = Data.GetXLinks(common("badLinks.txt"));
             int badLinkMinCount = 3;
-            Dictionary<string, Gloss> glossTable = Data.BuildGlossTableFromFile(common("Gloss.txt"));
-            Dictionary<string, Dictionary<string, string>> oldLinks = Data.GetOldLinks(common("oldAlignment.json"), groups);
             bool contentWordsOnly = true;
-            Dictionary<string, Dictionary<string, int>> strongs = Data.BuildStrongTable(common("strongs.txt"));
+
+            IAutoAlignAssumptions assumptions =
+                clearService.AutoAlignmentService.MakeStandardAssumptions(
+                    transModel2,
+                    manTransModel,
+                    alignProbs2,
+                    useAlignModel,
+                    puncs,
+                    stopWords,
+                    goodLinks,
+                    goodLinkMinCount,
+                    badLinks,
+                    badLinkMinCount,
+                    oldLinks,
+                    sourceFunctionWords,
+                    targetFunctionWords,
+                    contentWordsOnly,
+                    strongs,
+                    maxPaths);
+
+            
+            // Apply a tree-based auto-alignment to each of the zone
+            // alignment problems, producing an alignment datum in the
+            // persistent format.
 
             Console.WriteLine("Auto Alignment");
-            AutoAligner.AutoAlign(
-                parallelSourceIdPath, parallelSourceIdLemmaPath,
-                parallelTargetIdPath,
-                jsonOutput,
-                transModel, manTransModel,
-                treeFolder,
-                bookNames,
-                alignProbs, preAlignment, useAlignModel,
-                maxPaths,
-                puncs, groups, stopWords,
-                goodLinks, goodLinkMinCount, badLinks, badLinkMinCount,
-                glossTable,
-                oldLinks,
-                sourceFuncWords, targetFuncWords, contentWordsOnly, strongs);
 
-            string jsonOutputRef = reference("alignment.json");
-
-            string jsonText = File.ReadAllText(output("alignment.json"));
-            Line[] lines = JsonConvert.DeserializeObject<Line[]>(jsonText);
-            string jsonTextR = File.ReadAllText(reference("alignment.json"));
-            Line[] linesR = JsonConvert.DeserializeObject<Line[]>(jsonTextR);
-            int n = lines.Length;
-            int nR = linesR.Length;
-            if (n != nR)
-            {
-                Console.WriteLine("Unequal numbers of lines.");
-                return;
-            }
-            int differentLines = 0;
-            for (int i = 0; i < n; i++)
-            {
-                Line line = lines[i];
-                Line lineR = linesR[i];
-                if (line.links.Count != lineR.links.Count)
-                {
-                    Console.WriteLine($"Line {i} links {line.links.Count} ref {lineR.links.Count}");
-                    differentLines++;
-                }
-            }
-            Console.WriteLine($"Different lines: {differentLines}");
-            ;
-            
+            LegacyPersistentAlignment alignment =
+                AutoAlignFromModelsNoGroupsSubTask.Run(
+                    zoneAlignmentProblems,
+                    treeService,
+                    glossTable,
+                    assumptions);
 
 
-            //Console.WriteLine("Comparing JSON Output Files");
-            //if (FilesMatch(jsonOutput, jsonOutputRef))
-            //{
-            //    Console.WriteLine("*** OK ***");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("*** JSON output differs from reference. ***");
-            //}
-            //Console.WriteLine("End of Regression Test 1");
-        }
+            // Export the persistent-format datum to a file.
 
-        static bool FilesMatch(string path1, string path2)
-        {
-            return true;
+            string json = JsonConvert.SerializeObject(
+                alignment.Lines,
+                Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText(output("alignment.json"), json);
+
+
+            Console.WriteLine("Done");
         }
     }
 }
