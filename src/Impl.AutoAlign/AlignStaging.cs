@@ -407,36 +407,77 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        public static List<CandidateChain> CreatePaths(List<List<Candidate>> childCandidatesList, int maxPaths)
+
+        /// <summary>
+        /// Get the alternative alignments for a node of the syntax tree
+        /// by combining the alternatives for the child nodes.
+        /// </summary>
+        /// <param name="childCandidatesList">
+        /// List of alternative alignments for child nodes, where each
+        /// member is itself a list of the alternatives for one of the
+        /// child nodes.
+        /// </param>
+        /// <param name="maxPaths">
+        /// The maximum number of alternatives to allow at any
+        /// point in the process of generating alternatives, in order
+        /// to mitigate a possible combinatorial explosion.
+        /// </param>
+        /// <returns>
+        /// A list of alternative alignments for the node, each expressed
+        /// as a CandidateChain.
+        /// </returns>
+        /// 
+        public static List<CandidateChain> CreatePaths(
+            List<List<Candidate>> childCandidatesList,
+            int maxPaths)
         {
+            // Compute the maximum number of alternatives as the product of
+            // the numbers of alternatives for all of the children.
             // FIXME: what about overflow?
-            // Maybe the condition (maxArcs <= 0) below is meant for overflow?
-            //
             int maxArcs =
                 childCandidatesList
                 .Select(candidates => candidates.Count)
                 .Aggregate(1, (product, n) => product * n);
 
-            int maxDepth = // GetMaxDepth(childCandidatesList); // maximum sub-list length
+            // Compute the maximum length of the sublists of alternatives
+            // for the children.
+            int maxDepth =
                 childCandidatesList
                 .Select(candidates => candidates.Count)
                 .DefaultIfEmpty(0)
                 .Max();
 
+            // If the maximum number of alternatives exceeds maxPaths:
+            // FIXME: is the test maxArcs <0 in case the product above
+            // oveflows?  If so, is this strategy adequate?
             if (maxArcs > maxPaths || maxArcs <= 0)
             {
-                double root = Math.Pow((double)maxPaths, 1.0 / childCandidatesList.Count);
+                // Adjust maxdepths so that its n-th power is at most
+                // maxPaths, where n is the number of children.
+                double root = Math.Pow(
+                    (double)maxPaths,
+                    1.0 / childCandidatesList.Count);
                 maxDepth = (int)root;
             }
 
+            // Prepare to collect alternatives.
             List<CandidateChain> depth_N_paths = new List<CandidateChain>();
 
             try
             {
-                depth_N_paths = CreatePathsWithDepthLimit(childCandidatesList, maxDepth);
+                // Create alternatives with the maxDepth limit in force.
+                depth_N_paths =
+                    CreatePathsWithDepthLimit(childCandidatesList, maxDepth);
             }
             catch
             {
+                // I think this block is meant to catch memory overflow:
+
+                // FIXME:  See FIXME notes for catch block in
+                // ComputeTopCandidates().
+
+                // Start over by calling this function recursively with
+                // maxPaths cut in half.
                 depth_N_paths = CreatePaths(childCandidatesList, maxPaths / 2);
             }
 
@@ -444,21 +485,47 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        /// <summary>
+        /// Get the alternative alignments for a node of the syntax tree
+        /// by combining the alternatives for the child nodes.
+        /// </summary>
+        /// <param name="childCandidatesList">
+        /// List of alternative alignments for child nodes, where each
+        /// member is itself a list of the alternatives for one of the
+        /// child nodes.
+        /// </param>
+        /// <param name="depth">
+        /// The maximum number of alternatives to consider for any one
+        /// child.
+        /// </param>
+        /// <returns>
+        /// A list of alternative alignments for the node, each expressed
+        /// as a CandidateChain.
+        /// </returns>
+        /// 
         public static List<CandidateChain> CreatePathsWithDepthLimit(
             List<List<Candidate>> childCandidatesList,
             int depth)
         {
+            // If there are multiple child candidate alternatives:
             if (childCandidatesList.Count > 1)
             {
+                // Compute the head candidates by taking the first depth
+                // plus one of the alternatives for the first child.
                 IEnumerable<Candidate> headCandidates =
                     childCandidatesList[0].Take(depth + 1);
 
-                // (recursive call)
+                // Compute the tail candidates by calling this function
+                // recursively to generate alternatives for the remaining
+                // children.
                 List<CandidateChain> tailPaths =
                     CreatePathsWithDepthLimit(
                         getTail(childCandidatesList),
                         depth);
 
+                // Combine the head and tail alignments by prepending each
+                // head candidate to each of the tail candidates, and taking
+                // at most the first 16000000 members of the resulting list.
                 return
                     headCandidates
                     .SelectMany((Candidate nHeadCandidate) =>
@@ -470,6 +537,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
             else
             {
+                // Otherwise there is only one set of alternatives
+                // (because the recursive calls have reached the last
+                // child).
+
+                // Take the first depth plus one alternatives and
+                // convert each once to a CandidateChain to obtain
+                // the result.
                 return
                     childCandidatesList[0]
                     .Take(depth + 1)
@@ -477,24 +551,45 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .ToList();
             }
 
+            // Helper function to get the tail of the list of list
+            // of candidates.
             List<List<Candidate>> getTail(List<List<Candidate>> x) =>
                 x.Skip(1).ToList();
 
+            // Helper function to convert a Candidate to a CandidateChain.
             CandidateChain makeSingletonChain(Candidate candidate) =>
                 new CandidateChain(Enumerable.Repeat(candidate, 1));
+
+            // FIXME: See FIXME notes for Candidate.
         }
 
 
-        // prepends head to a copy of tail to obtain result
-        public static CandidateChain ConsChain(Candidate head, CandidateChain tail)
+        /// <summary>
+        /// Prepend a Candidate to a CandidateChain to obtain a new
+        /// Candidate chain.
+        /// </summary>
+        /// 
+        public static CandidateChain ConsChain(
+            Candidate head,
+            CandidateChain tail)
         {
             return new CandidateChain(
                 tail.Cast<Candidate>().Prepend(head));
         }
 
 
+        /// <summary>
+        /// Test that a CandidateChain does not have two source points
+        /// linked to the same target point.
+        /// </summary>
+        /// 
         public static bool HasNoDuplicateWords(CandidateChain path)
         {
+            // Test whether the CandidateChain has any duplicate words:
+            // Starting with the CandidateChain, get the MaybeTargetPoint
+            // objects mentioned in the chain, keep only those that really
+            // have target points, group the result by target point identity,
+            // and test whether any group has at least two members.
             bool pathHasDuplicateWords =
                 AutoAlignUtility.GetTargetWordsInPath(path)
                 .Where(word => !word.IsNothing)
@@ -503,18 +598,40 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return !pathHasDuplicateWords;
 
+            // Helper function to test of a group has at least two members.
             bool hasAtLeastTwoMembers(IEnumerable<MaybeTargetPoint> words) =>
                 words.Skip(1).Any();
         }
 
 
+        /// <summary>
+        /// Get the candidates of maximal probability, converting them
+        /// from CandidateChain to Candidate in the process.
+        /// </summary>
+        /// <param name="paths">
+        /// The candidates, each expressed as a candidate chain, assumed
+        /// to be sorted in order of decreasing probability.
+        /// </param>
+        /// <param name="probs">
+        /// A table of the probability for each candidate.
+        /// </param>
+        /// <returns>
+        /// The list of candidates with maximal probability.
+        /// </returns>
+        /// 
         public static List<Candidate> GetLeadingCandidates(
             List<CandidateChain> paths,
             Dictionary<CandidateChain, double> probs)
         {
+            // Get the probability of the first candidate on
+            // the list (if there is one).
             double leadingProb =
                 paths.Select(path => probs[path]).FirstOrDefault();
 
+            // Take candidates from the list as long as their
+            // probabilities are equal to the leading probability,
+            // converting each of the candidates found from
+            // CandidateChain to Candidate.
             return
                 paths
                 .Select(path => new Candidate(path, probs[path]))
@@ -576,33 +693,81 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
+        /// <summary>
+        /// Compute a distance metric for an alignment candidate.
+        /// </summary>
+        /// <param name="path">
+        /// The alignment candidate expressed as a CandidateChain.
+        /// </param>
+        /// <returns>
+        /// The distance metric.
+        /// </returns>
+        /// 
         public static int ComputeDistance(CandidateChain path)
         {
+            // Get the motions implied by the alignment.
             IEnumerable<Tuple<int, int>> motions = ComputeMotions(path);
 
+            // Return the sum of the absolute values of the sizes
+            // of the motions.
             return motions.Sum(m => Math.Abs(m.Item1 - m.Item2));
         }
 
 
+        /// <summary>
+        /// Compute an order probability metric for a CandidateChain,
+        /// based on what fraction of the motions implied by the
+        /// CandidateChain go backwards.
+        /// </summary>
+        /// <param name="path">
+        /// The alignment candidate expressed as a CandidateChain.
+        /// </param>
+        /// <returns>
+        /// The order metric.
+        /// </returns>
+        /// 
         public static double ComputeOrderProb(CandidateChain path)
         {
+            // Get the motions implied by the alignment.
             IEnumerable<Tuple<int, int>> motions = ComputeMotions(path);
 
+            // Get the number of motions, and add 1 to prevent division
+            // by zero in what follows.
             double countedWords = 1 + motions.Count();
+
+            // Get the number of backward motions.
             double violations = motions.Count(m => m.Item2 < m.Item1);
 
+            // Compute the metric based on what fraction of motions
+            // go backwards.
             return Math.Log(1.0 - violations / countedWords);
         }
 
 
+        /// <summary>
+        /// Compute the motions implied by a CandidateChain.
+        /// </summary>
+        /// <returns>
+        /// A list of motions, where each motion is a pair with
+        /// the indices of two adjacent target points in the
+        /// alignment.
+        /// </returns>
+        /// 
         public static IEnumerable<Tuple<int, int>> ComputeMotions(
             CandidateChain path)
         {
+            // Get the positions of the target points in the chain,
+            // by getting the MaybeTargetPoint objects in the chain,
+            // keeping only those that really have target points,
+            // and then getting their positions.
             IEnumerable<int> positions =
                 AutoAlignUtility.GetTargetWordsInPath(path)
                 .Where(tw => !tw.IsNothing)
                 .Select(tw => tw.Position);
 
+            // Zip the positions with the tail of the positions
+            // to create a list of motions, and keep only those
+            // motions that actually move.
             return
                 positions
                 .Zip(positions.Skip(1), Tuple.Create)
