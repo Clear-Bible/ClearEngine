@@ -14,6 +14,11 @@ namespace ClearBible.Clear3.Impl.TreeService
 {
     using ClearBible.Clear3.API;
 
+    // FIXME: Consider making an abstraction to represent a terminal
+    // node in the syntax tree, to be exposed through the API.
+
+    // FIXME: Consider moving some of the tree-related algorithms
+    // in the system at large into the tree service.
 
     /// <summary>
     /// Represents a treebank.
@@ -263,10 +268,23 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
 
+        /// <summary>
+        /// Get a SourceVerse from the treebank for a specified
+        /// verse ID.
+        /// </summary>
+        /// 
         public SourceVerse GetSourceVerse(VerseID verseID)
         {
             PreloadTreesForChapter(verseID.ChapterID);
 
+            // Starting from the subtrees as obtained from the
+            // treebank for the specified verse, get the
+            // descendants of the subtrees and keep only the
+            // terminal nodes, get the surface text, source ID
+            // and lemma for each terminal node, order the
+            // resulting sequence by source ID (thereby achieving
+            // manuscript order), and convert the results to
+            // a sequence of Source objects.
             return new SourceVerse(
                 GetChapterSubrange(
                     verseID.Book,

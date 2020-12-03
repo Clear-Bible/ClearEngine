@@ -6,23 +6,36 @@ using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.Utility
 {
+    /// <summary>
+    /// (Implementation of IUtility)
+    /// </summary>
+    /// 
     public class Utility : IUtility
     {
+        /// <summary>
+        /// (Implementation of IUtility.CreateParallelCorpora)
+        /// </summary>
+        /// 
         public ParallelCorpora CreateParallelCorpora(
             TargetVerseCorpus targetVerseCorpus,
             ITreeService treeService,
             SimpleVersification simpleVersification)
         {
+            // Prepare to collect ZonePair objects.
             List<ZonePair> zonePairs = new();
 
+            // Make a table mapping VerseID to TargetVerse.
             Dictionary<VerseID, TargetVerse> targetVerseTable =
                 targetVerseCorpus.List
                 .ToDictionary(
                     tv => tv.List[0].TargetID.VerseID,
                     tv => tv);
 
+            // For each zone specification in the simple versification:
             foreach (SimpleZoneSpec zoneSpec in simpleVersification.List)
             {
+                // Get the Target objects for the verses in this zone,
+                // in order.
                 List<Target> targets =
                     zoneSpec.TargetVerses
                     .SelectMany(tVerseID =>
@@ -36,16 +49,20 @@ namespace ClearBible.Clear3.Impl.Utility
                     })
                     .ToList();
 
+                // If any Target objects were found:
                 if (targets.Any())
                 {
+                    // Get the Source objects for the zone.
                     List<Source> sources =
                         zoneSpec.SourceVerses
                         .SelectMany(sVerseID =>
                             treeService.GetSourceVerse(sVerseID).List)
                         .ToList();
 
+                    // If any Source objects were found:
                     if (sources.Any())
                     {
+                        // Add a new ZonePair to the collection.
                         zonePairs.Add(
                             new ZonePair(
                                 new SourceZone(sources),
@@ -58,6 +75,10 @@ namespace ClearBible.Clear3.Impl.Utility
         }
 
 
+        /// <summary>
+        /// (Implementation of IUtility.FilterFunctionWordsFromParallelCorpora)
+        /// </summary>
+        /// 
         public ParallelCorpora FilterFunctionWordsFromParallelCorpora(
             ParallelCorpora toBeFiltered,
             List<string> sourceFunctionWords,
