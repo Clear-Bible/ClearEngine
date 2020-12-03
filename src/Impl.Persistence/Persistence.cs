@@ -10,13 +10,20 @@ namespace ClearBible.Clear3.Impl.Persistence
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.TreeService;
 
+    /// <summary>
+    /// (Implementation of IPersistence.)
+    /// </summary>
     public class Persistence : IPersistence
     {
+        /// <summary>
+        /// (Implementation of IPersistence.GetLpaLine)
+        /// 
         public LpaLine GetLpaLine(
             ZoneMultiAlignment zoneMultiAlignment,
             Dictionary<string, Gloss> glossTable,
             Dictionary<string, int> primaryPositions)
         {
+            // Extract the component parts of the ZoneMultiAlignment.
             ((List<SourcePoint> sourcePoints, List<TargetPoint> targetPoints),
              List<MultiLink> multiLinks)
                 = zoneMultiAlignment;
@@ -91,29 +98,48 @@ namespace ClearBible.Clear3.Impl.Persistence
         }
 
 
-
+        /// <summary>
+        /// Reorder the list of TargetBond so that the primary word
+        /// in a group occurs at the head of the list.
+        /// </summary>
+        /// 
         IEnumerable<TargetBond> WithPrimaryWordFirst(
                 IReadOnlyList<TargetBond> targets,
                 Dictionary<string, int> primaryPositions)
         {
+            // If there are not multiple targets, then there is nothing
+            // to do.
             if (targets.Count <= 1) return targets;
 
+            // Construct the group key as a string of space separated
+            // target words.
             string groupKey =
                 string.Join(
                     " ",
                     targets.Select(t => t.TargetPoint.Lower))
                 .Trim();
 
-            TargetBond primaryWord =
-                targets[primaryPositions[groupKey]];
+            // If the group key occurs in the primary positions table:
+            if (primaryPositions.TryGetValue(groupKey, out int n))
+            {
+                // Get the TargetBond associated with the primary position
+                // for the group.
+                TargetBond primaryWord = targets[n];
 
-            return
-                Enumerable.Empty<TargetBond>()
-                .Append(primaryWord)
-                .Concat(
-                    targets
-                    .Where(t => t != primaryWord))
-                .ToList();
+                // Reorder the TargetBond list to put the primary word at
+                // the front.
+                return
+                    Enumerable.Empty<TargetBond>()
+                    .Append(primaryWord)
+                    .Concat(
+                        targets
+                        .Where(t => t != primaryWord))
+                    .ToList();
+            }
+
+            // The group key does not occur in the primary positions
+            // table.
+            return targets;          
         }
     }
 }
