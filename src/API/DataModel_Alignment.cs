@@ -110,6 +110,7 @@ namespace ClearBible.Clear3.API
         List<Source> List);
 
 
+
     /// <summary>
     /// A word instance as located in a target translation, with its surface
     /// text and identification.
@@ -236,6 +237,17 @@ namespace ClearBible.Clear3.API
                             // source segments in manuscript order for this
                             // zone
         );
+
+
+
+    /// <summary>
+    /// The zero-based position of a SourcePoint within the sequence of
+    /// SourcePoint objects for a zone in manuscript order.
+    /// </summary>
+    /// 
+    public record SourcePointPosition(
+        int Int);
+
 
 
     /// <summary>

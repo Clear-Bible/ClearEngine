@@ -88,6 +88,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
     /// <summary>
+    /// A Candidate2 represents choices of a MaybeTargetPoint object for
+    /// each member of some subset of the source points, with also a score
+    /// that is associated with the candidate as a whole.
+    /// </summary>
+    /// 
+    public record Candidate(
+        Score Score,
+        Dictionary<SourcePointPosition, MaybeTargetPoint> Table
+        );
+    
+
+
+
+    /// <summary>
     /// A Candidate represents a sequence of zero or more MaybeTargetPoint
     /// objects, and with a probability that is associated with the sequence
     /// as a whole.  (In order to interpret what the Candidate means, one has
@@ -107,7 +121,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// Candidate chain without a matching sequence of SourcePoint
     /// objects that is implicit?
     /// 
-    public class Candidate
+    public class Candidate_Old
     {
         /// <summary>
         /// The sequence of assignments represented by this Candidate.
@@ -126,7 +140,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// Constructs a Candidate with a sequence of zero assignments.
         /// </summary>
         /// 
-        public Candidate()
+        public Candidate_Old()
         {
             Chain = new CandidateChain();
         }
@@ -136,7 +150,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// one MaybeTargetPoint, which is given.
         /// </summary>
         /// 
-        public Candidate(MaybeTargetPoint tw, double probability)
+        public Candidate_Old(MaybeTargetPoint tw, double probability)
         {
             Chain = new CandidateChain(Enumerable.Repeat(tw, 1));
             Prob = probability;
@@ -147,7 +161,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// that is given by a CandidateChain.
         /// </summary>
         ///
-        public Candidate(CandidateChain chain, double probability)
+        public Candidate_Old(CandidateChain chain, double probability)
         {
             Chain = chain;
             Prob = probability;
@@ -173,7 +187,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
         }
 
-        public CandidateChain(IEnumerable<Candidate> candidates)
+        public CandidateChain(IEnumerable<Candidate_Old> candidates)
             : base(candidates.ToList())
         {
         }
@@ -190,14 +204,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// objects that are alternatives to one another.
     /// </summary>
     /// 
-    public class AlternativeCandidates : List<Candidate>
+    public class AlternativeCandidates : List<Candidate_Old>
     {
         public AlternativeCandidates()
             : base()
         {
         }
 
-        public AlternativeCandidates(IEnumerable<Candidate> candidates)
+        public AlternativeCandidates(IEnumerable<Candidate_Old> candidates)
             : base(candidates)
         {
         }
@@ -210,7 +224,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// assignments of a TargetPoint for the associated SourcePoint.
     /// </summary>
     /// 
-    public class AlternativesForTerminals : Dictionary<string, List<Candidate>>
+    public class AlternativesForTerminals : Dictionary<string, List<Candidate_Old>>
     {
         public AlternativesForTerminals()
             : base()

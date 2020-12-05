@@ -164,7 +164,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     //
                     return new AlternativeCandidates(new[]
                     {
-                        new Candidate(
+                        new Candidate_Old(
                             new MaybeTargetPoint(targetPoint),
                             0.0)
                     });
@@ -196,7 +196,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Where(tp =>
                         wordIds.ContainsKey(tp.TargetID.AsCanonicalString))
                     .Select(tp => new MaybeTargetPoint(tp))
-                    .Select(mtp => new Candidate(mtp, 0.0)));
+                    .Select(mtp => new Candidate_Old(mtp, 0.0)));
             }
 
             // If the source point is a stop word:
@@ -240,7 +240,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .SelectMany(group =>
                         group
                         .Select(x =>
-                            new Candidate(
+                            new Candidate_Old(
                                 new MaybeTargetPoint(x.targetPoint),
                                 x.score))));
             }
@@ -285,7 +285,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .SelectMany(group =>
                         group
                         .Select(x =>
-                        new Candidate(
+                        new Candidate_Old(
                             new MaybeTargetPoint(x.targetPoint),
                             x.score))));
             }
@@ -348,7 +348,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     // Get the list of the candidates the candidates that
                     // link to the target point, one for each of the
                     // source IDs in this entry.
-                    List<Candidate> conflictingCandidates =
+                    List<Candidate_Old> conflictingCandidates =
                         GetConflictingCandidates(
                             target,
                             positions,
@@ -359,7 +359,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         conflictingCandidates.Max(c => c.Prob);
 
                     // Get those candidates of maximal probability.
-                    List<Candidate> best =
+                    List<Candidate_Old> best =
                         conflictingCandidates
                         .Where(c => c.Prob == topProb)
                         .ToList();
@@ -421,12 +421,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 string morphID = tableEnum.Key;
 
                 // Get the alternatives candidates from the record.
-                List<Candidate> candidates = tableEnum.Value;
+                List<Candidate_Old> candidates = tableEnum.Value;
 
                 // For each alternative candidate except the first one:
                 for (int i = 1; i < candidates.Count; i++) 
                 {
-                    Candidate c = candidates[i];
+                    Candidate_Old c = candidates[i];
 
                     // Get a string with text and position of the target
                     // word associated with this alternative.
@@ -498,7 +498,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// point, one for each of the source IDs.
         /// </returns>
         /// 
-        static List<Candidate> GetConflictingCandidates(
+        static List<Candidate_Old> GetConflictingCandidates(
             string target,
             List<string> positions,
             AlternativesForTerminals candidateTable)
@@ -541,17 +541,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         static void RemoveLosingCandidates(
             string target,
             List<string> positions,
-            Candidate winningCandidate,
+            Candidate_Old winningCandidate,
             AlternativesForTerminals candidateTable)
         {
             // For each source ID (as a canonical string):
             foreach (string morphID in positions)
             {
                 // For each alternative candidate for that source ID:
-                List<Candidate> candidates = candidateTable[morphID];
+                List<Candidate_Old> candidates = candidateTable[morphID];
                 for (int i = 0; i < candidates.Count; i++)
                 {
-                    Candidate c = candidates[i];
+                    Candidate_Old c = candidates[i];
 
                     // Get the string that identifies the target point
                     // by its text and position.
@@ -581,7 +581,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// has an empty candidate chain.
         /// </summary>
         /// 
-        static string GetTargetID(Candidate c)
+        static string GetTargetID(Candidate_Old c)
         {
             if (c.Chain.Count == 0)
             {
@@ -607,7 +607,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // Replace the empty candidate list with a list containing
                 // one empty candidate.
-                List<Candidate> emptyCandidate =
+                List<Candidate_Old> emptyCandidate =
                     AutoAlignUtility.CreateEmptyCandidate();
                 candidateTable[morphID] = emptyCandidate;
             }
@@ -626,7 +626,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             foreach (var tableEnum in candidateTable)
             {
                 string morphID = tableEnum.Key;
-                List<Candidate> candidates = tableEnum.Value;
+                List<Candidate_Old> candidates = tableEnum.Value;
 
                 if (candidates.Count == 0)
                 {
