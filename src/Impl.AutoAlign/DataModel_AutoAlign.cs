@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -8,7 +9,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using ClearBible.Clear3.API;
-
+using System.ComponentModel;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
@@ -88,15 +89,65 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
     /// <summary>
-    /// A Candidate2 represents choices of a MaybeTargetPoint object for
+    /// A TargetMap represents choices of a MaybeTargetPoint object for
+    /// each member of some subset of the source points.
+    /// </summary>
+    /// 
+    public record TargetMap(
+        ImmutableDictionary<SourceID, MaybeTargetPoint> Map)
+    {
+        /// <summary>
+        /// An empty TargetMap.
+        /// </summary>
+        /// 
+        public static TargetMap Empty { get; } =
+            new TargetMap(ImmutableDictionary
+                .Create<SourceID, MaybeTargetPoint>());
+
+        /// <summary>
+        /// Produce a new TargetMap by adding a mapping for a
+        /// source ID that is not already present.
+        /// </summary>
+        /// 
+        public TargetMap Add(SourceID id, MaybeTargetPoint mtp) =>
+            new TargetMap(Map.Add(id, mtp));
+
+        /// <summary>
+        /// Produce a new TargetMap by adding the mappings from a second
+        /// TargetMap, where none of the new source IDs are already mapped.
+        /// </summary>
+        /// 
+        public TargetMap Combine(TargetMap other) =>
+            new TargetMap(Map.AddRange(other.Map.AsEnumerable()));
+    }
+
+
+    /// <summary>
+    /// A Candidate represents choices of a MaybeTargetPoint object for
     /// each member of some subset of the source points, with also a score
     /// that is associated with the candidate as a whole.
     /// </summary>
     /// 
     public record Candidate(
         Score Score,
-        Dictionary<SourcePointPosition, MaybeTargetPoint> Table
-        );
+        TargetMap TargetMap);
+
+
+
+    /// <summary>
+    /// A list of candidates that are alternatives to one another.
+    /// All of the candidates are for the same subset of source points.
+    /// </summary>
+    /// 
+    public record AlternativeCandidates(
+        ImmutableList<Candidate> List)
+    {
+        public static AlternativeCandidates Empty { get; } =
+            new AlternativeCandidates(ImmutableList.Create<Candidate>());
+
+        public AlternativeCandidates Add(Candidate c) =>
+            new AlternativeCandidates(List.Add(c));
+    }
     
 
 
@@ -204,14 +255,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// objects that are alternatives to one another.
     /// </summary>
     /// 
-    public class AlternativeCandidates : List<Candidate_Old>
+    public class AlternativeCandidates_Old : List<Candidate_Old>
     {
-        public AlternativeCandidates()
+        public AlternativeCandidates_Old()
             : base()
         {
         }
 
-        public AlternativeCandidates(IEnumerable<Candidate_Old> candidates)
+        public AlternativeCandidates_Old(IEnumerable<Candidate_Old> candidates)
             : base(candidates)
         {
         }
@@ -224,11 +275,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// assignments of a TargetPoint for the associated SourcePoint.
     /// </summary>
     /// 
-    public class AlternativesForTerminals : Dictionary<string, List<Candidate_Old>>
+    public class AlternativesForTerminals_Old : Dictionary<string, List<Candidate_Old>>
     {
-        public AlternativesForTerminals()
+        public AlternativesForTerminals_Old()
             : base()
         {
         }
-    }
+    }   
 }

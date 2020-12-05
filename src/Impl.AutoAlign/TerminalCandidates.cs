@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -40,7 +41,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// node in the syntax tree.
         /// </returns>
         /// 
-        public static AlternativesForTerminals GetTerminalCandidates(
+        public static AlternativesForTerminals_Old GetTerminalCandidates(
             XElement treeNode,
             Dictionary<string, string> idMap,
             List<TargetPoint> targetPoints,
@@ -48,8 +49,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             IAutoAlignAssumptions assumptions)
         {
             // Prepare to record alternatives for terminal nodes.
-            AlternativesForTerminals candidateTable =
-                new AlternativesForTerminals();
+            AlternativesForTerminals_Old candidateTable =
+                new AlternativesForTerminals_Old();
 
             // For each terminal node beneath the root node of the
             // syntax tree for this zone:
@@ -74,9 +75,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         existingLinks,
                         assumptions);
 
+                AlternativeCandidates_Old topCandidates2 =
+                    new AlternativeCandidates_Old(topCandidates.List
+                        .Select(candidate =>
+                            new Candidate_Old(
+                                candidate.TargetMap.Map.Values.First(),
+                                candidate.Score.Double))
+                        .ToList());
+
+
                 // Add the candidates found to the table of alternatives
                 // for terminals.
-                candidateTable.Add(sourceID, topCandidates);
+                candidateTable.Add(sourceID, topCandidates2);
 
                 // Where there are conflicting non-first candidates where one
                 // of them is more probable than its competitors, remove those
@@ -159,15 +169,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 //
                 if (targetPoint != null)
                 {
-                    // The alternatives consist of just that
-                    // target word.
-                    //
-                    return new AlternativeCandidates(new[]
-                    {
-                        new Candidate_Old(
-                            new MaybeTargetPoint(targetPoint),
-                            0.0)
-                    });
+                    return
+                        AlternativeCandidates.Empty.Add(
+                            new Candidate(
+                                new Score(0.0),
+                                TargetMap.Empty.Add(
+                                    new SourceID(sourceID),
+                                    new MaybeTargetPoint(targetPoint))));
                 }
             }
 
@@ -177,7 +185,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // There are no alternatives.
                 //
-                return new AlternativeCandidates();
+                return AlternativeCandidates.Empty;
             }
 
             // If the Strong's database has a definition for
@@ -187,16 +195,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 Dictionary<string, int> wordIds = assumptions.Strongs[strong];
 
-                // The alternatives are all of those target points in the
-                // current zone that occur as a possible meaning in the Strong's
-                // database.
-                //
                 return new AlternativeCandidates(
                     targetPoints
                     .Where(tp =>
                         wordIds.ContainsKey(tp.TargetID.AsCanonicalString))
-                    .Select(tp => new MaybeTargetPoint(tp))
-                    .Select(mtp => new Candidate_Old(mtp, 0.0)));
+                    .Select(tp => new Candidate(
+                        new Score(0.0),
+                        TargetMap.Empty.Add(
+                            new SourceID(sourceID),
+                            new MaybeTargetPoint(tp))))
+                    .ToImmutableList());
             }
 
             // If the source point is a stop word:
@@ -205,7 +213,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // There are no alternatives.
                 //
-                return new AlternativeCandidates();
+                return AlternativeCandidates.Empty;
             }
 
             // If the manual translation model has any definitions for
@@ -240,9 +248,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .SelectMany(group =>
                         group
                         .Select(x =>
-                            new Candidate_Old(
-                                new MaybeTargetPoint(x.targetPoint),
-                                x.score))));
+                            new Candidate(
+                                new Score(x.score),
+                                TargetMap.Empty.Add(
+                                    new SourceID(sourceID),
+                                    new MaybeTargetPoint(x.targetPoint)))))
+                    .ToImmutableList());
             }
 
             // If the estimated translation model has any translations
@@ -285,14 +296,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .SelectMany(group =>
                         group
                         .Select(x =>
-                        new Candidate_Old(
-                            new MaybeTargetPoint(x.targetPoint),
-                            x.score))));
+                            new Candidate(
+                                new Score(x.score),
+                                TargetMap.Empty.Add(
+                                    new SourceID(sourceID),
+                                    new MaybeTargetPoint(x.targetPoint)))))
+                    .ToImmutableList());
             }
 
             // Otherwise, there are no alternatives.
             //
-            return new AlternativeCandidates();
+            return AlternativeCandidates.Empty;
 
 
             // Auxiliary helper function to adjust the score from
@@ -326,7 +340,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </param>
         /// 
         public static void ResolveConflicts(
-            AlternativesForTerminals candidateTable)
+            AlternativesForTerminals_Old candidateTable)
         {
             // Find competing non-first candidates, by making
             // a conflicts table that maps a target point (as identified
@@ -401,7 +415,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// instead of coded strings.
         /// 
         static Dictionary<string, List<string>> FindConflicts(
-            AlternativesForTerminals candidateTable)
+            AlternativesForTerminals_Old candidateTable)
         {
             // FIXME: consider ways to simplify this code.
 
@@ -501,7 +515,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         static List<Candidate_Old> GetConflictingCandidates(
             string target,
             List<string> positions,
-            AlternativesForTerminals candidateTable)
+            AlternativesForTerminals_Old candidateTable)
         {
             // Starting from the positions, look up each source ID in
             // the table of alternative candidates, and find the first
@@ -542,7 +556,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string target,
             List<string> positions,
             Candidate_Old winningCandidate,
-            AlternativesForTerminals candidateTable)
+            AlternativesForTerminals_Old candidateTable)
         {
             // For each source ID (as a canonical string):
             foreach (string morphID in positions)
@@ -596,7 +610,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static void FillGaps(AlternativesForTerminals candidateTable)
+        public static void FillGaps(AlternativesForTerminals_Old candidateTable)
         {
             // Find the source IDs for source points whose list of alternative
             // candidates is empty.
@@ -619,7 +633,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// of zero alternatives in the candidate table.
         /// </summary>
         /// 
-        static List<string> FindGaps(AlternativesForTerminals candidateTable)
+        static List<string> FindGaps(AlternativesForTerminals_Old candidateTable)
         {
             List<string> gaps = new List<string>();
 

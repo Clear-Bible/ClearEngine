@@ -215,7 +215,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Find possible choices of target point for each
             // relevant source point.
-            AlternativesForTerminals terminalCandidates =
+            AlternativesForTerminals_Old terminalCandidates =
                 TerminalCandidates2.GetTerminalCandidates(
                     treeNode,
                     sourceAltIdMap,
@@ -326,7 +326,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             XElement treeNode,
             int numberTargets,
             int maxPaths,
-            AlternativesForTerminals terminalCandidates)
+            AlternativesForTerminals_Old terminalCandidates)
         {
             // Prepare to keep track of the best alignments for subnodes
             // of the syntax tree.  The key is the TreeNodeStackID
@@ -389,7 +389,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, List<Candidate_Old>> alignments,
             int n,
             int maxPaths,
-            AlternativesForTerminals terminalCandidates)
+            AlternativesForTerminals_Old terminalCandidates)
         {
             // First call ourselves recursively to populate the
             // alignments table for each of the subnodes.
