@@ -59,10 +59,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // Get data about the source point associated with
                 // this terminal node.
-                string sourceID = terminalNode.SourceID().AsCanonicalString;
+                SourceID sourceID = terminalNode.SourceID();
                 string lemma = terminalNode.Lemma();                              
                 string strong = terminalNode.Strong();               
-                string altID = idMap[sourceID];
+                string altID = idMap[sourceID.AsCanonicalString];
 
                 // Compute the alternative candidates for this source point.
                 AlternativeCandidates topCandidates =
@@ -86,7 +86,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 // Add the candidates found to the table of alternatives
                 // for terminals.
-                candidateTable.Add(sourceID, topCandidates2);
+                candidateTable.Add(sourceID.AsCanonicalString, topCandidates2);
 
                 // Where there are conflicting non-first candidates where one
                 // of them is more probable than its competitors, remove those
@@ -143,7 +143,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </returns>
         /// 
         public static AlternativeCandidates GetTerminalCandidatesForWord(
-            string sourceID,
+            SourceID sourceID,
             string altID,
             string lemma,
             string strong,
@@ -174,7 +174,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             new Candidate(
                                 new Score(0.0),
                                 TargetMap.Empty.Add(
-                                    new SourceID(sourceID),
+                                    sourceID,
                                     new MaybeTargetPoint(targetPoint))));
                 }
             }
@@ -202,7 +202,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(tp => new Candidate(
                         new Score(0.0),
                         TargetMap.Empty.Add(
-                            new SourceID(sourceID),
+                            sourceID,
                             new MaybeTargetPoint(tp))))
                     .ToImmutableList());
             }
@@ -251,7 +251,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             new Candidate(
                                 new Score(x.score),
                                 TargetMap.Empty.Add(
-                                    new SourceID(sourceID),
+                                    sourceID,
                                     new MaybeTargetPoint(x.targetPoint)))))
                     .ToImmutableList());
             }
@@ -299,7 +299,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             new Candidate(
                                 new Score(x.score),
                                 TargetMap.Empty.Add(
-                                    new SourceID(sourceID),
+                                    sourceID,
                                     new MaybeTargetPoint(x.targetPoint)))))
                     .ToImmutableList());
             }
@@ -318,7 +318,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 if (assumptions.UseAlignModel)
                 {
                     if (assumptions.TryGetAlignment(
-                        sourceID, targetID, out double alignScore))
+                        sourceID.AsCanonicalString, targetID, out double alignScore))
                     {
                         return score + ((1.0 - score) * alignScore);
                     }
