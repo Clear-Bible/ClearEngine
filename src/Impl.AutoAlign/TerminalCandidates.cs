@@ -49,8 +49,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             IAutoAlignAssumptions assumptions)
         {
             // Prepare to record alternatives for terminal nodes.
-            AlternativesForTerminals_Old candidateTable =
-                new AlternativesForTerminals_Old();
+            Dictionary<SourceID, AlternativeCandidates> candidateTable =
+                new();
 
             // For each terminal node beneath the root node of the
             // syntax tree for this zone:
@@ -75,18 +75,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         existingLinks,
                         assumptions);
 
-                AlternativeCandidates_Old topCandidates2 =
-                    new AlternativeCandidates_Old(topCandidates.List
-                        .Select(candidate =>
-                            new Candidate_Old(
-                                candidate.TargetMap.Map.Values.First(),
-                                candidate.Score.Double))
-                        .ToList());
-
-
                 // Add the candidates found to the table of alternatives
                 // for terminals.
-                candidateTable.Add(sourceID.AsCanonicalString, topCandidates2);
+                candidateTable.Add(sourceID, topCandidates);
 
                 // Where there are conflicting non-first candidates where one
                 // of them is more probable than its competitors, remove those
@@ -94,12 +85,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 ResolveConflicts(candidateTable);
             }
 
+            AlternativesForTerminals_Old candidateTable_Old =
+                new AlternativesForTerminals_Old(
+                candidateTable
+                .ToDictionary(
+                    kvp => kvp.Key.AsCanonicalString,
+                    kvp => 
+                        kvp.Value.List
+                        .Select(candidate =>
+                            new Candidate_Old(
+                                candidate.TargetMap.Map.Values.First(),
+                                candidate.Score.Double))
+                        .ToList()));
+
+
             // For those candidate table entries where the list of alternaties
             // is empty, replace the empty list with a list containing
             // one empty Candidate.
-            FillGaps(candidateTable);
+            FillGaps(candidateTable_Old);
 
-            return candidateTable;
+            return candidateTable_Old;
         }
 
 

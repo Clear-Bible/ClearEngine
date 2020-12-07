@@ -281,5 +281,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             : base()
         {
         }
+
+        public AlternativesForTerminals_Old(
+            Dictionary<string, List<Candidate_Old>> init)
+            : base(init)
+        {
+        }
     }   
 }
