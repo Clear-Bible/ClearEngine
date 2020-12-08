@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Service;
 using ClearBible.Clear3.SubTasks;
+using ClearBible.Clear3.Impl.AutoAlign;
 
 namespace RegressionTest3
 {
@@ -34,12 +35,14 @@ namespace RegressionTest3
     {
         static void Main(string[] args)
         {
+            Console.WriteLine();
+            Console.WriteLine("---------------------------");
             Console.WriteLine("Starting Regression Test 3.");
 
             // Establish input and output folders.
 
-            string inputFolder = Path.Combine(".", "Input");
-            string outputFolder = Path.Combine(".", "Output");
+            string inputFolder = Path.Combine(".", "Input3");
+            string outputFolder = Path.Combine(".", "Output3");
 
             string InPath(string path) => Path.Combine(inputFolder, path);
             string OutPath(string path) => Path.Combine(outputFolder, path);
@@ -153,6 +156,8 @@ namespace RegressionTest3
             File.WriteAllText(OutPath("alignment.json"), json);
 
             Console.WriteLine("Done.");
+
+            Console.WriteLine($"Max Candidates: {AutoAlignmentService.MaxCandidates}");
         }
     }
 }
