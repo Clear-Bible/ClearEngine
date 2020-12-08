@@ -349,6 +349,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 alignments, numberTargets,
                 maxPaths, terminalCandidates);
 
+            Console.WriteLine();
+            foreach (var kvp in
+                alignments.OrderBy(kvp => kvp.Key))
+            {
+                Console.WriteLine($"{kvp.Key} : {kvp.Value.Count}");
+            }
+            Console.WriteLine();
+
             // Get the candidates that were stored for the root node.
             string goalNodeId =
                 treeNode.TreeNodeID().TreeNodeStackID.AsCanonicalString;
@@ -498,10 +506,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<CandidateChain, double> pathProbs =
                 new Dictionary<CandidateChain, double>();
 
+            long mem1 = GC.GetTotalMemory(true);
+
             // Combine the candidates of the children to get the
             // possibilities to be considered for this node.
             List<CandidateChain> allPaths =
                 AlignStaging.CreatePaths(childCandidateList, maxPaths);
+
+            long mem2 = GC.GetTotalMemory(true);
+            int numCandidates = allPaths.Count;
+            long delta = mem2 - mem1;
+            double perCandidate = delta / (double)numCandidates;
+
+            Console.WriteLine($"all paths: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
 
             // Remove any possibility that has two source points linked
             // to the same target point.  (There might be no possibilities
@@ -511,6 +528,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Where(AlignStaging.HasNoDuplicateWords)
                 .DefaultIfEmpty(allPaths[0])
                 .ToList();
+
+            Console.WriteLine($"After removing duplicate words");
+
+            long mem3 = GC.GetTotalMemory(true);
+            delta = mem3 - mem1;
+            numCandidates = paths.Count;
+            perCandidate = delta / (double)numCandidates;
+            Console.WriteLine($"no dup paths: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
 
             // Prepare to collect the best candidates.
             List<Candidate> topCandidates = new List<Candidate>();
@@ -587,8 +612,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             topCandidates = AlignStaging.GetLeadingCandidates(
                 sortedCandidates, pathProbs);
 
+            long mem4 = GC.GetTotalMemory(true);
+            delta = mem4 - mem1;
+            numCandidates = topCandidates.Count;
+            perCandidate = delta / (double)numCandidates;
+            Console.WriteLine($"Top candidates: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
+
+
+
             return topCandidates;
         }
+
+
+        public static int MaxCandidates = 0;
 
 
         /// <summary>
