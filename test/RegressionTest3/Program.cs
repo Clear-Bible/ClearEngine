@@ -41,8 +41,8 @@ namespace RegressionTest3
 
             // Establish input and output folders.
 
-            string inputFolder = Path.Combine(".", "Input3");
-            string outputFolder = Path.Combine(".", "Output3");
+            string inputFolder = Path.Combine(".", "Input");
+            string outputFolder = Path.Combine(".", "Output");
 
             string InPath(string path) => Path.Combine(inputFolder, path);
             string OutPath(string path) => Path.Combine(outputFolder, path);
@@ -157,7 +157,7 @@ namespace RegressionTest3
 
             Console.WriteLine("Done.");
 
-            Console.WriteLine($"Max Candidates: {AutoAlignmentService.MaxCandidates}");
+            //Console.WriteLine($"Max Candidates: {AutoAlignmentService.MaxCandidates}");
         }
     }
 }
