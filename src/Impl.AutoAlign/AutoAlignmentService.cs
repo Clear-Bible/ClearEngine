@@ -213,11 +213,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, string> existingLinks =
                 assumptions.OldLinksForVerse(verseIDFromTree);
 
+            // Create database of information about candidates.
+            CandidateDb candidateDb =
+                CandidateDb.MakeEmpty(targetPoints.Count);
+
+            // Create index of source points by SourceID.
+            Dictionary<SourceID, SourcePoint> sourcePointsByID =
+                sourcePoints.ToDictionary(
+                    sp => sp.SourceID,
+                    sp => sp);
+
             // Find possible choices of target point for each
             // relevant source point.
             AlternativesForTerminals terminalCandidates =
                 TerminalCandidates2.GetTerminalCandidates(
                     treeNode,
+                    candidateDb,
+                    sourcePointsByID,
                     sourceAltIdMap,
                     targetPoints,
                     existingLinks,
