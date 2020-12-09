@@ -189,11 +189,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// Create a list containing just one empty candidate.
         /// </summary>
         /// 
-        public static List<Candidate> CreateEmptyCandidate()
+        public static List<Candidate_Old> CreateEmptyCandidate()
         {
-            return new List<Candidate>()
+            return new List<Candidate_Old>()
             {
-                new Candidate()
+                new Candidate_Old()
             };
         }
 
@@ -211,7 +211,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// target text with the position of the target point within the zone.
         /// </returns>
         /// 
-        public static string GetWords(Candidate c)
+        public static string GetWords(Candidate_Old c)
         {
             List<MaybeTargetPoint> wordsInPath = GetTargetWordsInPath(c.Chain);
 
@@ -246,7 +246,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     return new MaybeTargetPoint[] { CreateFakeTargetWord() };
                 }
                 // Otherwise if the ArrayList contains Candidate objects:
-                else if (path[0] is Candidate)
+                else if (path[0] is Candidate_Old)
                 {
                     // Interpret the ArrayList as a sequence of Candidate
                     // objects, get the CandidateChain from each Candidate in
@@ -254,7 +254,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     // each of the CandidateChain objects, and then flatten
                     // the result.
                     return path
-                        .Cast<Candidate>()
+                        .Cast<Candidate_Old>()
                         .SelectMany(c => helper(c.Chain));
                 }
                 else
@@ -317,7 +317,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </summary>
         /// 
         public static List<OpenTargetBond> GetOpenTargetBonds(
-            Candidate candidate)
+            Candidate_Old candidate)
         {
             // Prepare to collect OpenTargetBond objects.
             List<OpenTargetBond> linkedWords = new List<OpenTargetBond>();
@@ -369,11 +369,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             else
             {
                 // If the ArrayList contains Candidate objects:
-                if (path[0] is Candidate)
+                if (path[0] is Candidate_Old)
                 {
                     // Call this function recursively on the CandidateChain
                     // of each Candidate in the ArrayList, in order.
-                    foreach (Candidate c in path)
+                    foreach (Candidate_Old c in path)
                     {
                         GetLinkedWordsHelper(c.Chain, links, c.Prob);
                     }

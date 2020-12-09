@@ -428,7 +428,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </returns>
         /// 
         public static List<CandidateChain> CreatePaths(
-            List<List<Candidate>> childCandidatesList,
+            List<List<Candidate_Old>> childCandidatesList,
             int maxPaths)
         {
             // Compute the maximum number of alternatives as the product of
@@ -504,7 +504,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </returns>
         /// 
         public static List<CandidateChain> CreatePathsWithDepthLimit(
-            List<List<Candidate>> childCandidatesList,
+            List<List<Candidate_Old>> childCandidatesList,
             int depth)
         {
             // If there are multiple child candidate alternatives:
@@ -512,7 +512,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // Compute the head candidates by taking the first depth
                 // plus one of the alternatives for the first child.
-                IEnumerable<Candidate> headCandidates =
+                IEnumerable<Candidate_Old> headCandidates =
                     childCandidatesList[0].Take(depth + 1);
 
                 // Compute the tail candidates by calling this function
@@ -528,7 +528,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // at most the first 16000000 members of the resulting list.
                 return
                     headCandidates
-                    .SelectMany((Candidate nHeadCandidate) =>
+                    .SelectMany((Candidate_Old nHeadCandidate) =>
                         tailPaths
                         .Select((CandidateChain tailPath) =>
                             ConsChain(nHeadCandidate, tailPath)))
@@ -553,11 +553,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Helper function to get the tail of the list of list
             // of candidates.
-            List<List<Candidate>> getTail(List<List<Candidate>> x) =>
+            List<List<Candidate_Old>> getTail(List<List<Candidate_Old>> x) =>
                 x.Skip(1).ToList();
 
             // Helper function to convert a Candidate to a CandidateChain.
-            CandidateChain makeSingletonChain(Candidate candidate) =>
+            CandidateChain makeSingletonChain(Candidate_Old candidate) =>
                 new CandidateChain(Enumerable.Repeat(candidate, 1));
 
             // FIXME: See FIXME notes for Candidate.
@@ -570,11 +570,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </summary>
         /// 
         public static CandidateChain ConsChain(
-            Candidate head,
+            Candidate_Old head,
             CandidateChain tail)
         {
             return new CandidateChain(
-                tail.Cast<Candidate>().Prepend(head));
+                tail.Cast<Candidate_Old>().Prepend(head));
         }
 
 
@@ -619,7 +619,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// The list of candidates with maximal probability.
         /// </returns>
         /// 
-        public static List<Candidate> GetLeadingCandidates(
+        public static List<Candidate_Old> GetLeadingCandidates(
             List<CandidateChain> paths,
             Dictionary<CandidateChain, double> probs)
         {
@@ -634,7 +634,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // CandidateChain to Candidate.
             return
                 paths
-                .Select(path => new Candidate(path, probs[path]))
+                .Select(path => new Candidate_Old(path, probs[path]))
                 .TakeWhile(cand => cand.Prob == leadingProb)
                 .ToList();
         }
