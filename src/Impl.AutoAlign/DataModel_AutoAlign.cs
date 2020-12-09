@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 using ClearBible.Clear3.API;
-
+using ClearBible.Clear3.Impl.TreeService;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
@@ -217,190 +217,95 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
         }
     }
+    
+
+    /// <summary>
+    /// Alternative candidates for source points.
+    /// </summary>
+    /// 
+    public record AltCandsForSourcePoint(
+        Dictionary<SourceID, List<CandidateKey>> Dictionary);
 
 
     /// <summary>
-    /// Information about a syntax tree node within the context of a zone.
-    /// The nodes are numbered in postorder with stacks of one-child nodes
-    /// collapsed.  Terminal nodes have a SourcePoint and no subnodes;
-    /// Nonterminal nodes have no SourcePoint and have an array of the
-    /// postorder numbers for the subnodes (and the subnode numbers are always
-    /// less than the node's own postorder number because of the way that
-    /// postorder numbers are assigned).
+    /// Alternative candidates for nodes of the syntax tree.
+    /// All of the nodes in the same stack of one-child nodes
+    /// share the same alternatives.
     /// </summary>
     /// 
-    public record TreeNodeInfo(
-        int PostOrderNumber,
-        int[] SubNodes,
-        SourcePoint SourcePoint)
-    {
-        public bool IsTerminal => SourcePoint is null;
-    }
+    public record AltCandsForSyntaxNode(
+        Dictionary<TreeNodeStackID, List<CandidateKey>> Dictionary);
 
 
     /// <summary>
-    /// Information about the syntax tree shape within the context of a zone.
-    /// The nodes are numbered in postorder with stacks of one-child nodes
-    /// collapsed.  The postorder numbers start at zero and continue to one
-    /// less than the number of nodes.  The table is an array that maps the
-    /// postorder number to information about the node.  You can visit the
-    /// nodes in postorder by walking along the array from 0.
+    /// The CandidateKey expresses the identity of a candidate
+    /// which applies to some subset of the source points, and links
+    /// each of them to a target point or to nothing.
+    /// </summary>
+    public class CandidateKey { }
+
+    
+    /// <summary>
+    /// A terminal candidate links a particular SourcePoint
+    /// to a particular TargetPoint, or to no TargetPoint (in which
+    /// case the TargetPoint property is null.
     /// </summary>
     /// 
-    public record TreeInfoTable(
-        TreeNodeInfo[] Array);
+    public record TerminalCandidateRecord(
+        SourcePoint SourcePoint,
+        TargetPoint TargetPoint);
 
 
+    /// <summary>
+    /// A non-terminal candidate is a sequence of sub-candidates.
+    /// </summary>
+    /// 
+    public record NonTerminalCandidateRecord(
+        CandidateKey[] SubCandidates);
 
-    public record CandidateTable(
-        List<Candidate>[] Array);
 
-
-
-    public record TerminalCandidate(
-        TargetPoint TargetPoint,
-        int Position,
-        BitArray Range,
-        int FirstPosition,
-        int LastPosition,
-        int NumberMotions,
-        int NumberBackwardMotions,
-        double LogJointProbability)
+    /// <summary>
+    /// Auxiliary information about a candidate.
+    /// </summary>
+    /// 
+    public class CandidateAuxInfoRecord
     {
-        //public override bool Equals(object obj)
-        //{
-        //    if (obj is null)
-        //        return false;
-        //    else if (obj is TerminalCandidate tc)
-        //        return Position == tc.Position;
-        //    else if (obj is Candidate c && c.IsTerminal)
-        //        return Position == c.GetTerminalCandidate().Position;
-        //    else
-        //        return false;
-        //}
-    }
+        // The set of target point positions that are linked to,
+        // expressed as a bit array.
+        public BitArray Range { get; set; }
 
+        public int FirstTargetPosition { get; set; }
+        public int LastTargetPosition { get; set; }
 
+        // The sum of absolute values of deltas in position, but
+        // considering only the source points that are linked to target
+        // points instead of nothing.
+        public int TotalMotion { get; set; }
 
-    public record NonTerminalCandidate(
-        int PostOrderNumber,
-        int CandidateNumber,
-        int[] SubCandidateNumbers,
-        BitArray Range,
-        int FirstPosition,
-        int LastPosition,
-        int NumberMotions,
-        int NumberBackwardMotions,
-        double LogJointProbability)
-    {
+        // The number of deltas that are non-zero.
+        public int NumberMotions { get; set; }
 
+        // The number of deltas that are negative.
+        public int NumberBackwardMotions { get; set; }
+
+        // The logarithm of a probability-like score for
+        // this candidate.
+        public double LogScore { get; set; }
     }
 
 
     /// <summary>
-    /// The Candidate type is a discriminated union of the
-    /// TerminalCandidate and NonTerminalCandidate types.  In
-    /// other words, you should think of a Candidate object as
-    /// being either a Candidate or a NonTerminalCandidate.
+    /// The CandidateDb expresses the meaning of a CandidateKey.
+    /// Each candidate key appears in either the Terminals or the
+    /// NonTerminals table, and all candidate keys appear in the
+    /// AuxInfo table.
+    /// NumberTargetPoints is a convenience for creating the Range
+    /// bit array in a candidate's auxiliary info record.
     /// </summary>
     /// 
-    public class Candidate
-    {
-        /// <summary>
-        /// The TerminalCandidate or NonTerminalCandidate object
-        /// that is being represented.
-        /// </summary>
-        /// 
-        private object _inner;
-
-        /// <summary>
-        /// Get the candidate with its type erased.
-        /// </summary>
-        /// 
-        public object Get() => _inner;
-
-        /// <summary>
-        /// True if the object being represented is a TerminalCandidate.
-        /// </summary>
-        /// 
-        public bool IsTerminal =>
-            _inner.GetType() == typeof(TerminalCandidate);
-
-        /// <summary>
-        /// True if the object being represented is a NonTerminalCandidate.
-        /// </summary>
-        /// 
-        public bool IsNonTerminal =>
-            _inner.GetType() == typeof(NonTerminalCandidate);
-
-        /// <summary>
-        /// API to convert to TerminalCandidate; fails if it is not
-        /// a TerminalCandidate.
-        /// </summary>
-        /// 
-        public TerminalCandidate GetTerminalCandidate() =>
-            (TerminalCandidate) _inner;
-
-        /// <summary>
-        /// API to convert to a NonTerminalCandidate; fails if it is not
-        /// a NonTerminalCandidate.
-        /// </summary>
-        /// 
-        public NonTerminalCandidate GetNonTerminalCandidate() =>
-            (NonTerminalCandidate) _inner;
-
-        /// <summary>
-        /// Constructor from a TerminalCandidate.
-        /// </summary>
-        /// 
-        public Candidate(TerminalCandidate c) { _inner = c; }
-
-        /// <summary>
-        /// Implicit type conversion from TerminalCandidate to Candidate.
-        /// </summary>
-        /// 
-        public static implicit operator Candidate(TerminalCandidate c) =>
-            new Candidate(c);
-
-        /// <summary>
-        /// Explicit type conversion from Candidate to TerminalCandidate.
-        /// Fails if not a TerminalCandidate.
-        /// </summary>
-        /// 
-        public static explicit operator TerminalCandidate(Candidate c) =>
-            c.GetTerminalCandidate();
-
-        /// <summary>
-        /// Constructor from a NonTerminalCandidate.
-        /// </summary>
-        /// 
-        public Candidate(NonTerminalCandidate c) { _inner = c; }
-
-        /// <summary>
-        /// Implicit type conversion from NonTerminalCandidate to Candidate.
-        /// </summary>
-        /// 
-        public static implicit operator Candidate(NonTerminalCandidate c) =>
-            new Candidate(c);
-
-        /// <summary>
-        /// Explicit type conversion from Candidate to NonTerminalCandidate.
-        /// Fails if not a NonTerminalCandidate.
-        /// </summary>
-        /// 
-        public static explicit operator NonTerminalCandidate(Candidate c) =>
-            c.GetNonTerminalCandidate();
-
-        /// <summary>
-        /// Equality; delegated to the object inside.
-        /// </summary>
-        /// 
-        public override bool Equals(object obj) => _inner.Equals(obj);
-
-        /// <summary>
-        /// Get hash code; delegated to the object inside.
-        /// </summary>
-        /// 
-        public override int GetHashCode() => _inner.GetHashCode();
-    }
+    public record CandidateDb(
+        int NumberTargetPoints,
+        Dictionary<CandidateKey, TerminalCandidateRecord> Terminals,
+        Dictionary<CandidateKey, NonTerminalCandidateRecord> NonTerminals,
+        Dictionary<CandidateKey, CandidateAuxInfoRecord> AuxInfo);
 }
