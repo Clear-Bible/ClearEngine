@@ -226,7 +226,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Traverse the syntax tree starting from the terminals
             // and working back to the root to construct alignments
             // and eventually the best one. 
-            Candidate topCandidate = AlignTree(
+            Candidate_Old topCandidate = AlignTree(
                 treeNode,
                 targetPoints.Count,
                 assumptions.MaxPaths,
@@ -322,7 +322,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// source ID is expressed as the canonical string.
         /// </param>
         /// 
-        public static Candidate AlignTree(
+        public static Candidate_Old AlignTree(
             XElement treeNode,
             int numberTargets,
             int maxPaths,
@@ -338,8 +338,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // points in their order of occurrence in the tree, which
             // might differ from their order in the manuscript.
             // FIXME: See FIXME notes for Candidate.
-            Dictionary<string, List<Candidate>> alignments =
-                new Dictionary<string, List<Candidate>>();
+            Dictionary<string, List<Candidate_Old>> alignments =
+                new Dictionary<string, List<Candidate_Old>>();
 
             // Traverse the syntax tree, starting from the terminal
             // nodes and back toward the root, placing the best candidate
@@ -360,7 +360,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Get the candidates that were stored for the root node.
             string goalNodeId =
                 treeNode.TreeNodeID().TreeNodeStackID.AsCanonicalString;
-            List<Candidate> verseAlignment = alignments[goalNodeId];
+            List<Candidate_Old> verseAlignment = alignments[goalNodeId];
 
             // Return the first of the root node candidates.
             return verseAlignment[0];
@@ -394,7 +394,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// 
         public static void AlignNode(
             XElement treeNode,
-            Dictionary<string, List<Candidate>> alignments,
+            Dictionary<string, List<Candidate_Old>> alignments,
             int n,
             int maxPaths,
             AlternativesForTerminals terminalCandidates)
@@ -447,18 +447,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 // Helper function to create an empty candidate in the
                 // case where there are no alternatives.
-                List<Candidate> makeNonEmpty(List<Candidate> list) =>
+                List<Candidate_Old> makeNonEmpty(List<Candidate_Old> list) =>
                     list.Count == 0
                     ? AutoAlignUtility.CreateEmptyCandidate()
                     : list;
 
                 // Helper function that retrieves the alignments for
                 // subnodes, producing an empty candidate when necessary.
-                List<Candidate> candidatesForNode(XElement node) =>
+                List<Candidate_Old> candidatesForNode(XElement node) =>
                     makeNonEmpty(alignments[getNodeId(node)]);
 
                 // Compute a list of candidates for each subnode.
-                List<List<Candidate>> candidates =
+                List<List<Candidate_Old>> candidates =
                     treeNode
                     .Elements()
                     .Select(candidatesForNode)
@@ -496,8 +496,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// to mitigate a possible combinatorial explosion.
         /// </param>
         ///
-        public static List<Candidate> ComputeTopCandidates(
-            List<List<Candidate>> childCandidateList,
+        public static List<Candidate_Old> ComputeTopCandidates(
+            List<List<Candidate_Old>> childCandidateList,
             int n,
             int maxPaths)
         {
@@ -538,7 +538,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Console.WriteLine($"no dup paths: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
 
             // Prepare to collect the best candidates.
-            List<Candidate> topCandidates = new List<Candidate>();
+            List<Candidate_Old> topCandidates = new List<Candidate_Old>();
 
             // For each remaining possibility:
             foreach (CandidateChain path in paths)
@@ -548,7 +548,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // are being expressed as logarithms, so adding the logarithms
                 // is like multiplying the probabilties.)
                 double jointProb =
-                    path.Cast<Candidate>().Sum(c => c.Prob);
+                    path.Cast<Candidate_Old>().Sum(c => c.Prob);
 
                 try
                 {
@@ -670,7 +670,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </summary>
         /// 
         public static List<OpenMonoLink> MakeOpenMonoLinks(
-            Candidate topCandidate,
+            Candidate_Old topCandidate,
             List<SourcePoint> sourcePoints)
         {
             // Convert the candidate to a list of OpenTargetBond.

@@ -107,7 +107,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// Candidate chain without a matching sequence of SourcePoint
     /// objects that is implicit?
     /// 
-    public class Candidate
+    public class Candidate_Old
     {
         /// <summary>
         /// The sequence of assignments represented by this Candidate.
@@ -126,7 +126,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// Constructs a Candidate with a sequence of zero assignments.
         /// </summary>
         /// 
-        public Candidate()
+        public Candidate_Old()
         {
             Chain = new CandidateChain();
         }
@@ -136,7 +136,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// one MaybeTargetPoint, which is given.
         /// </summary>
         /// 
-        public Candidate(MaybeTargetPoint tw, double probability)
+        public Candidate_Old(MaybeTargetPoint tw, double probability)
         {
             Chain = new CandidateChain(Enumerable.Repeat(tw, 1));
             Prob = probability;
@@ -147,7 +147,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// that is given by a CandidateChain.
         /// </summary>
         ///
-        public Candidate(CandidateChain chain, double probability)
+        public Candidate_Old(CandidateChain chain, double probability)
         {
             Chain = chain;
             Prob = probability;
@@ -173,7 +173,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
         }
 
-        public CandidateChain(IEnumerable<Candidate> candidates)
+        public CandidateChain(IEnumerable<Candidate_Old> candidates)
             : base(candidates.ToList())
         {
         }
@@ -190,14 +190,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// objects that are alternatives to one another.
     /// </summary>
     /// 
-    public class AlternativeCandidates : List<Candidate>
+    public class AlternativeCandidates : List<Candidate_Old>
     {
         public AlternativeCandidates()
             : base()
         {
         }
 
-        public AlternativeCandidates(IEnumerable<Candidate> candidates)
+        public AlternativeCandidates(IEnumerable<Candidate_Old> candidates)
             : base(candidates)
         {
         }
@@ -210,11 +210,197 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// assignments of a TargetPoint for the associated SourcePoint.
     /// </summary>
     /// 
-    public class AlternativesForTerminals : Dictionary<string, List<Candidate>>
+    public class AlternativesForTerminals : Dictionary<string, List<Candidate_Old>>
     {
         public AlternativesForTerminals()
             : base()
         {
         }
+    }
+
+
+    /// <summary>
+    /// Information about a syntax tree node within the context of a zone.
+    /// The nodes are numbered in postorder with stacks of one-child nodes
+    /// collapsed.  Terminal nodes have a SourcePoint and no subnodes;
+    /// Nonterminal nodes have no SourcePoint and have an array of the
+    /// postorder numbers for the subnodes (and the subnode numbers are always
+    /// less than the node's own postorder number because of the way that
+    /// postorder numbers are assigned).
+    /// </summary>
+    /// 
+    public record TreeNodeInfo(
+        int PostOrderNumber,
+        int[] SubNodes,
+        SourcePoint SourcePoint)
+    {
+        public bool IsTerminal => SourcePoint is null;
+    }
+
+
+    /// <summary>
+    /// Information about the syntax tree shape within the context of a zone.
+    /// The nodes are numbered in postorder with stacks of one-child nodes
+    /// collapsed.  The postorder numbers start at zero and continue to one
+    /// less than the number of nodes.  The table is an array that maps the
+    /// postorder number to information about the node.  You can visit the
+    /// nodes in postorder by walking along the array from 0.
+    /// </summary>
+    /// 
+    public record TreeInfoTable(
+        TreeNodeInfo[] Array);
+
+
+
+    public record CandidateTable(
+        List<Candidate>[] Array);
+
+
+
+    public record TerminalCandidate(
+        TargetPoint TargetPoint,
+        int Position,
+        BitArray Range,
+        int FirstPosition,
+        int LastPosition,
+        int NumberMotions,
+        int NumberBackwardMotions,
+        double LogJointProbability)
+    {
+        //public override bool Equals(object obj)
+        //{
+        //    if (obj is null)
+        //        return false;
+        //    else if (obj is TerminalCandidate tc)
+        //        return Position == tc.Position;
+        //    else if (obj is Candidate c && c.IsTerminal)
+        //        return Position == c.GetTerminalCandidate().Position;
+        //    else
+        //        return false;
+        //}
+    }
+
+
+
+    public record NonTerminalCandidate(
+        int PostOrderNumber,
+        int CandidateNumber,
+        int[] SubCandidateNumbers,
+        BitArray Range,
+        int FirstPosition,
+        int LastPosition,
+        int NumberMotions,
+        int NumberBackwardMotions,
+        double LogJointProbability)
+    {
+
+    }
+
+
+    /// <summary>
+    /// The Candidate type is a discriminated union of the
+    /// TerminalCandidate and NonTerminalCandidate types.  In
+    /// other words, you should think of a Candidate object as
+    /// being either a Candidate or a NonTerminalCandidate.
+    /// </summary>
+    /// 
+    public class Candidate
+    {
+        /// <summary>
+        /// The TerminalCandidate or NonTerminalCandidate object
+        /// that is being represented.
+        /// </summary>
+        /// 
+        private object _inner;
+
+        /// <summary>
+        /// Get the candidate with its type erased.
+        /// </summary>
+        /// 
+        public object Get() => _inner;
+
+        /// <summary>
+        /// True if the object being represented is a TerminalCandidate.
+        /// </summary>
+        /// 
+        public bool IsTerminal =>
+            _inner.GetType() == typeof(TerminalCandidate);
+
+        /// <summary>
+        /// True if the object being represented is a NonTerminalCandidate.
+        /// </summary>
+        /// 
+        public bool IsNonTerminal =>
+            _inner.GetType() == typeof(NonTerminalCandidate);
+
+        /// <summary>
+        /// API to convert to TerminalCandidate; fails if it is not
+        /// a TerminalCandidate.
+        /// </summary>
+        /// 
+        public TerminalCandidate GetTerminalCandidate() =>
+            (TerminalCandidate) _inner;
+
+        /// <summary>
+        /// API to convert to a NonTerminalCandidate; fails if it is not
+        /// a NonTerminalCandidate.
+        /// </summary>
+        /// 
+        public NonTerminalCandidate GetNonTerminalCandidate() =>
+            (NonTerminalCandidate) _inner;
+
+        /// <summary>
+        /// Constructor from a TerminalCandidate.
+        /// </summary>
+        /// 
+        public Candidate(TerminalCandidate c) { _inner = c; }
+
+        /// <summary>
+        /// Implicit type conversion from TerminalCandidate to Candidate.
+        /// </summary>
+        /// 
+        public static implicit operator Candidate(TerminalCandidate c) =>
+            new Candidate(c);
+
+        /// <summary>
+        /// Explicit type conversion from Candidate to TerminalCandidate.
+        /// Fails if not a TerminalCandidate.
+        /// </summary>
+        /// 
+        public static explicit operator TerminalCandidate(Candidate c) =>
+            c.GetTerminalCandidate();
+
+        /// <summary>
+        /// Constructor from a NonTerminalCandidate.
+        /// </summary>
+        /// 
+        public Candidate(NonTerminalCandidate c) { _inner = c; }
+
+        /// <summary>
+        /// Implicit type conversion from NonTerminalCandidate to Candidate.
+        /// </summary>
+        /// 
+        public static implicit operator Candidate(NonTerminalCandidate c) =>
+            new Candidate(c);
+
+        /// <summary>
+        /// Explicit type conversion from Candidate to NonTerminalCandidate.
+        /// Fails if not a NonTerminalCandidate.
+        /// </summary>
+        /// 
+        public static explicit operator NonTerminalCandidate(Candidate c) =>
+            c.GetNonTerminalCandidate();
+
+        /// <summary>
+        /// Equality; delegated to the object inside.
+        /// </summary>
+        /// 
+        public override bool Equals(object obj) => _inner.Equals(obj);
+
+        /// <summary>
+        /// Get hash code; delegated to the object inside.
+        /// </summary>
+        /// 
+        public override int GetHashCode() => _inner.GetHashCode();
     }
 }
