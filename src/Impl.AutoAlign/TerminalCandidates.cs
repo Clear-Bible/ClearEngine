@@ -53,6 +53,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlternativesForTerminals candidateTable =
                 new AlternativesForTerminals();
 
+            Dictionary<SourceID, List<CandidateKey>> candidateTable2 = new();
+
             // For each terminal node beneath the root node of the
             // syntax tree for this zone:
             foreach (XElement terminalNode in
@@ -81,14 +83,33 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         existingLinks,
                         assumptions);
 
+                //var uhoh =
+                //    topCandidates.Zip(topCandidates2, (a, b) =>
+                //    {
+                //        var aTargets =
+                //            AutoAlignUtility.GetTargetWordsInPath(a.Chain)
+                //            .Select(mtw => mtw.TargetPoint);
+                //        var bTargets = candidateDb.GetTargetPoints(b);
+                //        var flag = Enumerable.SequenceEqual(aTargets, bTargets);
+                //        return new { a, b, aTargets, bTargets, flag };
+                //    })
+                //    .FirstOrDefault(x => !x.flag);
+                      
+                //if (uhoh != null)
+                //{
+                //    ;
+                //}
+
                 // Add the candidates found to the table of alternatives
                 // for terminals.
                 candidateTable.Add(sourceIDAsString, topCandidates);
 
+                candidateTable2.Add(sourceID, topCandidates2);
+
                 // Where there are conflicting non-first candidates where one
                 // of them is more probable than its competitors, remove those
                 // competitors that are less probable and uncertain.
-                ResolveConflicts(candidateTable);
+                ResolveConflicts(candidateTable, candidateTable2);
             }
 
             // For those candidate table entries where the list of alternaties
@@ -403,7 +424,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </param>
         /// 
         public static void ResolveConflicts(
-            AlternativesForTerminals candidateTable)
+            AlternativesForTerminals candidateTable,
+            Dictionary<SourceID, List<CandidateKey>> candidateTable2)
         {
             // Find competing non-first candidates, by making
             // a conflicts table that maps a target point (as identified
@@ -411,7 +433,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // at least two source IDs (as canonical strings) that 
             // have a non-first alternative that links to that target point.
             Dictionary<string, List<string>> conflicts =
-                FindConflicts(candidateTable);
+                FindConflicts(candidateTable, candidateTable2);
 
             // If the conflicts table has any entries:
             if (conflicts.Count > 0)
@@ -478,7 +500,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// instead of coded strings.
         /// 
         static Dictionary<string, List<string>> FindConflicts(
-            AlternativesForTerminals candidateTable)
+            AlternativesForTerminals candidateTable,
+            Dictionary<SourceID, List<CandidateKey>> candidateTable2)
         {
             // FIXME: consider ways to simplify this code.
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
-
+using System.Collections.Generic;
+using System.Linq;
 using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
@@ -66,6 +67,29 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // does not really have a target point.
 
             return key;
+        }
+
+
+        public static List<TargetPoint> GetTargetPoints(
+            this CandidateDb candidateDb,
+            CandidateKey candidateKey)
+        {
+            IEnumerable<TargetPoint> f(CandidateKey key)
+            {
+                if (candidateDb.Terminals.TryGetValue(key,
+                    out TerminalCandidateRecord terminal))
+                    yield return terminal.TargetPoint;
+                else
+                {
+                    NonTerminalCandidateRecord nonterminal =
+                        candidateDb.NonTerminals[key];
+                    foreach (CandidateKey subkey in nonterminal.SubCandidates)
+                        foreach (TargetPoint tp in f(subkey))
+                            yield return tp;
+                }
+            }
+
+            return f(candidateKey).ToList();
         }
     }
 }
