@@ -10,7 +10,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.API;
     using ClearBible.Clear3.Impl.TreeService;
     using ClearBible.Clear3.Impl.Miscellaneous;
-
+    using System.Collections;
 
     public class TerminalCandidates2
     {
@@ -42,6 +42,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// 
         public static AlternativesForTerminals GetTerminalCandidates(
             XElement treeNode,
+            CandidateDb candidateDb,
+            Dictionary<SourceID, SourcePoint> sourcePointsByID,
             Dictionary<string, string> idMap,
             List<TargetPoint> targetPoints,
             Dictionary<string, string> existingLinks,
@@ -58,15 +60,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // Get data about the source point associated with
                 // this terminal node.
-                string sourceID = terminalNode.SourceID().AsCanonicalString;
+                SourceID sourceID = terminalNode.SourceID();
+                SourcePoint sourcePoint =
+                    sourcePointsByID[terminalNode.SourceID()];
+                string sourceIDAsString = sourceID.AsCanonicalString;
                 string lemma = terminalNode.Lemma();                              
                 string strong = terminalNode.Strong();               
-                string altID = idMap[sourceID];
+                string altID = idMap[sourceIDAsString];
 
                 // Compute the alternative candidates for this source point.
-                AlternativeCandidates topCandidates =
+                (AlternativeCandidates topCandidates, List<CandidateKey> topCandidates2) =
                     GetTerminalCandidatesForWord(
-                        sourceID,
+                        candidateDb,
+                        sourcePoint,
+                        sourceIDAsString,
                         altID,
                         lemma,
                         strong,
@@ -76,7 +83,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 // Add the candidates found to the table of alternatives
                 // for terminals.
-                candidateTable.Add(sourceID, topCandidates);
+                candidateTable.Add(sourceIDAsString, topCandidates);
 
                 // Where there are conflicting non-first candidates where one
                 // of them is more probable than its competitors, remove those
@@ -132,7 +139,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// A list of alternative candidate target words for the source word.
         /// </returns>
         /// 
-        public static AlternativeCandidates GetTerminalCandidatesForWord(
+        public static (AlternativeCandidates, List<CandidateKey>) GetTerminalCandidatesForWord(
+            CandidateDb candidateDb,
+            SourcePoint sourcePoint,
             string sourceID,
             string altID,
             string lemma,
@@ -162,12 +171,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     // The alternatives consist of just that
                     // target word.
                     //
-                    return new AlternativeCandidates(new[]
-                    {
-                        new Candidate_Old(
-                            new MaybeTargetPoint(targetPoint),
-                            0.0)
-                    });
+                    return (
+                        new AlternativeCandidates(new[]
+                        {
+                            new Candidate_Old(
+                                new MaybeTargetPoint(targetPoint),
+                                0.0)
+                        }),
+                        new List<CandidateKey>()
+                        {
+                            candidateDb.NewTerminal(sourcePoint, targetPoint, 0.0)
+                        });
                 }
             }
 
@@ -177,7 +191,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // There are no alternatives.
                 //
-                return new AlternativeCandidates();
+                return (new AlternativeCandidates(), new List<CandidateKey>());
             }
 
             // If the Strong's database has a definition for
@@ -191,12 +205,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // current zone that occur as a possible meaning in the Strong's
                 // database.
                 //
-                return new AlternativeCandidates(
+                return (
+                    new AlternativeCandidates(
+                        targetPoints
+                        .Where(tp =>
+                            wordIds.ContainsKey(tp.TargetID.AsCanonicalString))
+                        .Select(tp => new MaybeTargetPoint(tp))
+                        .Select(mtp => new Candidate_Old(mtp, 0.0))),
                     targetPoints
                     .Where(tp =>
                         wordIds.ContainsKey(tp.TargetID.AsCanonicalString))
-                    .Select(tp => new MaybeTargetPoint(tp))
-                    .Select(mtp => new Candidate_Old(mtp, 0.0)));
+                    .Select(tp =>
+                        candidateDb.NewTerminal(sourcePoint, tp, 0.0))
+                    .ToList());
             }
 
             // If the source point is a stop word:
@@ -205,7 +226,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // There are no alternatives.
                 //
-                return new AlternativeCandidates();
+                return (new AlternativeCandidates(), new List<CandidateKey>());
             }
 
             // If the manual translation model has any definitions for
@@ -219,7 +240,31 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // only the candidates of maximal score (as given by the manual
                 // translation model).
                 //
-                return new AlternativeCandidates(
+                return (
+                    new AlternativeCandidates(
+                        targetPoints
+                        .Select(targetPoint =>
+                        {
+                            bool ok = tryGetManScoreForTargetText(
+                                targetPoint.Lower,
+                                out double score);
+                            return new { ok, targetPoint, score };
+                        })
+                        .Where(x => x.ok)
+                        .Select(x => new
+                        {
+                            x.targetPoint,
+                            score = Math.Log(Math.Max(x.score, 0.2))
+                        })
+                        .GroupBy(x => x.score)
+                        .OrderByDescending(group => group.Key)
+                        .Take(1)
+                        .SelectMany(group =>
+                            group
+                            .Select(x =>
+                                new Candidate_Old(
+                                    new MaybeTargetPoint(x.targetPoint),
+                                    x.score)))),
                     targetPoints
                     .Select(targetPoint =>
                     {
@@ -239,10 +284,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Take(1)
                     .SelectMany(group =>
                         group
-                        .Select(x =>
-                            new Candidate_Old(
-                                new MaybeTargetPoint(x.targetPoint),
-                                x.score))));
+                        .Select(x => candidateDb.NewTerminal(
+                            sourcePoint,
+                            x.targetPoint,
+                            x.score)))
+                    .ToList());
             }
 
             // If the estimated translation model has any translations
@@ -258,7 +304,37 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // (as given by the estimated translation model modified
                 // by the estimated alignment).
                 //
-                return new AlternativeCandidates(
+                return (
+                    new AlternativeCandidates(
+                        targetPoints
+                        .Where(tp => !assumptions.IsBadLink(lemma, tp.Lower))
+                        .Where(tp => !assumptions.IsPunctuation(tp.Lower))
+                        .Where(tp => !assumptions.IsStopWord(tp.Lower))
+                        .Select(targetPoint =>
+                        {
+                            bool ok = tryGetScoreForTargetText(
+                                targetPoint.Lower,
+                                out double score);
+                            return new { ok, targetPoint, score };
+                        })
+                        .Where(x => x.ok)
+                        .Select(x => new
+                        {
+                            x.targetPoint,
+                            score = Math.Log(
+                                getAdjustedScore(
+                                    x.score,
+                                    x.targetPoint.TargetID.AsCanonicalString))
+                        })
+                        .GroupBy(x => x.score)
+                        .OrderByDescending(group => group.Key)
+                        .Take(1)
+                        .SelectMany(group =>
+                            group
+                            .Select(x =>
+                            new Candidate_Old(
+                                new MaybeTargetPoint(x.targetPoint),
+                                x.score)))),
                     targetPoints
                     .Where(tp => !assumptions.IsBadLink(lemma, tp.Lower))
                     .Where(tp => !assumptions.IsPunctuation(tp.Lower))
@@ -284,15 +360,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Take(1)
                     .SelectMany(group =>
                         group
-                        .Select(x =>
-                        new Candidate_Old(
-                            new MaybeTargetPoint(x.targetPoint),
-                            x.score))));
+                        .Select(x => candidateDb.NewTerminal(
+                            sourcePoint,
+                            x.targetPoint,
+                            x.score)))
+                    .ToList());
             }
 
             // Otherwise, there are no alternatives.
             //
-            return new AlternativeCandidates();
+            return (new AlternativeCandidates(), new List<CandidateKey>());
 
 
             // Auxiliary helper function to adjust the score from

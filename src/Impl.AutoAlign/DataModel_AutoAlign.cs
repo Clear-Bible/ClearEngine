@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Impl.TreeService;
+using System.Linq.Expressions;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
@@ -298,7 +299,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// The CandidateDb expresses the meaning of a CandidateKey.
     /// Each candidate key appears in either the Terminals or the
     /// NonTerminals table, and all candidate keys appear in the
-    /// AuxInfo table.
+    /// AuxInfo table, except for terminal candidates that do not
+    /// link to a real target point.
     /// NumberTargetPoints is a convenience for creating the Range
     /// bit array in a candidate's auxiliary info record.
     /// </summary>
@@ -307,5 +309,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         int NumberTargetPoints,
         Dictionary<CandidateKey, TerminalCandidateRecord> Terminals,
         Dictionary<CandidateKey, NonTerminalCandidateRecord> NonTerminals,
-        Dictionary<CandidateKey, CandidateAuxInfoRecord> AuxInfo);
+        Dictionary<CandidateKey, CandidateAuxInfoRecord> AuxInfo)
+    {
+        public static CandidateDb MakeEmpty(int numberTargetPoints) =>
+            new CandidateDb(
+                numberTargetPoints,
+                new(),
+                new(),
+                new());
+    }
 }
