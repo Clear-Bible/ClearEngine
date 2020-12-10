@@ -6,6 +6,25 @@ using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    public class TempCandidateDebug
+    {
+        private static Dictionary<CandidateKey, Candidate_Old> keyToOld = new();
+
+        private static Dictionary<Candidate_Old, CandidateKey> oldToKey = new();
+
+        public static void Put(CandidateKey key, Candidate_Old old)
+        {
+            keyToOld[key] = old;
+            oldToKey[old] = key;
+        }
+
+        public static Candidate_Old OldForKey(CandidateKey key) => keyToOld[key];
+
+        public static CandidateKey KeyForOld(Candidate_Old old) => oldToKey[old];
+    }
+
+
+
     /// <summary>
     /// The CandidateKey stands for a candidate
     /// which applies to some subset of the source points, and links
@@ -27,6 +46,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             _candidateDb = candidateDb;
         }
+
+        public double LogScore =>
+            _candidateDb.AuxInfo[this].LogScore;
 
         /// <summary>
         /// Get list of target points for this candidate, including
@@ -156,7 +178,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Add an aux record to the database.
             // The candidate has no motions, because there is just
             // one target point.
-            CandidateAuxInfoRecord aux = new CandidateAuxInfoRecord()
+            AuxInfo[key] = new CandidateAuxInfoRecord()
             {
                 Range = range,
                 FirstTargetPosition = position,
