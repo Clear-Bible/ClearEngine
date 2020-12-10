@@ -89,12 +89,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 //        var aTargets =
                 //            AutoAlignUtility.GetTargetWordsInPath(a.Chain)
                 //            .Select(mtw => mtw.TargetPoint);
-                //        var bTargets = candidateDb.GetTargetPoints(b);
+                //        var bTargets = b.GetTargetPoints();
                 //        var flag = Enumerable.SequenceEqual(aTargets, bTargets);
                 //        return new { a, b, aTargets, bTargets, flag };
                 //    })
                 //    .FirstOrDefault(x => !x.flag);
-                      
+
                 //if (uhoh != null)
                 //{
                 //    ;
@@ -547,6 +547,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     }
                 }
             }
+
+            Dictionary<TargetID, List<SourceID>> conflicts2 =
+                candidateTable2
+                .SelectMany(kvp =>
+                    kvp.Value
+                    .Skip(1)
+                    .Select(cKey => cKey.GetTargetPoints().FirstOrDefault())
+                    .Where(tp => tp is not null)
+                    .Select(tp => new
+                    {
+                        sourceID = kvp.Key,
+                        targetID = tp.TargetID
+                    }))
+                .GroupBy(x => x.targetID)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Select(x => x.sourceID).ToList());
+
 
             // Prepare to record conflicts.
             // This table has the same shape as the targets table,
