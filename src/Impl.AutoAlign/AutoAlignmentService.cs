@@ -225,7 +225,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Find possible choices of target point for each
             // relevant source point.
-            AlternativesForTerminals terminalCandidates =
+            (AlternativesForTerminals terminalCandidates,
+             Dictionary<SourceID, List<CandidateKey>> terminalCandidates2) =
                 TerminalCandidates2.GetTerminalCandidates(
                     treeNode,
                     candidateDb,
@@ -234,6 +235,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     targetPoints,
                     existingLinks,
                     assumptions);
+
+
 
             // Traverse the syntax tree starting from the terminals
             // and working back to the root to construct alignments

@@ -21,6 +21,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static Candidate_Old OldForKey(CandidateKey key) => keyToOld[key];
 
         public static CandidateKey KeyForOld(Candidate_Old old) => oldToKey[old];
+
+        public static bool CandidateTablesMatch(
+            AlternativesForTerminals oldTable,
+            Dictionary<SourceID, List<CandidateKey>> newTable)
+        {
+            return
+                oldTable
+                .SelectMany(kvp => kvp.Value.Select(val => (kvp.Key, val)))
+                .ToHashSet()
+                .SetEquals(
+                    newTable
+                    .SelectMany(kvp => kvp.Value.Select(val =>
+                        (kvp.Key.AsCanonicalString, TempCandidateDebug.OldForKey(val))))
+                    .ToHashSet());
+        }
     }
 
 
