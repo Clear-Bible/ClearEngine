@@ -40,14 +40,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// node in the syntax tree.
         /// </returns>
         /// 
-        public static AlternativesForTerminals GetTerminalCandidates(
-            XElement treeNode,
-            CandidateDb candidateDb,
-            Dictionary<SourceID, SourcePoint> sourcePointsByID,
-            Dictionary<string, string> idMap,
-            List<TargetPoint> targetPoints,
-            Dictionary<string, string> existingLinks,
-            IAutoAlignAssumptions assumptions)
+        public static
+            (AlternativesForTerminals,
+            Dictionary<SourceID, List<CandidateKey>>)
+            GetTerminalCandidates(
+                XElement treeNode,
+                CandidateDb candidateDb,
+                Dictionary<SourceID, SourcePoint> sourcePointsByID,
+                Dictionary<string, string> idMap,
+                List<TargetPoint> targetPoints,
+                Dictionary<string, string> existingLinks,
+                IAutoAlignAssumptions assumptions)
         {
             // Prepare to record alternatives for terminal nodes.
             AlternativesForTerminals candidateTable =
@@ -116,14 +119,30 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // of them is more probable than its competitors, remove those
                 // competitors that are less probable and uncertain.
                 ResolveConflicts(candidateTable, candidateTable2);
+
+                if (!TempCandidateDebug.CandidateTablesMatch(
+                    candidateTable, candidateTable2))
+                {
+                    ;
+                }
             }
 
             // For those candidate table entries where the list of alternaties
             // is empty, replace the empty list with a list containing
             // one empty Candidate.
-            FillGaps(candidateTable);
+            FillGaps(
+                candidateTable,
+                candidateTable2,
+                sourcePointsByID,
+                candidateDb);
 
-            return candidateTable;
+            if (!TempCandidateDebug.CandidateTablesMatch(
+                    candidateTable, candidateTable2))
+            {
+                ;
+            }
+
+            return (candidateTable, candidateTable2);
         }
 
 
@@ -818,20 +837,30 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
 
-        public static void FillGaps(AlternativesForTerminals candidateTable)
+        public static void FillGaps(
+            AlternativesForTerminals candidateTable,
+            Dictionary<SourceID, List<CandidateKey>> candidateTable2,
+            Dictionary<SourceID, SourcePoint> sourcePointsById,
+            CandidateDb candidateDb)
         {
-            // Find the source IDs for source points whose list of alternative
-            // candidates is empty.
-            List<string> gaps = FindGaps(candidateTable);
+            List<SourceID> gaps2 =
+                candidateTable2
+                .Where(kvp => !kvp.Value.Any())
+                .Select(kvp => kvp.Key)
+                .ToList();
 
-            // For each gap found:
-            foreach (string morphID in gaps)
+            foreach (SourceID sourceID in gaps2)
             {
-                // Replace the empty candidate list with a list containing
-                // one empty candidate.
-                List<Candidate_Old> emptyCandidate =
-                    AutoAlignUtility.CreateEmptyCandidate();
-                candidateTable[morphID] = emptyCandidate;
+                Candidate_Old emptyCandidate = new Candidate_Old();
+                List<Candidate_Old> candidates = new() { emptyCandidate };
+                candidateTable[sourceID.AsCanonicalString] = candidates;
+
+                CandidateKey emptyCandidate2 =
+                    candidateDb.NewEmptyTerminal(sourcePointsById[sourceID]);
+                List<CandidateKey> candidates2 = new() { emptyCandidate2 };
+                candidateTable2[sourceID] = candidates2;
+
+                TempCandidateDebug.Put(emptyCandidate2, emptyCandidate);                   
             }
         }
 
