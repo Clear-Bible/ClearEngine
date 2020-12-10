@@ -83,6 +83,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         existingLinks,
                         assumptions);
 
+                foreach ((Candidate_Old old, CandidateKey key) in
+                    topCandidates.Zip(topCandidates2, (old, key) => (old, key)))
+                {
+                    TempCandidateDebug.Put(key, old);
+                }
+
                 //var uhoh =
                 //    topCandidates.Zip(topCandidates2, (a, b) =>
                 //    {
@@ -432,8 +438,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // by a string with the target text and position) to a list of 
             // at least two source IDs (as canonical strings) that 
             // have a non-first alternative that links to that target point.
-            Dictionary<string, List<string>> conflicts =
+            (Dictionary<string, List<string>> conflicts,
+             Dictionary<(TargetID, string), List<(SourceID, CandidateKey)>> conflicts2) =
                 FindConflicts(candidateTable, candidateTable2);
+
+            if (conflicts.Count > 0)
+            {
+                ;
+            }
 
             // If the conflicts table has any entries:
             if (conflicts.Count > 0)
@@ -444,6 +456,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     string target = conflictEnum.Key;
                     List<string> positions = conflictEnum.Value;
 
+                    TargetID target2 =
+                        conflicts2
+                        .Where(kvp => kvp.Key.Item2 == target)
+                        .Select(kvp => kvp.Key.Item1)
+                        .FirstOrDefault();
+
+                    List<(SourceID, CandidateKey)> positions2 =
+                        conflicts2
+                        .Where(kvp => kvp.Key.Item2 == target)
+                        .Select(kvp => kvp.Value)
+                        .FirstOrDefault();
+
                     // Get the list of the candidates the candidates that
                     // link to the target point, one for each of the
                     // source IDs in this entry.
@@ -453,15 +477,33 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             positions,
                             candidateTable);
 
+
                     // Find the maximum probability among these candidates.
                     double topProb =
                         conflictingCandidates.Max(c => c.Prob);
+
+                    double topProb2 =
+                        positions2.Max(p => p.Item2.LogScore);
 
                     // Get those candidates of maximal probability.
                     List<Candidate_Old> best =
                         conflictingCandidates
                         .Where(c => c.Prob == topProb)
                         .ToList();
+
+                    List<(SourceID, CandidateKey)> best2 =
+                        positions2.
+                        Where(p => p.Item2.LogScore == topProb2)
+                        .ToList();
+
+                    bool ok =
+                        best.ToHashSet().SetEquals(
+                            best2.Select(p => TempCandidateDebug.OldForKey(p.Item2)).ToHashSet());
+
+                    if (!ok)
+                    {
+                        ;
+                    }
 
                     // If there is only one such candidate of maximal
                     // probability:
@@ -475,7 +517,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             target,
                             positions,
                             best[0],
-                            candidateTable);
+                            candidateTable,
+                            target2,
+                            positions2,
+                            best2[0],
+                            candidateTable2);
                     }
                 }
             }
@@ -499,7 +545,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// FIXME: maybe identify the target points by TargetPoint objects
         /// instead of coded strings.
         /// 
-        static Dictionary<string, List<string>> FindConflicts(
+        static (Dictionary<string, List<string>>,
+            Dictionary<(TargetID, string), List<(SourceID, CandidateKey)>>) FindConflicts(
             AlternativesForTerminals candidateTable,
             Dictionary<SourceID, List<CandidateKey>> candidateTable2)
         {
@@ -548,24 +595,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            Dictionary<TargetID, List<SourceID>> conflicts2 =
-                candidateTable2
-                .SelectMany(kvp =>
-                    kvp.Value
-                    .Skip(1)
-                    .Select(cKey => cKey.GetTargetPoints().FirstOrDefault())
-                    .Where(tp => tp is not null)
-                    .Select(tp => new
-                    {
-                        sourceID = kvp.Key,
-                        targetID = tp.TargetID
-                    }))
-                .GroupBy(x => x.targetID)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.Select(x => x.sourceID).ToList());
-
-
             // Prepare to record conflicts.
             // This table has the same shape as the targets table,
             // but will only have the records where there is more
@@ -588,7 +617,31 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            return conflicts;
+            Dictionary<(TargetID, string), List<(SourceID, CandidateKey)>> conflicts2 =
+                candidateTable2
+                .SelectMany(kvp =>
+                    kvp.Value
+                    .Skip(1)
+                    .Select(cKey => new
+                    {
+                        cKey,
+                        tp = cKey.GetTargetPoints().FirstOrDefault()
+                    })
+                    .Where(x => x.tp is not null)
+                    .Select(x => new
+                    {
+                        x.cKey,
+                        sourceID = kvp.Key,
+                        targetID = x.tp.TargetID,
+                        codedTarget = $"{x.tp.Lower}-{x.tp.Position}"
+                    }))
+                .GroupBy(x => (x.targetID, x.codedTarget))
+                .Where(group => group.Skip(1).Any())
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.Select(x => (x.sourceID, x.cKey)).ToList());
+
+            return (conflicts, conflicts2);
         }
 
 
@@ -660,11 +713,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string target,
             List<string> positions,
             Candidate_Old winningCandidate,
-            AlternativesForTerminals candidateTable)
+            AlternativesForTerminals candidateTable,
+
+            TargetID target2,
+            List<(SourceID, CandidateKey)> positions2,
+            (SourceID, CandidateKey) winningCandidate2,
+            Dictionary<SourceID, List<CandidateKey>> candidateTable2)
         {
             // For each source ID (as a canonical string):
             foreach (string morphID in positions)
             {
+                List<Candidate_Old> removed = new();
+
                 // For each alternative candidate for that source ID:
                 List<Candidate_Old> candidates = candidateTable[morphID];
                 for (int i = 0; i < candidates.Count; i++)
@@ -687,8 +747,52 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         // Remove this candidate from the table of alternative
                         // candidates for the source ID.
                         candidates.Remove(c);
+                        removed.Add(c);
                     }
                 }
+
+                //List<CandidateKey> toRemove2 =
+                //    candidateTable2
+                //    .Where(kvp => kvp.Key.AsCanonicalString == morphID)
+                //    .SelectMany(kvp =>
+                //        kvp.Value.Select(cKey => new
+                //        {
+                //            coded =
+                //                string.Join(" ",
+                //                    cKey.GetTargetPoints()
+                //                    .Select(tp => $"{tp.Lower}-{tp.Position}")),
+                //            cKey
+                //        }))
+                //    .Where(x => x.coded == target)
+                //    .Where(x => x.coded != AutoAlignUtility.GetWords(winningCandidate))
+                //    .Where(x => x.cKey.LogScore < 0.0)
+                //    .Select(x => x.cKey)
+                //    .ToList();
+
+
+                var wip =
+                    candidateTable2
+                    .Where(kvp => kvp.Key.AsCanonicalString == morphID)
+                    .SelectMany(kvp =>
+                        kvp.Value
+                        .Where(cKey => cKey.GetTargetPoints().First().TargetID.Equals(target2))
+                        .Where(cKey => cKey != winningCandidate2.Item2)
+                        .Where(cKey => cKey.LogScore < 0.0))
+                    .ToList();
+
+                if (removed.Count > 0 || wip.Count > 0)
+                {
+                    bool ok =
+                        removed.ToHashSet().SetEquals(
+                            wip.Select(cKey => TempCandidateDebug.OldForKey(cKey)).ToHashSet());
+                    if (!ok)
+                    {
+                        ;
+                    }
+                }
+
+                foreach (CandidateKey cKey in wip)
+                    candidateTable2[new SourceID(morphID)].Remove(cKey);
             }
         }
 
