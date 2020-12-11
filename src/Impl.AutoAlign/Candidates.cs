@@ -82,15 +82,30 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     yield return terminal.TargetPoint;
                 else
                 {
-                    NonTerminalCandidateRecord nonterminal =
+                    NonTerminalCandidateRecord nt =
                         _candidateDb.NonTerminals[key];
-                    foreach (CandidateKey subkey in nonterminal.SubCandidates)
-                        foreach (TargetPoint tp in f(subkey))
-                            yield return tp;
+                    foreach (TargetPoint tp in f(nt.Head)) yield return tp;
+                    foreach (TargetPoint tp in f(nt.Tail)) yield return tp;
                 }
             }
 
             return f(this).ToList();
+        }
+
+
+        public CandidateKey Cons(CandidateKey tail)
+        {
+            CandidateKey cons = new CandidateKey(_candidateDb);
+
+            _candidateDb.NonTerminals[cons] = new NonTerminalCandidateRecord(
+                Head: this,
+                Tail: tail);
+
+            _candidateDb.AuxInfo[cons] = _candidateDb.CombineAuxInfo(
+                _candidateDb.AuxInfo.GetValueOrDefault(this),
+                _candidateDb.AuxInfo.GetValueOrDefault(tail));
+
+            return cons;
         }
     }
 
@@ -111,7 +126,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// </summary>
     /// 
     public record NonTerminalCandidateRecord(
-        CandidateKey[] SubCandidates);
+        CandidateKey Head,
+        CandidateKey Tail);
 
 
     /// <summary>
@@ -124,8 +140,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         // expressed as a bit array.
         public BitArray Range { get; set; }
 
-        public int FirstTargetPosition { get; set; }
-        public int LastTargetPosition { get; set; }
+        public int? FirstTargetPosition { get; set; }
+        public int? LastTargetPosition { get; set; }
 
         // The sum of absolute values of deltas in position, but
         // considering only the source points that are linked to target
@@ -148,9 +164,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// The CandidateDb expresses the meaning of a CandidateKey.
     /// Each candidate key appears in either the Terminals or the
     /// NonTerminals table, and all candidate keys appear in the
-    /// AuxInfo table, except for terminal candidates that do not
-    /// link to a real target point.
-    /// NumberTargetPoints is a convenience for creating the Range
+    /// AuxInfo table.
+    /// NumberTargetPoints is used for creating the Range
     /// bit array in a candidate's auxiliary info record.
     /// </summary>
     /// 
@@ -209,8 +224,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         /// <summary>
-        /// Create a new terminal candidate that maps a source point
-        /// to nothing.
+        /// Create a new terminal candidate that represents the
+        /// certainty of not linking a source point at all.
         /// </summary>
         /// 
         public CandidateKey NewEmptyTerminal(
@@ -222,10 +237,63 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Terminals[key] = new TerminalCandidateRecord(
                 sourcePoint, null);
 
-            // Do not add an aux record, because this candidate
-            // does not really have a target point.
+            // Add an aux record to the database.
+            // The candidate has no start and end positions, and no
+            // motions, because there is no target point.
+            // The log score is zero, because this candidate represents
+            // a probability of 1 for no link at all for this source point.
+            AuxInfo[key] = new CandidateAuxInfoRecord()
+            {
+                Range = new BitArray(NumberTargetPoints),
+                FirstTargetPosition = null,
+                LastTargetPosition = null,
+                TotalMotion = 0,
+                NumberMotions = 0,
+                NumberBackwardMotions = 0,
+                LogScore = 0.0
+            };
 
             return key;
+        }
+
+
+        public CandidateAuxInfoRecord CombineAuxInfo(
+            CandidateAuxInfoRecord head,
+            CandidateAuxInfoRecord tail)
+        {
+            int delta =
+                (tail.FirstTargetPosition - head.LastTargetPosition)
+                ?? 0;
+
+            int deltaTotalMotion = Math.Abs(delta);
+            int deltaNumberMotions = delta != 0 ? 1 : 0;
+            int deltaNumberBackwardMotions = delta < 0 ? 1 : 0;
+
+            return new CandidateAuxInfoRecord()
+            {
+                Range = (new BitArray(head.Range)).Or(tail.Range),
+                FirstTargetPosition =
+                    head.FirstTargetPosition ??
+                    tail.FirstTargetPosition,
+                LastTargetPosition =
+                    tail.LastTargetPosition ??
+                    head.FirstTargetPosition,
+                TotalMotion =
+                    head.TotalMotion +
+                    tail.TotalMotion +
+                    deltaTotalMotion,
+                NumberMotions =
+                    head.NumberMotions +
+                    tail.NumberMotions +
+                    deltaNumberMotions,
+                NumberBackwardMotions =
+                    head.NumberBackwardMotions +
+                    tail.NumberBackwardMotions +
+                    deltaNumberBackwardMotions,
+                LogScore =
+                    head.LogScore +
+                    tail.LogScore
+            };
         }
     }
 }

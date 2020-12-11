@@ -534,8 +534,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             // Prepare to keep track of probabilities for each
             // alternative.
-            Dictionary<CandidateChain, double> pathProbs =
-                new Dictionary<CandidateChain, double>();
+            Dictionary<(CandidateChain, CandidateKey), double> pathProbs =
+                new();
 
             Dictionary<CandidateKey, double> candidateScores = new();
 
@@ -557,9 +557,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Remove any possibility that has two source points linked
             // to the same target point.  (There might be no possibilities
             // left.)
-            List<CandidateChain> paths =
+            List<(CandidateChain, CandidateKey)> paths =
                 allPaths
-                .Where(AlignStaging.HasNoDuplicateWords)
+                .Where(pair => AlignStaging.HasNoDuplicateWords(pair.Item1))
                 .DefaultIfEmpty(allPaths[0])
                 .ToList();
 
@@ -572,23 +572,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //Console.WriteLine($"no dup paths: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
 
             // Prepare to collect the best candidates.
-            List<Candidate_Old> topCandidates = new List<Candidate_Old>();
+            List<(Candidate_Old, CandidateKey)> topCandidates = new();
 
             // For each remaining possibility:
-            foreach (CandidateChain path in paths)
+            foreach ((CandidateChain, CandidateKey) pair in paths)
             {
                 // The joint probability is the sum of the probabilities
                 // of the sub-candidates.  (At this point the probabilities
                 // are being expressed as logarithms, so adding the logarithms
                 // is like multiplying the probabilties.)
                 double jointProb =
-                    path.Cast<Candidate_Old>().Sum(c => c.Prob);
+                    pair.Item1.Cast<Candidate_Old>().Sum(c => c.Prob);
 
                 try
                 {
                     // Record the possible alternative and its probability
                     // in the probability-tracking table.
-                    pathProbs.Add(path, jointProb);
+                    pathProbs.Add(pair, jointProb);
                 }
                 catch
                 {
@@ -619,9 +619,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                     // Get the candidates we have found so far, sorted by
                     // their probabilities in descending order.
-                    List<CandidateChain> sortedCandidates2 =
+                    List<(CandidateChain, CandidateKey)> sortedCandidates2 =
                             pathProbs
-                                .OrderByDescending(kvp => (double)kvp.Value)
+                                .OrderByDescending(kvp => kvp.Value)
                                 .Select(kvp => kvp.Key)
                                 .ToList();
 
@@ -629,18 +629,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     topCandidates = AlignStaging.GetLeadingCandidates(
                         sortedCandidates2, pathProbs);
 
-                    return (topCandidates, new());
+                    return (
+                        topCandidates.Select(pair => pair.Item1).ToList(),
+                        topCandidates.Select(pair => pair.Item2).ToList());
                 }
             }
 
             // Make certain adjustments to the probabilities of
             // the candidates.
-            Dictionary<CandidateChain, double> pathProbs2 =
+            Dictionary<(CandidateChain, CandidateKey), double> pathProbs2 =
                 AlignStaging.AdjustProbsByDistanceAndOrder(pathProbs);
 
             // Sort the candidates by their probabilities, and use a
             // special hashing function to break ties.
-            List<CandidateChain> sortedCandidates = SortPaths(pathProbs2);
+            List<(CandidateChain, CandidateKey)> sortedCandidates =
+                SortPaths(pathProbs2);
 
             // Keep only the candidates of maximal probability.
             topCandidates = AlignStaging.GetLeadingCandidates(
@@ -652,9 +655,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //perCandidate = delta / (double)numCandidates;
             //Console.WriteLine($"Top candidates: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
 
-
-
-            return (topCandidates, new());
+            return (
+                topCandidates.Select(pair => pair.Item1).ToList(),
+                topCandidates.Select(pair => pair.Item2).ToList());
         }
 
 
@@ -673,8 +676,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// The sorted list of candidates.
         /// </returns>
         /// 
-        public static List<CandidateChain> SortPaths(
-            Dictionary<CandidateChain, double> pathProbs)
+        public static List<(CandidateChain, CandidateKey)> SortPaths(
+            Dictionary<(CandidateChain, CandidateKey), double> pathProbs)
         {
             // Hashing function to break ties: compute a list of target
             // points, and call the standard hashing function on this
@@ -690,7 +693,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return pathProbs
                 .OrderByDescending(kvp => kvp.Value)
                 .ThenByDescending(kvp =>
-                    hashCodeOfWordsInPath(kvp.Key))
+                    hashCodeOfWordsInPath(kvp.Key.Item1))
                 .Select(kvp => kvp.Key)
                 .ToList();
         }
