@@ -427,9 +427,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// as a CandidateChain.
         /// </returns>
         /// 
-        public static List<CandidateChain> CreatePaths(
+        public static List<(CandidateChain, CandidateKey)> CreatePaths(
             List<List<Candidate_Old>> childCandidatesList,
-            int maxPaths)
+            int maxPaths,
+            List<List<CandidateKey>> childCandidatesList2)
         {
             // Compute the maximum number of alternatives as the product of
             // the numbers of alternatives for all of the children.
@@ -461,13 +462,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             }
 
             // Prepare to collect alternatives.
-            List<CandidateChain> depth_N_paths = new List<CandidateChain>();
+            List<(CandidateChain, CandidateKey)> depth_N_paths = new();
 
             try
             {
                 // Create alternatives with the maxDepth limit in force.
                 depth_N_paths =
-                    CreatePathsWithDepthLimit(childCandidatesList, maxDepth);
+                    CreatePathsWithDepthLimit(
+                        childCandidatesList,
+                        maxDepth,
+                        childCandidatesList2);
             }
             catch
             {
@@ -478,7 +482,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 // Start over by calling this function recursively with
                 // maxPaths cut in half.
-                depth_N_paths = CreatePaths(childCandidatesList, maxPaths / 2);
+                depth_N_paths = CreatePaths(
+                    childCandidatesList,
+                    maxPaths / 2,
+                    childCandidatesList2);
             }
 
             return depth_N_paths;
@@ -503,9 +510,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// as a CandidateChain.
         /// </returns>
         /// 
-        public static List<CandidateChain> CreatePathsWithDepthLimit(
+        public static List<(CandidateChain, CandidateKey)> CreatePathsWithDepthLimit(
             List<List<Candidate_Old>> childCandidatesList,
-            int depth)
+            int depth,
+            List<List<CandidateKey>> childCandidatesList2)
         {
             // If there are multiple child candidate alternatives:
             if (childCandidatesList.Count > 1)
@@ -518,10 +526,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // Compute the tail candidates by calling this function
                 // recursively to generate alternatives for the remaining
                 // children.
-                List<CandidateChain> tailPaths =
+                List<(CandidateChain, CandidateKey)> tailPaths =
                     CreatePathsWithDepthLimit(
-                        getTail(childCandidatesList),
-                        depth);
+                        childCandidatesList.Skip(1).ToList(),
+                        depth,
+                        childCandidatesList2.Skip(1).ToList());
 
                 // Combine the head and tail alignments by prepending each
                 // head candidate to each of the tail candidates, and taking
