@@ -523,6 +523,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 IEnumerable<Candidate_Old> headCandidates =
                     childCandidatesList[0].Take(depth + 1);
 
+                IEnumerable<CandidateKey> headCandidates2 =
+                    childCandidatesList2[0].Take(depth + 1);
+
                 // Compute the tail candidates by calling this function
                 // recursively to generate alternatives for the remaining
                 // children.
@@ -537,12 +540,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // at most the first 16000000 members of the resulting list.
                 return
                     headCandidates
-                    .SelectMany((Candidate_Old nHeadCandidate) =>
+                    .Zip(headCandidates2, ValueTuple.Create)
+                    .SelectMany(headPair =>
                         tailPaths
-                        .Select((CandidateChain tailPath) =>
-                            ConsChain(nHeadCandidate, tailPath)))
-                    .Take(16000000)
-                    .ToList();
+                        .Select(tailPair =>
+                            (ConsChain(headPair.Item1, tailPair.Item1),
+                             headPair.Item2.Cons(tailPair.Item2))))
+                     .Take(16000000)
+                     .ToList();
             }
             else
             {
@@ -555,15 +560,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // the result.
                 return
                     childCandidatesList[0]
+                    .Zip(childCandidatesList2[0], ValueTuple.Create)
                     .Take(depth + 1)
-                    .Select(makeSingletonChain)
+                    .Select(pair =>
+                        (makeSingletonChain(pair.Item1),
+                         pair.Item2))
                     .ToList();
             }
 
             // Helper function to get the tail of the list of list
             // of candidates.
-            List<List<Candidate_Old>> getTail(List<List<Candidate_Old>> x) =>
-                x.Skip(1).ToList();
+            //List<List<Candidate_Old>> getTail(List<List<Candidate_Old>> x) =>
+            //    x.Skip(1).ToList();
 
             // Helper function to convert a Candidate to a CandidateChain.
             CandidateChain makeSingletonChain(Candidate_Old candidate) =>
@@ -628,9 +636,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// The list of candidates with maximal probability.
         /// </returns>
         /// 
-        public static List<Candidate_Old> GetLeadingCandidates(
-            List<CandidateChain> paths,
-            Dictionary<CandidateChain, double> probs)
+        public static List<(Candidate_Old, CandidateKey)> GetLeadingCandidates(
+            List<(CandidateChain, CandidateKey)> paths,
+            Dictionary<(CandidateChain, CandidateKey), double> probs)
         {
             // Get the probability of the first candidate on
             // the list (if there is one).
@@ -643,8 +651,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // CandidateChain to Candidate.
             return
                 paths
-                .Select(path => new Candidate_Old(path, probs[path]))
-                .TakeWhile(cand => cand.Prob == leadingProb)
+                .Select(pair =>
+                    (new Candidate_Old(pair.Item1, probs[pair]),
+                    pair.Item2))
+                .TakeWhile(pair => pair.Item1.Prob == leadingProb)
                 .ToList();
         }
 
@@ -660,15 +670,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// value is the (log) probability of that candidate.
         /// </param>
         /// 
-        public static Dictionary<CandidateChain, double>
+        public static Dictionary<(CandidateChain, CandidateKey), double>
             AdjustProbsByDistanceAndOrder(
-                Dictionary<CandidateChain, double> pathProbs)
+                Dictionary<(CandidateChain, CandidateKey), double> pathProbs)
         {
             // Find the minimum value of the ComputeDistance metric
             // as applied to the candidates.
             int minimalDistance =
                 pathProbs.Keys
-                .Select(ComputeDistance)
+                .Select(pair => ComputeDistance(pair.Item1))
                 .DefaultIfEmpty(10000)
                 .Min();
 
@@ -685,12 +695,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // for the chain.
                 return
                     pathProbs
-                    .Select(kvp => new { Chain = kvp.Key, Prob = kvp.Value })
+                    .Select(kvp => new { Pair = kvp.Key, Prob = kvp.Value })
                     .ToDictionary(
-                        c => c.Chain,
+                        c => c.Pair,
                         c => c.Prob + c.Prob +
-                            getDistanceProb(ComputeDistance(c.Chain)) +
-                            ComputeOrderProb(c.Chain) / 2.0);
+                            getDistanceProb(ComputeDistance(c.Pair.Item1)) +
+                            ComputeOrderProb(c.Pair.Item1) / 2.0);
             }
             else
             {
