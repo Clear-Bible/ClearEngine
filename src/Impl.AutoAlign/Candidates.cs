@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
@@ -36,7 +38,49 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         (kvp.Key.AsCanonicalString, TempCandidateDebug.OldForKey(val))))
                     .ToHashSet());
         }
+
+        public static List<CandidateReport1Line> Report1(CandidateKey key)
+        {
+            Dictionary<CandidateKey, int> ids = new();
+            int nextID = 1;
+            int idFor(CandidateKey key)
+            {
+                if (ids.TryGetValue(key, out int id)) return id;
+                id = nextID++;
+                ids[key] = id;
+                return id;
+            }
+
+            IEnumerable<CandidateReport1Line> f(CandidateKey key)
+            {
+                if (key.TryGetTerminal(out TerminalCandidateRecord rec))
+                    yield return new CandidateReport1Line(
+                        idFor(key), null, null,
+                        rec.TargetPoint?.Position, key.AuxInfo);
+                else
+                {
+                    NonTerminalCandidateRecord recnt =
+                        key.NonTerminalCandidateRecord;
+                    yield return new CandidateReport1Line(
+                        idFor(key), idFor(recnt.Head), idFor(recnt.Tail),
+                        null, key.AuxInfo);
+                    foreach (var line in f(recnt.Head)) yield return line;
+                    foreach (var line in f(recnt.Tail)) yield return line;
+                }
+            }
+
+            return f(key).ToList();
+        }
     }
+
+    public record CandidateReport1Line(
+        int ID,
+        int? head,
+        int? tail,
+        int? targetPosition,
+        CandidateAuxInfoRecord aux);
+
+    
 
 
 
@@ -62,8 +106,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             _candidateDb = candidateDb;
         }
 
-        public double LogScore =>
-            _candidateDb.AuxInfo[this].LogScore;
+        public double LogScore => AuxInfo.LogScore;
+
+        public CandidateAuxInfoRecord AuxInfo =>
+            _candidateDb.AuxInfo[this];
+
+        public bool TryGetTerminal(out TerminalCandidateRecord record) =>
+            _candidateDb.Terminals.TryGetValue(this, out record);
+
+        public TerminalCandidateRecord TerminalCandidateRecord =>
+            _candidateDb.Terminals[this];
+
+        public bool TryGetNonTerminal(out NonTerminalCandidateRecord record) =>
+            _candidateDb.NonTerminals.TryGetValue(this, out record);
+
+        public NonTerminalCandidateRecord NonTerminalCandidateRecord =>
+            _candidateDb.NonTerminals[this];
+
 
         /// <summary>
         /// Get list of target points for this candidate, including
@@ -277,7 +336,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     tail.FirstTargetPosition,
                 LastTargetPosition =
                     tail.LastTargetPosition ??
-                    head.FirstTargetPosition,
+                    head.LastTargetPosition,
                 TotalMotion =
                     head.TotalMotion +
                     tail.TotalMotion +
