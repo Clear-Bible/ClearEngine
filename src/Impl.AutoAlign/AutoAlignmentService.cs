@@ -635,6 +635,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
+            foreach ((CandidateChain chain, CandidateKey key) in pathProbs.Keys)
+            {
+                List<TargetPoint> pts1 =
+                    AutoAlignUtility.GetTargetWordsInPath(chain)
+                    .Select(mtp => mtp.TargetPoint)
+                    .ToList();
+
+                List<TargetPoint> pts2 = key.GetTargetPoints();
+
+                if (!Enumerable.SequenceEqual(pts1, pts2))
+                {
+                    ;
+                }
+            }
+
             // Make certain adjustments to the probabilities of
             // the candidates.
             Dictionary<(CandidateChain, CandidateKey), double> pathProbs2 =
