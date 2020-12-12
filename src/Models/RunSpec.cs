@@ -45,6 +45,10 @@ namespace Models
           case "HMM":
             model = Model.HMM;
             break;
+          case "F":
+          case "FASTALIGN":
+            model = Model.FASTALIGN;
+            break;
           default:
             return (List<ModelSpec>) null;
         }
