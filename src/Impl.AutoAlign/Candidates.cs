@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
 using ClearBible.Clear3.API;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
@@ -354,5 +356,477 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     tail.LogScore
             };
         }
+    }
+
+
+    /// <summary>
+    /// Represents a set of target point positions, and provides some
+    /// limited operations for working with them.
+    /// </summary>
+    /// 
+    public class Range
+    {
+        private List<uint> _bitVectors;
+
+        /// <summary>
+        /// Creates a new empty set of positions.
+        /// </summary>
+        /// 
+        public Range()
+        {
+            _bitVectors = new();
+        }
+
+        /// <summary>
+        /// Creates a singleton set containing only the specified
+        /// position.
+        /// </summary>
+        /// 
+        public Range(int targetPosition)
+        {
+            int div = targetPosition / 32;
+            int mod = targetPosition % 32;
+            _bitVectors =
+                Enumerable.Repeat((uint)0, mod)
+                .Concat(Enumerable.Repeat((uint)1 << mod, 1))
+                .ToList();          
+        }
+
+        private Range(List<uint> bitVectors)
+        {
+            _bitVectors = bitVectors;
+        }
+
+        /// <summary>
+        /// Combines the receiver with another Range to produce a new
+        /// Range that represents the union of the two sets, with also
+        /// a flag that is true if there is any position in common
+        /// between the two sets.
+        /// </summary>
+        /// 
+        public (Range, bool) Combine(Range other)
+        {
+            bool conflicted =
+                _bitVectors.Zip(other._bitVectors, (a, b) => a & b)
+                .Any(x => x != 0);
+
+            int cthis = _bitVectors.Count;
+            int cother = other._bitVectors.Count;
+            IEnumerable<uint> tail =
+                cthis > cother
+                ? _bitVectors.Skip(cthis - cother)
+                : _bitVectors.Skip(cother - cthis);
+
+            List<uint> union =
+                _bitVectors.Zip(other._bitVectors, (a, b) => a | b)
+                .Concat(tail)
+                .ToList();
+
+            return (new Range(union), conflicted);
+        }
+
+        /// <summary>
+        /// Get the list of positions that is represented by
+        /// the receiver.
+        /// </summary>
+        /// 
+        public List<int> Positions()
+        {
+            return
+                _bitVectors
+                .SelectMany((bv, n) =>
+                    Enumerable.Range(0, 32)
+                    .Select(k => new
+                    {
+                        position = 32 * n + k,
+                        flag = ((1 << k) & bv) != 0
+                    }))
+                .Where(x => x.flag)
+                .Select(x => x.position)
+                .ToList();
+        }
+    }
+
+
+    public abstract class Candidate
+    {
+        /// <summary>
+        /// Make a new point Candidate that represents the link between
+        /// one sourcePoint and one targetPoint with a specified
+        /// score.
+        /// </summary>
+        /// <param name="numberTerminals">
+        /// The number of terminals in the current zone (needed by
+        /// the implementation).
+        /// </param>
+        /// 
+        public static Candidate NewPoint(
+            SourcePoint sourcePoint,
+            TargetPoint targetPoint,
+            double logScore)
+            =>
+            new PointCandidate(
+                sourcePoint,
+                targetPoint,
+                logScore);
+
+        /// <summary>
+        /// Make a point Candidate that represents the certainty of linking
+        /// a sourcePoint to nothing.
+        /// </summary>
+        /// <param name="numberTerminals">
+        /// The number of terminals in the current zone (needed by
+        /// the implementation).
+        /// </param>
+        /// 
+        public static Candidate NewEmptyPoint(
+            SourcePoint sourcePoint,
+            int numberTerminals)
+            =>
+            new EmptyPointCandidate(sourcePoint);
+
+        /// <summary>
+        /// Make a new Candidate that represents all of the links in
+        /// the receiver and all of the links in tail.
+        /// </summary>
+        /// 
+        public Candidate Union(Candidate tail) =>
+            new UnionCandidate(this, tail);
+
+        /// <summary>
+        /// Make a new Candidate that refers to the receiver as
+        /// its underlying candidate and has an adjusted score.
+        /// </summary>
+        /// 
+        public Candidate WithAdjustedScore(double logScore) =>
+            new AdjustedScoreCandidate(this, logScore);
+
+
+        /// <summary>
+        /// True if this Candidate was create by NewPoint() or
+        /// NewEmptyPoint().
+        /// </summary>
+        /// 
+        public bool IsPoint { get; }
+
+        /// <summary>
+        /// True if this Candidate was created by Union().
+        /// </summary>
+        /// 
+        public bool IsUnion { get; }
+
+        /// <summary>
+        /// True if this Candidate was created by WithAdjustedScore().
+        /// </summary>
+        /// 
+        public bool IsAdjusted { get; }
+
+        /// <summary>
+        /// The source point if IsPoint is true, and null
+        /// for other kinds of Candidate.
+        /// </summary>
+        /// 
+        public abstract SourcePoint SourcePoint { get; }
+
+        /// <summary>
+        /// The target point if this Candidate was created
+        /// by NewPoint(), and null otherwise.  In particular,
+        /// is null for a point candidate that represents the
+        /// certainty of linking a source point to nothing.
+        /// </summary>
+        /// 
+        public abstract TargetPoint TargetPoint { get; }
+
+        /// <summary>
+        /// The right child of a union candidate.
+        /// Is null for other kinds of candidate.
+        /// </summary>
+        /// 
+        public abstract Candidate Head { get; }
+
+        /// <summary>
+        /// The left child of a union candidate.
+        /// Is null for other kinds of candidates.
+        /// </summary>
+        /// 
+        public abstract Candidate Tail { get; }
+
+        /// <summary>
+        /// The underlying Candidate if this is an adjusted-score
+        /// Candidate.  Is null for other kinds of candidates.
+        /// </summary>
+        /// 
+        public abstract Candidate Underlying { get; }
+
+        /// <summary>
+        /// The logarithm of a probability-like score for
+        /// this candidate.
+        /// If the Candidate was created by NewPoint, then
+        /// equals the score that was specified.
+        /// If the Candidate was created by NewEmptyPoint,
+        /// then equals 0.
+        /// If the Candidate was created by Union(), then
+        /// equals the sum of the scores of the head and tail.
+        /// If the Candidate was created by WithAdjustedScore(),
+        /// then equals the score that was specified.
+        /// </summary>
+        /// 
+        public abstract double LogScore { get; }
+
+        /// <summary>
+        /// True if this candidate links two different source points
+        /// to the same target point.
+        /// </summary>
+        /// 
+        public abstract bool IsConflicted { get; }
+
+        /// <summary>
+        /// The target position of the left-most source point
+        /// for this candidate,
+        /// or null if no targets are linked by this candidate.
+        /// </summary>
+        /// 
+        public abstract int? FirstTargetPosition { get; }
+
+        /// <summary>
+        /// The target position of the right-most source point
+        /// for this candidate,
+        /// or null if no targets are linked by this candidate.
+        /// </summary>
+        /// 
+        public abstract int? LastTargetPosition { get; }
+
+        /// <summary>
+        /// The sum of the absolute values of the deltas in target
+        /// point positions for this candidate, when considered in
+        /// source-point tree order and omitting source points that
+        /// are linked to nothing.
+        /// </summary>
+        /// 
+        public abstract int TotalMotion { get; }
+
+        /// <summary>
+        /// The number of the non-zero deltas in target
+        /// point positions for this candidate, when considered in
+        /// source-point tree order and omitting source points that
+        /// are linked to nothing.
+        /// </summary>
+        /// 
+        public abstract int NumberMotions { get; }
+
+        /// <summary>
+        /// The number of the negative deltas in target
+        /// point positions for this candidate, when considered in
+        /// source-point tree order and omitting source points that
+        /// are linked to nothing.
+        /// </summary>
+        /// 
+        public abstract int NumberBackwardMotions { get; }
+
+        /// <summary>
+        /// Representation of the set of target points that are
+        /// linked to by this candidate.
+        /// </summary>
+        /// 
+        public abstract Range Range { get; }
+    }
+
+
+    public class PointCandidate : Candidate
+    {
+        public PointCandidate(
+            SourcePoint sourcePoint,
+            TargetPoint targetPoint,
+            double logScore)
+        {
+            _sourcePoint = sourcePoint;
+            _targetPoint = targetPoint;
+            _logScore = logScore;
+        }
+
+        private SourcePoint _sourcePoint;
+        private TargetPoint _targetPoint;
+        private double _logScore;
+
+        public override SourcePoint SourcePoint => _sourcePoint;
+
+        public override TargetPoint TargetPoint => _targetPoint;
+
+        public override Candidate Head => null;
+
+        public override Candidate Tail => null;
+
+        public override Candidate Underlying => null;
+
+        public override double LogScore => _logScore;
+
+        public override bool IsConflicted => false;
+
+        public override int? FirstTargetPosition => _targetPoint.Position;
+
+        public override int? LastTargetPosition => _targetPoint.Position;
+
+        public override int TotalMotion => 0;
+
+        public override int NumberMotions => 0;
+
+        public override int NumberBackwardMotions => 0;
+
+        public override Range Range => new Range(_targetPoint.Position);
+    }
+
+
+    public class EmptyPointCandidate : Candidate
+    {
+        public EmptyPointCandidate(
+            SourcePoint sourcePoint)
+        {
+            _sourcePoint = sourcePoint;
+        }
+
+        private SourcePoint _sourcePoint;
+
+        public override SourcePoint SourcePoint => _sourcePoint;
+
+        public override TargetPoint TargetPoint => null;
+
+        public override Candidate Head => null;
+
+        public override Candidate Tail => null;
+
+        public override Candidate Underlying => null;
+
+        public override double LogScore => 0.0;
+
+        public override bool IsConflicted => false;
+
+        public override int? FirstTargetPosition => null;
+
+        public override int? LastTargetPosition => null;
+
+        public override int TotalMotion => 0;
+
+        public override int NumberMotions => 0;
+
+        public override int NumberBackwardMotions => 0;
+
+        public override Range Range => new Range();
+    }
+
+
+    public class UnionCandidate : Candidate
+    {
+        public UnionCandidate(Candidate head, Candidate tail)
+        {
+            _head = head;
+            _tail = tail;
+            _logScore = head.LogScore + tail.LogScore;
+
+            int delta =
+                (tail.FirstTargetPosition - head.LastTargetPosition)
+                ?? 0;
+
+            int deltaTotalMotion = Math.Abs(delta);
+            int deltaNumberMotions = delta != 0 ? 1 : 0;
+            int deltaNumberBackwardMotions = delta < 0 ? 1 : 0;
+
+            _firstTargetPosition =
+                head.FirstTargetPosition ??
+                tail.FirstTargetPosition;
+            _lastTargetPosition =
+                tail.LastTargetPosition ??
+                head.LastTargetPosition;
+            _totalMotion =
+                head.TotalMotion +
+                tail.TotalMotion +
+                deltaTotalMotion;
+            _numberMotions =
+                head.NumberMotions +
+                tail.NumberMotions +
+                deltaNumberMotions;
+            _numberBackwardMotions =
+                head.NumberBackwardMotions +
+                tail.NumberBackwardMotions +
+                deltaNumberBackwardMotions;
+
+            (_range, _conflicted) = head.Range.Combine(tail.Range);
+        }
+
+        private Candidate _head;
+        private Candidate _tail;
+        private double _logScore;
+        private int? _firstTargetPosition;
+        private int? _lastTargetPosition;
+        private int _totalMotion;
+        private int _numberMotions;
+        private int _numberBackwardMotions;
+        private Range _range;
+        private bool _conflicted;
+
+
+        public override SourcePoint SourcePoint => null;
+
+        public override TargetPoint TargetPoint => null;
+
+        public override Candidate Head => _head;
+
+        public override Candidate Tail => _tail;
+
+        public override Candidate Underlying => null;
+
+        public override double LogScore => _logScore;
+
+        public override bool IsConflicted => _conflicted;
+
+        public override int? FirstTargetPosition => _firstTargetPosition;
+
+        public override int? LastTargetPosition => _lastTargetPosition;
+
+        public override int TotalMotion => _totalMotion;
+
+        public override int NumberMotions => _numberMotions;
+
+        public override int NumberBackwardMotions => _numberBackwardMotions;
+
+        public override Range Range => _range;
+    }
+
+
+    public class AdjustedScoreCandidate : Candidate
+    {
+        public AdjustedScoreCandidate(Candidate basis, double logScore)
+        {
+            _basis = basis;
+            _logScore = logScore;
+        }
+
+        Candidate _basis;
+        double _logScore;
+
+        public override SourcePoint SourcePoint => null;
+
+        public override TargetPoint TargetPoint => null;
+
+        public override Candidate Head => null;
+
+        public override Candidate Tail => null;
+
+        public override Candidate Underlying => _basis;
+
+        public override double LogScore => _logScore;
+
+        public override bool IsConflicted => _basis.IsConflicted;
+
+        public override int? FirstTargetPosition => _basis.FirstTargetPosition;
+
+        public override int? LastTargetPosition => _basis.LastTargetPosition;
+
+        public override int TotalMotion => _basis.TotalMotion;
+
+        public override int NumberMotions => _basis.NumberMotions;
+
+        public override int NumberBackwardMotions => _basis.NumberBackwardMotions;
+
+        public override Range Range => _basis.Range;
     }
 }
