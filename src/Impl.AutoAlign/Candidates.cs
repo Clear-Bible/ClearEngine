@@ -480,8 +480,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </param>
         /// 
         public static Candidate NewEmptyPoint(
-            SourcePoint sourcePoint,
-            int numberTerminals)
+            SourcePoint sourcePoint)
             =>
             new EmptyPointCandidate(sourcePoint);
 
@@ -507,19 +506,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// NewEmptyPoint().
         /// </summary>
         /// 
-        public bool IsPoint { get; }
+        public abstract bool IsPoint { get; }
 
         /// <summary>
         /// True if this Candidate was created by Union().
         /// </summary>
         /// 
-        public bool IsUnion { get; }
+        public abstract bool IsUnion { get; }
 
         /// <summary>
         /// True if this Candidate was created by WithAdjustedScore().
         /// </summary>
         /// 
-        public bool IsAdjusted { get; }
+        public abstract bool IsAdjusted { get; }
 
         /// <summary>
         /// The source point if IsPoint is true, and null
@@ -648,6 +647,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         private TargetPoint _targetPoint;
         private double _logScore;
 
+        public override bool IsPoint => true;
+
+        public override bool IsUnion => false;
+
+        public override bool IsAdjusted => false;
+
         public override SourcePoint SourcePoint => _sourcePoint;
 
         public override TargetPoint TargetPoint => _targetPoint;
@@ -685,6 +690,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
         private SourcePoint _sourcePoint;
+
+        public override bool IsPoint => true;
+
+        public override bool IsUnion => false;
+
+        public override bool IsAdjusted => false;
 
         public override SourcePoint SourcePoint => _sourcePoint;
 
@@ -764,6 +775,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         private bool _conflicted;
 
 
+        public override bool IsPoint => false;
+
+        public override bool IsUnion => true;
+
+        public override bool IsAdjusted => false;
+
         public override SourcePoint SourcePoint => null;
 
         public override TargetPoint TargetPoint => null;
@@ -802,6 +819,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         Candidate _basis;
         double _logScore;
+
+
+        public override bool IsPoint => false;
+
+        public override bool IsUnion => false;
+
+        public override bool IsAdjusted => true;
 
         public override SourcePoint SourcePoint => null;
 
