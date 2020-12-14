@@ -364,7 +364,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// limited operations for working with them.
     /// </summary>
     /// 
-    public class Range
+    public class TargetRange
     {
         private List<uint> _bitVectors;
 
@@ -372,7 +372,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// Creates a new empty set of positions.
         /// </summary>
         /// 
-        public Range()
+        public TargetRange()
         {
             _bitVectors = new();
         }
@@ -382,17 +382,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// position.
         /// </summary>
         /// 
-        public Range(int targetPosition)
+        public TargetRange(int targetPosition)
         {
             int div = targetPosition / 32;
             int mod = targetPosition % 32;
             _bitVectors =
-                Enumerable.Repeat((uint)0, mod)
+                Enumerable.Repeat((uint)0, div)
                 .Concat(Enumerable.Repeat((uint)1 << mod, 1))
                 .ToList();          
         }
 
-        private Range(List<uint> bitVectors)
+        private TargetRange(List<uint> bitVectors)
         {
             _bitVectors = bitVectors;
         }
@@ -404,7 +404,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// between the two sets.
         /// </summary>
         /// 
-        public (Range, bool) Combine(Range other)
+        public (TargetRange, bool) Combine(TargetRange other)
         {
             bool conflicted =
                 _bitVectors.Zip(other._bitVectors, (a, b) => a & b)
@@ -414,15 +414,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int cother = other._bitVectors.Count;
             IEnumerable<uint> tail =
                 cthis > cother
-                ? _bitVectors.Skip(cthis - cother)
-                : _bitVectors.Skip(cother - cthis);
+                ? _bitVectors.Skip(cother)
+                : other._bitVectors.Skip(cthis);
 
             List<uint> union =
                 _bitVectors.Zip(other._bitVectors, (a, b) => a | b)
                 .Concat(tail)
                 .ToList();
 
-            return (new Range(union), conflicted);
+            return (new TargetRange(union), conflicted);
         }
 
         /// <summary>
@@ -628,7 +628,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// linked to by this candidate.
         /// </summary>
         /// 
-        public abstract Range Range { get; }
+        public abstract TargetRange TargetRange { get; }
     }
 
 
@@ -672,7 +672,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public override int NumberBackwardMotions => 0;
 
-        public override Range Range => new Range(_targetPoint.Position);
+        public override TargetRange TargetRange => new TargetRange(_targetPoint.Position);
     }
 
 
@@ -710,7 +710,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public override int NumberBackwardMotions => 0;
 
-        public override Range Range => new Range();
+        public override TargetRange TargetRange => new TargetRange();
     }
 
 
@@ -749,7 +749,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 tail.NumberBackwardMotions +
                 deltaNumberBackwardMotions;
 
-            (_range, _conflicted) = head.Range.Combine(tail.Range);
+            (_range, _conflicted) = head.TargetRange.Combine(tail.TargetRange);
         }
 
         private Candidate _head;
@@ -760,7 +760,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         private int _totalMotion;
         private int _numberMotions;
         private int _numberBackwardMotions;
-        private Range _range;
+        private TargetRange _range;
         private bool _conflicted;
 
 
@@ -788,7 +788,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public override int NumberBackwardMotions => _numberBackwardMotions;
 
-        public override Range Range => _range;
+        public override TargetRange TargetRange => _range;
     }
 
 
@@ -827,6 +827,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public override int NumberBackwardMotions => _basis.NumberBackwardMotions;
 
-        public override Range Range => _basis.Range;
+        public override TargetRange TargetRange => _basis.TargetRange;
     }
 }
