@@ -11,6 +11,8 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
         static void Main(string[] args)
         {
             UnitTest_TargetRange.Basic();
+            UnitTest_Candidate.Basic();
+
             Console.WriteLine("OK");
         }
     }
