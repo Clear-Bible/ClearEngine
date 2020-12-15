@@ -112,11 +112,11 @@ namespace RegressionTest1
                  stopWordsPath: common("stopWords.txt"),
                  sourceFuncWordsPath: common("sourceFuncWords.txt"),
                  targetFuncWordsPath: common("targetFuncWords.txt"),
-                 manTransModelPath: common("manTransModel.txt"),
-                 goodLinksPath: common("goodLinks.txt"),
-                 badLinksPath: common("badLinks.txt"),
-                 glossTablePath: common("Gloss.txt"),
-                 groupsPath: common("groups.txt"),
+                 manTransModelPath: common("manTransModel.tsv"),
+                 goodLinksPath: common("goodLinks.tsv"),
+                 badLinksPath: common("badLinks.tsv"),
+                 glossTablePath: common("Gloss.tsv"),
+                 groupsPath: common("groups.tsv"),
                  oldAlignmentPath: common("oldAlignment.json"),
                  strongsPath: common("strongs.txt"));
 

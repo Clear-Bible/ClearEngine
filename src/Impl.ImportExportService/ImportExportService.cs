@@ -37,7 +37,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
 
                 while ((line = sr.ReadLine()) != null)
                 {
-                    if (line.Trim().Length < 9) continue;
+                    if ((line.Trim().Length < 9) || (line.Substring(0, 2) == "//")) continue;
 
                     string canonicalVerseIDString = line.Substring(0, line.IndexOf(" "));
 
@@ -126,7 +126,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         {
             return new TranslationModel(
                 File.ReadLines(filePath)
-                .Select(line => line.Split(' ').ToList())
+                .Select(line => line.Split('\t').ToList())
                 .Where(fields => fields.Count == 3)
                 .Select(fields => new
                 {
@@ -195,7 +195,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                 dictionary =
                     File.ReadLines(filePath)
                     .Select(line =>
-                        line.Split('#').Select(s => s.Trim()).ToList())
+                        line.Split('\t').Select(s => s.Trim()).ToList())
                     .Where(fields => fields.Count == 3)
                     .Select(fields => new
                     {
@@ -255,7 +255,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
             {
-                string[] groups = line.Split(" ".ToCharArray());
+                string[] groups = line.Split("\t".ToCharArray());
                 if (groups.Length == 4)
                 {
                     string source = groups[0].Trim();
@@ -296,7 +296,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
             {
-                string[] groups = line.Split(" ".ToCharArray());
+                string[] groups = line.Split("\t".ToCharArray());
                 if (groups.Length == 2)
                 {
                     string badLink = groups[0].Trim();
@@ -316,7 +316,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             string[] lines = File.ReadAllLines(glossFile);
             foreach (string line in lines)
             {
-                string[] groups = line.Split("#".ToCharArray());
+                string[] groups = line.Split("\t".ToCharArray());
 
                 if (groups.Length == 3)
                 {

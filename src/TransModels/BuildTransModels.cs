@@ -71,11 +71,11 @@ namespace TransModels
                         string targetID = targetWord.Substring(targetWord.LastIndexOf("_") + 1);
                         string pair = sourceID + "-" + targetID;
                         models.AlignModel.Add(pair, prob);
-                        sw2.WriteLine("{0} {1}", pair, prob);
+                        sw2.WriteLine("{0}\t{1}", pair, prob);
                     }
                     catch
                     {
-                        Console.WriteLine("Index out of bound: {0} {1}", sourceIndex, targetIndex);
+                        Console.WriteLine("BuildTransModel() Index out of bound: {0} {1}", sourceIndex, targetIndex);
                     }
                 }
 
@@ -100,7 +100,7 @@ namespace TransModels
                     string translation = (string)transEnum.Key;
                     double transPro = (double)transEnum.Value;
 
-                    sw.WriteLine("{0} {1} {2}", source, translation, transPro);
+                    sw.WriteLine("{0}\t{1}\t{2}", source, translation, transPro);
                 }
             }
 
@@ -114,7 +114,7 @@ namespace TransModels
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
             {
-                string[] groups = line.Split(" ".ToCharArray());
+                string[] groups = line.Split("\t".ToCharArray());
                 if (groups.Length == 3)
                 {
                     string source = groups[0].Trim();
@@ -146,7 +146,7 @@ namespace TransModels
             string[] lines = File.ReadAllLines(alignFile);
             foreach (string line in lines)
             {
-                string[] groups = line.Split(" ".ToCharArray());
+                string[] groups = line.Split("\t".ToCharArray());
                 if (groups.Length == 2)
                 {
                     string pair = groups[0];
