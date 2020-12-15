@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\src\API\Api.csproj" />
+    <ProjectReference Include="..\src\Clear3Service\Clear3Service.csproj" />
+    <ProjectReference Include="..\src\SubTasks\SubTasks.csproj" />
+  </ItemGroup>
+</Project>
