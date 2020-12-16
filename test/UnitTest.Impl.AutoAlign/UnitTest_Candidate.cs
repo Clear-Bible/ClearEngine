@@ -119,6 +119,97 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
                 c4.TargetRange.Positions(),
                 new int[] { 2 }));
 
+            // Candidate 5: union of candidates 2 and 1 (the
+            // other order from above).
+            Candidate c5 = c2.Union(c1);
+
+            Assert.False(c5.IsPoint);
+            Assert.True(c5.IsUnion);
+            Assert.False(c5.IsAdjusted);
+            Assert.Null(c5.SourcePoint);
+            Assert.Null(c5.TargetPoint);
+            Assert.AreSame(c5.Head, c2);
+            Assert.AreSame(c5.Tail, c1);
+            Assert.Null(c5.Underlying);
+            Assert.AreEqual(c5.LogScore, -0.1);
+            Assert.False(c5.IsConflicted);
+            Assert.AreEqual(c5.FirstTargetPosition, 2);
+            Assert.AreEqual(c5.LastTargetPosition, 2);
+            Assert.AreEqual(c5.TotalMotion, 0);
+            Assert.AreEqual(c5.NumberMotions, 0);
+            Assert.AreEqual(c5.NumberBackwardMotions, 0);
+            Assert.True(Enumerable.SequenceEqual(
+                c5.TargetRange.Positions(),
+                new int[] { 2 }));
+
+            // Candidate 6: source4 -> target6.
+            // Candidate 7: union of 5 and 6.
+            Candidate
+                c6 = Candidate.NewPoint(sourcePoints[4], targetPoints[6], -0.2),
+                c7 = c5.Union(c6);
+
+            Assert.False(c7.IsPoint);
+            Assert.True(c7.IsUnion);
+            Assert.False(c7.IsAdjusted);
+            Assert.Null(c7.SourcePoint);
+            Assert.Null(c7.TargetPoint);
+            Assert.AreSame(c7.Head, c5);
+            Assert.AreSame(c7.Tail, c6);
+            Assert.Null(c7.Underlying);
+            Assert.True(Math.Abs(c7.LogScore - -0.3) < 1e-6);
+            Assert.False(c7.IsConflicted);
+            Assert.AreEqual(c7.FirstTargetPosition, 2);
+            Assert.AreEqual(c7.LastTargetPosition, 6);
+            Assert.AreEqual(c7.TotalMotion, 4);
+            Assert.AreEqual(c7.NumberMotions, 1);
+            Assert.AreEqual(c7.NumberBackwardMotions, 0);
+            Assert.True(Enumerable.SequenceEqual(
+                c7.TargetRange.Positions(),
+                new int[] { 2, 6 }));
+
+            // Candidate 8: union of 6 and 5 (the other order from above).
+            Candidate c8 = c6.Union(c5);
+
+            Assert.False(c8.IsPoint);
+            Assert.True(c8.IsUnion);
+            Assert.False(c8.IsAdjusted);
+            Assert.Null(c8.SourcePoint);
+            Assert.Null(c8.TargetPoint);
+            Assert.AreSame(c8.Head, c6);
+            Assert.AreSame(c8.Tail, c5);
+            Assert.Null(c8.Underlying);
+            Assert.True(Math.Abs(c7.LogScore - -0.3) < 1e-6);
+            Assert.False(c8.IsConflicted);
+            Assert.AreEqual(c8.FirstTargetPosition, 6);
+            Assert.AreEqual(c8.LastTargetPosition, 2);
+            Assert.AreEqual(c8.TotalMotion, 4);
+            Assert.AreEqual(c8.NumberMotions, 1);
+            Assert.AreEqual(c8.NumberBackwardMotions, 1);
+            Assert.True(Enumerable.SequenceEqual(
+                c8.TargetRange.Positions(),
+                new int[] { 2, 6 }));
+
+            // Make something that is conflicted.
+            Candidate c9 = c8.Union(c1);
+
+            Assert.False(c9.IsPoint);
+            Assert.True(c9.IsUnion);
+            Assert.False(c9.IsAdjusted);
+            Assert.Null(c9.SourcePoint);
+            Assert.Null(c9.TargetPoint);
+            Assert.AreSame(c9.Head, c8);
+            Assert.AreSame(c9.Tail, c1);
+            Assert.Null(c9.Underlying);
+            Assert.True(Math.Abs(c9.LogScore - -0.4) < 1e-6);
+            Assert.True(c9.IsConflicted);
+            Assert.AreEqual(c9.FirstTargetPosition, 6);
+            Assert.AreEqual(c9.LastTargetPosition, 2);
+            Assert.AreEqual(c9.TotalMotion, 4);
+            Assert.AreEqual(c9.NumberMotions, 1);
+            Assert.AreEqual(c9.NumberBackwardMotions, 1);
+            Assert.True(Enumerable.SequenceEqual(
+                c9.TargetRange.Positions(),
+                new int[] { 2, 6 }));
         }
     }
 }
