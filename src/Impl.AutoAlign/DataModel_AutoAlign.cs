@@ -225,7 +225,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// </summary>
     /// 
     public record AltCandsForSourcePoint(
-        Dictionary<SourceID, List<CandidateKey>> Dictionary);
+        Dictionary<SourceID, List<Candidate>> Dictionary);
 
 
     /// <summary>
@@ -235,7 +235,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// </summary>
     /// 
     public record AltCandsForSyntaxNode(
-        Dictionary<TreeNodeStackID, List<CandidateKey>> Dictionary);
+        Dictionary<TreeNodeStackID, List<Candidate>> Dictionary);
 
 
     
