@@ -36,6 +36,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
                 targetPoints[2],
                 -0.1);
 
+            Assert.AreEqual(c1.Kind, CandidateKind.Point);
             Assert.True(c1.IsPoint);
             Assert.False(c1.IsUnion);
             Assert.False(c1.IsAdjusted);
@@ -58,6 +59,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             // Candidate2: source2 -> nothing.
             Candidate c2 = Candidate.NewEmptyPoint(sourcePoints[2]);
 
+            Assert.AreEqual(c2.Kind, CandidateKind.EmptyPoint);
             Assert.True(c2.IsPoint);
             Assert.False(c2.IsUnion);
             Assert.False(c2.IsAdjusted);
@@ -78,6 +80,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             // Candidate3: union of candidates 1 and 2.
             Candidate c3 = c1.Union(c2);
 
+            Assert.AreEqual(c3.Kind, CandidateKind.Union);
             Assert.False(c3.IsPoint);
             Assert.True(c3.IsUnion);
             Assert.False(c3.IsAdjusted);
@@ -100,6 +103,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             // Candidate4: adjust score of candidate3 to -0.2
             Candidate c4 = c3.WithAdjustedScore(-0.2);
 
+            Assert.AreEqual(c4.Kind, CandidateKind.Adjusted);
             Assert.False(c4.IsPoint);
             Assert.False(c4.IsUnion);
             Assert.True(c4.IsAdjusted);
@@ -123,6 +127,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             // other order from above).
             Candidate c5 = c2.Union(c1);
 
+            Assert.AreEqual(c5.Kind, CandidateKind.Union);
             Assert.False(c5.IsPoint);
             Assert.True(c5.IsUnion);
             Assert.False(c5.IsAdjusted);
@@ -148,6 +153,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
                 c6 = Candidate.NewPoint(sourcePoints[4], targetPoints[6], -0.2),
                 c7 = c5.Union(c6);
 
+            Assert.AreEqual(c7.Kind, CandidateKind.Union);
             Assert.False(c7.IsPoint);
             Assert.True(c7.IsUnion);
             Assert.False(c7.IsAdjusted);
@@ -170,6 +176,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             // Candidate 8: union of 6 and 5 (the other order from above).
             Candidate c8 = c6.Union(c5);
 
+            Assert.AreEqual(c8.Kind, CandidateKind.Union);
             Assert.False(c8.IsPoint);
             Assert.True(c8.IsUnion);
             Assert.False(c8.IsAdjusted);
@@ -192,6 +199,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             // Make something that is conflicted.
             Candidate c9 = c8.Union(c1);
 
+            Assert.AreEqual(c9.Kind, CandidateKind.Union);
             Assert.False(c9.IsPoint);
             Assert.True(c9.IsUnion);
             Assert.False(c9.IsAdjusted);

@@ -213,10 +213,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, string> existingLinks =
                 assumptions.OldLinksForVerse(verseIDFromTree);
 
-            // Create database of information about candidates.
-            CandidateDb candidateDb =
-                CandidateDb.MakeEmpty(targetPoints.Count);
-
             // Create index of source points by SourceID.
             Dictionary<SourceID, SourcePoint> sourcePointsByID =
                 sourcePoints.ToDictionary(
@@ -226,10 +222,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Find possible choices of target point for each
             // relevant source point.
             (AlternativesForTerminals terminalCandidates,
-             Dictionary<SourceID, List<CandidateKey>> terminalCandidates2) =
+             Dictionary<SourceID, List<Candidate>> terminalCandidates2) =
                 TerminalCandidates2.GetTerminalCandidates(
                     treeNode,
-                    candidateDb,
                     sourcePointsByID,
                     sourceAltIdMap,
                     targetPoints,
@@ -341,7 +336,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int numberTargets,
             int maxPaths,
             AlternativesForTerminals terminalCandidates,
-            Dictionary<SourceID, List<CandidateKey>> terminalCandidates2)
+            Dictionary<SourceID, List<Candidate>> terminalCandidates2)
         {
             // Prepare to keep track of the best alignments for subnodes
             // of the syntax tree.  The key is the TreeNodeStackID
@@ -356,7 +351,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, List<Candidate_Old>> alignments =
                 new Dictionary<string, List<Candidate_Old>>();
 
-            Dictionary<TreeNodeStackID, List<CandidateKey>> alignments2 =
+            Dictionary<TreeNodeStackID, List<Candidate>> alignments2 =
                 new();
 
             // Traverse the syntax tree, starting from the terminal
@@ -410,8 +405,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int n,
             int maxPaths,
             AlternativesForTerminals terminalCandidates,
-            Dictionary<TreeNodeStackID, List<CandidateKey>> alignments2,
-            Dictionary<SourceID, List<CandidateKey>> terminalCandidates2)
+            Dictionary<TreeNodeStackID, List<Candidate>> alignments2,
+            Dictionary<SourceID, List<Candidate>> terminalCandidates2)
         {
             // First call ourselves recursively to populate the
             // alignments table for each of the subnodes.
@@ -485,7 +480,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(candidatesForNode)
                     .ToList();
 
-                List<List<CandidateKey>> candidates2 =
+                List<List<Candidate>> candidates2 =
                     treeNode
                     .Elements()
                     .Select(node => alignments2[node.TreeNodeStackID()])
@@ -525,16 +520,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// to mitigate a possible combinatorial explosion.
         /// </param>
         ///
-        public static (List<Candidate_Old>, List<CandidateKey>)
+        public static (List<Candidate_Old>, List<Candidate>)
             ComputeTopCandidates(
                 List<List<Candidate_Old>> childCandidateList,
                 int n,
                 int maxPaths,
-                List<List<CandidateKey>> childCandidateList2)
+                List<List<Candidate>> childCandidateList2)
         {
             // Prepare to keep track of probabilities for each
             // alternative.
-            Dictionary<(CandidateChain, CandidateKey), double> pathProbs =
+            Dictionary<(CandidateChain, Candidate), double> pathProbs =
                 new();
 
             Dictionary<CandidateKey, double> candidateScores = new();
@@ -543,7 +538,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Combine the candidates of the children to get the
             // possibilities to be considered for this node.
-            List<(CandidateChain, CandidateKey)> allPaths =
+            List<(CandidateChain, Candidate)> allPaths =
                 AlignStaging.CreatePaths(
                     childCandidateList, maxPaths, childCandidateList2);
 
@@ -557,7 +552,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Remove any possibility that has two source points linked
             // to the same target point.  (There might be no possibilities
             // left.)
-            List<(CandidateChain, CandidateKey)> paths =
+            List<(CandidateChain, Candidate)> paths =
                 allPaths
                 .Where(pair => AlignStaging.HasNoDuplicateWords(pair.Item1))
                 .DefaultIfEmpty(allPaths[0])
@@ -572,10 +567,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //Console.WriteLine($"no dup paths: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
 
             // Prepare to collect the best candidates.
-            List<(Candidate_Old, CandidateKey)> topCandidates = new();
+            List<(Candidate_Old, Candidate)> topCandidates = new();
 
             // For each remaining possibility:
-            foreach ((CandidateChain, CandidateKey) pair in paths)
+            foreach ((CandidateChain, Candidate) pair in paths)
             {
                 // The joint probability is the sum of the probabilities
                 // of the sub-candidates.  (At this point the probabilities
@@ -619,7 +614,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                     // Get the candidates we have found so far, sorted by
                     // their probabilities in descending order.
-                    List<(CandidateChain, CandidateKey)> sortedCandidates2 =
+                    List<(CandidateChain, Candidate)> sortedCandidates2 =
                             pathProbs
                                 .OrderByDescending(kvp => kvp.Value)
                                 .Select(kvp => kvp.Key)
@@ -635,7 +630,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            foreach ((CandidateChain chain, CandidateKey key) in pathProbs.Keys)
+            foreach ((CandidateChain chain, Candidate key) in pathProbs.Keys)
             {
                 List<TargetPoint> pts1 =
                     AutoAlignUtility.GetTargetWordsInPath(chain)
@@ -652,12 +647,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Make certain adjustments to the probabilities of
             // the candidates.
-            Dictionary<(CandidateChain, CandidateKey), double> pathProbs2 =
+            Dictionary<(CandidateChain, Candidate), double> pathProbs2 =
                 AlignStaging.AdjustProbsByDistanceAndOrder(pathProbs);
 
             // Sort the candidates by their probabilities, and use a
             // special hashing function to break ties.
-            List<(CandidateChain, CandidateKey)> sortedCandidates =
+            List<(CandidateChain, Candidate)> sortedCandidates =
                 SortPaths(pathProbs2);
 
             // Keep only the candidates of maximal probability.
@@ -691,8 +686,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// The sorted list of candidates.
         /// </returns>
         /// 
-        public static List<(CandidateChain, CandidateKey)> SortPaths(
-            Dictionary<(CandidateChain, CandidateKey), double> pathProbs)
+        public static List<(CandidateChain, Candidate)> SortPaths(
+            Dictionary<(CandidateChain, Candidate), double> pathProbs)
         {
             // Hashing function to break ties: compute a list of target
             // points, and call the standard hashing function on this
