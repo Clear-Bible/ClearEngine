@@ -532,7 +532,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<(CandidateChain, Candidate), double> pathProbs =
                 new();
 
-            Dictionary<CandidateKey, double> candidateScores = new();
+            Dictionary<Candidate, double> candidateScores = new();
 
             //long mem1 = GC.GetTotalMemory(true);
 
