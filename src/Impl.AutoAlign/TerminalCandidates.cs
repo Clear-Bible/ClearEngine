@@ -42,10 +42,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// 
         public static
             (AlternativesForTerminals,
-            Dictionary<SourceID, List<CandidateKey>>)
+            Dictionary<SourceID, List<Candidate>>)
             GetTerminalCandidates(
                 XElement treeNode,
-                CandidateDb candidateDb,
                 Dictionary<SourceID, SourcePoint> sourcePointsByID,
                 Dictionary<string, string> idMap,
                 List<TargetPoint> targetPoints,
@@ -56,7 +55,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlternativesForTerminals candidateTable =
                 new AlternativesForTerminals();
 
-            Dictionary<SourceID, List<CandidateKey>> candidateTable2 = new();
+            Dictionary<SourceID, List<Candidate>> candidateTable2 = new();
 
             // For each terminal node beneath the root node of the
             // syntax tree for this zone:
@@ -74,9 +73,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 string altID = idMap[sourceIDAsString];
 
                 // Compute the alternative candidates for this source point.
-                (AlternativeCandidates topCandidates, List<CandidateKey> topCandidates2) =
+                (AlternativeCandidates topCandidates, List<Candidate> topCandidates2) =
                     GetTerminalCandidatesForWord(
-                        candidateDb,
                         sourcePoint,
                         sourceIDAsString,
                         altID,
@@ -86,28 +84,28 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         existingLinks,
                         assumptions);
 
-                foreach ((Candidate_Old old, CandidateKey key) in
+                foreach ((Candidate_Old old, Candidate cand) in
                     topCandidates.Zip(topCandidates2, (old, key) => (old, key)))
                 {
-                    TempCandidateDebug.Put(key, old);
+                    TempCandidateDebug.Put(cand, old);
                 }
 
-                //var uhoh =
-                //    topCandidates.Zip(topCandidates2, (a, b) =>
-                //    {
-                //        var aTargets =
-                //            AutoAlignUtility.GetTargetWordsInPath(a.Chain)
-                //            .Select(mtw => mtw.TargetPoint);
-                //        var bTargets = b.GetTargetPoints();
-                //        var flag = Enumerable.SequenceEqual(aTargets, bTargets);
-                //        return new { a, b, aTargets, bTargets, flag };
-                //    })
-                //    .FirstOrDefault(x => !x.flag);
+                var uhoh =
+                    topCandidates.Zip(topCandidates2, (a, b) =>
+                    {
+                        var aTargets =
+                            AutoAlignUtility.GetTargetWordsInPath(a.Chain)
+                            .Select(mtw => mtw.TargetPoint);
+                        var bTargets = b.GetTargetPoints();
+                        var flag = Enumerable.SequenceEqual(aTargets, bTargets);
+                        return new { a, b, aTargets, bTargets, flag };
+                    })
+                    .FirstOrDefault(x => !x.flag);
 
-                //if (uhoh != null)
-                //{
-                //    ;
-                //}
+                if (uhoh != null)
+                {
+                    ;
+                }
 
                 // Add the candidates found to the table of alternatives
                 // for terminals.
@@ -133,8 +131,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             FillGaps(
                 candidateTable,
                 candidateTable2,
-                sourcePointsByID,
-                candidateDb);
+                sourcePointsByID);
 
             if (!TempCandidateDebug.CandidateTablesMatch(
                     candidateTable, candidateTable2))
@@ -185,8 +182,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// A list of alternative candidate target words for the source word.
         /// </returns>
         /// 
-        public static (AlternativeCandidates, List<CandidateKey>) GetTerminalCandidatesForWord(
-            CandidateDb candidateDb,
+        public static (AlternativeCandidates, List<Candidate>) GetTerminalCandidatesForWord(
             SourcePoint sourcePoint,
             string sourceID,
             string altID,
@@ -224,9 +220,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                                 new MaybeTargetPoint(targetPoint),
                                 0.0)
                         }),
-                        new List<CandidateKey>()
+                        new List<Candidate>()
                         {
-                            candidateDb.NewTerminal(sourcePoint, targetPoint, 0.0)
+                            Candidate.NewPoint(sourcePoint, targetPoint, 0.0)
                         });
                 }
             }
@@ -237,7 +233,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // There are no alternatives.
                 //
-                return (new AlternativeCandidates(), new List<CandidateKey>());
+                return (new AlternativeCandidates(), new List<Candidate>());
             }
 
             // If the Strong's database has a definition for
@@ -262,7 +258,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Where(tp =>
                         wordIds.ContainsKey(tp.TargetID.AsCanonicalString))
                     .Select(tp =>
-                        candidateDb.NewTerminal(sourcePoint, tp, 0.0))
+                        Candidate.NewPoint(sourcePoint, tp, 0.0))
                     .ToList());
             }
 
@@ -272,7 +268,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // There are no alternatives.
                 //
-                return (new AlternativeCandidates(), new List<CandidateKey>());
+                return (new AlternativeCandidates(), new List<Candidate>());
             }
 
             // If the manual translation model has any definitions for
@@ -330,7 +326,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Take(1)
                     .SelectMany(group =>
                         group
-                        .Select(x => candidateDb.NewTerminal(
+                        .Select(x => Candidate.NewPoint(
                             sourcePoint,
                             x.targetPoint,
                             x.score)))
@@ -406,7 +402,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Take(1)
                     .SelectMany(group =>
                         group
-                        .Select(x => candidateDb.NewTerminal(
+                        .Select(x => Candidate.NewPoint(
                             sourcePoint,
                             x.targetPoint,
                             x.score)))
@@ -415,7 +411,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Otherwise, there are no alternatives.
             //
-            return (new AlternativeCandidates(), new List<CandidateKey>());
+            return (new AlternativeCandidates(), new List<Candidate>());
 
 
             // Auxiliary helper function to adjust the score from
@@ -450,7 +446,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// 
         public static void ResolveConflicts(
             AlternativesForTerminals candidateTable,
-            Dictionary<SourceID, List<CandidateKey>> candidateTable2)
+            Dictionary<SourceID, List<Candidate>> candidateTable2)
         {
             // Find competing non-first candidates, by making
             // a conflicts table that maps a target point (as identified
@@ -458,7 +454,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // at least two source IDs (as canonical strings) that 
             // have a non-first alternative that links to that target point.
             (Dictionary<string, List<string>> conflicts,
-             Dictionary<(TargetID, string), List<(SourceID, CandidateKey)>> conflicts2) =
+             Dictionary<(TargetID, string), List<(SourceID, Candidate)>> conflicts2) =
                 FindConflicts(candidateTable, candidateTable2);
 
             if (conflicts.Count > 0)
@@ -481,7 +477,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         .Select(kvp => kvp.Key.Item1)
                         .FirstOrDefault();
 
-                    List<(SourceID, CandidateKey)> positions2 =
+                    List<(SourceID, Candidate)> positions2 =
                         conflicts2
                         .Where(kvp => kvp.Key.Item2 == target)
                         .Select(kvp => kvp.Value)
@@ -510,14 +506,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         .Where(c => c.Prob == topProb)
                         .ToList();
 
-                    List<(SourceID, CandidateKey)> best2 =
+                    List<(SourceID, Candidate)> best2 =
                         positions2.
                         Where(p => p.Item2.LogScore == topProb2)
                         .ToList();
 
                     bool ok =
                         best.ToHashSet().SetEquals(
-                            best2.Select(p => TempCandidateDebug.OldForKey(p.Item2)).ToHashSet());
+                            best2.Select(p => TempCandidateDebug.OldForCand(p.Item2)).ToHashSet());
 
                     if (!ok)
                     {
@@ -565,9 +561,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// instead of coded strings.
         /// 
         static (Dictionary<string, List<string>>,
-            Dictionary<(TargetID, string), List<(SourceID, CandidateKey)>>) FindConflicts(
+            Dictionary<(TargetID, string), List<(SourceID, Candidate)>>) FindConflicts(
             AlternativesForTerminals candidateTable,
-            Dictionary<SourceID, List<CandidateKey>> candidateTable2)
+            Dictionary<SourceID, List<Candidate>> candidateTable2)
         {
             // FIXME: consider ways to simplify this code.
 
@@ -636,7 +632,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            Dictionary<(TargetID, string), List<(SourceID, CandidateKey)>> conflicts2 =
+            Dictionary<(TargetID, string), List<(SourceID, Candidate)>> conflicts2 =
                 candidateTable2
                 .SelectMany(kvp =>
                     kvp.Value
@@ -735,9 +731,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlternativesForTerminals candidateTable,
 
             TargetID target2,
-            List<(SourceID, CandidateKey)> positions2,
-            (SourceID, CandidateKey) winningCandidate2,
-            Dictionary<SourceID, List<CandidateKey>> candidateTable2)
+            List<(SourceID, Candidate)> positions2,
+            (SourceID, Candidate) winningCandidate2,
+            Dictionary<SourceID, List<Candidate>> candidateTable2)
         {
             // For each source ID (as a canonical string):
             foreach (string morphID in positions)
@@ -803,15 +799,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     bool ok =
                         removed.ToHashSet().SetEquals(
-                            wip.Select(cKey => TempCandidateDebug.OldForKey(cKey)).ToHashSet());
+                            wip.Select(cKey => TempCandidateDebug.OldForCand(cKey)).ToHashSet());
                     if (!ok)
                     {
                         ;
                     }
                 }
 
-                foreach (CandidateKey cKey in wip)
-                    candidateTable2[new SourceID(morphID)].Remove(cKey);
+                foreach (Candidate cand in wip)
+                    candidateTable2[new SourceID(morphID)].Remove(cand);
             }
         }
 
@@ -839,9 +835,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public static void FillGaps(
             AlternativesForTerminals candidateTable,
-            Dictionary<SourceID, List<CandidateKey>> candidateTable2,
-            Dictionary<SourceID, SourcePoint> sourcePointsById,
-            CandidateDb candidateDb)
+            Dictionary<SourceID, List<Candidate>> candidateTable2,
+            Dictionary<SourceID, SourcePoint> sourcePointsById)
         {
             List<SourceID> gaps2 =
                 candidateTable2
@@ -855,9 +850,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 List<Candidate_Old> candidates = new() { emptyCandidate };
                 candidateTable[sourceID.AsCanonicalString] = candidates;
 
-                CandidateKey emptyCandidate2 =
-                    candidateDb.NewEmptyTerminal(sourcePointsById[sourceID]);
-                List<CandidateKey> candidates2 = new() { emptyCandidate2 };
+                Candidate emptyCandidate2 =
+                    Candidate.NewEmptyPoint(sourcePointsById[sourceID]);
+                List<Candidate> candidates2 = new() { emptyCandidate2 };
                 candidateTable2[sourceID] = candidates2;
 
                 TempCandidateDebug.Put(emptyCandidate2, emptyCandidate);                   

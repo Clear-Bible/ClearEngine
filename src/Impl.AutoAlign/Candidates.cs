@@ -12,23 +12,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 {
     public class TempCandidateDebug
     {
-        private static Dictionary<CandidateKey, Candidate_Old> keyToOld = new();
+        private static Dictionary<Candidate, Candidate_Old> candToOld = new();
 
-        private static Dictionary<Candidate_Old, CandidateKey> oldToKey = new();
+        private static Dictionary<Candidate_Old, Candidate> oldToCand = new();
 
-        public static void Put(CandidateKey key, Candidate_Old old)
+        public static void Put(Candidate cand, Candidate_Old old)
         {
-            keyToOld[key] = old;
-            oldToKey[old] = key;
+            candToOld[cand] = old;
+            oldToCand[old] = cand;
         }
 
-        public static Candidate_Old OldForKey(CandidateKey key) => keyToOld[key];
+        public static Candidate_Old OldForCand(Candidate cand) => candToOld[cand];
 
-        public static CandidateKey KeyForOld(Candidate_Old old) => oldToKey[old];
+        public static Candidate CandForOld(Candidate_Old old) => oldToCand[old];
 
         public static bool CandidateTablesMatch(
             AlternativesForTerminals oldTable,
-            Dictionary<SourceID, List<CandidateKey>> newTable)
+            Dictionary<SourceID, List<Candidate>> newTable)
         {
             return
                 oldTable
@@ -37,50 +37,90 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .SetEquals(
                     newTable
                     .SelectMany(kvp => kvp.Value.Select(val =>
-                        (kvp.Key.AsCanonicalString, TempCandidateDebug.OldForKey(val))))
+                        (kvp.Key.AsCanonicalString, TempCandidateDebug.OldForCand(val))))
                     .ToHashSet());
         }
 
-        public static List<CandidateReport1Line> Report1(CandidateKey key)
+        public static List<CandidateReport1Line> Report1(Candidate cand)
         {
-            Dictionary<CandidateKey, int> ids = new();
+            Dictionary<Candidate, int> ids = new();
             int nextID = 1;
-            int idFor(CandidateKey key)
+            int idFor(Candidate cand)
             {
-                if (ids.TryGetValue(key, out int id)) return id;
+                if (ids.TryGetValue(cand, out int id)) return id;
                 id = nextID++;
-                ids[key] = id;
+                ids[cand] = id;
                 return id;
             }
 
-            IEnumerable<CandidateReport1Line> f(CandidateKey key)
+            IEnumerable<CandidateReport1Line> f(Candidate cand)
             {
-                if (key.TryGetTerminal(out TerminalCandidateRecord rec))
-                    yield return new CandidateReport1Line(
-                        idFor(key), null, null,
-                        rec.TargetPoint?.Position, key.AuxInfo);
-                else
+                yield return new CandidateReport1Line(cand, idFor);
+                if (cand.IsUnion)
                 {
-                    NonTerminalCandidateRecord recnt =
-                        key.NonTerminalCandidateRecord;
-                    yield return new CandidateReport1Line(
-                        idFor(key), idFor(recnt.Head), idFor(recnt.Tail),
-                        null, key.AuxInfo);
-                    foreach (var line in f(recnt.Head)) yield return line;
-                    foreach (var line in f(recnt.Tail)) yield return line;
+                    foreach (var line in f(cand.Head)) yield return line;
+                    foreach (var line in f(cand.Tail)) yield return line;
+                }
+                else if (cand.IsAdjusted)
+                {
+                    foreach (var line in f(cand.Underlying)) yield return line;
                 }
             }
 
-            return f(key).ToList();
+            return f(cand).ToList();
         }
     }
 
-    public record CandidateReport1Line(
-        int ID,
-        int? head,
-        int? tail,
-        int? targetPosition,
-        CandidateAuxInfoRecord aux);
+
+    public class CandidateReport1Line
+    {
+        public int ID;
+        public string Description;
+        public CandidateInfo Info;
+
+        public CandidateReport1Line(
+            Candidate subject,
+            Func<Candidate, int> getID)
+        {
+            ID = getID(subject);
+            Info = new CandidateInfo(subject);
+            switch (subject.Kind)
+            {
+                case CandidateKind.Point:
+                    Description = string.Format(
+                        "point({0,3},{1,3}) ",
+                        subject.SourcePoint.TreePosition,
+                        subject.TargetPoint.Position);
+                    break;
+
+                case CandidateKind.EmptyPoint:
+                    Description = string.Format(
+                        "emptyPoint({0,3})",
+                        subject.SourcePoint.TreePosition);
+                    break;
+
+                case CandidateKind.Union:
+                    Description = string.Format(
+                        "union({0,3},{1,3}) ",
+                        getID(subject.Head),
+                        getID(subject.Tail));
+                    break;
+
+                case CandidateKind.Adjusted:
+                    Description = string.Format(
+                        "adjusted({0,3})  ",
+                        getID(subject.Underlying));
+                    break;
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"[{ID,3} {Description} {Info}]";
+        }
+    }
+
+    
 
     
 
@@ -218,6 +258,41 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         // The logarithm of a probability-like score for
         // this candidate.
         public double LogScore { get; set; }
+    }
+
+    public class CandidateInfo
+    {
+        public int? FirstTargetPosition;
+        public int? LastTargetPosition;
+        public int TotalMotion;
+        public int NumberMotions;
+        public int NumberBackwardMotions;
+        public double LogScore;
+        public List<int> TargetPositions;
+
+        public CandidateInfo(Candidate cand)
+        {
+            FirstTargetPosition = cand.FirstTargetPosition;
+            LastTargetPosition = cand.LastTargetPosition;
+            TotalMotion = cand.TotalMotion;
+            NumberMotions = cand.NumberMotions;
+            NumberBackwardMotions = cand.NumberBackwardMotions;
+            LogScore = cand.LogScore;
+            TargetPositions = cand.TargetRange.Positions();
+        }
+
+        public override string ToString()
+        {
+            return string.Format(
+                "[{0:3} {1:3} {2:3} {3:3} {4:3} {5:6} ({6})]",
+                FirstTargetPosition,
+                LastTargetPosition,
+                TotalMotion,
+                NumberMotions,
+                NumberBackwardMotions,
+                LogScore,
+                string.Join(" ", TargetPositions));
+        }
     }
 
 
@@ -448,6 +523,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
+    public enum CandidateKind
+    {
+        Point,
+        EmptyPoint,
+        Union,
+        Adjusted
+    };
+
+
     public abstract class Candidate
     {
         /// <summary>
@@ -500,6 +584,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public Candidate WithAdjustedScore(double logScore) =>
             new AdjustedScoreCandidate(this, logScore);
 
+
+        public abstract CandidateKind Kind { get; }
 
         /// <summary>
         /// True if this Candidate was create by NewPoint() or
@@ -628,6 +714,30 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </summary>
         /// 
         public abstract TargetRange TargetRange { get; }
+
+
+        /// <summary>
+        /// Get the list of target points associated with this candidate,
+        /// including nulls as implied by empty-point sub-candidates, in
+        /// source-point syntax-tree order.
+        /// </summary>
+        /// 
+        public List<TargetPoint> GetTargetPoints()
+        {
+            IEnumerable<TargetPoint> f(Candidate cand)
+            {
+                if (cand.IsPoint) yield return cand.TargetPoint;
+                else if (cand.IsAdjusted)
+                    foreach (var p in f(cand.Underlying)) yield return p;
+                else if (cand.IsUnion)
+                {
+                    foreach (var p in f(cand.Head)) yield return p;
+                    foreach (var p in f(cand.Tail)) yield return p;
+                }               
+            }
+
+            return f(this).ToList();
+        }
     }
 
 
@@ -646,6 +756,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         private SourcePoint _sourcePoint;
         private TargetPoint _targetPoint;
         private double _logScore;
+
+        public override CandidateKind Kind => CandidateKind.Point;
 
         public override bool IsPoint => true;
 
@@ -688,6 +800,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             _sourcePoint = sourcePoint;
         }
+
+        public override CandidateKind Kind => CandidateKind.EmptyPoint;
 
         private SourcePoint _sourcePoint;
 
@@ -775,6 +889,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         private bool _conflicted;
 
 
+        public override CandidateKind Kind => CandidateKind.Union;
+
         public override bool IsPoint => false;
 
         public override bool IsUnion => true;
@@ -820,6 +936,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         Candidate _basis;
         double _logScore;
 
+
+        public override CandidateKind Kind => CandidateKind.Adjusted;
 
         public override bool IsPoint => false;
 
