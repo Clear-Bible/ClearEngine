@@ -677,27 +677,27 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 case CandidateKind.Point:
                     Description = string.Format(
-                        "point({0,3},{1,3}) ",
+                        "point({0:D3},{1:D3}) ",
                         subject.SourcePoint.TreePosition,
                         subject.TargetPoint.Position);
                     break;
 
                 case CandidateKind.EmptyPoint:
                     Description = string.Format(
-                        "emptyPoint({0,3})",
+                        "emptyPoint({0:D3})",
                         subject.SourcePoint.TreePosition);
                     break;
 
                 case CandidateKind.Union:
                     Description = string.Format(
-                        "union({0,3},{1,3}) ",
+                        "union({0:D3},{1:D3}) ",
                         getID(subject.Head),
                         getID(subject.Tail));
                     break;
 
                 case CandidateKind.Adjusted:
                     Description = string.Format(
-                        "adjusted({0,3})  ",
+                        "adjusted({0:D3})  ",
                         getID(subject.Underlying));
                     break;
             }
@@ -705,7 +705,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public override string ToString()
         {
-            return $"[{ID,3} {Description} {Info}]";
+            return $"[{ID:D3} {Description} {Info}]";
         }
     }
 
@@ -717,6 +717,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// 
     public class CandidateInfo
     {
+        public bool Conflicted;
         public int? FirstTargetPosition;
         public int? LastTargetPosition;
         public int TotalMotion;
@@ -727,6 +728,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public CandidateInfo(Candidate cand)
         {
+            Conflicted = cand.IsConflicted;
             FirstTargetPosition = cand.FirstTargetPosition;
             LastTargetPosition = cand.LastTargetPosition;
             TotalMotion = cand.TotalMotion;
@@ -739,13 +741,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public override string ToString()
         {
             return string.Format(
-                "[{0:3} {1:3} {2:3} {3:3} {4:3} {5:6} ({6})]",
+                "[{0:D3} {1:D3} {2:D3} {3:D3} {4:D3} {5:E6} {6} ({7})]",
                 FirstTargetPosition,
                 LastTargetPosition,
                 TotalMotion,
                 NumberMotions,
                 NumberBackwardMotions,
                 LogScore,
+                Conflicted ? "X" : " ",
                 string.Join(" ", TargetPositions));
         }
     }

@@ -674,41 +674,47 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AdjustProbsByDistanceAndOrder(
                 Dictionary<(CandidateChain, Candidate), double> pathProbs)
         {
-            foreach ((CandidateChain chain, Candidate cand) in pathProbs.Keys)
-            {
-                List<Tuple<int, int>> motions = ComputeMotions(chain).ToList();
-                int motionsCount = motions.Count();
-                int backwards = motions.Count(m => m.Item2 < m.Item1);
+            //foreach ((CandidateChain chain, Candidate cand) in pathProbs.Keys)
+            //{
+            //    List<Tuple<int, int>> motions = ComputeMotions(chain).ToList();
+            //    int motionsCount = motions.Count();
+            //    int backwards = motions.Count(m => m.Item2 < m.Item1);
 
-                int dist1 = ComputeDistance(chain);
-                int dist2 = cand.TotalMotion;
-                if (dist1 != dist2)
-                {
-                    List<int?> pts1 =
-                        AutoAlignUtility.GetTargetWordsInPath(chain)
-                        .Select(mtp => mtp.TargetPoint?.Position)
-                        .ToList();
-                    foreach (var x in TempCandidateDebug.Report1(cand))
-                        Console.WriteLine(x.ToString());
-                    ;
-                }
+            //    int dist1 = ComputeDistance(chain);
+            //    int dist2 = cand.TotalMotion;
+            //    if (dist1 != dist2)
+            //    {
+            //        List<int?> pts1 =
+            //            AutoAlignUtility.GetTargetWordsInPath(chain)
+            //            .Select(mtp => mtp.TargetPoint?.Position)
+            //            .ToList();
+            //        foreach (var x in TempCandidateDebug.Report1(cand))
+            //            Console.WriteLine(x.ToString());
+            //        ;
+            //    }
 
-                if (motionsCount != cand.NumberMotions)
-                {
-                    ;
-                }
+            //    if (motionsCount != cand.NumberMotions)
+            //    {
+            //        ;
+            //    }
 
-                if (backwards != cand.NumberBackwardMotions)
-                {
-                    ;
-                }
-            }
+            //    if (backwards != cand.NumberBackwardMotions)
+            //    {
+            //        ;
+            //    }
+            //}
 
             // Find the minimum value of the ComputeDistance metric
             // as applied to the candidates.
             int minimalDistance =
                 pathProbs.Keys
                 .Select(pair => ComputeDistance(pair.Item1))
+                .DefaultIfEmpty(10000)
+                .Min();
+
+            int minimalDistance2 =
+                pathProbs.Keys
+                .Select(pair => pair.Item2.TotalMotion)
                 .DefaultIfEmpty(10000)
                 .Min();
 
@@ -723,7 +729,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // make a new table with revised probabilities based
                 // on the ComputeDistance and ComputeOrderProb metrics
                 // for the chain.
-                return
+                Dictionary<(CandidateChain, Candidate), double> pathProbsA =
                     pathProbs
                     .Select(kvp => new { Pair = kvp.Key, Prob = kvp.Value })
                     .ToDictionary(
@@ -731,6 +737,44 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         c => c.Prob + c.Prob +
                             getDistanceProb(ComputeDistance(c.Pair.Item1)) +
                             ComputeOrderProb(c.Pair.Item1) / 2.0);
+
+                double adjustedProbability(Candidate cand, double original)
+                {
+                    double distanceProbability = 
+                        Math.Log(minimalDistance / (double) cand.TotalMotion);
+                    double orderProbability =
+                        Math.Log(1.0 -
+                            cand.NumberBackwardMotions /
+                            (1.0 + cand.NumberMotions));
+                    return
+                        2.0 * original +
+                        distanceProbability +
+                        orderProbability / 2.0;
+                }
+
+                Dictionary<(CandidateChain, Candidate), double> pathProbsB =
+                    pathProbs
+                    .Select(kvp => new { Pair = kvp.Key, Prob = kvp.Value })
+                    .ToDictionary(
+                        c => c.Pair,
+                        c => adjustedProbability(c.Pair.Item2, c.Prob));
+
+                var uhoh =
+                    pathProbs.Keys
+                    .Select(key => new { key, a = pathProbsA[key], b = pathProbsB[key] })
+                    .Where(x => x.a != x.b)
+                    .FirstOrDefault();
+
+                if (uhoh is not null)
+                {
+                    CandidateChain chain = uhoh.key.Item1;
+                    Candidate cand = uhoh.key.Item2;
+                    
+                    ;
+                }
+
+
+                return pathProbsB;
             }
             else
             {

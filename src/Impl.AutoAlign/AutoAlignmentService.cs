@@ -369,6 +369,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 treeNode.TreeNodeID().TreeNodeStackID.AsCanonicalString;
             List<Candidate_Old> verseAlignment = alignments[goalNodeId];
 
+            Candidate_Old verseAlignment1 =
+                alignments[treeNode.TreeNodeStackID().AsCanonicalString][0];
+            List<TargetPoint> targets1 =
+                AutoAlignUtility.GetTargetWordsInPath(verseAlignment1.Chain)
+                .Select(mtp => mtp.TargetPoint)
+                .ToList();
+
+            Candidate verseAlignment2 =
+                alignments2[treeNode.TreeNodeStackID()][0];
+            List<TargetPoint> targets2 = verseAlignment2.GetTargetPoints();
+
+            if (!Enumerable.SequenceEqual(targets1, targets2))
+            {
+                ;
+            }
+
+            //if (verseAlignment2.IsConflicted)
+            //{
+            //    foreach (var line in
+            //        TempCandidateDebug.Report1(verseAlignment2))
+            //        Console.WriteLine(line.ToString());
+            //    ;
+            //}
+
+
+
             // Return the first of the root node candidates.
             return verseAlignment[0];
         }
