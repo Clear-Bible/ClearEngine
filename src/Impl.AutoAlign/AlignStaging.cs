@@ -674,36 +674,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AdjustProbsByDistanceAndOrder(
                 Dictionary<(CandidateChain, Candidate), double> pathProbs)
         {
-            //foreach ((CandidateChain chain, Candidate cand) in pathProbs.Keys)
-            //{
-            //    List<Tuple<int, int>> motions = ComputeMotions(chain).ToList();
-            //    int motionsCount = motions.Count();
-            //    int backwards = motions.Count(m => m.Item2 < m.Item1);
-
-            //    int dist1 = ComputeDistance(chain);
-            //    int dist2 = cand.TotalMotion;
-            //    if (dist1 != dist2)
-            //    {
-            //        List<int?> pts1 =
-            //            AutoAlignUtility.GetTargetWordsInPath(chain)
-            //            .Select(mtp => mtp.TargetPoint?.Position)
-            //            .ToList();
-            //        foreach (var x in TempCandidateDebug.Report1(cand))
-            //            Console.WriteLine(x.ToString());
-            //        ;
-            //    }
-
-            //    if (motionsCount != cand.NumberMotions)
-            //    {
-            //        ;
-            //    }
-
-            //    if (backwards != cand.NumberBackwardMotions)
-            //    {
-            //        ;
-            //    }
-            //}
-
             // Find the minimum value of the ComputeDistance metric
             // as applied to the candidates.
             int minimalDistance =

@@ -693,6 +693,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return (
                 topCandidates.Select(pair => pair.Item1).ToList(),
+
+                //topCandidates
+                //.Select(pair => new { cand = pair.Item2, prob = }
+
                 topCandidates.Select(pair => pair.Item2).ToList());
         }
 
