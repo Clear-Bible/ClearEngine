@@ -500,7 +500,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 tail.NumberBackwardMotions +
                 deltaNumberBackwardMotions;
 
-            (_range, _conflicted) = head.TargetRange.Combine(tail.TargetRange);
+            (TargetRange range, bool subRangesInConflict) =
+                head.TargetRange.Combine(tail.TargetRange);
+
+            _range = range;
+            _conflicted =
+                subRangesInConflict ||
+                head.IsConflicted ||
+                tail.IsConflicted;
         }
 
         private Candidate _head;
