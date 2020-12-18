@@ -551,7 +551,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // left.)
             List<(CandidateChain, Candidate)> paths =
                 allPaths
-                .Where(pair => AlignStaging.HasNoDuplicateWords(pair.Item1))
+                .Where(pair => !pair.Item2.IsConflicted)
                 .DefaultIfEmpty(allPaths[0])
                 .ToList();
 
