@@ -512,6 +512,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(node => alignments2[node.TreeNodeStackID()])
                     .ToList();
 
+
+
                 // Combine the subnode candidates to produce the
                 // candidates for this node, keeping only the best ones.
                 (alignments[nodeID], alignments2[nodeID2]) =
@@ -676,7 +678,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<(CandidateChain, Candidate), double> pathProbs2 =
                 AlignStaging.AdjustProbsByDistanceAndOrder(pathProbs);
 
-            // Sort the candidates by their probabilities, and use a
+            // Sort the candidates by their adjusted probabilities, and use a
             // special hashing function to break ties.
             List<(CandidateChain, Candidate)> sortedCandidates =
                 SortPaths(pathProbs2);
@@ -684,6 +686,21 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Keep only the candidates of maximal probability.
             topCandidates = AlignStaging.GetLeadingCandidates(
                 sortedCandidates, pathProbs);
+
+            //var uhoh =
+            //    topCandidates
+            //    .Select(pair => new
+            //    {
+            //        a = pair.Item1,
+            //        b = pair.Item2,
+            //        flag = Math.Abs(pair.Item1.Prob - pair.Item2.LogScore) > 1e-10
+            //    })
+            //    .FirstOrDefault(x => x.flag);
+
+            //if (uhoh != null)
+            //{
+            //    ;
+            //}
 
             //long mem4 = GC.GetTotalMemory(true);
             //delta = mem4 - mem1;
@@ -693,9 +710,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return (
                 topCandidates.Select(pair => pair.Item1).ToList(),
-
-                //topCandidates
-                //.Select(pair => new { cand = pair.Item2, prob = }
 
                 topCandidates.Select(pair => pair.Item2).ToList());
         }

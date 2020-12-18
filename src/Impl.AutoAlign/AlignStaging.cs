@@ -643,7 +643,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Get the probability of the first candidate on
             // the list (if there is one).
             double leadingProb =
-                paths.Select(path => probs[path]).FirstOrDefault();
+                // paths.Select(path => probs[path]).FirstOrDefault();
+                paths.Select(pair => pair.Item2.LogScore).FirstOrDefault();
 
             // Take candidates from the list as long as their
             // probabilities are equal to the leading probability,
@@ -654,7 +655,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select(pair =>
                     (new Candidate_Old(pair.Item1, probs[pair]),
                     pair.Item2))
-                .TakeWhile(pair => pair.Item1.Prob == leadingProb)
+                .TakeWhile(pair => pair.Item2.LogScore == leadingProb)
                 .ToList();
         }
 
@@ -727,12 +728,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(kvp => new { Pair = kvp.Key, Prob = kvp.Value })
                     .ToDictionary(
                         c => c.Pair,
-                        c => adjustedProbability(c.Pair.Item2, c.Prob));
+                        // c => adjustedProbability(c.Pair.Item2, c.Prob));
+                        c => adjustedProbability(c.Pair.Item2, c.Pair.Item2.LogScore));
 
                 var uhoh =
                     pathProbs.Keys
                     .Select(key => new { key, a = pathProbsA[key], b = pathProbsB[key] })
-                    .Where(x => x.a != x.b)
+                    .Where(x => Math.Abs(x.a - x.b) > 1e-12)
                     .FirstOrDefault();
 
                 if (uhoh is not null)
