@@ -327,6 +327,28 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return f(this).ToList();
         }
+
+
+        /// <summary>
+        /// Get the correspondence between source points and target points
+        /// represented by this candidate, in the form of an enumeration of
+        /// source-target pairs in source-point syntax-tree order, and with
+        /// null target points for those source points that are not linked
+        /// to anything.  Each link is accompanied by its log score.
+        /// </summary>
+        /// 
+        public IEnumerable<(SourcePoint, TargetPoint, double)> GetCorrespondence()
+        {
+            if (IsPoint) yield return (SourcePoint, TargetPoint, LogScore);
+            else if (IsAdjusted)
+                foreach (var x in Underlying.GetCorrespondence())
+                    yield return x;
+            else if (IsUnion)
+            {
+                foreach (var x in Head.GetCorrespondence()) yield return x;
+                foreach (var x in Tail.GetCorrespondence()) yield return x;
+            }
+        }
     }
 
 

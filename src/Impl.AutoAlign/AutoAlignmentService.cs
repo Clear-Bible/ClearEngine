@@ -785,7 +785,38 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         openTargetBond: linkedWord))
                 .ToList();
 
-            return links;
+            List<(SourcePoint, TargetPoint, double)> alignment2 =
+                topCandidate2.GetCorrespondence().ToList();
+
+            List<OpenMonoLink> links2 =
+                topCandidate2.GetCorrespondence()
+                .Select(x =>
+                    new OpenMonoLink(
+                        x.Item1,
+                        new OpenTargetBond(
+                            new MaybeTargetPoint(x.Item2),
+                            (x.Item2 is null) ? -1000.0 : x.Item3)))
+                .ToList();
+
+            //var uhoh =
+            //    links.Zip(links2, (oml1, oml2) => new
+            //    {
+            //        oml1,
+            //        oml2,
+            //        flag =
+            //            oml1.SourcePoint != oml2.SourcePoint ||
+            //            oml1.OpenTargetBond.MaybeTargetPoint.TargetPoint !=
+            //            oml2.OpenTargetBond.MaybeTargetPoint.TargetPoint ||
+            //            oml1.OpenTargetBond.Score != oml2.OpenTargetBond.Score
+            //    })
+            //    .FirstOrDefault(x => x.flag);
+
+            //if (uhoh is not null)
+            //{
+            //    ;
+            //}
+
+            return links2;
         }
 
 
