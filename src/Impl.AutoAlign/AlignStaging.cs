@@ -612,19 +612,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </returns>
         /// 
         public static List<Candidate> GetLeadingCandidates(
-            List<Candidate> paths,
-            Dictionary<Candidate, double> probs)
+            List<Candidate> paths)
         {
             // Get the probability of the first candidate on
             // the list (if there is one).
             double leadingProb =
-                // paths.Select(path => probs[path]).FirstOrDefault();
                 paths.Select(cand => cand.LogScore).FirstOrDefault();
 
             // Take candidates from the list as long as their
-            // probabilities are equal to the leading probability,
-            // converting each of the candidates found from
-            // CandidateChain to Candidate.
+            // probabilities are equal to the leading probability.
             return
                 paths
                 .TakeWhile(cand => cand.LogScore == leadingProb)
@@ -645,11 +641,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// 
         public static Dictionary<Candidate, double>
             AdjustProbsByDistanceAndOrder(
-                Dictionary<Candidate, double> pathProbs)
+                // Dictionary<Candidate, double> pathProbs)
+                List<Candidate> candidates)
         {
             // Find the minimum value of the total motion.
             int minimalDistance =
-                pathProbs.Keys
+                candidates
                 .Select(cand => cand.TotalMotion)
                 .DefaultIfEmpty(10000)
                 .Min();
@@ -671,7 +668,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
 
                 Dictionary<Candidate, double> pathProbsB =
-                    pathProbs.Keys
+                    candidates
                     .ToDictionary(
                         cand => cand,
                         cand => adjustedProbability(cand));
@@ -681,9 +678,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             else
             {
                 // The minimum value of the ComputeDistance metric
-                // was zero; in this case, just use the original table
-                // without modification.
-                return pathProbs;
+                // was zero; in this case, just use the unadjusted
+                // probabilities of each candidate.
+                return
+                    candidates
+                    .ToDictionary(
+                        cand => cand,
+                        cand => cand.LogScore);              
             }
         }
 
