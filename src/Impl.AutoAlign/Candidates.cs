@@ -110,8 +110,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     {
         Point,       // links one source point to one target point
         EmptyPoint,  // links one source point to nothing
-        Union,       // combines two sub-candidates
-        Adjusted     // an underlying candidate with an adjusted score
+        Union        // combines two sub-candidates
     };
 
 
@@ -165,14 +164,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public Candidate Union(Candidate tail) =>
             new UnionCandidate(this, tail);
 
-        /// <summary>
-        /// Make a new Candidate that refers to the receiver as
-        /// its underlying candidate and has an adjusted score.
-        /// </summary>
-        /// 
-        public Candidate WithAdjustedScore(double logScore) =>
-            new AdjustedScoreCandidate(this, logScore);
-
 
         public abstract CandidateKind Kind { get; }
 
@@ -188,12 +179,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </summary>
         /// 
         public abstract bool IsUnion { get; }
-
-        /// <summary>
-        /// True if this Candidate was created by WithAdjustedScore().
-        /// </summary>
-        /// 
-        public abstract bool IsAdjusted { get; }
 
         /// <summary>
         /// The source point if IsPoint is true, and null
@@ -316,8 +301,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             IEnumerable<TargetPoint> f(Candidate cand)
             {
                 if (cand.IsPoint) yield return cand.TargetPoint;
-                else if (cand.IsAdjusted)
-                    foreach (var p in f(cand.Underlying)) yield return p;
                 else if (cand.IsUnion)
                 {
                     foreach (var p in f(cand.Head)) yield return p;
@@ -340,9 +323,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public IEnumerable<(SourcePoint, TargetPoint, double)> GetCorrespondence()
         {
             if (IsPoint) yield return (SourcePoint, TargetPoint, LogScore);
-            else if (IsAdjusted)
-                foreach (var x in Underlying.GetCorrespondence())
-                    yield return x;
             else if (IsUnion)
             {
                 foreach (var x in Head.GetCorrespondence()) yield return x;
@@ -378,8 +358,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public override bool IsPoint => true;
 
         public override bool IsUnion => false;
-
-        public override bool IsAdjusted => false;
 
         public override SourcePoint SourcePoint => _sourcePoint;
 
@@ -429,8 +407,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public override bool IsPoint => true;
 
         public override bool IsUnion => false;
-
-        public override bool IsAdjusted => false;
 
         public override SourcePoint SourcePoint => _sourcePoint;
 
@@ -528,8 +504,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public override bool IsUnion => true;
 
-        public override bool IsAdjusted => false;
-
         public override SourcePoint SourcePoint => null;
 
         public override TargetPoint TargetPoint => null;
@@ -558,57 +532,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     }
 
 
-    /// <summary>
-    /// Implements Candidate for an adjusted-score candidate that
-    /// is an underlying candidate with an adjusted score.
-    /// </summary>
-    /// 
-    public class AdjustedScoreCandidate : Candidate
-    {
-        public AdjustedScoreCandidate(Candidate basis, double logScore)
-        {
-            _basis = basis;
-            _logScore = logScore;
-        }
-
-        Candidate _basis;
-        double _logScore;
-
-
-        public override CandidateKind Kind => CandidateKind.Adjusted;
-
-        public override bool IsPoint => false;
-
-        public override bool IsUnion => false;
-
-        public override bool IsAdjusted => true;
-
-        public override SourcePoint SourcePoint => null;
-
-        public override TargetPoint TargetPoint => null;
-
-        public override Candidate Head => null;
-
-        public override Candidate Tail => null;
-
-        public override Candidate Underlying => _basis;
-
-        public override double LogScore => _logScore;
-
-        public override bool IsConflicted => _basis.IsConflicted;
-
-        public override int? FirstTargetPosition => _basis.FirstTargetPosition;
-
-        public override int? LastTargetPosition => _basis.LastTargetPosition;
-
-        public override int TotalMotion => _basis.TotalMotion;
-
-        public override int NumberMotions => _basis.NumberMotions;
-
-        public override int NumberBackwardMotions => _basis.NumberBackwardMotions;
-
-        public override TargetRange TargetRange => _basis.TargetRange;
-    }
+    
 
 
 
@@ -625,35 +549,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// 
     public class TempCandidateDebug
     {
-        private static Dictionary<Candidate, Candidate_Old> candToOld = new();
-
-        private static Dictionary<Candidate_Old, Candidate> oldToCand = new();
-
-        public static void Put(Candidate cand, Candidate_Old old)
-        {
-            candToOld[cand] = old;
-            oldToCand[old] = cand;
-        }
-
-        public static Candidate_Old OldForCand(Candidate cand) => candToOld[cand];
-
-        public static Candidate CandForOld(Candidate_Old old) => oldToCand[old];
-
-        public static bool CandidateTablesMatch(
-            AlternativesForTerminals oldTable,
-            Dictionary<SourceID, List<Candidate>> newTable)
-        {
-            return
-                oldTable
-                .SelectMany(kvp => kvp.Value.Select(val => (kvp.Key, val)))
-                .ToHashSet()
-                .SetEquals(
-                    newTable
-                    .SelectMany(kvp => kvp.Value.Select(val =>
-                        (kvp.Key.AsCanonicalString, TempCandidateDebug.OldForCand(val))))
-                    .ToHashSet());
-        }
-
         public static List<CandidateReport1Line> Report1(Candidate cand)
         {
             Dictionary<Candidate, int> ids = new();
@@ -673,10 +568,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     foreach (var line in f(cand.Head)) yield return line;
                     foreach (var line in f(cand.Tail)) yield return line;
-                }
-                else if (cand.IsAdjusted)
-                {
-                    foreach (var line in f(cand.Underlying)) yield return line;
                 }
             }
 
@@ -722,12 +613,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         "union({0:D3},{1:D3}) ",
                         getID(subject.Head),
                         getID(subject.Tail));
-                    break;
-
-                case CandidateKind.Adjusted:
-                    Description = string.Format(
-                        "adjusted({0:D3})  ",
-                        getID(subject.Underlying));
                     break;
             }
         }
