@@ -39,7 +39,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.AreEqual(c1.Kind, CandidateKind.Point);
             Assert.True(c1.IsPoint);
             Assert.False(c1.IsUnion);
-            Assert.False(c1.IsAdjusted);
             Assert.AreSame(c1.SourcePoint, sourcePoints[0]);
             Assert.AreSame(c1.TargetPoint, targetPoints[2]);
             Assert.Null(c1.Head);
@@ -62,7 +61,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.AreEqual(c2.Kind, CandidateKind.EmptyPoint);
             Assert.True(c2.IsPoint);
             Assert.False(c2.IsUnion);
-            Assert.False(c2.IsAdjusted);
             Assert.AreSame(c2.SourcePoint, sourcePoints[2]);
             Assert.Null(c2.TargetPoint);
             Assert.Null(c2.Head);
@@ -83,7 +81,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.AreEqual(c3.Kind, CandidateKind.Union);
             Assert.False(c3.IsPoint);
             Assert.True(c3.IsUnion);
-            Assert.False(c3.IsAdjusted);
             Assert.Null(c3.SourcePoint);
             Assert.Null(c3.TargetPoint);
             Assert.AreSame(c3.Head, c1);
@@ -100,29 +97,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
                 c3.TargetRange.Positions(),
                 new int[] { 2 }));
 
-            // Candidate4: adjust score of candidate3 to -0.2
-            Candidate c4 = c3.WithAdjustedScore(-0.2);
-
-            Assert.AreEqual(c4.Kind, CandidateKind.Adjusted);
-            Assert.False(c4.IsPoint);
-            Assert.False(c4.IsUnion);
-            Assert.True(c4.IsAdjusted);
-            Assert.Null(c4.SourcePoint);
-            Assert.Null(c4.TargetPoint);
-            Assert.Null(c4.Head);
-            Assert.Null(c4.Tail);
-            Assert.AreSame(c4.Underlying, c3);
-            Assert.AreEqual(c4.LogScore, -0.2);
-            Assert.False(c4.IsConflicted);
-            Assert.AreEqual(c4.FirstTargetPosition, 2);
-            Assert.AreEqual(c4.LastTargetPosition, 2);
-            Assert.AreEqual(c4.TotalMotion, 0);
-            Assert.AreEqual(c4.NumberMotions, 0);
-            Assert.AreEqual(c4.NumberBackwardMotions, 0);
-            Assert.True(Enumerable.SequenceEqual(
-                c4.TargetRange.Positions(),
-                new int[] { 2 }));
-
             // Candidate 5: union of candidates 2 and 1 (the
             // other order from above).
             Candidate c5 = c2.Union(c1);
@@ -130,7 +104,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.AreEqual(c5.Kind, CandidateKind.Union);
             Assert.False(c5.IsPoint);
             Assert.True(c5.IsUnion);
-            Assert.False(c5.IsAdjusted);
             Assert.Null(c5.SourcePoint);
             Assert.Null(c5.TargetPoint);
             Assert.AreSame(c5.Head, c2);
@@ -156,7 +129,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.AreEqual(c7.Kind, CandidateKind.Union);
             Assert.False(c7.IsPoint);
             Assert.True(c7.IsUnion);
-            Assert.False(c7.IsAdjusted);
             Assert.Null(c7.SourcePoint);
             Assert.Null(c7.TargetPoint);
             Assert.AreSame(c7.Head, c5);
@@ -179,7 +151,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.AreEqual(c8.Kind, CandidateKind.Union);
             Assert.False(c8.IsPoint);
             Assert.True(c8.IsUnion);
-            Assert.False(c8.IsAdjusted);
             Assert.Null(c8.SourcePoint);
             Assert.Null(c8.TargetPoint);
             Assert.AreSame(c8.Head, c6);
@@ -202,7 +173,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.AreEqual(c9.Kind, CandidateKind.Union);
             Assert.False(c9.IsPoint);
             Assert.True(c9.IsUnion);
-            Assert.False(c9.IsAdjusted);
             Assert.Null(c9.SourcePoint);
             Assert.Null(c9.TargetPoint);
             Assert.AreSame(c9.Head, c8);
