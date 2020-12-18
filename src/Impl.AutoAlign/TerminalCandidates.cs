@@ -428,59 +428,27 @@ namespace ClearBible.Clear3.Impl.AutoAlign
              Dictionary<(TargetID, string), List<(SourceID, Candidate)>> conflicts2) =
                 FindConflicts(candidateTable, candidateTable2);
 
-
             // If the conflicts table has any entries:
             if (conflicts2.Count > 0)
             {
                 // For each entry in the conflicts table:
-                foreach (var conflictEnum in conflicts)
+                //foreach (var conflictEnum in conflicts)
+                foreach (var kvp in conflicts2)
                 {
-                    string target = conflictEnum.Key;
-                    List<string> positions = conflictEnum.Value;
-
-                    TargetID target2 =
-                        conflicts2
-                        .Where(kvp => kvp.Key.Item2 == target)
-                        .Select(kvp => kvp.Key.Item1)
-                        .FirstOrDefault();
-
-                    List<(SourceID, Candidate)> positions2 =
-                        conflicts2
-                        .Where(kvp => kvp.Key.Item2 == target)
-                        .Select(kvp => kvp.Value)
-                        .FirstOrDefault();
-
-                    // Get the list of the candidates the candidates that
-                    // link to the target point, one for each of the
-                    // source IDs in this entry.
-                    List<Candidate_Old> conflictingCandidates =
-                        GetConflictingCandidates(
-                            target,
-                            positions,
-                            candidateTable);
-
-
-                    // Find the maximum probability among these candidates.
-                    double topProb =
-                        conflictingCandidates.Max(c => c.Prob);
+                    TargetID target2 = kvp.Key.Item1;
+                    List<(SourceID, Candidate)> positions2 = kvp.Value;
 
                     double topProb2 =
                         positions2.Max(p => p.Item2.LogScore);
-
-                    // Get those candidates of maximal probability.
-                    List<Candidate_Old> best =
-                        conflictingCandidates
-                        .Where(c => c.Prob == topProb)
-                        .ToList();
 
                     List<(SourceID, Candidate)> best2 =
                         positions2.
                         Where(p => p.Item2.LogScore == topProb2)
                         .ToList();
-
+                   
                     // If there is only one such candidate of maximal
                     // probability:
-                    if (best.Count == 1)
+                    if (best2.Count == 1)
                     {
                         // Remove those candidates linking to the target
                         // point from the source points that are not the
