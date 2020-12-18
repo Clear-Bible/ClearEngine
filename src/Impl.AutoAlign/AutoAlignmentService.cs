@@ -238,7 +238,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 treeNode,
                 targetPoints.Count,
                 assumptions.MaxPaths,
-                terminalCandidates,
                 terminalCandidates2);
 
             // Express the result using a list of OpenMonoLink.
@@ -335,7 +334,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             XElement treeNode,
             int numberTargets,
             int maxPaths,
-            AlternativesForTerminals terminalCandidates,
             Dictionary<SourceID, List<Candidate>> terminalCandidates2)
         {
             // Prepare to keep track of the best alignments for subnodes
@@ -359,8 +357,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // for each sub-node into the alignments dictionary.
             AlignNode(
                 treeNode,
-                alignments, numberTargets,
-                maxPaths, terminalCandidates,
+                numberTargets,
+                maxPaths,
                 alignments2,
                 terminalCandidates2);
 
@@ -396,10 +394,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// 
         public static void AlignNode(
             XElement treeNode,
-            Dictionary<string, List<Candidate_Old>> alignments,
             int n,
             int maxPaths,
-            AlternativesForTerminals terminalCandidates,
             Dictionary<TreeNodeStackID, List<Candidate>> alignments2,
             Dictionary<SourceID, List<Candidate>> terminalCandidates2)
         {
@@ -409,9 +405,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 AlignNode(
                     subTree,
-                    alignments, n,
-                    maxPaths, terminalCandidates,
-                    alignments2, terminalCandidates2);
+                    n,
+                    maxPaths,
+                    alignments2,
+                    terminalCandidates2);
             }
 
             // Get the TreeNodeStackId of this node as canonical
@@ -425,69 +422,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // If this is a terminal node:
             if (treeNode.FirstNode is XText)
             {
-                // Get the source ID associated with this tree node.
-                // FIXME: Get rid of this bare string manipulation.
-                string morphId = treeNode.Attribute("morphId").Value;
-                if (morphId.Length == 11)
-                {
-                    morphId += "1";
-                }
-
-                // Get the alternatives for this source ID from the
-                // terminal candidates table, and add them to the alignments
-                // table as the alternatives for this node.
-                alignments.Add(nodeID, terminalCandidates[morphId]);
-
                 SourceID sourceID = treeNode.SourceID();
-
                 alignments2.Add(nodeID2, terminalCandidates2[sourceID]);
             }
             // Otherwise this is a non-terminal node; if it has
             // multiple children:
             else if (treeNode.Descendants().Count() > 1)
             {
-                // Helper function to get the TreeNodeStackId of this
-                // node as a canonical string.
-                // FIXME: Get rid of this bare string manipulation.
-                string getNodeId(XElement node)
-                {
-                    string id = node.Attribute("nodeId").Value;
-                    int numDigitsToDrop = id.Length == 15 ? 1 : 2;
-                    return id.Substring(0, id.Length - numDigitsToDrop);
-                }
-
-                // Helper function to create an empty candidate in the
-                // case where there are no alternatives.
-                List<Candidate_Old> makeNonEmpty(List<Candidate_Old> list) =>
-                    list.Count == 0
-                    ? AutoAlignUtility.CreateEmptyCandidate()
-                    : list;
-
-                // Helper function that retrieves the alignments for
-                // subnodes, producing an empty candidate when necessary.
-                List<Candidate_Old> candidatesForNode(XElement node) =>
-                    makeNonEmpty(alignments[getNodeId(node)]);
-
-                // Compute a list of candidates for each subnode.
-                List<List<Candidate_Old>> candidates =
-                    treeNode
-                    .Elements()
-                    .Select(candidatesForNode)
-                    .ToList();
-
                 List<List<Candidate>> candidates2 =
                     treeNode
                     .Elements()
                     .Select(node => alignments2[node.TreeNodeStackID()])
                     .ToList();
 
-
-
-                // Combine the subnode candidates to produce the
-                // candidates for this node, keeping only the best ones.
-                (alignments[nodeID], alignments2[nodeID2]) =
+                alignments2[nodeID2] =
                     ComputeTopCandidates(
-                        candidates, n, maxPaths,
+                        n, maxPaths,
                         candidates2);              
             }
 
@@ -517,9 +467,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// to mitigate a possible combinatorial explosion.
         /// </param>
         ///
-        public static (List<Candidate_Old>, List<Candidate>)
+        public static List<Candidate>
             ComputeTopCandidates(
-                List<List<Candidate_Old>> childCandidateList,
                 int n,
                 int maxPaths,
                 List<List<Candidate>> childCandidateList2)
@@ -530,9 +479,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Combine the candidates of the children to get the
             // possibilities to be considered for this node.
-            List<(CandidateChain, Candidate)> allPaths =
+            List<Candidate> allPaths =
                 AlignStaging.CreatePaths(
-                    childCandidateList, maxPaths, childCandidateList2);
+                    maxPaths, childCandidateList2);
 
             //long mem2 = GC.GetTotalMemory(true);
             //int numCandidates = allPaths.Count;
@@ -544,9 +493,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Remove any possibility that has two source points linked
             // to the same target point.  (There might be no possibilities
             // left.)
-            List<(CandidateChain, Candidate)> paths =
+            List<Candidate> paths =
                 allPaths
-                .Where(pair => !pair.Item2.IsConflicted)
+                .Where(cand => !cand.IsConflicted)
                 .DefaultIfEmpty(allPaths[0])
                 .ToList();
 
@@ -562,26 +511,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Make a dictionary of (log) probabilities for each candidate,
             // to be possibly adjusted and then used to choose which
             // candidates are best.
-            Dictionary<(CandidateChain, Candidate), double> pathProbs =
+            Dictionary<Candidate, double> pathProbs =
                 paths
                 .ToDictionary(
-                    pair => pair,
-                    pair => pair.Item2.LogScore);
+                    cand => cand,
+                    cand => cand.LogScore);
 
 
             // Make possible adjustments to the probabilities of
             // the candidates depending on local conditions.
-            Dictionary<(CandidateChain, Candidate), double> pathProbs2 =
+            Dictionary<Candidate, double> pathProbs2 =
                 AlignStaging.AdjustProbsByDistanceAndOrder(pathProbs);
 
             // Sort the candidates by their adjusted probabilities, and use a
             // special hashing function to break ties.
-            List<(CandidateChain, Candidate)> sortedCandidates =
+            List<Candidate> sortedCandidates =
                 SortPaths(pathProbs2);
 
             // Keep only the best candidate, together with any candidates
             // that follow it and have the same unadjusted probability.
-            List<(Candidate_Old, Candidate)> topCandidates =
+            List<Candidate> topCandidates =
                 AlignStaging.GetLeadingCandidates(
                     sortedCandidates, pathProbs);
 
@@ -591,10 +540,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //perCandidate = delta / (double)numCandidates;
             //Console.WriteLine($"Top candidates: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
 
-            return (
-                topCandidates.Select(pair => pair.Item1).ToList(),
-
-                topCandidates.Select(pair => pair.Item2).ToList());
+            return topCandidates;
         }
 
 
@@ -613,15 +559,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// The sorted list of candidates.
         /// </returns>
         /// 
-        public static List<(CandidateChain, Candidate)> SortPaths(
-            Dictionary<(CandidateChain, Candidate), double> pathProbs)
+        public static List<Candidate> SortPaths(
+            Dictionary<Candidate, double> pathProbs)
         {
             // Hashing function to break ties: compute a list of target
             // points, and call the standard hashing function on this
             // list.
             // FIXME: maybe reconsider what this function does?
-            int hashCodeOfWordsInPath(CandidateChain path) =>
+            int hashCodeOfWordsInPathOld(CandidateChain path) =>
                 AutoAlignUtility.GetTargetWordsInPath(path).GetHashCode();
+
+            int hashCodeOfWordsInPath(Candidate cand) =>
+                cand.GetTargetPoints().GetHashCode();
+
 
             // Starting from the path probabilities table,
             // order the entries, first by probability in descending order,
@@ -630,7 +580,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             return pathProbs
                 .OrderByDescending(kvp => kvp.Value)
                 .ThenByDescending(kvp =>
-                    hashCodeOfWordsInPath(kvp.Key.Item1))
+                    hashCodeOfWordsInPath(kvp.Key))
                 .Select(kvp => kvp.Key)
                 .ToList();
         }
