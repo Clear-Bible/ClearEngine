@@ -234,7 +234,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Traverse the syntax tree starting from the terminals
             // and working back to the root to construct alignments
             // and eventually the best one. 
-            Candidate_Old topCandidate = AlignTree(
+            (Candidate_Old topCandidate, Candidate topCandidate2) = AlignTree(
                 treeNode,
                 targetPoints.Count,
                 assumptions.MaxPaths,
@@ -243,7 +243,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Express the result using a list of OpenMonoLink.
             List<OpenMonoLink> openMonoLinks =
-                MakeOpenMonoLinks(topCandidate, sourcePoints);
+                MakeOpenMonoLinks(topCandidate, topCandidate2, sourcePoints);
 
             // Resolve conflicts (where more than one source point is
             // linking to the same target point) by removing links.
@@ -331,7 +331,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// source ID is expressed as the canonical string.
         /// </param>
         /// 
-        public static Candidate_Old AlignTree(
+        public static (Candidate_Old, Candidate) AlignTree(
             XElement treeNode,
             int numberTargets,
             int maxPaths,
@@ -396,7 +396,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
             // Return the first of the root node candidates.
-            return verseAlignment[0];
+            return (verseAlignment[0], verseAlignment2);
         }
 
 
@@ -762,6 +762,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// 
         public static List<OpenMonoLink> MakeOpenMonoLinks(
             Candidate_Old topCandidate,
+            Candidate topCandidate2,
             List<SourcePoint> sourcePoints)
         {
             // Convert the candidate to a list of OpenTargetBond.
