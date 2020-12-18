@@ -529,8 +529,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<(CandidateChain, Candidate), double> pathProbs =
                 new();
 
-            Dictionary<Candidate, double> candidateScores = new();
-
             //long mem1 = GC.GetTotalMemory(true);
 
             // Combine the candidates of the children to get the
@@ -569,12 +567,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // For each remaining possibility:
             foreach ((CandidateChain, Candidate) pair in paths)
             {
-                // The joint probability is the sum of the probabilities
-                // of the sub-candidates.  (At this point the probabilities
-                // are being expressed as logarithms, so adding the logarithms
-                // is like multiplying the probabilties.)
-                double jointProb =
-                    pair.Item1.Cast<Candidate_Old>().Sum(c => c.Prob);
+                double jointProb = pair.Item2.LogScore;
 
                 try
                 {
@@ -627,20 +620,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            foreach ((CandidateChain chain, Candidate key) in pathProbs.Keys)
-            {
-                List<TargetPoint> pts1 =
-                    AutoAlignUtility.GetTargetWordsInPath(chain)
-                    .Select(mtp => mtp.TargetPoint)
-                    .ToList();
+            //foreach ((CandidateChain chain, Candidate key) in pathProbs.Keys)
+            //{
+            //    List<TargetPoint> pts1 =
+            //        AutoAlignUtility.GetTargetWordsInPath(chain)
+            //        .Select(mtp => mtp.TargetPoint)
+            //        .ToList();
 
-                List<TargetPoint> pts2 = key.GetTargetPoints();
+            //    List<TargetPoint> pts2 = key.GetTargetPoints();
 
-                if (!Enumerable.SequenceEqual(pts1, pts2))
-                {
-                    ;
-                }
-            }
+            //    if (!Enumerable.SequenceEqual(pts1, pts2))
+            //    {
+            //        ;
+            //    }
+            //}
 
             // Make certain adjustments to the probabilities of
             // the candidates.
