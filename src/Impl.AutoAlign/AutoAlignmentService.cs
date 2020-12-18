@@ -234,7 +234,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Traverse the syntax tree starting from the terminals
             // and working back to the root to construct alignments
             // and eventually the best one. 
-            (Candidate_Old topCandidate, Candidate topCandidate2) = AlignTree(
+            Candidate topCandidate2 = AlignTree(
                 treeNode,
                 targetPoints.Count,
                 assumptions.MaxPaths,
@@ -331,7 +331,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// source ID is expressed as the canonical string.
         /// </param>
         /// 
-        public static (Candidate_Old, Candidate) AlignTree(
+        public static Candidate AlignTree(
             XElement treeNode,
             int numberTargets,
             int maxPaths,
@@ -355,7 +355,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 new();
 
             // Traverse the syntax tree, starting from the terminal
-            // nodes and back toward the root, placing the best candidate
+            // nodes and back toward the root, placing the best candidates
             // for each sub-node into the alignments dictionary.
             AlignNode(
                 treeNode,
@@ -364,39 +364,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 alignments2,
                 terminalCandidates2);
 
-            // Get the candidates that were stored for the root node.
-            string goalNodeId =
-                treeNode.TreeNodeID().TreeNodeStackID.AsCanonicalString;
-            List<Candidate_Old> verseAlignment = alignments[goalNodeId];
-
-            Candidate_Old verseAlignment1 =
-                alignments[treeNode.TreeNodeStackID().AsCanonicalString][0];
-            List<TargetPoint> targets1 =
-                AutoAlignUtility.GetTargetWordsInPath(verseAlignment1.Chain)
-                .Select(mtp => mtp.TargetPoint)
-                .ToList();
-
-            Candidate verseAlignment2 =
-                alignments2[treeNode.TreeNodeStackID()][0];
-            List<TargetPoint> targets2 = verseAlignment2.GetTargetPoints();
-
-            if (!Enumerable.SequenceEqual(targets1, targets2))
-            {
-                ;
-            }
-
-            //if (verseAlignment2.IsConflicted)
-            //{
-            //    foreach (var line in
-            //        TempCandidateDebug.Report1(verseAlignment2))
-            //        Console.WriteLine(line.ToString());
-            //    ;
-            //}
-
-
-
             // Return the first of the root node candidates.
-            return (verseAlignment[0], verseAlignment2);
+            return alignments2[treeNode.TreeNodeStackID()][0];
         }
 
 
