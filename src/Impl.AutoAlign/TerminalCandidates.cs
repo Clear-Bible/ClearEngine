@@ -40,9 +40,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// node in the syntax tree.
         /// </returns>
         /// 
-        public static
-            (AlternativesForTerminals,
-            Dictionary<SourceID, List<Candidate>>)
+        public static Dictionary<SourceID, List<Candidate>>
             GetTerminalCandidates(
                 XElement treeNode,
                 Dictionary<SourceID, SourcePoint> sourcePointsByID,
@@ -84,16 +82,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         existingLinks,
                         assumptions);
 
-                foreach ((Candidate_Old old, Candidate cand) in
-                    topCandidates.Zip(topCandidates2, (old, key) => (old, key)))
-                {
-                    TempCandidateDebug.Put(cand, old);
-                }
-
                 // Add the candidates found to the table of alternatives
                 // for terminals.
-                candidateTable.Add(sourceIDAsString, topCandidates);
-
                 candidateTable2.Add(sourceID, topCandidates2);
 
                 // Where there are conflicting non-first candidates where one
@@ -106,11 +96,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // is empty, replace the empty list with a list containing
             // one empty Candidate.
             FillGaps(
-                candidateTable,
                 candidateTable2,
                 sourcePointsByID);
 
-            return (candidateTable, candidateTable2);
+            return candidateTable2;
         }
 
 
@@ -683,7 +672,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public static void FillGaps(
-            AlternativesForTerminals candidateTable,
             Dictionary<SourceID, List<Candidate>> candidateTable2,
             Dictionary<SourceID, SourcePoint> sourcePointsById)
         {
@@ -695,16 +683,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             foreach (SourceID sourceID in gaps2)
             {
-                Candidate_Old emptyCandidate = new Candidate_Old();
-                List<Candidate_Old> candidates = new() { emptyCandidate };
-                candidateTable[sourceID.AsCanonicalString] = candidates;
-
                 Candidate emptyCandidate2 =
                     Candidate.NewEmptyPoint(sourcePointsById[sourceID]);
                 List<Candidate> candidates2 = new() { emptyCandidate2 };
-                candidateTable2[sourceID] = candidates2;
-
-                TempCandidateDebug.Put(emptyCandidate2, emptyCandidate);                   
+                candidateTable2[sourceID] = candidates2;                 
             }
         }
 
