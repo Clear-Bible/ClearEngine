@@ -547,7 +547,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// that use them.
     /// </summary>
     /// 
-    public class TempCandidateDebug
+    public class CandidateDebug
     {
         public static List<CandidateReport1Line> Report1(Candidate cand)
         {

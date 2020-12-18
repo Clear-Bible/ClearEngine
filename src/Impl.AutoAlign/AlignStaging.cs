@@ -557,46 +557,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         /// <summary>
-        /// Prepend a Candidate to a CandidateChain to obtain a new
-        /// Candidate chain.
-        /// </summary>
-        /// 
-        public static CandidateChain ConsChain(
-            Candidate_Old head,
-            CandidateChain tail)
-        {
-            return new CandidateChain(
-                tail.Cast<Candidate_Old>().Prepend(head));
-        }
-
-
-        /// <summary>
-        /// Test that a CandidateChain does not have two source points
-        /// linked to the same target point.
-        /// </summary>
-        /// 
-        public static bool HasNoDuplicateWords(CandidateChain path)
-        {
-            // Test whether the CandidateChain has any duplicate words:
-            // Starting with the CandidateChain, get the MaybeTargetPoint
-            // objects mentioned in the chain, keep only those that really
-            // have target points, group the result by target point identity,
-            // and test whether any group has at least two members.
-            bool pathHasDuplicateWords =
-                AutoAlignUtility.GetTargetWordsInPath(path)
-                .Where(word => !word.IsNothing)
-                .GroupBy(word => new { word.Lower, word.Position })
-                .Any(hasAtLeastTwoMembers);
-
-            return !pathHasDuplicateWords;
-
-            // Helper function to test of a group has at least two members.
-            bool hasAtLeastTwoMembers(IEnumerable<MaybeTargetPoint> words) =>
-                words.Skip(1).Any();
-        }
-
-
-        /// <summary>
         /// Get the candidates of maximal probability, converting them
         /// from CandidateChain to Candidate in the process.
         /// </summary>
@@ -686,88 +646,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         cand => cand,
                         cand => cand.LogScore);              
             }
-        }
-
-
-        /// <summary>
-        /// Compute a distance metric for an alignment candidate.
-        /// </summary>
-        /// <param name="path">
-        /// The alignment candidate expressed as a CandidateChain.
-        /// </param>
-        /// <returns>
-        /// The distance metric.
-        /// </returns>
-        /// 
-        public static int ComputeDistance(CandidateChain path)
-        {
-            // Get the motions implied by the alignment.
-            IEnumerable<Tuple<int, int>> motions = ComputeMotions(path);
-
-            // Return the sum of the absolute values of the sizes
-            // of the motions.
-            return motions.Sum(m => Math.Abs(m.Item1 - m.Item2));
-        }
-
-
-        /// <summary>
-        /// Compute an order probability metric for a CandidateChain,
-        /// based on what fraction of the motions implied by the
-        /// CandidateChain go backwards.
-        /// </summary>
-        /// <param name="path">
-        /// The alignment candidate expressed as a CandidateChain.
-        /// </param>
-        /// <returns>
-        /// The order metric.
-        /// </returns>
-        /// 
-        public static double ComputeOrderProb(CandidateChain path)
-        {
-            // Get the motions implied by the alignment.
-            IEnumerable<Tuple<int, int>> motions = ComputeMotions(path);
-
-            // Get the number of motions, and add 1 to prevent division
-            // by zero in what follows.
-            double countedWords = 1 + motions.Count();
-
-            // Get the number of backward motions.
-            double violations = motions.Count(m => m.Item2 < m.Item1);
-
-            // Compute the metric based on what fraction of motions
-            // go backwards.
-            return Math.Log(1.0 - violations / countedWords);
-        }
-
-
-        /// <summary>
-        /// Compute the motions implied by a CandidateChain.
-        /// </summary>
-        /// <returns>
-        /// A list of motions, where each motion is a pair with
-        /// the indices of two adjacent target points in the
-        /// alignment.
-        /// </returns>
-        /// 
-        public static IEnumerable<Tuple<int, int>> ComputeMotions(
-            CandidateChain path)
-        {
-            // Get the positions of the target points in the chain,
-            // by getting the MaybeTargetPoint objects in the chain,
-            // keeping only those that really have target points,
-            // and then getting their positions.
-            IEnumerable<int> positions =
-                AutoAlignUtility.GetTargetWordsInPath(path)
-                .Where(tw => !tw.IsNothing)
-                .Select(tw => tw.Position);
-
-            // Zip the positions with the tail of the positions
-            // to create a list of motions, and keep only those
-            // motions that actually move.
-            return
-                positions
-                .Zip(positions.Skip(1), Tuple.Create)
-                .Where(m => m.Item1 != m.Item2);
         }
     }
 }

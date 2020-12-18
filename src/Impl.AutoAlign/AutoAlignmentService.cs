@@ -344,10 +344,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // tree node(s); the candidate sequence matches the source
             // points in their order of occurrence in the tree, which
             // might differ from their order in the manuscript.
-            // FIXME: See FIXME notes for Candidate.
-            Dictionary<string, List<Candidate_Old>> alignments =
-                new Dictionary<string, List<Candidate_Old>>();
-
+            //
             Dictionary<TreeNodeStackID, List<Candidate>> alignments2 =
                 new();
 
