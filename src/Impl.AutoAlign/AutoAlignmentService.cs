@@ -620,21 +620,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
             }
 
-            //foreach ((CandidateChain chain, Candidate key) in pathProbs.Keys)
-            //{
-            //    List<TargetPoint> pts1 =
-            //        AutoAlignUtility.GetTargetWordsInPath(chain)
-            //        .Select(mtp => mtp.TargetPoint)
-            //        .ToList();
-
-            //    List<TargetPoint> pts2 = key.GetTargetPoints();
-
-            //    if (!Enumerable.SequenceEqual(pts1, pts2))
-            //    {
-            //        ;
-            //    }
-            //}
-
             // Make certain adjustments to the probabilities of
             // the candidates.
             Dictionary<(CandidateChain, Candidate), double> pathProbs2 =
@@ -648,21 +633,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Keep only the candidates of maximal probability.
             topCandidates = AlignStaging.GetLeadingCandidates(
                 sortedCandidates, pathProbs);
-
-            //var uhoh =
-            //    topCandidates
-            //    .Select(pair => new
-            //    {
-            //        a = pair.Item1,
-            //        b = pair.Item2,
-            //        flag = Math.Abs(pair.Item1.Prob - pair.Item2.LogScore) > 1e-10
-            //    })
-            //    .FirstOrDefault(x => x.flag);
-
-            //if (uhoh != null)
-            //{
-            //    ;
-            //}
 
             //long mem4 = GC.GetTotalMemory(true);
             //delta = mem4 - mem1;

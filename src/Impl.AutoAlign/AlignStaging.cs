@@ -675,15 +675,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AdjustProbsByDistanceAndOrder(
                 Dictionary<(CandidateChain, Candidate), double> pathProbs)
         {
-            // Find the minimum value of the ComputeDistance metric
-            // as applied to the candidates.
+            // Find the minimum value of the total motion.
             int minimalDistance =
-                pathProbs.Keys
-                .Select(pair => ComputeDistance(pair.Item1))
-                .DefaultIfEmpty(10000)
-                .Min();
-
-            int minimalDistance2 =
                 pathProbs.Keys
                 .Select(pair => pair.Item2.TotalMotion)
                 .DefaultIfEmpty(10000)
@@ -691,25 +684,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             if (minimalDistance > 0)
             {
-                // Helper function to compute a new probability
-                // from the result of the ComputeDistance metric.
-                double getDistanceProb(double distance) =>
-                    Math.Log(minimalDistance / distance);
-
-                // Considering each entry in the pathProbs table,
-                // make a new table with revised probabilities based
-                // on the ComputeDistance and ComputeOrderProb metrics
-                // for the chain.
-                Dictionary<(CandidateChain, Candidate), double> pathProbsA =
-                    pathProbs
-                    .Select(kvp => new { Pair = kvp.Key, Prob = kvp.Value })
-                    .ToDictionary(
-                        c => c.Pair,
-                        c => c.Prob + c.Prob +
-                            getDistanceProb(ComputeDistance(c.Pair.Item1)) +
-                            ComputeOrderProb(c.Pair.Item1) / 2.0);
-
-                double adjustedProbability(Candidate cand, double original)
+                double adjustedProbability(Candidate cand)
                 {
                     double distanceProbability = 
                         Math.Log(minimalDistance / (double) cand.TotalMotion);
@@ -718,7 +693,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             cand.NumberBackwardMotions /
                             (1.0 + cand.NumberMotions));
                     return
-                        2.0 * original +
+                        2.0 * cand.LogScore +
                         distanceProbability +
                         orderProbability / 2.0;
                 }
@@ -728,23 +703,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(kvp => new { Pair = kvp.Key, Prob = kvp.Value })
                     .ToDictionary(
                         c => c.Pair,
-                        // c => adjustedProbability(c.Pair.Item2, c.Prob));
-                        c => adjustedProbability(c.Pair.Item2, c.Pair.Item2.LogScore));
-
-                var uhoh =
-                    pathProbs.Keys
-                    .Select(key => new { key, a = pathProbsA[key], b = pathProbsB[key] })
-                    .Where(x => Math.Abs(x.a - x.b) > 1e-12)
-                    .FirstOrDefault();
-
-                if (uhoh is not null)
-                {
-                    CandidateChain chain = uhoh.key.Item1;
-                    Candidate cand = uhoh.key.Item2;
-                    
-                    ;
-                }
-
+                        c => adjustedProbability(c.Pair.Item2));
 
                 return pathProbsB;
             }
