@@ -473,8 +473,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 int maxPaths,
                 List<List<Candidate>> childCandidateList2)
         {
-            
-
             //long mem1 = GC.GetTotalMemory(true);
 
             // Combine the candidates of the children to get the
@@ -507,32 +505,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //perCandidate = delta / (double)numCandidates;
             //Console.WriteLine($"no dup paths: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
 
-
-            // Make a dictionary of (log) probabilities for each candidate,
-            // to be possibly adjusted and then used to choose which
-            // candidates are best.
-            Dictionary<Candidate, double> pathProbs =
-                paths
-                .ToDictionary(
-                    cand => cand,
-                    cand => cand.LogScore);
-
-
-            // Make possible adjustments to the probabilities of
-            // the candidates depending on local conditions.
+            // Compute possibly adjusted probabilities for the candidates
+            // which depend on the local conditions.
             Dictionary<Candidate, double> pathProbs2 =
-                AlignStaging.AdjustProbsByDistanceAndOrder(pathProbs);
+                AlignStaging.AdjustProbsByDistanceAndOrder(paths);
 
             // Sort the candidates by their adjusted probabilities, and use a
             // special hashing function to break ties.
-            List<Candidate> sortedCandidates =
-                SortPaths(pathProbs2);
+            List<Candidate> sortedCandidates = SortPaths(pathProbs2);
 
             // Keep only the best candidate, together with any candidates
             // that follow it and have the same unadjusted probability.
             List<Candidate> topCandidates =
-                AlignStaging.GetLeadingCandidates(
-                    sortedCandidates, pathProbs);
+                AlignStaging.GetLeadingCandidates(sortedCandidates);
 
             //long mem4 = GC.GetTotalMemory(true);
             //delta = mem4 - mem1;
@@ -566,12 +551,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // points, and call the standard hashing function on this
             // list.
             // FIXME: maybe reconsider what this function does?
-            int hashCodeOfWordsInPathOld(CandidateChain path) =>
-                AutoAlignUtility.GetTargetWordsInPath(path).GetHashCode();
-
             int hashCodeOfWordsInPath(Candidate cand) =>
                 cand.GetTargetPoints().GetHashCode();
-
 
             // Starting from the path probabilities table,
             // order the entries, first by probability in descending order,
