@@ -427,8 +427,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// as a CandidateChain.
         /// </returns>
         /// 
-        public static List<(CandidateChain, Candidate)> CreatePaths(
-            List<List<Candidate_Old>> childCandidatesList,
+        public static List<Candidate> CreatePaths(
             int maxPaths,
             List<List<Candidate>> childCandidatesList2)
         {
@@ -436,14 +435,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // the numbers of alternatives for all of the children.
             // FIXME: what about overflow?
             int maxArcs =
-                childCandidatesList
+                childCandidatesList2
                 .Select(candidates => candidates.Count)
                 .Aggregate(1, (product, n) => product * n);
 
             // Compute the maximum length of the sublists of alternatives
             // for the children.
             int maxDepth =
-                childCandidatesList
+                childCandidatesList2
                 .Select(candidates => candidates.Count)
                 .DefaultIfEmpty(0)
                 .Max();
@@ -457,19 +456,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // maxPaths, where n is the number of children.
                 double root = Math.Pow(
                     (double)maxPaths,
-                    1.0 / childCandidatesList.Count);
+                    1.0 / childCandidatesList2.Count);
                 maxDepth = (int)root;
             }
 
             // Prepare to collect alternatives.
-            List<(CandidateChain, Candidate)> depth_N_paths = new();
+            List<Candidate> depth_N_paths = new();
 
             try
             {
                 // Create alternatives with the maxDepth limit in force.
                 depth_N_paths =
                     CreatePathsWithDepthLimit(
-                        childCandidatesList,
                         maxDepth,
                         childCandidatesList2);
             }
@@ -483,7 +481,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // Start over by calling this function recursively with
                 // maxPaths cut in half.
                 depth_N_paths = CreatePaths(
-                    childCandidatesList,
                     maxPaths / 2,
                     childCandidatesList2);
             }
@@ -510,28 +507,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// as a CandidateChain.
         /// </returns>
         /// 
-        public static List<(CandidateChain, Candidate)> CreatePathsWithDepthLimit(
-            List<List<Candidate_Old>> childCandidatesList,
+        public static List<Candidate> CreatePathsWithDepthLimit(
             int depth,
             List<List<Candidate>> childCandidatesList2)
         {
             // If there are multiple child candidate alternatives:
-            if (childCandidatesList.Count > 1)
+            if (childCandidatesList2.Count > 1)
             {
                 // Compute the head candidates by taking the first depth
                 // plus one of the alternatives for the first child.
-                IEnumerable<Candidate_Old> headCandidates =
-                    childCandidatesList[0].Take(depth + 1);
-
                 IEnumerable<Candidate> headCandidates2 =
                     childCandidatesList2[0].Take(depth + 1);
 
                 // Compute the tail candidates by calling this function
                 // recursively to generate alternatives for the remaining
                 // children.
-                List<(CandidateChain, Candidate)> tailPaths =
+                List<Candidate> tailPaths =
                     CreatePathsWithDepthLimit(
-                        childCandidatesList.Skip(1).ToList(),
                         depth,
                         childCandidatesList2.Skip(1).ToList());
 
@@ -539,13 +531,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // head candidate to each of the tail candidates, and taking
                 // at most the first 16000000 members of the resulting list.
                 return
-                    headCandidates
-                    .Zip(headCandidates2, ValueTuple.Create)
-                    .SelectMany(headPair =>
+                    headCandidates2
+                    .SelectMany(head =>
                         tailPaths
-                        .Select(tailPair =>
-                            (ConsChain(headPair.Item1, tailPair.Item1),
-                             headPair.Item2.Union(tailPair.Item2))))
+                        .Select(tail =>
+                            head.Union(tail)))
                      .Take(16000000)
                      .ToList();
             }
@@ -555,27 +545,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // (because the recursive calls have reached the last
                 // child).
 
-                // Take the first depth plus one alternatives and
-                // convert each once to a CandidateChain to obtain
-                // the result.
+                // Take the first depth plus one alternatives.
                 return
-                    childCandidatesList[0]
-                    .Zip(childCandidatesList2[0], ValueTuple.Create)
+                    childCandidatesList2[0]
                     .Take(depth + 1)
-                    .Select(pair =>
-                        (makeSingletonChain(pair.Item1),
-                         pair.Item2))
                     .ToList();
             }
-
-            // Helper function to get the tail of the list of list
-            // of candidates.
-            //List<List<Candidate_Old>> getTail(List<List<Candidate_Old>> x) =>
-            //    x.Skip(1).ToList();
-
-            // Helper function to convert a Candidate to a CandidateChain.
-            CandidateChain makeSingletonChain(Candidate_Old candidate) =>
-                new CandidateChain(Enumerable.Repeat(candidate, 1));
 
             // FIXME: See FIXME notes for Candidate.
         }
@@ -636,15 +611,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// The list of candidates with maximal probability.
         /// </returns>
         /// 
-        public static List<(Candidate_Old, Candidate)> GetLeadingCandidates(
-            List<(CandidateChain, Candidate)> paths,
-            Dictionary<(CandidateChain, Candidate), double> probs)
+        public static List<Candidate> GetLeadingCandidates(
+            List<Candidate> paths,
+            Dictionary<Candidate, double> probs)
         {
             // Get the probability of the first candidate on
             // the list (if there is one).
             double leadingProb =
                 // paths.Select(path => probs[path]).FirstOrDefault();
-                paths.Select(pair => pair.Item2.LogScore).FirstOrDefault();
+                paths.Select(cand => cand.LogScore).FirstOrDefault();
 
             // Take candidates from the list as long as their
             // probabilities are equal to the leading probability,
@@ -652,10 +627,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // CandidateChain to Candidate.
             return
                 paths
-                .Select(pair =>
-                    (new Candidate_Old(pair.Item1, probs[pair]),
-                    pair.Item2))
-                .TakeWhile(pair => pair.Item2.LogScore == leadingProb)
+                .TakeWhile(cand => cand.LogScore == leadingProb)
                 .ToList();
         }
 
@@ -671,14 +643,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// value is the (log) probability of that candidate.
         /// </param>
         /// 
-        public static Dictionary<(CandidateChain, Candidate), double>
+        public static Dictionary<Candidate, double>
             AdjustProbsByDistanceAndOrder(
-                Dictionary<(CandidateChain, Candidate), double> pathProbs)
+                Dictionary<Candidate, double> pathProbs)
         {
             // Find the minimum value of the total motion.
             int minimalDistance =
                 pathProbs.Keys
-                .Select(pair => pair.Item2.TotalMotion)
+                .Select(cand => cand.TotalMotion)
                 .DefaultIfEmpty(10000)
                 .Min();
 
@@ -698,11 +670,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         orderProbability / 2.0;
                 }
 
-                Dictionary<(CandidateChain, Candidate), double> pathProbsB =
+                Dictionary<Candidate, double> pathProbsB =
                     pathProbs.Keys
                     .ToDictionary(
-                        pair => pair,
-                        pair => adjustedProbability(pair.Item2));
+                        cand => cand,
+                        cand => adjustedProbability(cand));
 
                 return pathProbsB;
             }
