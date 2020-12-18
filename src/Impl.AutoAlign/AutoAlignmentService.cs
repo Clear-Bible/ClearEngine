@@ -524,10 +524,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 int maxPaths,
                 List<List<Candidate>> childCandidateList2)
         {
-            // Prepare to keep track of probabilities for each
-            // alternative.
-            Dictionary<(CandidateChain, Candidate), double> pathProbs =
-                new();
+            
 
             //long mem1 = GC.GetTotalMemory(true);
 
@@ -561,67 +558,19 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             //perCandidate = delta / (double)numCandidates;
             //Console.WriteLine($"no dup paths: {numCandidates}, memory: {(double)delta}, per candidate: {perCandidate}");
 
-            // Prepare to collect the best candidates.
-            List<(Candidate_Old, Candidate)> topCandidates = new();
 
-            // For each remaining possibility:
-            foreach ((CandidateChain, Candidate) pair in paths)
-            {
-                double jointProb = pair.Item2.LogScore;
+            // Make a dictionary of (log) probabilities for each candidate,
+            // to be possibly adjusted and then used to choose which
+            // candidates are best.
+            Dictionary<(CandidateChain, Candidate), double> pathProbs =
+                paths
+                .ToDictionary(
+                    pair => pair,
+                    pair => pair.Item2.LogScore);
 
-                try
-                {
-                    // Record the possible alternative and its probability
-                    // in the probability-tracking table.
-                    pathProbs.Add(pair, jointProb);
-                }
-                catch
-                {
-                    // FIXME: catching all exceptions is usually a
-                    // bad practice because it swallows all possible
-                    // error conditions indiscriminately and silently.
 
-                    // This catch block is intended to catch a memory
-                    // overflow.
-
-                    // Andi thinks that the exception of interest here is
-                    // System.OutOfMemoryException, but he cannot remember
-                    // for sure.
-
-                    // FIXME: The Microsoft guidance for OutOfMemoryException
-                    // is:  "This ... exception represents a catastrophic
-                    // failure.  If you choose to handle the exception, you
-                    // should include a catch block that calls the
-                    // Environment.FailFast method to terminate your app and
-                    // add an entry to the system event log, ..."
-                    // May need to reconsider the approach here.
-
-                    // What was logged in Clear2:
-                    // Console.WriteLine("Hashtable out of memory.");
-
-                    Console.WriteLine(
-                        "Out of memory in ComputeTopCandidates().");
-
-                    // Get the candidates we have found so far, sorted by
-                    // their probabilities in descending order.
-                    List<(CandidateChain, Candidate)> sortedCandidates2 =
-                            pathProbs
-                                .OrderByDescending(kvp => kvp.Value)
-                                .Select(kvp => kvp.Key)
-                                .ToList();
-
-                    // Keep only the candidates of maximal probability.
-                    topCandidates = AlignStaging.GetLeadingCandidates(
-                        sortedCandidates2, pathProbs);
-
-                    return (
-                        topCandidates.Select(pair => pair.Item1).ToList(),
-                        topCandidates.Select(pair => pair.Item2).ToList());
-                }
-            }
-
-            // Make certain adjustments to the probabilities of
-            // the candidates.
+            // Make possible adjustments to the probabilities of
+            // the candidates depending on local conditions.
             Dictionary<(CandidateChain, Candidate), double> pathProbs2 =
                 AlignStaging.AdjustProbsByDistanceAndOrder(pathProbs);
 
@@ -630,9 +579,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             List<(CandidateChain, Candidate)> sortedCandidates =
                 SortPaths(pathProbs2);
 
-            // Keep only the candidates of maximal probability.
-            topCandidates = AlignStaging.GetLeadingCandidates(
-                sortedCandidates, pathProbs);
+            // Keep only the best candidate, together with any candidates
+            // that follow it and have the same unadjusted probability.
+            List<(Candidate_Old, Candidate)> topCandidates =
+                AlignStaging.GetLeadingCandidates(
+                    sortedCandidates, pathProbs);
 
             //long mem4 = GC.GetTotalMemory(true);
             //delta = mem4 - mem1;

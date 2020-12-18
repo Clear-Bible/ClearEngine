@@ -699,11 +699,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 }
 
                 Dictionary<(CandidateChain, Candidate), double> pathProbsB =
-                    pathProbs
-                    .Select(kvp => new { Pair = kvp.Key, Prob = kvp.Value })
+                    pathProbs.Keys
                     .ToDictionary(
-                        c => c.Pair,
-                        c => adjustedProbability(c.Pair.Item2));
+                        pair => pair,
+                        pair => adjustedProbability(pair.Item2));
 
                 return pathProbsB;
             }
