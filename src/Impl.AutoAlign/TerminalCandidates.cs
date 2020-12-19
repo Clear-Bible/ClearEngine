@@ -339,19 +339,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // at least two source IDs (as canonical strings) that 
             // have a non-first alternative that links to that target point.
             
-             Dictionary<TargetID, List<(SourceID, Candidate)>> conflicts2 =
+             List<(TargetID, List<(SourceID, Candidate)>)> conflicts2 =
                 FindConflicts(candidateTable2);
 
-            // If the conflicts table has any entries:
+            // If the conflicts list has any entries:
             if (conflicts2.Count > 0)
             {
                 // For each entry in the conflicts table:
                 //foreach (var conflictEnum in conflicts)
-                foreach (var kvp in conflicts2)
+                foreach (
+                    (TargetID target2, List<(SourceID, Candidate)> positions2)
+                    in conflicts2)
                 {
-                    TargetID target2 = kvp.Key;
-                    List<(SourceID, Candidate)> positions2 = kvp.Value;
-
                     double topProb2 =
                         positions2.Max(p => p.Item2.LogScore);
 
@@ -395,32 +394,33 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         ///
         ///
         /// 
-        static Dictionary<TargetID, List<(SourceID, Candidate)>>
+        static List<(TargetID, List<(SourceID, Candidate)>)>
             FindConflicts(
                 Dictionary<SourceID, List<Candidate>> candidateTable2)
         {
-            Dictionary<TargetID, List<(SourceID, Candidate)>> conflicts2 =
+            List<(TargetID, List<(SourceID, Candidate)>)> conflicts2 =
                 candidateTable2
                 .SelectMany(kvp =>
                     kvp.Value
                     .Skip(1)
-                    .Select(cKey => new
+                    .Select(cand => new
                     {
-                        cKey,
-                        tp = cKey.GetTargetPoints().FirstOrDefault()
+                        cand,
+                        tp = cand.GetTargetPoints().FirstOrDefault()
                     })
                     .Where(x => x.tp is not null)
                     .Select(x => new
                     {
-                        x.cKey,
+                        x.cand,
                         sourceID = kvp.Key,
                         targetID = x.tp.TargetID,
                     }))
                 .GroupBy(x => x.targetID)
                 .Where(group => group.Skip(1).Any())
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.Select(x => (x.sourceID, x.cKey)).ToList());
+                .Select(group =>
+                    (group.Key,
+                     group.Select(x => (x.sourceID, x.cand)).ToList()))
+                .ToList();
 
             return conflicts2;
         }
