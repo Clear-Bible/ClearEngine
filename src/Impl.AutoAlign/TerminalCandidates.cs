@@ -333,46 +333,43 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static void ResolveConflicts(
             Dictionary<SourceID, List<Candidate>> candidateTable2)
         {
-            // Find competing non-first candidates, by making
-            // a conflicts table that maps a target point (as identified
-            // by a string with the target text and position) to a list of 
-            // at least two source IDs (as canonical strings) that 
-            // have a non-first alternative that links to that target point.
-            
-             List<(TargetID, List<(SourceID, Candidate)>)> conflicts2 =
+            // Find competing non-first candidates, expressed as a
+            // list of conflicts.  Each conflict has a target ID, and a list
+            /// of at least two candidates that link to the target.  The
+            /// candidates are all obtained from the input candidate table,
+            /// and none of the candidates is the first alternative of
+            /// its source node.
+            List<(TargetID, List<(SourceID, Candidate)>)> conflicts2 =
                 FindConflicts(candidateTable2);
 
-            // If the conflicts list has any entries:
-            if (conflicts2.Count > 0)
+            // For each conflict:
+            foreach (
+                (TargetID target2, List<(SourceID, Candidate)> positions2)
+                in conflicts2)
             {
-                // For each entry in the conflicts table:
-                //foreach (var conflictEnum in conflicts)
-                foreach (
-                    (TargetID target2, List<(SourceID, Candidate)> positions2)
-                    in conflicts2)
-                {
-                    double topProb2 =
-                        positions2.Max(p => p.Item2.LogScore);
+                // Among the conflicting candidates, find those of
+                // maximal probability.
+                double topProb2 =
+                    positions2.Max(p => p.Item2.LogScore);
 
-                    List<(SourceID, Candidate)> best2 =
-                        positions2.
-                        Where(p => p.Item2.LogScore == topProb2)
-                        .ToList();
+                List<(SourceID, Candidate)> best2 =
+                    positions2.
+                    Where(p => p.Item2.LogScore == topProb2)
+                    .ToList();
                    
-                    // If there is only one such candidate of maximal
-                    // probability:
-                    if (best2.Count == 1)
-                    {
-                        // Remove those candidates linking to the target
-                        // point from the source points that are not the
-                        // one candidate of maximal probability and that
-                        // have (log) probabilities less than zero.
-                        RemoveLosingCandidates2(
-                            target2,
-                            positions2,
-                            best2[0],
-                            candidateTable2);
-                    }
+                // If there is only one such candidate of maximal
+                // probability:
+                if (best2.Count == 1)
+                {
+                    // Remove all candidates linking to the target
+                    // point from the source points that are not the
+                    // one candidate of maximal probability and that
+                    // are not themselves certain.
+                    RemoveLosingCandidates2(
+                        target2,
+                        positions2,
+                        best2[0],
+                        candidateTable2);
                 }
             }
         }
@@ -386,18 +383,29 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// the zone currently being aligned.
         /// </param>
         /// <returns>
-        /// A table of conflicts.  Each conflict is a mapping from a target
-        /// point (as identified by a string with the target text and position)
-        /// to a list of at least two source IDs (as canonical strings) that 
-        /// have a non-first alternative that links to that target point.
+        /// A list of conflicts.  Each conflict has a target ID, and a list
+        /// of at least two candidates that link to the target.  The candidates
+        /// are all obtained from the input candidate table, and none of the
+        /// these candidates is the first alternative of its source node.
+        /// Each candidate that appears in the result is accompanied by its
+        /// source node.
         /// </returns>
         ///
-        ///
-        /// 
         static List<(TargetID, List<(SourceID, Candidate)>)>
             FindConflicts(
                 Dictionary<SourceID, List<Candidate>> candidateTable2)
         {
+            // Starting with the candidate table, consider each key-value
+            // pair.  Skip the first candidate in the value, thereby
+            // considering only non-first candidates.  Get the target
+            // point for each candidate, and only keep those candidates
+            // for which the target point is not null.  Now we have a
+            // collection of candidates, each with a source ID and a target
+            // ID.  Group these candidates by the target ID, and keep
+            // only those groups that have at least two members.  The
+            // final result is a list of groups, represented by the target ID
+            // for the group and a list of source-ID-candidate pairs for
+            // the group.
             List<(TargetID, List<(SourceID, Candidate)>)> conflicts2 =
                 candidateTable2
                 .SelectMany(kvp =>
@@ -406,7 +414,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(cand => new
                     {
                         cand,
-                        tp = cand.GetTargetPoints().FirstOrDefault()
+                        tp = cand.TargetPoint
                     })
                     .Where(x => x.tp is not null)
                     .Select(x => new
@@ -448,6 +456,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     candidateTable2[position].Remove(cand);
             }
         }
+
 
 
         public static void FillGaps(
