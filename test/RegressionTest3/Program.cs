@@ -141,12 +141,17 @@ namespace RegressionTest3
             // glossary, and assumptions, to produce an alignment expressed
             // in the Alignment2 format.
 
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             LegacyPersistentAlignment alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
                     zoneAlignmentFactsList,
                     treeService,
                     glossTable,
                     assumptions);
+
+            stopwatch.Stop();
+            Console.WriteLine($"milliseconds: {stopwatch.ElapsedMilliseconds}");
 
             // Export from the Alignment2 format to a file.
 
