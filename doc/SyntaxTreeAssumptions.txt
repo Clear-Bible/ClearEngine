@@ -1,0 +1,233 @@
+
+Clear3 assumptions about the syntax trees
+Tim Sauerwein / 2020-Dec-22
+
+
+* At present, the Clear3 prototype only permits use of one built-in treebank.  
+  However, Clear3 was designed to allow treebanks to be added and used as resources.  
+  A small amount of coding will be needed to fully deploy this ability in the current 
+  Clear3 prototype.
+
+
+* Below is my best effort to describe the assumptions that the current Clear3 prototype
+  actually makes about the treebank.
+
+
+* Clear2 makes slightly more assumptions than Clear3 about the syntax trees.  In Clear2
+  the code that interacts with the syntax trees is spread throughout the system and
+  may be harder to deal with.  If using new-format syntax trees with Clear2, allow extra 
+  time to identify and mitigate issues.
+
+
+At present, Clear3 makes the following assumptions about the syntax trees.
+
+
+* The syntax trees are in XML format with UTF-8 encoding.
+
+
+* The syntax trees are divided into separate files for each chapter of the bible.  
+  These files have names of the form:
+
+       bbnnn.trees.xml, 
+
+         where bb is a two-character or three-character prefix that corresponds 
+         to the book and is one of the following:
+
+            gn ex lv nu dt
+            js ju ru 1s 2s 1k 2k 1c 2c er ne es
+            jb ps pr ec ca
+            is je lm ek da
+            ho jl am ob jn mi na hb zp hg zc ma
+            Mat Mrk Luk Jhn Act
+            Rom 1Co 2Co Gal Eph Php Col 1Th 2Th 1Tm 2Tm Tit Phm
+            Heb Jms 1Pe 2Pe 1Jn 2Jn 3Jn Jud Rev
+
+       and where nnn is a string of three digits that gives the chapter number, 
+       with leading zeros if necessary.
+
+    For example, the file named "1c024.trees.xml" contains the XML for 
+    the syntax trees for First Chronicles chapter 24.
+
+
+* Each verse has its own syntax tree.  Clear3 finds these syntax trees in the XML 
+  by first finding all "Sentence" elements that are descendants of the root element, 
+  and then for each "Sentence" element finding the first descendant "Node" element.
+
+    If you are a C# programmer, the C# expression that produces an 
+    IEnumerable<XElement> for the verses in a chapter is:
+
+        XElement.Load(treeFile)
+        .Descendants("Sentence")
+        .Select(s => s.Descendants("Node").First());
+
+Here is an example showing how the current treebank is structured as XML for John 
+chapter 1 (the example is derived from the file Jhn001.trees.xml).
+
+<Sentences>
+  <Sentence ID = "Jhn1:1">
+    <Trees>
+      <Tree>
+        <Node ...>
+          <Node ...>
+            <Node ...>
+              <Node ...>
+                <Node ...>
+                  <Node >Ἐν</Node>
+                  <Node ...>
+                    <Node ...>ἀρχῇ</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node ...>
+                <Node ...>
+                  <Node ...>ἦν</Node>
+                </Node>
+              </Node>
+              <Node ...>
+                <Node ...>
+                  <Node ...>ὁ</Node>
+                  <Node ...>
+                    <Node Id=...>λόγος,</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            ...
+          </Node> 
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID = "Jhn1:2">
+    <Trees>
+      <Tree>
+        <Node ...>
+          ...
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  ...
+</Sentences>
+
+
+* Terminal nodes of the syntax tree (that is, those that correspond to syntactic 
+  segments of the source manuscript), are recognized as such because the terminal 
+  nodes are the XML elements where the first child node is a Text node.
+
+    If you are a C# programmer, the C# expression that enumerates all 
+    of the terminal nodes beneath a given tree node is:
+
+        treeNode
+        .Descendants()
+        .Where(e => e.FirstNode is XText)
+
+
+* (However, Clear3 does not actually use the content of the Text node beneath a 
+  terminal node.)
+
+
+* In the current treebank, the XML elements are decorated with many different attributes,
+  but Clear3 only uses some of them.  The attributes that Clear3 uses are:
+
+    nodeId
+    Cat
+    morphId
+    UnicodeLemma
+    Unicode
+    Language
+    StrongNumberX
+    Analysis
+
+
+* The first two of these attributes, "nodeId" and "Cat", are possessed by
+  all "Node" elements.  The others occur only for "Node" elements that are
+  terminals.
+
+
+* The "nodeId" attribute is a string of 15 decimal digits that uniquely identifies
+  the "Node" element as a node within the syntax tree.  This string has the form
+     BBCCCVVVPPPSSSL
+  where:
+    BB  is the two-digit number for a book of the Bible, 
+           with Genesis as 01 and Revelation as 66.
+    CCC is the three-digit number of the chapter, beginning with 001
+    VVV is the three-digit number of the verse, usually beginning with 001
+    PPP is the three-digit number of the first word covered by the
+           syntax sub-tree rooted at this node (the "position")
+    SSS is the three-digit number of words covered by the
+           syntax sub-tree rooted at this node (the "span")
+    L   is the one-digit level number of this node, beginning with 0,
+            where: 
+              * a node that has a single child node with the same 
+                position and span has level one higher than its child, and
+              * other nodes have level 0.
+
+
+* The Clear3 prototype uses the "nodeId" attribute for the following purposes:
+   - to recognize the book, chapter, and verse with which a syntax tree
+     is associated,
+   - as a unique identifier for a node, and
+   - to recognize nodes that are stacked above each other and differ only
+     by their levels (because such nodes share the same alignment candidates
+     in the course of the tree-based alignment algorithm).
+
+
+* The "morphId" attribute is a string of either 11 or 12 decimal digits that
+  identifies the segment of the source manuscript that is associated with a
+  terminal node.  This string has the one of the formats
+     BBCCCVVVWWW
+     BBCCCVVVWWWS
+  where:
+    BB  is the two-digit number for a book of the Bible, 
+           with Genesis as 01 and Revelation as 66,
+    CCC is the three-digit number of the chapter, beginning with 001
+    VVV is the three-digit number of the verse, usually beginning with 001
+    WWW is the three-digit number of the word within the verse, beginning
+        with 001, and numbered as the words occur in manuscript order
+        (which might be different than the order of the corresponding terminal
+        nodes along the the fringe of the syntax tree)
+    S, if present, is the number of the subsegment within the word, starting with 1,
+       and occurs for Hebrew and Aramaic but does not occur for Greek (where the entire 
+       word is the smallest linguistically significant segment of meaning)
+
+
+* The remaining attributes as listed above are used in Clear3 as follows:
+
+    Cat -- the Category, not used in the alignment algorithm, but inserted into
+           the output as describing the part of speech of a manuscript word
+
+    UnicodeLemma -- the text of the dictionary form of the source segment
+
+    Unicode -- the text of the surface form of the source segment
+
+    Language -- a string that is "G", "H", or "A" for Greek, Hebrew, or Aramaic,
+                respectively
+
+    StrongNumberX -- a code, based on Strong's Concordance, for the source segment.
+                     These codes were assigned by Marumori.  They are generally the
+                     same as the standard Strong's codes, but sometimes they distinguish
+                     additional shades of meaning with the Strong's categories.
+
+    Analysis -- a string that expresses the morphology of the surface form
+                of the source segment, not used in the Clear3 alignment algorithm,
+                but inserted verbatim into the output as an analysis of the
+                manuscript word
+
+
+* In addition to the above, Clear2 (but not Clear3) uses these attributes:
+
+  Start -- a string to be interpreted as an integer that is the 0-based position 
+            within its verse of the first segment covered by the syntax tree rooted 
+            at this node
+
+  English -- an English gloss for the source segment
+
+
+
+
+
+
+
+
+
