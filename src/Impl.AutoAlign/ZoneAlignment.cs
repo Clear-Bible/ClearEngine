@@ -16,6 +16,28 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// 
     public class ZoneAlignment
     {
+        /// <summary>
+        /// Perform tree-based auto-alignment for a single zone.
+        /// </summary>
+        /// <param name="iTreeService">
+        /// Services for a particular treebank, as obtained from the
+        /// resource manager.
+        /// </param>
+        /// <param name="zoneAlignmentFacts">
+        /// A statement of the zone alignment problem to be posed
+        /// to the auto-alignment algorithm.
+        /// </param>
+        /// <param name="autoAlignAssumptions">
+        /// Assumptions that condition the auto-alignment algorithm,
+        /// such as identification of source and target functions
+        /// words.
+        /// </param>
+        /// <returns>
+        /// The estimated alignment for the zone, consisting of
+        /// contextual information about the zone and a collection of
+        /// one-to-one links, as computed by the auto-alignment algorithm.
+        /// </returns>
+        ///
         public static ZoneMonoAlignment AlignZone(
             ITreeService iTreeService,
             ZoneAlignmentProblem zoneAlignmentFacts,
@@ -170,7 +192,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Get the verseID from the tree, and the old links
             // corresponding to that verse.
-            // FIXME: What if the zone has more than one verse?
+            // FIXME: This is the way it was done in Clear2; but what
+            // if the zone has more than one verse?
             string verseIDFromTree =
                 treeNode.TreeNodeID().VerseID.AsCanonicalString;
             Dictionary<string, string> existingLinks =
@@ -240,9 +263,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         /// <summary>
-        /// Convert from a candidate that corresponds to source points in
-        /// syntax tree order to a list of OpenMonoLink that expresses
-        /// the same information.
+        /// Convert from a candidate to a list of OpenMonoLink that expresses
+        /// the same information.  Note that the OpenTargetBond objects will
+        /// have (log) probability scores of -1000.0 when the bond has no
+        /// target point.
         /// </summary>
         /// 
         public static List<OpenMonoLink> MakeOpenMonoLinks(
@@ -350,6 +374,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public static List<List<OpenMonoLink>> FindConflictingLinks(
             List<OpenMonoLink> links)
         {
+            // Compute the result by starting with the links,
+            // keeping only those that have target words, grouping
+            // the results by target word, and finding those groups
+            // that have more than one member.
             return links
                 .Where(targetWordNotEmpty)
                 .GroupBy(targetTextAndId)
@@ -372,7 +400,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// Find the winning links in a group of conflicting links.
         /// </summary>
         /// <param name="conflict">
-        /// The list of conflicting links.
+        /// The list of conflicting links, known to be non-empty.
         /// </param>
         /// <param name="tryHarder">
         /// Use a more sophisticated algorithm to identify a single
@@ -387,28 +415,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             bool tryHarder)
         {
             // The winners are the links of maximal probability.
-            // (we know that conflict is not the empty list)
+            // (Note: we know that conflict is not the empty list).
             //
             double bestProb = conflict.Max(mw => prob(mw));
             List<OpenMonoLink> winners = conflict
                 .Where(mw => mw.OpenTargetBond.Score == bestProb)
                 .ToList();
 
-            // On the second pass, if there are multiple winners,
+            // If trying harder and there are multiple winners,
             // then select the winner where the source and target
             // relative positions are closest in a relative sense.
             //
             if (tryHarder && winners.Count > 1)
             {
+                // Get the smallest relative delta among the
+                // conflicting links.
                 double minDelta = conflict.Min(mw => relativeDelta(mw));
 
-                OpenMonoLink winner2 = winners
+                // Get the first link that attain the minimum relative delta.
+                OpenMonoLink winner = winners
                     .Where(mw => relativeDelta(mw) == minDelta)
                     .FirstOrDefault();
 
-                if (winner2 != null)
+                // Use the link so obtained as the sole winner.
+                if (winner != null)
                 {
-                    winners = new List<OpenMonoLink>() { winner2 };
+                    winners = new List<OpenMonoLink>() { winner };
                 }
             }
 
@@ -416,6 +448,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             double prob(OpenMonoLink mw) => mw.OpenTargetBond.Score;
 
+            // The relative delta is the distance between the source
+            // point relative tree position and the target point
+            // relative tree position.
             double relativeDelta(OpenMonoLink mw) =>
                 Math.Abs(mw.SourcePoint.RelativeTreePosition -
                          mw.OpenTargetBond.MaybeTargetPoint.RelativePos);
