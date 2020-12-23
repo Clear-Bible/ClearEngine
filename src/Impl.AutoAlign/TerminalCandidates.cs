@@ -49,8 +49,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // For each terminal node beneath the root node of the
             // syntax tree for this zone:
-            foreach (XElement terminalNode in
-                GetTerminalXmlNodes(treeNode))
+            foreach (XElement terminalNode in treeNode.GetTerminalNodes())
             {
                 // Get data about the source point associated with
                 // this terminal node.
@@ -92,28 +91,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 sourcePointsByID);
 
             return candidateTable2;
-        }
-
-
-        /// <summary>
-        /// Get the terminal nodes underneath a syntax tree node.
-        /// </summary>
-        /// <param name="treeNode">
-        /// The syntax tree node to be examined.
-        /// </param>
-        /// <returns>
-        /// The list of terminal nodes in syntax tree order.
-        /// </returns>
-        /// 
-        public static List<XElement> GetTerminalXmlNodes(XElement treeNode)
-        {
-            // Starting from the treeNode, get all of its descendants in
-            // tree order, and keep only those nodes whose first child as
-            // a Text node in XML.
-            return treeNode
-                .Descendants()
-                .Where(e => e.FirstNode is XText)
-                .ToList();
         }
 
 
