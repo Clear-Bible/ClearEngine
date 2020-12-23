@@ -68,7 +68,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // sourceID => WordInfo
 
             List<XElement> terminals =
-                AutoAlignUtility.GetTerminalXmlNodes(treeNode);
+                TerminalCandidates.GetTerminalXmlNodes(treeNode);
 
             List<SourceWord> sourceWordList =
                 MakeSourceWordList(
@@ -551,7 +551,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             XElement tree)
         {
             return
-                AutoAlignUtility.GetTerminalXmlNodes(tree)
+                TerminalCandidates.GetTerminalXmlNodes(tree)
                 .ToDictionary(
                     node => GetSourceIdFromTerminalXmlNode(node),
                     node => GetWordInfoFromTerminalXmlNode(node));
