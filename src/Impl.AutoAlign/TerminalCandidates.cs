@@ -365,7 +365,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     // point from the source points that are not the
                     // one candidate of maximal probability and that
                     // are not themselves certain.
-                    RemoveLosingCandidates2(
+                    RemoveLosingCandidates(
                         target2,
                         positions2,
                         best2[0],
@@ -434,7 +434,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         }
 
 
-        static void RemoveLosingCandidates2(
+        static void RemoveLosingCandidates(
             TargetID target2,
             List<(SourceID, Candidate)> positions2,
             (SourceID, Candidate) winningCandidate2,
