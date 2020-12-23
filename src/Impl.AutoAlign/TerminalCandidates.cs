@@ -8,7 +8,7 @@ using ClearBible.Clear3.Impl.TreeService;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
-    public class TerminalCandidates2
+    public class TerminalCandidates
     {
         /// <summary>
         /// Find the suitable choices of target point for each suitable
