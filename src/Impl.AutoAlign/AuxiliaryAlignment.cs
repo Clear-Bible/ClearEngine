@@ -6,6 +6,7 @@ using System.Xml.Linq;
 
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Impl.Miscellaneous;
+using ClearBible.Clear3.Impl.TreeService;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
@@ -710,8 +711,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 List<OpenMonoLink> linkedSiblings =
                     treeNode.Parent.Elements()
                     .Where(child => child != treeNode)
-                    .SelectMany(child =>
-                        TerminalCandidates.GetTerminalXmlNodes(child))
+                    .SelectMany(child => child.GetTerminalNodes())
                     .Select(term => term.SourceId())
                     .Select(sourceId => linksTable.GetValueOrDefault(sourceId))
                     .Where(x => !(x is null))

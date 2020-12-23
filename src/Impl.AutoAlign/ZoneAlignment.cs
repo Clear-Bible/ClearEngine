@@ -60,8 +60,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             // Get the terminal nodes beneath the specified syntax
             // tree node.
-            List<XElement> terminals =
-                    TerminalCandidates.GetTerminalXmlNodes(treeNode);
+            List<XElement> terminals = treeNode.GetTerminalNodes();
 
             // Prepare to compute fractional positions.
             double totalSourcePoints = terminals.Count();
@@ -331,7 +330,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 new OpenMonoLink(
                     sourcePoint: sourceNode,
                     openTargetBond: new OpenTargetBond(
-                        MaybeTargetPoint: AutoAlignUtility.CreateFakeTargetWord(),
+                        MaybeTargetPoint: new MaybeTargetPoint(null),
                         Score: -1000));
         }
 

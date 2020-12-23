@@ -326,6 +326,28 @@ namespace ClearBible.Clear3.Impl.TreeService
         {
             return node.TreeNodeID().TreeNodeStackID;
         }
+
+        /// <summary>
+        /// Get the terminal nodes underneath a syntax tree node.
+        /// </summary>
+        /// <param name="treeNode">
+        /// The syntax tree node to be examined.
+        /// </param>
+        /// <returns>
+        /// The list of terminal nodes in syntax tree order.
+        /// </returns>
+        /// 
+        public static List<XElement> GetTerminalNodes(
+            this XElement treeNode)
+        {
+            // Starting from the treeNode, get all of its descendants in
+            // tree order, and keep only those nodes whose first child as
+            // a Text node in XML.
+            return treeNode
+                .Descendants()
+                .Where(e => e.FirstNode is XText)
+                .ToList();
+        }
     }
 
 
