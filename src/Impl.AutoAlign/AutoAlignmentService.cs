@@ -222,7 +222,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Find possible choices of target point for each
             // relevant source point.
              Dictionary<SourceID, List<Candidate>> terminalCandidates2 =
-                TerminalCandidates2.GetTerminalCandidates(
+                TerminalCandidates.GetTerminalCandidates(
                     treeNode,
                     sourcePointsByID,
                     sourceAltIdMap,
