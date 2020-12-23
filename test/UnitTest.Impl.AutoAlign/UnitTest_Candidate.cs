@@ -43,7 +43,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.AreSame(c1.TargetPoint, targetPoints[2]);
             Assert.Null(c1.Head);
             Assert.Null(c1.Tail);
-            Assert.Null(c1.Underlying);
             Assert.AreEqual(c1.LogScore, -0.1);
             Assert.False(c1.IsConflicted);
             Assert.AreEqual(c1.FirstTargetPosition, 2);
@@ -65,7 +64,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.Null(c2.TargetPoint);
             Assert.Null(c2.Head);
             Assert.Null(c2.Tail);
-            Assert.Null(c2.Underlying);
             Assert.AreEqual(c2.LogScore, 0.0);
             Assert.False(c2.IsConflicted);
             Assert.Null(c2.FirstTargetPosition);
@@ -85,7 +83,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.Null(c3.TargetPoint);
             Assert.AreSame(c3.Head, c1);
             Assert.AreSame(c3.Tail, c2);
-            Assert.Null(c3.Underlying);
             Assert.AreEqual(c3.LogScore, -0.1);
             Assert.False(c3.IsConflicted);
             Assert.AreEqual(c3.FirstTargetPosition, 2);
@@ -108,7 +105,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.Null(c5.TargetPoint);
             Assert.AreSame(c5.Head, c2);
             Assert.AreSame(c5.Tail, c1);
-            Assert.Null(c5.Underlying);
             Assert.AreEqual(c5.LogScore, -0.1);
             Assert.False(c5.IsConflicted);
             Assert.AreEqual(c5.FirstTargetPosition, 2);
@@ -133,7 +129,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.Null(c7.TargetPoint);
             Assert.AreSame(c7.Head, c5);
             Assert.AreSame(c7.Tail, c6);
-            Assert.Null(c7.Underlying);
             Assert.True(Math.Abs(c7.LogScore - -0.3) < 1e-6);
             Assert.False(c7.IsConflicted);
             Assert.AreEqual(c7.FirstTargetPosition, 2);
@@ -155,7 +150,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.Null(c8.TargetPoint);
             Assert.AreSame(c8.Head, c6);
             Assert.AreSame(c8.Tail, c5);
-            Assert.Null(c8.Underlying);
             Assert.True(Math.Abs(c7.LogScore - -0.3) < 1e-6);
             Assert.False(c8.IsConflicted);
             Assert.AreEqual(c8.FirstTargetPosition, 6);
@@ -177,7 +171,6 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
             Assert.Null(c9.TargetPoint);
             Assert.AreSame(c9.Head, c8);
             Assert.AreSame(c9.Tail, c1);
-            Assert.Null(c9.Underlying);
             Assert.True(Math.Abs(c9.LogScore - -0.4) < 1e-6);
             Assert.True(c9.IsConflicted);
             Assert.AreEqual(c9.FirstTargetPosition, 6);

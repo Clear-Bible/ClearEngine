@@ -10,6 +10,11 @@ using ClearBible.Clear3.Impl.TreeService;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
+    /// <summary>
+    /// This class contains the principal static method ImproveAlignment(),
+    /// and other static methods that support it.
+    /// </summary>
+    /// 
     public class AuxiliaryAlignment
     {
         /// <summary>
