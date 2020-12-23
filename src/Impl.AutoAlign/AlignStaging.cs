@@ -170,56 +170,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         /// <summary>
-        /// Get the lower-cased text of the target word, by looking it up
-        /// in a list of target points by the target ID of the word.
-        /// </summary>
-        /// <param name="targetID">
-        /// The target ID as a canonical string.
-        /// </param>
-        /// <param name="targetWords">
-        /// The list of target words to examine.
-        /// </param>
-        /// <returns>
-        /// The target text, or "" if the word could not be found in the
-        /// list of target words.
-        /// </returns>
-        /// 
-        public static string GetTargetWordTextFromID(string targetID, List<MaybeTargetPoint> targetWords)
-        {
-            return targetWords
-                .Where(tw => targetID == tw.ID)
-                .Select(tw => tw.Lower)
-                .DefaultIfEmpty("")
-                .First();
-        }
-
-
-        /// <summary>
-        /// Get the 0-based position of the target word within a list,
-        /// where the word is identified by its target ID.
-        /// </summary>
-        /// <param name="targetID">
-        /// The target ID of the word as a canonical string.
-        /// </param>
-        /// <param name="targetWords">
-        /// The list of target words to examine.
-        /// </param>
-        /// <returns>
-        /// The position, or 0 if the word could not be found in the
-        /// list of target words.
-        /// </returns>
-        /// 
-        public static int GetTargetPositionFromID(string targetID, List<MaybeTargetPoint> targetWords)
-        {
-            return targetWords
-                .Where(tw => targetID == tw.ID)
-                .Select(tw => tw.Position)
-                .DefaultIfEmpty(0)
-                .First();
-        }
-
-
-        /// <summary>
         /// Get candidate target points for linking to an unlinked source
         /// point the lie in the region surrounding an anchor link.
         /// </summary>
