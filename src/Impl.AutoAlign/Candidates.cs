@@ -101,9 +101,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
     /// <summary>
-    /// Different kinds of candidates, as explained further in
-    /// the comments for the Candidate abstract class and its
-    /// subclasses.
+    /// Different kinds of concrete Candidate objects.
     /// </summary>
     /// 
     public enum CandidateKind
@@ -116,8 +114,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
     /// <summary>
     /// Abstract class that represents a candidate alignment.  There
-    /// are different kinds of candidates, as explained further in the
-    /// comments for this class and its subclasses.
+    /// are different kinds of candidates, as explained further below.
     /// </summary>
     /// 
     public abstract class Candidate
@@ -127,10 +124,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// one sourcePoint and one targetPoint with a specified
         /// score.
         /// </summary>
-        /// <param name="numberTerminals">
-        /// The number of terminals in the current zone (needed by
-        /// the implementation).
-        /// </param>
         /// 
         public static Candidate NewPoint(
             SourcePoint sourcePoint,
@@ -146,10 +139,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// Make a point Candidate that represents the certainty of linking
         /// a sourcePoint to nothing.
         /// </summary>
-        /// <param name="numberTerminals">
-        /// The number of terminals in the current zone (needed by
-        /// the implementation).
-        /// </param>
         /// 
         public static Candidate NewEmptyPoint(
             SourcePoint sourcePoint)
@@ -165,6 +154,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             new UnionCandidate(this, tail);
 
 
+        /// <summary>
+        /// Reports which kind of Candidate this is.
+        /// </summary>
+        /// 
         public abstract CandidateKind Kind { get; }
 
         /// <summary>
@@ -211,13 +204,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public abstract Candidate Tail { get; }
 
         /// <summary>
-        /// The underlying Candidate if this is an adjusted-score
-        /// Candidate.  Is null for other kinds of candidates.
-        /// </summary>
-        /// 
-        public abstract Candidate Underlying { get; }
-
-        /// <summary>
         /// The logarithm of a probability-like score for
         /// this candidate.
         /// If the Candidate was created by NewPoint, then
@@ -226,8 +212,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// then equals 0.
         /// If the Candidate was created by Union(), then
         /// equals the sum of the scores of the head and tail.
-        /// If the Candidate was created by WithAdjustedScore(),
-        /// then equals the score that was specified.
         /// </summary>
         /// 
         public abstract double LogScore { get; }
@@ -367,8 +351,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         public override Candidate Tail => null;
 
-        public override Candidate Underlying => null;
-
         public override double LogScore => _logScore;
 
         public override bool IsConflicted => false;
@@ -415,8 +397,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public override Candidate Head => null;
 
         public override Candidate Tail => null;
-
-        public override Candidate Underlying => null;
 
         public override double LogScore => 0.0;
 
@@ -511,8 +491,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public override Candidate Head => _head;
 
         public override Candidate Tail => _tail;
-
-        public override Candidate Underlying => null;
 
         public override double LogScore => _logScore;
 

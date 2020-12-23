@@ -4,17 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using ClearBible.Clear3.API;
-using ClearBible.Clear3.Impl.TreeService;
-using System.Linq.Expressions;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
-    // Internal Data Model for Tree-based Auto Alignment Algorithm
-    //------------------------------------------------------------
+    // Internal Data Model for Impl.AutoAlign
+    //---------------------------------------
 
 
     /// <summary>

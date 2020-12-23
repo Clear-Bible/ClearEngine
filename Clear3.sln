@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Impl.Persistence", "src\Imp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest.Impl.AutoAlign", "test\UnitTest.Impl.AutoAlign\UnitTest.Impl.AutoAlign.csproj", "{94F5A1F2-58CB-4556-B703-30E226BE059E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest.Impl.AutoAlign", "test\UnitTest.Impl.AutoAlign\UnitTest.Impl.AutoAlign.csproj", "{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -249,5 +251,17 @@ Global
 		{94F5A1F2-58CB-4556-B703-30E226BE059E}.Debug|x64.Build.0 = Debug|Any CPU
 		{94F5A1F2-58CB-4556-B703-30E226BE059E}.Release|x64.ActiveCfg = Release|Any CPU
 		{94F5A1F2-58CB-4556-B703-30E226BE059E}.Release|x64.Build.0 = Release|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Debug|x86.Build.0 = Debug|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Release|x86.ActiveCfg = Release|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Release|x86.Build.0 = Release|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Debug|x64.Build.0 = Debug|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Release|x64.ActiveCfg = Release|Any CPU
+		{1B4D8C0D-4328-43B7-B1BE-DEB4499894FE}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

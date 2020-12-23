@@ -11,8 +11,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     using ClearBible.Clear3.Impl.Miscellaneous;
 
 
-    // This file is work in progress.
-    // The functions here have not yet been exposed through the API.
+    // This file is a place to save some reworked code from Clear2
+    // related to groups.
+    //
+    // The functions here have not been exposed through the API.
+    //
+    // The groups part of the Clear2 tree-based aligner was preliminary
+    // work, and is no longer thought to be the best approach.
 
 
     public class MappedGroup
@@ -52,6 +57,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// anything.
         /// This code is in an intermediate stage of being reworked
         /// from Clear2 into Clear3.
+        /// This code is based on ideas that are no longer believed to
+        /// be the best approach.
         /// This code has not been tested in its current form.
         /// </summary>
         /// 

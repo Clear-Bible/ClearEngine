@@ -32,6 +32,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             ZoneAlignmentProblem zoneAlignmentFacts,
             IAutoAlignAssumptions autoAlignAssumptions)
         {
+            // Delegate to AlignZone static method of
+            // the ZoneAlignment class.
             return ZoneAlignment.AlignZone(
                 iTreeService,
                 zoneAlignmentFacts,
