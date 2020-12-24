@@ -107,8 +107,8 @@ namespace ClearBible.Clear3.API
         /// A dictionary that maps source word to target
         /// word, as identified by their alternate IDs.  (Alternate IDs have
         /// the form, for example, of "λόγος-2" to mean the second occurence
-        /// of the lemma "λόγος" within the verse, or "word-2" to mean the
-        /// second occurrence of the lowercased target text "word"
+        /// of the surface form "λόγος" within the verse, or "word-2" to mean
+        /// the second occurrence of the surface target text "word"
         /// within the verse.)
         /// </returns>
         /// 
