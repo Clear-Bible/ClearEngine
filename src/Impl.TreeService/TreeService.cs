@@ -17,9 +17,6 @@ namespace ClearBible.Clear3.Impl.TreeService
     // FIXME: Consider making an abstraction to represent a terminal
     // node in the syntax tree, to be exposed through the API.
 
-    // FIXME: Consider moving some of the tree-related algorithms
-    // in the system at large into the tree service.
-
     /// <summary>
     /// Represents a treebank.
     /// Implements ClearBible.Clear3.API.ITreeService, and

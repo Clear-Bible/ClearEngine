@@ -310,14 +310,17 @@ namespace ClearBible.Clear3.API
         /// a dictionary mapping a manuscript word alternate ID to a
         /// target word alternate ID.  (Alternate IDs have the form,
         /// for example, of "λόγος-2" to mean the second occurence of
-        /// the lemma "λόγος" within the verse, or "word-2" to mean the
-        /// second occurrence of the lowercased target text "word"
+        /// the surface form "λόγος" within the verse, or "word-2" to mean the
+        /// second occurrence of the target text "word"
         /// within the verse.)  Using alternate IDs at this point is an
         /// attempt to identify the links even if the translation of
         /// the verse has changed since the alignment was made.
         /// </returns>
-        /// FIXME: Documentation should also explain side effects to
-        /// the groups database.
+        /// <remarks>
+        /// When a link is found that has more than one source word
+        /// or more than one target word, the groups table is updated
+        /// by adding the mapping that is implied by the link.
+        /// </remarks>
         /// 
         Dictionary<string, Dictionary<string, string>> GetOldLinks(
             string jsonFile,
@@ -350,7 +353,8 @@ namespace ClearBible.Clear3.API
     /// translated words.
     /// </summary>
     ///
-    /// FIXME: Consider reworking?
+    /// FIXME: This interface will probably need to become more
+    /// general in future to accomodate new ideas for segmentation.
     /// 
     public interface ISegmenter
     {
@@ -612,7 +616,8 @@ namespace ClearBible.Clear3.API
     }
 
 
-    // FIXME -- exactly two glosses seems restrictive
+    // FIXME -- exactly two glosses seems restrictive; this is
+    // how it was done in Clear2.
     //
     public class Gloss
     {
