@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
+using ClearBible.Clear3.API;
+using ClearBible.Clear3.Impl.TreeService;
 
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
-    using System.Text.RegularExpressions;
-    using ClearBible.Clear3.API;
-    using ClearBible.Clear3.Impl.TreeService;
-    using ClearBible.Clear3.Impl.Miscellaneous;
-
-
-    public class TerminalCandidates2
+    /// <summary>
+    /// This class contains the principal static method GetTerminalCandidates(),
+    /// and other static methods that support it.
+    /// </summary>
+    /// 
+    public class TerminalCandidates
     {
         /// <summary>
         /// Find the suitable choices of target point for each suitable
@@ -20,6 +21,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </summary>
         /// <param name="treeNode">
         /// Root of the syntax tree for the zone.
+        /// </param>
+        /// <param name="sourcePointsByID">
+        /// Table for looking up source points by their IDs.
         /// </param>
         /// <param name="idMap">
         /// Table of the source points as indexed by the alternate IDs.
@@ -40,35 +44,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// node in the syntax tree.
         /// </returns>
         /// 
-        public static AlternativesForTerminals GetTerminalCandidates(
-            XElement treeNode,
-            Dictionary<string, string> idMap,
-            List<TargetPoint> targetPoints,
-            Dictionary<string, string> existingLinks,
-            IAutoAlignAssumptions assumptions)
+        public static Dictionary<SourceID, List<Candidate>>
+            GetTerminalCandidates(
+                XElement treeNode,
+                Dictionary<SourceID, SourcePoint> sourcePointsByID,
+                Dictionary<string, string> idMap,
+                List<TargetPoint> targetPoints,
+                Dictionary<string, string> existingLinks,
+                IAutoAlignAssumptions assumptions)
         {
-            // Prepare to record alternatives for terminal nodes.
-            AlternativesForTerminals candidateTable =
-                new AlternativesForTerminals();
+            Dictionary<SourceID, List<Candidate>> candidateTable2 = new();
 
             // For each terminal node beneath the root node of the
             // syntax tree for this zone:
-            foreach (XElement terminalNode in
-                AutoAlignUtility.GetTerminalXmlNodes(treeNode))
+            foreach (XElement terminalNode in treeNode.GetTerminalNodes())
             {
                 // Get data about the source point associated with
                 // this terminal node.
-                string sourceID = terminalNode.SourceID().AsCanonicalString;
-                string lemma = terminalNode.Lemma();                              
+                SourceID sourceID = terminalNode.SourceID();
+                SourcePoint sourcePoint =
+                    sourcePointsByID[terminalNode.SourceID()];                            
                 string strong = terminalNode.Strong();               
-                string altID = idMap[sourceID];
 
                 // Compute the alternative candidates for this source point.
-                AlternativeCandidates topCandidates =
+                List<Candidate> topCandidates2 =
                     GetTerminalCandidatesForWord(
-                        sourceID,
-                        altID,
-                        lemma,
+                        sourcePoint,
                         strong,
                         targetPoints,
                         existingLinks,
@@ -76,20 +77,23 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
                 // Add the candidates found to the table of alternatives
                 // for terminals.
-                candidateTable.Add(sourceID, topCandidates);
+                candidateTable2.Add(sourceID, topCandidates2);
 
-                // Where there are conflicting non-first candidates where one
+                // Resolve conflicts, which means:
+                // where there are conflicting non-first candidates where one
                 // of them is more probable than its competitors, remove those
                 // competitors that are less probable and uncertain.
-                ResolveConflicts(candidateTable);
+                ResolveConflicts(candidateTable2);               
             }
 
             // For those candidate table entries where the list of alternaties
             // is empty, replace the empty list with a list containing
             // one empty Candidate.
-            FillGaps(candidateTable);
+            FillGaps(
+                candidateTable2,
+                sourcePointsByID);
 
-            return candidateTable;
+            return candidateTable2;
         }
 
 
@@ -111,12 +115,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// but keeping only those of maximal score.
         /// (7) Otherwise there are no alternatives.
         /// </summary>
-        /// <param name="sourceID">ID of the source word</param>
-        /// <param name="altID">
-        /// Alternate ID of the source word, as computed from the position
-        /// of the source word in the zone. See also SourcePoint.
+        /// <param name="sourcePoint">
+        /// The source point for which alternatives are sought.
         /// </param>
-        /// <param name="lemma">Lemma of the source word.</param>
         /// <param name="strong">Strong number of the source word.</param>
         /// <param name="targetPoints">
         /// The target words in the current zone.
@@ -132,15 +133,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// A list of alternative candidate target words for the source word.
         /// </returns>
         /// 
-        public static AlternativeCandidates GetTerminalCandidatesForWord(
-            string sourceID,
-            string altID,
-            string lemma,
+        public static List<Candidate> GetTerminalCandidatesForWord(
+            SourcePoint sourcePoint,
             string strong,
             List<TargetPoint> targetPoints,
             Dictionary <string, string> existingLinks,
             IAutoAlignAssumptions assumptions)
         {
+            string sourceID = sourcePoint.SourceID.AsCanonicalString;
+            string altID = sourcePoint.AltID;
+            string lemma = sourcePoint.Lemma;
+
             // If there is an existing link for the source word:
             //
             if (existingLinks.Count > 0 &&
@@ -162,12 +165,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     // The alternatives consist of just that
                     // target word.
                     //
-                    return new AlternativeCandidates(new[]
-                    {
-                        new Candidate(
-                            new MaybeTargetPoint(targetPoint),
-                            0.0)
-                    });
+                    return 
+                        new List<Candidate>()
+                        {
+                            Candidate.NewPoint(sourcePoint, targetPoint, 0.0)
+                        };
                 }
             }
 
@@ -177,7 +179,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // There are no alternatives.
                 //
-                return new AlternativeCandidates();
+                return new List<Candidate>();
             }
 
             // If the Strong's database has a definition for
@@ -191,12 +193,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // current zone that occur as a possible meaning in the Strong's
                 // database.
                 //
-                return new AlternativeCandidates(
+                return 
                     targetPoints
                     .Where(tp =>
                         wordIds.ContainsKey(tp.TargetID.AsCanonicalString))
-                    .Select(tp => new MaybeTargetPoint(tp))
-                    .Select(mtp => new Candidate(mtp, 0.0)));
+                    .Select(tp =>
+                        Candidate.NewPoint(sourcePoint, tp, 0.0))
+                    .ToList();
             }
 
             // If the source point is a stop word:
@@ -205,7 +208,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // There are no alternatives.
                 //
-                return new AlternativeCandidates();
+                return new List<Candidate>();
             }
 
             // If the manual translation model has any definitions for
@@ -219,7 +222,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // only the candidates of maximal score (as given by the manual
                 // translation model).
                 //
-                return new AlternativeCandidates(
+                return 
                     targetPoints
                     .Select(targetPoint =>
                     {
@@ -239,10 +242,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Take(1)
                     .SelectMany(group =>
                         group
-                        .Select(x =>
-                            new Candidate(
-                                new MaybeTargetPoint(x.targetPoint),
-                                x.score))));
+                        .Select(x => Candidate.NewPoint(
+                            sourcePoint,
+                            x.targetPoint,
+                            x.score)))
+                    .ToList();
             }
 
             // If the estimated translation model has any translations
@@ -258,7 +262,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // (as given by the estimated translation model modified
                 // by the estimated alignment).
                 //
-                return new AlternativeCandidates(
+                return 
                     targetPoints
                     .Where(tp => !assumptions.IsBadLink(lemma, tp.Lower))
                     .Where(tp => !assumptions.IsPunctuation(tp.Lower))
@@ -284,15 +288,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Take(1)
                     .SelectMany(group =>
                         group
-                        .Select(x =>
-                        new Candidate(
-                            new MaybeTargetPoint(x.targetPoint),
-                            x.score))));
+                        .Select(x => Candidate.NewPoint(
+                            sourcePoint,
+                            x.targetPoint,
+                            x.score)))
+                    .ToList();
             }
 
             // Otherwise, there are no alternatives.
             //
-            return new AlternativeCandidates();
+            return new List<Candidate>();
 
 
             // Auxiliary helper function to adjust the score from
@@ -326,58 +331,44 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </param>
         /// 
         public static void ResolveConflicts(
-            AlternativesForTerminals candidateTable)
+            Dictionary<SourceID, List<Candidate>> candidateTable)
         {
-            // Find competing non-first candidates, by making
-            // a conflicts table that maps a target point (as identified
-            // by a string with the target text and position) to a list of 
-            // at least two source IDs (as canonical strings) that 
-            // have a non-first alternative that links to that target point.
-            Dictionary<string, List<string>> conflicts =
+            // Find competing non-first candidates, expressed as a
+            // list of conflicts.  Each conflict has a target ID, and a list
+            /// of at least two candidates that link to the target.  The
+            /// candidates are all obtained from the input candidate table,
+            /// and none of the candidates is the first alternative of
+            /// its source node.
+            List<(TargetID, List<(SourceID, Candidate)>)> conflicts2 =
                 FindConflicts(candidateTable);
 
-            // If the conflicts table has any entries:
-            if (conflicts.Count > 0)
+            // For each conflict:
+            foreach (
+                (TargetID target2, List<(SourceID, Candidate)> positions2)
+                in conflicts2)
             {
-                // For each entry in the conflicts table:
-                foreach (var conflictEnum in conflicts)
+                // Among the conflicting candidates, find those of
+                // maximal probability.
+                double topProb2 =
+                    positions2.Max(p => p.Item2.LogScore);
+                List<(SourceID, Candidate)> best2 =
+                    positions2.
+                    Where(p => p.Item2.LogScore == topProb2)
+                    .ToList();
+                   
+                // If there is only one such candidate of maximal
+                // probability:
+                if (best2.Count == 1)
                 {
-                    string target = conflictEnum.Key;
-                    List<string> positions = conflictEnum.Value;
-
-                    // Get the list of the candidates the candidates that
-                    // link to the target point, one for each of the
-                    // source IDs in this entry.
-                    List<Candidate> conflictingCandidates =
-                        GetConflictingCandidates(
-                            target,
-                            positions,
-                            candidateTable);
-
-                    // Find the maximum probability among these candidates.
-                    double topProb =
-                        conflictingCandidates.Max(c => c.Prob);
-
-                    // Get those candidates of maximal probability.
-                    List<Candidate> best =
-                        conflictingCandidates
-                        .Where(c => c.Prob == topProb)
-                        .ToList();
-
-                    // If there is only one such candidate of maximal
-                    // probability:
-                    if (best.Count == 1)
-                    {
-                        // Remove those candidates linking to the target
-                        // point from the source points that are not the
-                        // one candidate of maximal probability and that
-                        // have (log) probabilities less than zero.
-                        RemoveLosingCandidates(
-                            target,
-                            positions,
-                            best[0],
-                            candidateTable);
-                    }
+                    // Remove all candidates linking to the target
+                    // point from the source points that are not the
+                    // one candidate of maximal probability and that
+                    // are not themselves certain.
+                    RemoveLosingCandidates(
+                        target2,
+                        positions2,
+                        best2[0],
+                        candidateTable);
                 }
             }
         }
@@ -391,250 +382,125 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// the zone currently being aligned.
         /// </param>
         /// <returns>
-        /// A table of conflicts.  Each conflict is a mapping from a target
-        /// point (as identified by a string with the target text and position)
-        /// to a list of at least two source IDs (as canonical strings) that 
-        /// have a non-first alternative that links to that target point.
+        /// A list of conflicts.  Each conflict has a target ID, and a list
+        /// of at least two candidates that link to the target.  The candidates
+        /// are all obtained from the input candidate table, and none of the
+        /// these candidates is the first alternative of its source node.
+        /// Each candidate that appears in the result is accompanied by its
+        /// source ID.
         /// </returns>
         ///
-        /// FIXME: maybe identify the target points by TargetPoint objects
-        /// instead of coded strings.
-        /// 
-        static Dictionary<string, List<string>> FindConflicts(
-            AlternativesForTerminals candidateTable)
+        static List<(TargetID, List<(SourceID, Candidate)>)>
+            FindConflicts(
+                Dictionary<SourceID, List<Candidate>> candidateTable)
         {
-            // FIXME: consider ways to simplify this code.
-
-            // Prepare to track the non-first alternatives that link
-            // to target points.
-            // This table will map a target point (as expressed by a string with
-            // the text and position of the target point) to those source IDs
-            // (expressed as canonical strings) that have a non-first
-            // alternative that links to that target point.
-            Dictionary<string, List<string>> targets =
-                new Dictionary<string, List<string>>();
-
-            // For each record in the table of alternative candidates:
-            foreach (var tableEnum in candidateTable)
-            {
-                // Get the source ID (as a canonical string) for the record.
-                string morphID = tableEnum.Key;
-
-                // Get the alternatives candidates from the record.
-                List<Candidate> candidates = tableEnum.Value;
-
-                // For each alternative candidate except the first one:
-                for (int i = 1; i < candidates.Count; i++) 
-                {
-                    Candidate c = candidates[i];
-
-                    // Get a string with text and position of the target
-                    // word associated with this alternative.
-                    string linkedWords = AutoAlignUtility.GetWords(c);
-
-                    // Add a mapping from the target word to the
-                    // source ID to the target table.
-                    if (targets.ContainsKey(linkedWords))
+            // Starting with the candidate table, consider each key-value
+            // pair.  Skip the first candidate in the value, thereby
+            // considering only non-first candidates.  Get the target
+            // point for each candidate, and only keep those candidates
+            // for which the target point is not null.  Now we have a
+            // collection of candidates, each with a source ID and a target
+            // ID.  Group these candidates by the target ID, and keep
+            // only those groups that have at least two members.  The
+            // final result is a list of groups, represented by the target ID
+            // for the group and a list of source-ID-candidate pairs for
+            // the group.
+            List<(TargetID, List<(SourceID, Candidate)>)> conflicts =
+                candidateTable
+                .SelectMany(kvp =>
+                    kvp.Value
+                    .Skip(1)
+                    .Select(cand => new
                     {
-                        List<string> positions = targets[linkedWords];
-                        positions.Add(morphID);
-                    }
-                    else
+                        cand,
+                        tp = cand.TargetPoint
+                    })
+                    .Where(x => x.tp is not null)
+                    .Select(x => new
                     {
-                        List<string> positions = new List<string>();
-                        positions.Add(morphID);
-                        targets.Add(linkedWords, positions);
-                    }
-                }
-            }
-
-            // Prepare to record conflicts.
-            // This table has the same shape as the targets table,
-            // but will only have the records where there is more
-            // than one source ID.
-            Dictionary<string, List<string>> conflicts =
-                new Dictionary<string, List<string>>();
-
-            // For each record of the targets table constructed
-            // above:
-            foreach (var targetEnum in targets)
-            {
-                string target = targetEnum.Key;
-                List<string> positions = targetEnum.Value;
-
-                // If the record has more than one sourceID, add
-                // it to the conflicts table.
-                if (positions.Count > 1)
-                {
-                    conflicts.Add(target, positions);
-                }
-            }
+                        x.cand,
+                        sourceID = kvp.Key,
+                        targetID = x.tp.TargetID,
+                    }))
+                .GroupBy(x => x.targetID)
+                .Where(group => group.Skip(1).Any())
+                .Select(group =>
+                    (group.Key,
+                     group.Select(x => (x.sourceID, x.cand)).ToList()))
+                .ToList();
 
             return conflicts;
         }
 
 
-
         /// <summary>
-        /// Get the Candidate objects for the competing non-first candidates
-        /// that link to a specified target point from the specified
-        /// source point.
+        /// Remove from the candidate table those candidates that link to
+        /// the specified target point from the specified positions, that
+        /// are different from the winning candidate, and that are not
+        /// themselves certain.
         /// </summary>
-        /// <param name="target">
-        /// A target point identified by a string with the target text and
-        /// position.
-        /// </param>
-        /// <param name="positions">
-        /// A list of the source IDs (as canonical strings) with non-first
-        /// alternatives that link to the target point.  This list has at
-        /// least two entries.
-        /// </param>
-        /// <param name="candidateTable">
-        /// A table of alternative links for some of the source points
-        /// in the zone.
-        /// </param>
-        /// <returns>
-        /// A list of the candidates that link to the target
-        /// point, one for each of the source IDs.
-        /// </returns>
-        /// 
-        static List<Candidate> GetConflictingCandidates(
-            string target,
-            List<string> positions,
-            AlternativesForTerminals candidateTable)
-        {
-            // Starting from the positions, look up each source ID in
-            // the table of alternative candidates, and find the first
-            // candidate that links to the position.
-            return
-                positions
-                .Select(morphID =>
-                    candidateTable[morphID]
-                    .FirstOrDefault(c =>
-                        AutoAlignUtility.GetWords(c) == target))
-                .ToList();
-        }
-
-
-        /// <summary>
-        /// Remove candidates that link to the specified target from the
-        /// specified source IDs which are not the winning candidate and
-        /// have (log) probability less than zero.
-        /// </summary>
-        /// <param name="target">
-        /// Target point as identified by a string with its text and position.
-        /// </param>
-        /// <param name="positions">
-        /// A list of source IDs (as canonical strings) with non-first
-        /// candidates that link to the target point.  This list has at
-        /// least two members.
-        /// </param>
-        /// <param name="winningCandidate">
-        /// The unique candidate of greatest probability among all of the
-        /// candidates implied by positions.
-        /// </param>
-        /// <param name="candidateTable">
-        /// A table that maps some source IDs (as canonical strings) to the
-        /// alternative candidates for that source point.
-        /// </param>
         /// 
         static void RemoveLosingCandidates(
-            string target,
-            List<string> positions,
-            Candidate winningCandidate,
-            AlternativesForTerminals candidateTable)
+            TargetID target,
+            List<(SourceID, Candidate)> positions,
+            (SourceID, Candidate) winningCandidate,
+            Dictionary<SourceID, List<Candidate>> candidateTable)
         {
-            // For each source ID (as a canonical string):
-            foreach (string morphID in positions)
+            // For each position:
+            foreach (SourceID position in positions.Select(x => x.Item1))
             {
-                // For each alternative candidate for that source ID:
-                List<Candidate> candidates = candidateTable[morphID];
-                for (int i = 0; i < candidates.Count; i++)
-                {
-                    Candidate c = candidates[i];
+                // Compute the candidates to be removed for this position.
+                // Start with all candidates for this position, and keep
+                // only those that link to target, are not equal to
+                // winning candidate, and have logScore less than zero.
+                List<Candidate> toBeRemoved =
+                    candidateTable[position]
+                    .Where(cand => cand.TargetPoint.TargetID.Equals(target))
+                    .Where(cand => cand != winningCandidate.Item2)
+                    .Where(cand => cand.LogScore < 0.0)
+                    .ToList();
 
-                    // Get the string that identifies the target point
-                    // by its text and position.
-                    string targetID = GetTargetID(c);
-                    if (targetID == string.Empty) continue;
-                    string linkedWords = AutoAlignUtility.GetWords(c);
-
-                    // If all of these are true:
-                    // (1) the target point for this candidate is the one under
-                    // consideration,
-                    // (2) this is not the winning candidate, and
-                    // (3) the (log) probability of this candidate is negative,
-                    if (linkedWords == target && c != winningCandidate && c.Prob < 0.0)
-                    {
-                        // Remove this candidate from the table of alternative
-                        // candidates for the source ID.
-                        candidates.Remove(c);
-                    }
-                }
+                // Remove each of the candidates so obtained from the table.
+                foreach (Candidate cand in toBeRemoved)
+                    candidateTable[position].Remove(cand);
             }
         }
 
 
         /// <summary>
-        /// Return the Target ID (as a canonical string) of the target
-        /// point associated with a Candidate, of "" if the Candidate
-        /// has an empty candidate chain.
+        /// For those candidate table entries where the list of alternaties
+        /// is empty, replace the empty list with a list containing
+        /// one empty Candidate.
         /// </summary>
+        /// <param name="candidateTable">
+        /// Candidate table to be adjusted.
+        /// </param>
+        /// <param name="sourcePointsById">
+        /// Lookup table for obtaining a source point from its source ID.
+        /// </param>
         /// 
-        static string GetTargetID(Candidate c)
+        public static void FillGaps(
+            Dictionary<SourceID, List<Candidate>> candidateTable,
+            Dictionary<SourceID, SourcePoint> sourcePointsById)
         {
-            if (c.Chain.Count == 0)
+            // Find those positions with no candidates.
+            List<SourceID> gaps =
+                candidateTable
+                .Where(kvp => !kvp.Value.Any())
+                .Select(kvp => kvp.Key)
+                .ToList();
+
+            // For each position so obtained:
+            foreach (SourceID sourceID in gaps)
             {
-                return string.Empty;
+                // Replace the candidate table entry with a list
+                // containing just one alternative that links the
+                // source point to nothing.
+                Candidate emptyCandidate2 =
+                    Candidate.NewEmptyPoint(sourcePointsById[sourceID]);
+                List<Candidate> candidates2 = new() { emptyCandidate2 };
+                candidateTable[sourceID] = candidates2;                 
             }
-            else
-            {
-                MaybeTargetPoint tWord = (MaybeTargetPoint)c.Chain[0];
-                return tWord.ID;
-            }
-        }
-
-
-
-        public static void FillGaps(AlternativesForTerminals candidateTable)
-        {
-            // Find the source IDs for source points whose list of alternative
-            // candidates is empty.
-            List<string> gaps = FindGaps(candidateTable);
-
-            // For each gap found:
-            foreach (string morphID in gaps)
-            {
-                // Replace the empty candidate list with a list containing
-                // one empty candidate.
-                List<Candidate> emptyCandidate =
-                    AutoAlignUtility.CreateEmptyCandidate();
-                candidateTable[morphID] = emptyCandidate;
-            }
-        }
-
-
-        /// <summary>
-        /// Get the Source IDs (as canonical strings) that have a list
-        /// of zero alternatives in the candidate table.
-        /// </summary>
-        /// 
-        static List<string> FindGaps(AlternativesForTerminals candidateTable)
-        {
-            List<string> gaps = new List<string>();
-
-            foreach (var tableEnum in candidateTable)
-            {
-                string morphID = tableEnum.Key;
-                List<Candidate> candidates = tableEnum.Value;
-
-                if (candidates.Count == 0)
-                {
-                    gaps.Add(morphID);
-                }
-            }
-
-            return gaps;
         }
     }
 }
