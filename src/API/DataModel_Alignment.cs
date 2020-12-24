@@ -34,13 +34,10 @@ namespace ClearBible.Clear3.API
     /// 
     public record TargetText(string Text);
 
-    // FIXME: use TargetText in the system at large only for target
-    // surface text and never for lowercased target surface text
-
-
-    // FIXME: introduce LowerText(string Text);
-    // for a string to be interpreted as lowercased target surface text,
-    // and use LowerText consistently in the system at large
+    // FIXME: introduce a LowerText(string Text) record type, and
+    // change name of TargetText to TargetSurfaceText; adjust usage in
+    // the system at large to distinguish between target lower-cased text
+    // and target surface text.
 
 
     /// <summary>
