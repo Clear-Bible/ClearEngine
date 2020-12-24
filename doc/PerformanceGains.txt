@@ -1,0 +1,55 @@
+
+Performance gains for new Candidate data structures versus
+the old ones.
+
+2020-Dec-21
+
+Measured run times for the tree-based aligner portion of the software,
+by instrumenting the portion of Regression Test 3 that calls 
+AutoAlignFromModelsNoGroupsSubTask.Run().
+
+Case 1: 2 Cor 11:26
+Case 2: The whole NT
+
+Note: previously identified 2 Cor 11:26 as the verse that gives rise to
+the largest number of tree-based alignment candidates during 
+Regression Test 3.
+
+Run times in milliseconds:
+
+New Candidate data structures, as represented by commit
+705f5bd349bbd7f75d9d85ac0bc4f37f0951d37d
+
+2 Cor 11:26
+4644
+4572
+4716
+average: 4644
+
+Whole NT
+29621
+29982
+31117
+average: 30240
+
+
+Old Candidate data structures, as represented by commit
+2e20ef992f57ecddadab3ea9387ef76585068ca3
+
+2 Cor 11:26
+22720
+22718
+23251
+average: 22896
+
+Whole NT
+118523
+118999
+114672
+average: 117398
+
+
+Factor old-to-new:
+2 Cor 11:26 : 4.9
+Whole NT : 3.9
+
