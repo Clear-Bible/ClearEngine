@@ -223,7 +223,7 @@ namespace ClearBible.Clear3.API
         SourceID SourceID,
         string AltID,  // alternative identification in the form of, for
                        // example, "λόγος-2" to mean the second occurence of
-                       // the lemma "λόγος" within this zone
+                       // the surface form "λόγος" within this zone
         int TreePosition,  // zero-based position within the sequence of
                            // terminal nodes in syntax tree order for this
                            // zone
@@ -246,7 +246,7 @@ namespace ClearBible.Clear3.API
         TargetID TargetID,
         string AltID,  // alternative identification in the form of, for
                        // example, "word-2" to mean the second occurrence of
-                       // the lowercased text "word" within this zone
+                       // the surface text "word" within this zone
         int Position,  // zero-based position within the sequence of target
                        // words in translation order for this zone,
         double RelativePosition  // the Position restated as a fraction,
