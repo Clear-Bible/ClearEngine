@@ -84,7 +84,7 @@ namespace ClearBible.Clear3.API
 
         /// <summary>
         /// Alternate ID of the form, for example, "λόγος-2" to mean the
-        /// second occurence of the lemma "λόγος" within this zone
+        /// second occurence of the surface text "λόγος" within this zone
         /// </summary>
         /// 
         public string altId;
@@ -137,7 +137,7 @@ namespace ClearBible.Clear3.API
 
         /// <summary>
         /// Alternate ID of the form, for example, "word-2" to mean the
-        /// second occurence of the lowercased text "word" within this zone.
+        /// second occurence of the surface text "word" within this zone.
         /// </summary>
         /// 
         public string altId;
