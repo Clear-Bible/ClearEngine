@@ -16,7 +16,7 @@ using ClearBible.Clear3.SubTasks;
 
 namespace Clear2
 {
-    public class CmdLine
+    public class ActionsClear3
     {
         public static void SetProject(string argProject)
         {
@@ -84,8 +84,8 @@ namespace Clear2
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
             //
-            tokFilename = (string)clearSettings["TokFile"]; // e.g. "tokens.txt"
-            tokLowerFilename = (string)clearSettings["TokLowerFile"]; // e.g. "tokens.lower.txt", Not currently used
+            tokFilename = (string)clearSettings["TokenFile"]; // e.g. "tokens.txt"
+            tokLowerFilename = (string)clearSettings["TokenLemmaFile"]; // e.g. "tokens.lower.txt", Not currently used
 
             sourceFilenameM = (string)clearSettings["SourceFileM"]; // e.g. 
             sourceIdFilenameM = (string)clearSettings["SourceIdFileM"]; // e.g. 
@@ -96,7 +96,7 @@ namespace Clear2
             sourceIdLemmaFilename = (string)clearSettings["SourceIdLemmaFile"]; // e.g. source.id.lemma.txt"
             targetFilename = (string)clearSettings["TargetFile"]; // e.g. "target.txt"
             targetIdFilename = (string)clearSettings["TargetIdFile"]; // e.g. "target.id.txt"
-            targetLowerIdFilename = (string)clearSettings["TargetLowerIdFile"]; // e.g "target.lower.id.txt", Not currently used
+            targetLowerIdFilename = (string)clearSettings["TargetIdLemmaFile"]; // e.g "target.lower.id.txt", Not currently used
 
             targetPuncFilename = (string)clearSettings["TargetPuncFile"]; // e.g. "target.punc.txt"
             targetPuncLowerFilename = (string)clearSettings["TargetPuncLowerFile"]; // "target.punc.lower.txt", Not currently used

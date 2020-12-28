@@ -54,7 +54,7 @@ namespace Clear2
                 {
                     Console.WriteLine();
                     Console.WriteLine("Running ClearEngine 2");
-                    CmdLine.InitializeConfig();
+                    ActionsClear3.InitializeConfig();
                     ProcessArgs(args);
                 }
             }            
@@ -258,8 +258,8 @@ namespace Clear2
                         {
                             if (!initialized)
                             {
-                                CmdLine.InitializeFiles();
-                                CmdLine.Initialize();
+                                ActionsClear3.InitializeFiles();
+                                ActionsClear3.Initialize();
                             }
 
                             Command command = runCommands[runCommand];
@@ -268,62 +268,62 @@ namespace Clear2
                             {
                                 case Command.Story1:
                                 case Command.AutoAlign:
-                                    Console.WriteLine(CmdLine.Do_Button1());
+                                    Console.WriteLine(ActionsClear3.Do_Button1());
                                     Console.WriteLine("Done doing Story1.");
                                     break;
                                 case Command.Story2:
                                 case Command.IncrementalUpdate:
-                                    Console.WriteLine(CmdLine.Do_Button2());
+                                    Console.WriteLine(ActionsClear3.Do_Button2());
                                     Console.WriteLine("Done doing Story2.");
                                     break;
                                 case Command.Story3:
                                 case Command.RebuildModel:
-                                    Console.WriteLine(CmdLine.Do_Button3());
+                                    Console.WriteLine(ActionsClear3.Do_Button3());
                                     Console.WriteLine("Done doing Story3.");
                                     break;
                                 case Command.Story4:
                                 case Command.AlignToGateway:
-                                    Console.WriteLine(CmdLine.Do_Button4());
+                                    Console.WriteLine(ActionsClear3.Do_Button4());
                                     Console.WriteLine("Done doing Story4.");
                                     break;
                                 case Command.Story5:
                                 case Command.ManuscriptToTarget:
-                                    Console.WriteLine(CmdLine.Do_Button5());
+                                    Console.WriteLine(ActionsClear3.Do_Button5());
                                     Console.WriteLine("Done doing Story5.");
                                     break;
                                 case Command.Story6:
                                 case Command.BuildTranslationModel:
-                                    Console.WriteLine(CmdLine.Do_Button6());
+                                    Console.WriteLine(ActionsClear3.Do_Button6());
                                     Console.WriteLine("Done doing Story6.");
                                     break;
                                 case Command.Story7:
                                 case Command.TokenizeVerses:
-                                    Console.WriteLine(CmdLine.Do_Button7());
+                                    Console.WriteLine(ActionsClear3.Do_Button7());
                                     Console.WriteLine("Done doing Story7.");
                                     break;
                                 case Command.Story8:
                                 case Command.CreateParallelFiles:
-                                    Console.WriteLine(CmdLine.Do_Button8());
+                                    Console.WriteLine(ActionsClear3.Do_Button8());
                                     Console.WriteLine("Done doing Story8.");
                                     break;
                                 case Command.Story9:
                                 case Command.FreshStart:
-                                    Console.WriteLine(CmdLine.Do_Button9());
+                                    Console.WriteLine(ActionsClear3.Do_Button9());
                                     Console.WriteLine("Done doing Story9.");
                                     break;
                                 case Command.Story10:
                                 case Command.CopyInitialFiles:
-                                    Console.WriteLine(CmdLine.Do_Button10());
+                                    Console.WriteLine(ActionsClear3.Do_Button10());
                                     Console.WriteLine("Done doing Story10.");
                                     break;
                                 case Command.Story11:
                                 case Command.InitializeState:
-                                    Console.WriteLine(CmdLine.Do_Button11());
+                                    Console.WriteLine(ActionsClear3.Do_Button11());
                                     Console.WriteLine("Done doing Story11.");
                                     break;
                                 case Command.Story12:
                                 case Command.Process:
-                                    Console.WriteLine(CmdLine.Do_Button12());
+                                    Console.WriteLine(ActionsClear3.Do_Button12());
                                     Console.WriteLine("Done doing Story12.");
                                     break;
                                 default: // This should never happen unless I forgot to revise the mainCommands
@@ -350,17 +350,17 @@ namespace Clear2
             switch (option)
             {
                 case Options.SetProject:
-                    CmdLine.SetProject(param);
+                    ActionsClear3.SetProject(param);
                     Console.WriteLine("Project set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetTestament:
-                    CmdLine.SetTestament(param);
+                    ActionsClear3.SetTestament(param);
                     Console.WriteLine("Testament set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetContentWordsOnly:
-                    CmdLine.SetContentWordsOnly(param);
+                    ActionsClear3.SetContentWordsOnly(param);
                     Console.WriteLine("ContentWordsOnly set to {0}", param);
                     initialized = false;
                     break;
