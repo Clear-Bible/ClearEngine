@@ -353,7 +353,7 @@ namespace Clear2
             // tm Not used yet in Clear3
             // tm = AutoAligner.ReadTM(tmFile); // tm is a Hashtable with the Key the source Strongs number, and the Value is a list of translations. 
 
-            transModel = importExportService.ImportTranslationModel(transModelFile);
+            translationModel = importExportService.ImportTranslationModel(transModelFile);
             alignmentModel = importExportService.ImportAlignmentModel(alignModelFile);
 
             (List<string> puncs,
@@ -419,7 +419,7 @@ namespace Clear2
 
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
-                    transModel,
+                    translationModel,
                     manTransModel,
                     alignmentModel,
                     useAlignModel,
@@ -499,21 +499,24 @@ namespace Clear2
 
             if (contentWordsOnly)
             {
-                (transModel, alignmentModel) = clearService.SMTService.DefaultSMT(parallelCorporaCW, runSpec, epsilon);
+                (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(parallelCorporaCW, runSpec, epsilon);
             }
             else
             {
-                (transModel, alignmentModel) = clearService.SMTService.DefaultSMT(parallelCorpora, runSpec, epsilon);
+                (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(parallelCorpora, runSpec, epsilon);
             }
 
             dt = DateTime.Now;
             Console.WriteLine(dt.ToString("G"));
 
-            WriteTransModel(transModel, transModelFile);
-            WriteAlignModel(alignmentModel, alignModelFile);
+            ExportTranslationModel(translationModel, transModelFile);
+            ExportAlignmentModel(alignmentModel, alignModelFile);
 
-            transModel = importExportService.ImportTranslationModel(transModelFile);
-            alignmentModel = importExportService.ImportAlignmentModel(alignModelFile);
+            // Within the SMTService.DefaultSMT, it writes and reads from the file, so any double differences is already done.
+            // No need to read them in again.
+
+            // transModel = importExportService.ImportTranslationModel(transModelFile);
+            // alignmentModel = importExportService.ImportAlignmentModel(alignModelFile);
 
             // 2020.06.29 CL: We updated alignModel so also need to update preAlignment.
             // preAlignment = Data.BuildPreAlignmentTable(alignModel);
@@ -635,7 +638,7 @@ namespace Clear2
             return "Done Processing.";
         }
 
-        public static void WriteTransModel(TranslationModel model, string filename)
+        public static void ExportTranslationModel(TranslationModel model, string filename)
         {
             StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8);
 
@@ -711,7 +714,7 @@ namespace Clear2
             sw.Close();
         }
 
-        public static void WriteAlignModel(AlignmentModel table, string filename)
+        public static void ExportAlignmentModel(AlignmentModel table, string filename)
         {
             StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8);
 
@@ -805,7 +808,7 @@ namespace Clear2
 
         private static string transModelFilename; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
         private static string transModelFile; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
-        private static TranslationModel transModel; // translation model
+        private static TranslationModel translationModel; // translation model
 
         private static string manTransModelFilename; // the file that contains the translation model created from manually checked alignments
         private static string manTransModelFile; // the file that contains the translation model created from manually checked alignments
@@ -813,7 +816,7 @@ namespace Clear2
 
         private static string alignModelFilename; // the file that contains the alignment model;
         private static string alignModelFile; // the file that contains the alignment model;
-        private static AlignmentModel alignModel; // alignment model
+        // private static AlignmentModel alignModel; // alignment model
         private static AlignmentModel alignmentModel; // alignment model
         private static AlignmentModel preAlignment; // alignment table
 
