@@ -4,11 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections;
 using System.IO;
-using System.Runtime.InteropServices;
-
-
-using TransModels;
-using System.Globalization;
 
 namespace Clear2
 {
@@ -32,9 +27,10 @@ namespace Clear2
         SetProject, 
         SetTestament,
         SetContentWordsOnly,
+        SetRunSpec,
     }
 
-    static class program
+    static class Program
     {
         /// <summary>
         /// The main entry point for the application.
@@ -146,6 +142,16 @@ namespace Clear2
                     else
                     {
                         Console.WriteLine(string.Format("Error: Option {0} parameter should be true or false", optionStr));
+                    }
+                    break;
+                case Options.SetRunSpec:
+                    if (param.StartsWith("Machine;") || (param == "1:10;H:5"))
+                    {
+                        good = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Format("Error: Option {0} parameter should start with 'Machine;' or be '1:10;H:5'", optionStr));
                     }
                     break;
                 default: // This should never happen unless I forgot to revise the mainCommands
@@ -362,6 +368,11 @@ namespace Clear2
                     Console.WriteLine("ContentWordsOnly set to {0}", param);
                     initialized = false;
                     break;
+                case Options.SetRunSpec:
+                    ActionsClear3.SetRunSpec(param);
+                    Console.WriteLine("runSpec set to {0}", param);
+                    initialized = false;
+                    break;
                 default: // This should never happen unless I forgot to revise the mainCommands
                     Console.WriteLine(string.Format("Error: Option {0} has no case statement.", optionStr));
                     hasCase = false;
@@ -492,6 +503,7 @@ namespace Clear2
                 {"-p", Options.SetProject }, {"--project", Options.SetProject },
                 {"-t", Options.SetTestament }, {"--testament", Options.SetTestament },
                 {"-c", Options.SetContentWordsOnly }, {"--content-words-only", Options.SetContentWordsOnly },
+                {"-r", Options.SetRunSpec }, {"--runspec", Options.SetRunSpec },
             };
         }
 

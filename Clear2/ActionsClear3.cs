@@ -27,10 +27,17 @@ namespace Clear2
         {
             testament = argTestament;
         }
+
         public static void SetContentWordsOnly(string argContentWordsOnly)
         {
             contentWordsOnly = (argContentWordsOnly == "true");
         }
+
+        public static void SetRunSpec(string argRunSpec)
+        {
+            runSpec = argRunSpec;
+        }
+
         public static void InitializeConfig()
         {
             Console.WriteLine();
