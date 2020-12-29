@@ -52,8 +52,6 @@ namespace Clear2
                 LoadTables();
                 if (CheckCommandLine(args))
                 {
-                    Console.WriteLine();
-                    Console.WriteLine("Running ClearEngine 2");
                     ActionsClear3.InitializeConfig();
                     ProcessArgs(args);
                 }

@@ -9,4 +9,19 @@
   <ItemGroup>
     <ProjectReference Include="..\Models\Models.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SIL.Core">
+      <HintPath>bin\Debug\net5.0\SIL.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SIL.Machine">
+      <HintPath>bin\Debug\net5.0\SIL.Machine.dll</HintPath>
+    </Reference>
+    <Reference Include="SIL.Machine.Translation.Thot">
+      <HintPath>bin\Debug\net5.0\SIL.Machine.Translation.Thot.dll</HintPath>
+    </Reference>
+    <Reference Include="SIL.Scripture">
+      <HintPath>bin\Debug\net5.0\SIL.Scripture.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

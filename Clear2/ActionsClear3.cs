@@ -33,6 +33,9 @@ namespace Clear2
         }
         public static void InitializeConfig()
         {
+            Console.WriteLine();
+            Console.WriteLine("Running ClearEngine 3");
+
             clearConfigFilename = "CLEAR.config"; // default configuration file
             ReadConfig(clearConfigFilename);
         }
@@ -59,7 +62,7 @@ namespace Clear2
             testament = (string)runSettings["Testament"]; // e.g. "OT" or "NT"
 
             // Set Processing Parameters
-            runSpec = (string)processingSettings["RunSpec"]; // e.g. 1:10;H:5
+            runSpec = (string)processingSettings["RunSpec2"]; // e.g. 1:10;H:5
             epsilon = Double.Parse((string)processingSettings["Epsilon"]); // Must exceed this to be counted into model, e.g. "0.1"
 
             useAlignModel = ((string)processingSettings["UseAlignModel"] == "true"); // e.g. "true"
@@ -84,8 +87,8 @@ namespace Clear2
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
             //
-            tokFilename = (string)clearSettings["TokenFile"]; // e.g. "tokens.txt"
-            tokLowerFilename = (string)clearSettings["TokenLemmaFile"]; // e.g. "tokens.lower.txt", Not currently used
+            tokenFilename = (string)clearSettings["TokenFile"]; // e.g. "tokens.txt"
+            tokenLemmaFilename = (string)clearSettings["TokenLemmaFile"]; // e.g. "tokens.lower.txt", Not currently used
 
             sourceFilenameM = (string)clearSettings["SourceFileM"]; // e.g. 
             sourceIdFilenameM = (string)clearSettings["SourceIdFileM"]; // e.g. 
@@ -96,7 +99,7 @@ namespace Clear2
             sourceIdLemmaFilename = (string)clearSettings["SourceIdLemmaFile"]; // e.g. source.id.lemma.txt"
             targetFilename = (string)clearSettings["TargetFile"]; // e.g. "target.txt"
             targetIdFilename = (string)clearSettings["TargetIdFile"]; // e.g. "target.id.txt"
-            targetLowerIdFilename = (string)clearSettings["TargetIdLemmaFile"]; // e.g "target.lower.id.txt", Not currently used
+            targetIdLemmaFilename = (string)clearSettings["TargetIdLemmaFile"]; // e.g "target.id.lemma.txt"
 
             targetPuncFilename = (string)clearSettings["TargetPuncFile"]; // e.g. "target.punc.txt"
             targetPuncLowerFilename = (string)clearSettings["TargetPuncLowerFile"]; // "target.punc.lower.txt", Not currently used
@@ -169,8 +172,8 @@ namespace Clear2
             glossFile = Path.Combine(resourcesFolder, glossFilename); // e.g. "Gloss.tsv"
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
-            tokFile = Path.Combine(targetFolder, tokFilename);
-            tokLowerFile = Path.Combine(targetFolder, tokLowerFilename);
+            tokFile = Path.Combine(targetFolder, tokenFilename);
+            tokLowerFile = Path.Combine(targetFolder, tokenLemmaFilename);
 
             sourceFileM = Path.Combine(sourceFolder, sourceFilenameM);
             sourceIdFileM = Path.Combine(sourceFolder, sourceIdFilenameM);
@@ -181,7 +184,7 @@ namespace Clear2
             sourceIdLemmaFile = Path.Combine(targetFolder, sourceIdLemmaFilename);
             targetFile = Path.Combine(targetFolder, targetFilename);
             targetIdFile = Path.Combine(targetFolder, targetIdFilename);
-            targetLowerIdFile = Path.Combine(targetFolder, targetLowerIdFilename);
+            targetLowerIdFile = Path.Combine(targetFolder, targetIdLemmaFilename);
 
             targetPuncFile = Path.Combine(targetFolder, targetPuncFilename);
             targetPuncLowerFile = Path.Combine(targetFolder, targetPuncLowerFilename);
@@ -890,9 +893,9 @@ namespace Clear2
         private static ParallelCorpora parallelCorpora;
         private static ParallelCorpora parallelCorporaCW;
 
-        private static string tokFilename;
+        private static string tokenFilename;
         private static string tokFile;
-        private static string tokLowerFilename;
+        private static string tokenLemmaFilename;
         private static string tokLowerFile;
         private static string sourceFilenameM;
         private static string sourceFileM;
@@ -911,7 +914,7 @@ namespace Clear2
         private static string targetFile;
         private static string targetIdFilename;
         private static string targetIdFile;
-        private static string targetLowerIdFilename;
+        private static string targetIdLemmaFilename;
         private static string targetLowerIdFile;
 
         private static string targetPuncFilename;
