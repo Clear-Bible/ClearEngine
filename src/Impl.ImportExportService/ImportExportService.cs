@@ -19,8 +19,6 @@ namespace ClearBible.Clear3.Impl.ImportExportService
     /// (Implementation of IImportExportService.)
     /// </summary>
     ///
-    // FIXME: Improve documentation.
-    //
     public class ImportExportService : IImportExportService
     {
         public TargetVerseCorpus ImportTargetVerseCorpusFromLegacy(
