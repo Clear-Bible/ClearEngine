@@ -425,15 +425,22 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         }
 
 
-        // Input file has lines of the form:
-        //   link count
-        // Output datum is of the form
-        //   Hashtable(link => count)
-        //
         /// <summary>
         /// Obtain a good links or bad links dictionary from a legacy
         /// file format used in Clear2.
         /// </summary>
+        /// <remarks>
+        /// The intent is to collect information about the judgments 
+        /// made when checking alignments manually or otherwise performing
+        /// manual linking.
+        /// </remarks>
+        /// <returns>
+        /// A Dictionary that maps a string of the form xxx#yyy (where xxx
+        /// is a lemma and yyy is a lowercased target text) to a count.
+        /// The meaning is that an association between the lemma
+        /// and the lowercased target text was found to be good (or bad)
+        /// for the count number of times.
+        /// </returns>
         /// 
         public Dictionary<string, int> GetXLinks(string file)
         {
