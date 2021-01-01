@@ -28,10 +28,12 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
 
         private void SegPuncs(ref string puncText, ref string puncLowerText, string verseText, List<string> puncs, string lang)
         {
-            verseText = verseText.Replace("—", " — ");
-            verseText = verseText.Replace("-", " - ");
-            verseText = verseText.Replace(",“", ", “");
-            verseText = verseText.Replace("  ", " ");
+            // 2020.09.11 CL: Do we need these now that I run verse files through a program to clean up the verses? Will need to check.
+
+            // verseText = verseText.Replace("—", " — ");
+            // verseText = verseText.Replace("-", " - ");
+            // verseText = verseText.Replace(",“", ", “");
+            // verseText = verseText.Replace("  ", " ");
             if (lang == "Gbary")
             {
                 verseText = verseText.Replace("^", "");

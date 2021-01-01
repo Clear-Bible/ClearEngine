@@ -104,7 +104,7 @@ namespace TransModels
                     }
                     catch
                     {
-                        Console.WriteLine("ERROR in GetAlignmentModel() Index out of bound: Line {0}, source {1} target {2}", i+1, sourceIndex, targetIndex);
+                        Console.WriteLine("ERROR in GetAlignmentModel() Index out of bound: Line {0}, source {1}/{2} target {3}/{4}", i+1, sourceIndex, sourceIDs.Length, targetIndex, targetIDs.Length);
                     }
                 }
 

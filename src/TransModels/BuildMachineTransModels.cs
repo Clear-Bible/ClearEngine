@@ -46,7 +46,8 @@ namespace TransModels
                 var transModel = ConvertTranslationTableToHashtable(transTable);
                 BuildTransModels.WriteTransModel(transModel, transModelFile);
                     
-                var alignModel = GetAlignmentModel(sourceFile, targetFile, sourceIdFile, targetIdFile, model);
+                // var alignModel = GetAlignmentModel(sourceFile, targetFile, sourceIdFile, targetIdFile, model);
+                var alignModel = GetAlignmentModel(sourceIdFile, targetIdFile, model);
                 BuildTransModels.WriteAlignModel(alignModel, alignModelFile);
             }
         }
@@ -78,14 +79,14 @@ namespace TransModels
         }
 
         static Hashtable GetAlignmentModel(
-           string sourceFile,
-           string targetFile,
+           // string sourceFile,
+           // string targetFile,
            string sourceIdFile,
            string targetIdFile,
            IWordAlignmentModel model)
         {
-//            string[] sourceList = File.ReadAllLines(sourceFile);
-//            string[] targetList = File.ReadAllLines(targetFile);
+            // string[] sourceList = File.ReadAllLines(sourceFile);
+            // string[] targetList = File.ReadAllLines(targetFile);
             string[] sourceIdList = File.ReadAllLines(sourceIdFile);
             string[] targetIdList = File.ReadAllLines(targetIdFile);
 
@@ -136,7 +137,7 @@ namespace TransModels
                     }
                     catch
                     {
-                        Console.WriteLine("ERROR in WriteAlignmentModel() Index out of bound: {0} {1}", sourceIndex, targetIndex);
+                        Console.WriteLine("ERROR in GetAlignmentModel() Index out of bound: Line {0}, source {1}/{2} target {3}/{4}", i + 1, sourceIndex, sourceIDs.Length, targetIndex, targetIDs.Length);
                     }
                 }
             }
