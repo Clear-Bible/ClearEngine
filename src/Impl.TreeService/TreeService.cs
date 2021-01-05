@@ -293,8 +293,10 @@ namespace ClearBible.Clear3.Impl.TreeService
                     .Where(e => e.FirstNode is XText)
                     .Select(e => new
                     {
-                        text = e.Surface(),
-                        lemma = e.Lemma(),
+                        // text = e.Surface(),
+                        // lemma = e.Lemma(),
+                        text = e.Surface().Replace(' ', '~'),
+                        lemma = e.Lemma().Replace(' ', '~'),
                         sourceID = e.SourceID()
                     }))
                 .OrderBy(x => x.sourceID.AsCanonicalString)
