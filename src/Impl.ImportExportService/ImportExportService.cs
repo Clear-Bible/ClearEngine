@@ -527,9 +527,21 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                     sourceVerse = new VerseID(mb, mc, mv),
                     targetVerse = new VerseID(tb, tc, tv);
 
+                // 2021.01.05 CL: The original code had the bug below.
+                // 2020.10.22 CL: Bug in the following code. It does not check to see if a verse is already in the list before adding it.
+                // Pairing seems to be loose in that there is transitivity assumed in the pairing. 
+                // So if X1-Y1, X1-Y2, and then:
+                //   (a) X2-Y2 then it assumes X2-Y1 
+                //   (b) X2-Y1 then it assume X2-Y2
+
                 if (currentSourceVerses.Contains(sourceVerse))
                 {
-                    currentTargetVerses.Add(targetVerse);
+                    // 2021.01.05 CL: The original code had the bug below.
+                    // 2020.10.22 CL: Bug. Didn't check to see if it already is in the list.
+                    if (!currentTargetVerses.Contains(targetVerse))
+                    {
+                        currentTargetVerses.Add(targetVerse);
+                    } 
                 }
                 else if (currentTargetVerses.Contains(targetVerse))
                 {

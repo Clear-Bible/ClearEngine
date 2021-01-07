@@ -131,7 +131,7 @@ namespace Clear2
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter should be OT or NT", optionStr));
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be OT or NT", optionStr, param));
                     }
                     break;
                 case Options.SetContentWordsOnly:
@@ -141,7 +141,7 @@ namespace Clear2
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter should be true or false", optionStr));
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be true or false", optionStr, param));
                     }
                     break;
                 case Options.SetRunSpec:
@@ -151,7 +151,7 @@ namespace Clear2
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter should start with 'Machine;' or be '1:10;H:5'", optionStr));
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should start with 'Machine;' or be '1:10;H:5'", optionStr, param));
                     }
                     break;
                 default: // This should never happen unless I forgot to revise the mainCommands
