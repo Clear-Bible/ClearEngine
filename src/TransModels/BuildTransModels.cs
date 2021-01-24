@@ -55,9 +55,13 @@ namespace TransModels
             {
                 string sourceWords = (string)sourceIdList[i];
                 string targetWords = (string)targetIdList[i];
+                // Shrink two spaces to one space
+                //sourceWords = sourceWords.Replace("  ", " ");
                 targetWords = targetWords.Replace("  ", " ");
+
                 string[] sWords = sourceWords.Split(" ".ToCharArray());
                 string[] tWords = targetWords.Split(" ".ToCharArray());
+                
                 foreach (Alignment alignment in alignments)
                 {
                     int sourceIndex = alignment.Source;
@@ -76,6 +80,11 @@ namespace TransModels
                     catch
                     {
                         Console.WriteLine("Index out of bound: {0} {1}", sourceIndex, targetIndex);
+                        // ADDED FOR DEBUG
+                        Console.WriteLine($">>> sourceWords: {sourceWords}");
+                        Console.WriteLine($">>> targetWords: {targetWords}");
+                        Console.WriteLine($"------------------------------------");
+                        // ADDED END
                     }
                 }
 
