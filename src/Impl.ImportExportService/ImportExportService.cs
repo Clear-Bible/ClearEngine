@@ -849,8 +849,12 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                 // current step:
                 if (currentSourceVerses.Contains(sourceVerse))
                 {
-                    // Add the target verse.
-                    currentTargetVerses.Add(targetVerse);
+                    // Only add target verse if it does not already exist.
+                    if (!currentTargetVerses.Contains(targetVerse))
+                    {
+                        // Add the target verse.
+                        currentTargetVerses.Add(targetVerse);
+                    }
                 }
                 // Otherwise if we have already seen the target verse
                 // in the current step:
