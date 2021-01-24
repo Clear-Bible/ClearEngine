@@ -293,8 +293,9 @@ namespace ClearBible.Clear3.Impl.TreeService
                     .Where(e => e.FirstNode is XText)
                     .Select(e => new
                     {
-                        text = e.Surface(),
-                        lemma = e.Lemma(),
+                        // Replace space with tilda to keep a single word in the trees a space-separated word.
+                        text = e.Surface().Replace(' ', '~'),
+                        lemma = e.Lemma().Replace(' ', '~'),
                         sourceID = e.SourceID()
                     }))
                 .OrderBy(x => x.sourceID.AsCanonicalString)
