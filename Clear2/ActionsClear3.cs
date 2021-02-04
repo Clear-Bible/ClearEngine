@@ -474,22 +474,26 @@ namespace Clear2
         
         public static string Do_Button2()
         {
+            Console.WriteLine("Updating Incrementally. Not implemented yet in Clear3.");
             return "Story2 not implemented.";
 
         }
 
         public static string Do_Button3()
         {
+            Console.WriteLine("Updating Globally. Not implemented yet in Clear3.");
             return "Story3 not implemented.";
         }
 
         public static string Do_Button4()
         {
+            Console.WriteLine("Aligning Gateway-to-Translation via Manuscript-to-Gateway. Not implemented yet in Clear3.");
             return "Story4 not implemented.";
         }
 
         public static string Do_Button5()
         {
+            Console.WriteLine("Aligning Manuscript-to-Translation via Manuscript-to-Gateway. Not implemented yet in Clear3.");
             return "Story5 not implemented.";
         }
 
