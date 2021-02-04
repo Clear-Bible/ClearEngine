@@ -47,7 +47,7 @@ namespace Models
             break;
           case "F":
           case "FASTALIGN":
-            model = Model.FASTALIGN;
+            model = Model.FastAlign;
             break;
           default:
             return (List<ModelSpec>) null;

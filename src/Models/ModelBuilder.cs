@@ -154,7 +154,7 @@ namespace Models
         case Model.HMM:
           this.m_model = this.m_symType != SymmetrizationType.None ? (IAlignmentModel) new Symmetrizer((IAlignmentModel) new HMM(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength), (IAlignmentModel) new HMM(this.m_corpus2Dict.Count, this.m_corpus1Dict.Count, corpusSegmenter2.MaxLength, corpusSegmenter1.MaxLength), this.m_symType) : (IAlignmentModel) new HMM(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength);
           break;
-        case Model.FASTALIGN:
+        case Model.FastAlign:
           break;
         default:
           this.m_model = (IAlignmentModel) null;

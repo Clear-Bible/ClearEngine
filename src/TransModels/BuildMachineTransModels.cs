@@ -36,7 +36,8 @@ namespace TransModels
             using (IWordAlignmentModel model = CreateModel(runSpec))
             {
                 using (ConsoleProgressBarMachine progressBar = new ConsoleProgressBarMachine(Console.Out))
-                using (ITrainer trainer = model.CreateTrainer(TokenProcessors.Lowercase, TokenProcessors.Lowercase, parallelCorpus))
+                // using (ITrainer trainer = model.CreateTrainer(TokenProcessors.Lowercase, TokenProcessors.Lowercase, parallelCorpus))
+                using (ITrainer trainer = model.CreateTrainer(TokenProcessors.Null, TokenProcessors.Null, parallelCorpus))
                 {
                     trainer.Train(progressBar);
                     trainer.Save();
@@ -75,7 +76,8 @@ namespace TransModels
         {
             var directModel = new TAlignModel();
             var inverseModel = new TAlignModel();
-            return new SymmetrizedWordAlignmentModel(directModel, inverseModel);
+            // return new SymmetrizedWordAlignmentModel(directModel, inverseModel);
+            return new SymmetrizedWordAlignmentModel(directModel, inverseModel) { Heuristic = SymmetrizationHeuristic.Intersection };
         }
 
         static Hashtable GetAlignmentModel(

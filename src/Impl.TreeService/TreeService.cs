@@ -293,8 +293,13 @@ namespace ClearBible.Clear3.Impl.TreeService
                     .Where(e => e.FirstNode is XText)
                     .Select(e => new
                     {
-                        text = e.Surface(),
-                        lemma = e.Lemma(),
+                        // 2021.01.04 CL: Some terminal words in the OT trees are compuond words. 
+                        // Need to replace the spaces in a word with a non-space so it is tokenized as a single word otherwise
+                        // there will mismatch between the number of words and the number of IDs (number of words will be more).
+                        // text = e.Surface(),
+                        // lemma = e.Lemma(),
+                        text = e.Surface().Replace(' ', '~'),
+                        lemma = e.Lemma().Replace(' ', '~'),
                         sourceID = e.SourceID()
                     }))
                 .OrderBy(x => x.sourceID.AsCanonicalString)

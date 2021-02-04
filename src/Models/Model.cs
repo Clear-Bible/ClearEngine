@@ -12,6 +12,6 @@ namespace Models
     Model2,
     Model3,
     HMM,
-    FASTALIGN, // 2020.12.12 CL Added for future possibility
+    FastAlign, // 2020.12.12 CL Added for future possibility
   }
 }
