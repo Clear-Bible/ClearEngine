@@ -14,7 +14,7 @@ using ClearBible.Clear3.Service;
 using ClearBible.Clear3.SubTasks;
 
 
-namespace Clear2
+namespace Clear3_Tool
 {
     public class ActionsClear3
     {
@@ -36,6 +36,31 @@ namespace Clear2
         public static void SetRunSpec(string argRunSpec)
         {
             runSpec = argRunSpec;
+        }
+
+        public static void SetEpsilon(string arg)
+        {
+            epsilon = double.Parse(arg);
+        }
+
+        public static void SetThotModel(string arg)
+        {
+            thotIterations = arg;
+        }
+
+        public static void SetThotHeuristic(string arg)
+        {
+            thotIterations = arg;
+        }
+
+        public static void SetThotIterations(string arg)
+        {
+            thotIterations = arg;
+        }
+
+        public static void SetSmtContentWordsOnly(string arg)
+        {
+            smtContentWordsOnly = (arg == "true");
         }
 
         public static void InitializeConfig()
@@ -71,16 +96,19 @@ namespace Clear2
             // Set Processing Parameters
             runSpec = (string)processingSettings["RunSpec2"]; // e.g. 1:10;H:5
             epsilon = Double.Parse((string)processingSettings["Epsilon"]); // Must exceed this to be counted into model, e.g. "0.1"
+            thotModel = (string)processingSettings["ThotModel"];
+            thotHeuristic = (string)processingSettings["ThotHeuristic"];
+            thotIterations = (string)processingSettings["ThotInterations"];
+            smtContentWordsOnly = ((string)processingSettings["ContentWordsSMT"] == "true"); // e.g. "true" Only use content words for building models
+            contentWordsOnly = ((string)processingSettings["ContentWordsOnly"] == "true"); // e.g. "true" Only align content words
 
             useAlignModel = ((string)processingSettings["UseAlignModel"] == "true"); // e.g. "true"
             badLinkMinCount = Int32.Parse((string)processingSettings["BadLinkMinCount"]); // e.g. "3", the minimal count required for treating a link as bad
             goodLinkMinCount = Int32.Parse((string)processingSettings["GoodLinkMinCount"]); // e.g. "3" the minimal count required for treating a link as bad
-            contentWordsOnly = ((string)processingSettings["ContentWordsOnly"] == "true"); // e.g. "true" Only align content words
+
 
             // Set Translation Parameters
             translationConfigFilename = (string)clearSettings["TranslationConfigFile"];
-
-
 
             // Set file information in resourcesFolder
             sourceFoldername = (string)clearSettings["SourceFolder"];
@@ -91,6 +119,7 @@ namespace Clear2
             puncsFilename = (string)clearSettings["PuncsFile"];
             glossFilename = (string)clearSettings["GlossFile"];
             versificationFilenameDefault = (string)clearSettings["Versification_File"];
+            versificationTypeDefault = (string)clearSettings["Versification_Type"];
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
             //
@@ -145,13 +174,24 @@ namespace Clear2
             translationFolder = Path.Combine(projectsFolder, project);
             translationConfigFile = Path.Combine(translationFolder, translationConfigFilename);
 
+            if (!File.Exists(translationConfigFile))
+            {
+                translationConfigFile = Path.Combine(resourcesFolder, translationConfigFilename);
+            }
+
             translationSettings = Configuration.GetSettings(translationConfigFile);
 
             // Set variables related to which language, translation, and testament to process.
+
             lang = (string)translationSettings["Language"]; // e.g. "English"
             translation = (string)translationSettings["Translation"]; // e.g. NIV84
             versificationFilename = (string)translationSettings["Versification_File"];
             versificationType = (string)translationSettings["Versification_Type"]; // e.g. "NRT", "S1"
+
+            if (versificationType == "")
+            {
+                versificationType = versificationTypeDefault;
+            }
 
             // Set variables related to which language, translation, and testament to process.
             if (versificationFilename == "")
@@ -501,6 +541,15 @@ namespace Clear2
         {
             Console.WriteLine("Building Models");
 
+            if (runSpec.StartsWith("Machine;"))
+            {
+                var machineRunSpec = runSpec.Substring(runSpec.IndexOf(';') + 1);
+                string[] parts = machineRunSpec.Split(':');
+                if (parts[0] == "") runSpec += thotModel;
+                if (parts.Length < 2) runSpec += ":" + thotHeuristic;
+                if (parts.Length < 3) runSpec += ":" + thotIterations;
+            }
+
             DateTime dt = DateTime.Now;
             Console.WriteLine(dt.ToString("G"));
 
@@ -647,6 +696,20 @@ namespace Clear2
             Do_Button1(); // Auto align
 
             return "Done Processing.";
+        }
+
+        public static string Do_Button13()
+        {
+            Console.WriteLine("Doing FreshStart command");
+
+            Do_Button10(); // Copy Initial files
+            Do_Button11(); // Initialize State
+            Do_Button7(); // Tokenize
+            Do_Button8(); // Parallelize
+            Do_Button6(); // Create statistical models
+            Do_Button1(); // Auto align
+
+            return ("Done Processing.");
         }
 
         public static void ExportTranslationModel(TranslationModel model, string filename)
@@ -814,6 +877,10 @@ namespace Clear2
 
         private static string runSpec; // 1:10;H:5
         private static double epsilon; // Must exceed this to be counted into model, 0.1
+        private static string thotModel; // For SIL auto aligner interations
+        private static string thotHeuristic; // For SIL auto aligner interations
+        private static string thotIterations; // For SIL auto aligner interations
+        private static bool smtContentWordsOnly; // Use only content words for creating the statistical models: transModel and alignModel
         private static bool useAlignModel; // whether to use the alignment model
         private static bool contentWordsOnly; // whether to align content words only
 
@@ -829,7 +896,7 @@ namespace Clear2
         private static string alignModelFile; // the file that contains the alignment model;
         // private static AlignmentModel alignModel; // alignment model
         private static AlignmentModel alignmentModel; // alignment model
-        private static AlignmentModel preAlignment; // alignment table
+        // private static AlignmentModel preAlignment; // alignment table
 
         private static string glossFilename; // 2020.07.11 CL: The file where the source glosses are kept.
         private static string glossFile; // 2020.07.11 CL: The file where the source glosses are kept.
@@ -839,11 +906,12 @@ namespace Clear2
         private static string puncsFile; // 2020.07.11 CL: The file where the source punctuations kept.
         private static List<string> puncs; // list of punctuation marks
 
-        private static string versificationFilenameDefault; // default versification file
+        private static string versificationFilenameDefault; // default versification
+        private static string versificationTypeDefault; // default versification type
         private static string versificationFilename; // versification file
         private static string versificationFile; // versification file
         private static string versificationType; // versification type
-        private static ArrayList versificationList; // list of source-target verse pairs
+        // private static ArrayList versificationList; // list of source-target verse pairs
         private static SimpleVersification simpleVersification;
 
         private static string jsonOutputFilename; // output of aligner in JSON
@@ -878,20 +946,20 @@ namespace Clear2
 
         private static string tmFilename; // translation memory file
         private static string tmFile; // translation memory file
-        private static Hashtable tm; // translation memory
+        // private static Hashtable tm; // translation memory
 
         private static string freqPhrasesFilename; // the file that contains frequent phrases
         private static string freqPhrasesFile; // the file that contains frequent phrases
-        private static Hashtable freqPhrases; // table of frequent phrases
+        // private static Hashtable freqPhrases; // table of frequent phrases
 
         private static string sourceFuncWordsFilename; 
         private static string sourceFuncWordsFile;
-        private static List<string> sourceFuncWords; // function words
+        // private static List<string> sourceFuncWords; // function words
         private static List<string> sourceFunctionWords; // function words
 
         private static string targetFuncWordsFilename; // 2020.07.10 CL: Added this to make it global to this form since targetFuncWords is global.
         private static string targetFuncWordsFile; // 2020.07.10 CL: Added this to make it global to this form since targetFuncWords is global.
-        private static List<string> targetFuncWords;
+        // private static List<string> targetFuncWords;
         private static List<string> targetFunctionWords;
 
         private static string strongFilename;

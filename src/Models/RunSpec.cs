@@ -57,6 +57,50 @@ namespace Models
       return modelSpecList;
     }
 
+    public static List<ModelSpec> ParseMachineModelList(string spec)
+    {
+      List<ModelSpec> modelSpecList = new List<ModelSpec>();
+      string[] strArray1 = spec.Split(';');
+      if (strArray1.Length == 0)
+        return (List<ModelSpec>)null;
+      foreach (string str in strArray1)
+      {
+
+        char[] chArray = new char[1] { ':' };
+        string[] strArray2 = str.Split(chArray);
+        // int result;
+        // if (strArray2.Length != 2 || !int.TryParse(strArray2[1], out result) || result <= 0)
+        //   return (List<ModelSpec>)null;
+        int result = 1;
+        Model model;
+        switch (strArray2[0].ToUpper())
+        {
+          case "1":
+          case "IBM1":
+          case "MODEL1":
+            model = Model.Model1;
+            break;
+          case "2":
+          case "IBM2":
+          case "MODEL2":
+            model = Model.Model2;
+            break;
+          case "H":
+          case "HMM":
+            model = Model.HMM;
+            break;
+          case "F":
+          case "FASTALIGN":
+            model = Model.FastAlign;
+            break;
+          default:
+            return (List<ModelSpec>)null;
+        }
+        modelSpecList.Insert(0, new ModelSpec(model, result));
+      }
+      return modelSpecList;
+    }
+
     public static SymmetrizationType ParseSymmetrization(string spec)
     {
       switch (spec.ToUpper())

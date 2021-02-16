@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Xml;
 
-namespace Clear2
+namespace Clear3_Tool
 {
     class Configuration
     {

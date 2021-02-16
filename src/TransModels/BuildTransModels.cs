@@ -40,7 +40,7 @@ namespace TransModels
                 modelBuilder.TargetFile = targetFile;
                 modelBuilder.RunSpecification = runSpec;
 
-                // If you don't specify, you get no symmetry
+                // If you don't specify, you get no symmetry. Heuristics avaliable are "Diag", "Max",  "Min", "None", "Null"
                 modelBuilder.Symmetrization = SymmetrizationType.Min;
 
                 //Train the model
@@ -73,38 +73,32 @@ namespace TransModels
             int i = 0;
             foreach (List<Alignment> alignments in allAlignments)
             {
-                /*
-                string sourceWords = sourceIdList[i];
-                string targetWords = targetIdList[i];
-                string[] sWords = sourceWords.Split();
-                string[] tWords = targetWords.Split();
-                */
+                string sourceLine = sourceIdList[i];
+                string targetLine = targetIdList[i];
 
-                var sourceIDs = SplitIDs(sourceIdList[i]);
-                var targetIDs = SplitIDs(targetIdList[i]);
-
-                foreach (Alignment alignment in alignments)
+                // It may happen that the target line is blank since all words were identified as function words if doing only content words.
+                if ((sourceLine != "") && (targetLine != ""))
                 {
-                    int sourceIndex = alignment.Source;
-                    int targetIndex = alignment.Target;
-                    double prob = alignment.AlignProb;
-                    try
-                    {
-                        /*
-                        string sourceWord = sWords[sourceIndex];
-                        string targetWord = tWords[targetIndex];
-                        string sourceID = sourceWord.Substring(sourceWord.LastIndexOf('_') + 1); // sourceWord = "word_ID"
-                        string targetID = targetWord.Substring(targetWord.LastIndexOf('_') + 1); // targetWord = "word_ID"
-                        */
-                        var sourceID = sourceIDs[sourceIndex];
-                        var targetID = targetIDs[targetIndex];
+                    var sourceIDs = SplitIDs(sourceLine);
+                    var targetIDs = SplitIDs(targetLine);
 
-                        string pair = sourceID + "-" + targetID;
-                        alignModel.Add(pair, prob);
-                    }
-                    catch
+                    foreach (Alignment alignment in alignments)
                     {
-                        Console.WriteLine("ERROR in GetAlignmentModel() Index out of bound: Line {0}, source {1}/{2} target {3}/{4}", i+1, sourceIndex, sourceIDs.Length, targetIndex, targetIDs.Length);
+                        int sourceIndex = alignment.Source;
+                        int targetIndex = alignment.Target;
+                        double prob = alignment.AlignProb;
+                        try
+                        {
+                            var sourceID = sourceIDs[sourceIndex];
+                            var targetID = targetIDs[targetIndex];
+
+                            string pair = sourceID + "-" + targetID;
+                            alignModel.Add(pair, prob);
+                        }
+                        catch
+                        {
+                            Console.WriteLine("ERROR in GetAlignmentModel() Index out of bound: Line {0}, source {1}/{2} target {3}/{4}", i + 1, sourceIndex, sourceIDs.Length, targetIndex, targetIDs.Length);
+                        }
                     }
                 }
 
@@ -155,7 +149,7 @@ namespace TransModels
 
             sw.Close();
 
-            // WriteAlignModelSorted(table, file);
+            WriteAlignModelSorted(table, file);
         }
 
         static void WriteAlignModelSorted(Hashtable table, string file)
@@ -239,7 +233,7 @@ namespace TransModels
 
             sw.Close();
 
-            // WriteTransModelSorted(model, file);
+            WriteTransModelSorted(model, file);
         }
 
         static void WriteTransModelSorted(Hashtable model, string file)
