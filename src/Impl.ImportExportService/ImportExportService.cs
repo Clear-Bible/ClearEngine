@@ -282,11 +282,23 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         }
 
 
-        // Input file has lines of the form:
-        //   link count
-        // Output datum is of the form
-        //   Hashtable(link => count)
-        //
+        /// <summary>
+        /// Obtain a good links or bad links dictionary from a legacy
+        /// file format used in Clear2.
+        /// </summary>
+        /// <remarks>
+        /// The intent is to collect information about the judgments 
+        /// made when checking alignments manually or otherwise performing
+        /// manual linking.
+        /// </remarks>
+        /// <returns>
+        /// A Dictionary that maps a string of the form xxx#yyy (where xxx
+        /// is a lemma and yyy is a lowercased target text) to a count.
+        /// The meaning is that an association between the lemma
+        /// and the lowercased target text was found to be good (or bad)
+        /// for the count number of times.
+        /// </returns>
+        /// 
         public Dictionary<string, int> GetXLinks(string file)
         {
             Dictionary<string, int> xLinks = new Dictionary<string, int>();
@@ -527,9 +539,21 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                     sourceVerse = new VerseID(mb, mc, mv),
                     targetVerse = new VerseID(tb, tc, tv);
 
+                // 2021.01.05 CL: The original code had the bug below.
+                // 2020.10.22 CL: Bug in the following code. It does not check to see if a verse is already in the list before adding it.
+                // Pairing seems to be loose in that there is transitivity assumed in the pairing. 
+                // So if X1-Y1, X1-Y2, and then:
+                //   (a) X2-Y2 then it assumes X2-Y1 
+                //   (b) X2-Y1 then it assume X2-Y2
+
                 if (currentSourceVerses.Contains(sourceVerse))
                 {
-                    currentTargetVerses.Add(targetVerse);
+                    // 2021.01.05 CL: The original code had the bug below.
+                    // 2020.10.22 CL: Bug. Didn't check to see if it already is in the list.
+                    if (!currentTargetVerses.Contains(targetVerse))
+                    {
+                        currentTargetVerses.Add(targetVerse);
+                    } 
                 }
                 else if (currentTargetVerses.Contains(targetVerse))
                 {

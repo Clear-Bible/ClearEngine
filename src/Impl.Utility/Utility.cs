@@ -32,6 +32,10 @@ namespace ClearBible.Clear3.Impl.Utility
                     tv => tv);
 
             // For each zone specification in the simple versification:
+            // CL: This seems very inefficient going from the versification to the actual verses you have.
+            // If you only have one verse, it would go through all the zoneSpecs just to match with one verse.
+            // Or even if there is a whole NT, you go through the whole OT before finding a verse match.
+            // It seems it would be better to go from the verses you have, find the versification, and then create the parallel corpora.
             foreach (SimpleZoneSpec zoneSpec in simpleVersification.List)
             {
                 // Get the Target objects for the verses in this zone,

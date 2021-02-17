@@ -512,16 +512,22 @@ namespace ClearBible.Clear3.API
         /// not participate in linking.
         /// </param>
         /// <param name="goodLinks">
-        /// A database of lemma-to-target-text links that were considered
-        /// good during past manual checking, with counts of how many times.
+        /// A dictionary mapping strings of the form xxx#yyy (where xxx is
+        /// a lemma and yyy is a lower-cased target text) to a count,
+        /// representing that the association between the lemma and the
+        /// target text has been found to be good for the count number of
+        /// times.
         /// </param>
         /// <param name="goodLinkMinCount">
         /// The count threshold at which the auto-aligner algorithm will
         /// allow a good link to influence the auto alignment.
         /// </param>
         /// <param name="badLinks">
-        /// A database of lemma-to-target-text links that were considered
-        /// bad during past manual checking, with counts of how many times.
+        /// A dictionary mapping strings of the form xxx#yyy (where xxx is
+        /// a lemma and yyy is a lower-cased target text) to a count,
+        /// representing that the association between the lemma and the
+        /// target text has been found to be good for the count number of
+        /// times.
         /// </param>
         /// <param name="badLinkMinCount">
         /// The count threshold at which the auto-aligner algorithm will

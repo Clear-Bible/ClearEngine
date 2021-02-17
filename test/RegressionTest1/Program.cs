@@ -52,7 +52,7 @@ namespace RegressionTest1
             // Prepare for input and output.
 
             // option = 0 for Brief, 1 for Long.
-            int option = 0;
+            int option = 1;
 
             string[] inputFolders = { "InputBrief", "InputLong" };
             string[] outputFolders = { "OutputBrief", "OutputLong" };
