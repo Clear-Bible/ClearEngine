@@ -148,11 +148,9 @@ namespace TransModels
             }
 
             sw.Close();
-
-            WriteAlignModelSorted(table, file);
         }
 
-        static void WriteAlignModelSorted(Hashtable table, string file)
+        public static void WriteAlignModelSorted(Hashtable table, string file)
         {
             int extIndex = file.LastIndexOf(".");
             string fileOut = file.Substring(0, extIndex) + "-sorted" + file.Substring(extIndex);
@@ -187,6 +185,7 @@ namespace TransModels
 
                 sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}", pair, prob));
             }
+
             sw.Close();
         }
 
@@ -232,11 +231,9 @@ namespace TransModels
             }
 
             sw.Close();
-
-            WriteTransModelSorted(model, file);
         }
 
-        static void WriteTransModelSorted(Hashtable model, string file)
+        public static void WriteTransModelSorted(Hashtable model, string file)
         {
             int extIndex = file.LastIndexOf(".");
             string fileOut = file.Substring(0, extIndex) + "-sorted" + file.Substring(extIndex);
