@@ -59,5 +59,57 @@ namespace ClearBible.Clear3.SubTasks
 
             return align;
         }
+
+        // TODO: WORKING-HERE
+        public static LegacyPersistentAlignment Run2(
+            List<ZonePair> zonePairs,
+            ITreeService treeService,
+            Dictionary<string, Gloss> glossTable,
+            IAutoAlignAssumptions assumptions)
+        {
+            IClear30ServiceAPI clearService =
+                Clear30Service.FindOrCreate();
+
+            IAutoAlignmentService autoAlignmentService =
+                clearService.AutoAlignmentService;
+
+            IPersistence outputService =
+                clearService.Persistence;
+
+
+            // This map of group key to position of primary
+            // word within group is required for output; just
+            // use an empty Dictionary.
+            Dictionary<string, int> primaryPositions =
+                new Dictionary<string, int>();
+
+            LegacyPersistentAlignment align = new LegacyPersistentAlignment()
+            {
+                Lines =
+                    zonePairs
+                    .Select(zonePair =>
+                    {
+                        ZoneMonoAlignment zoneMonoAlignment =
+                            autoAlignmentService.AlignZone2(
+                                treeService,
+                                zonePair,
+                                assumptions);
+
+                        ZoneMultiAlignment zoneMultiAlignment =
+                            autoAlignmentService.ConvertToZoneMultiAlignment(
+                                zoneMonoAlignment);
+
+                        return
+                            outputService.GetLpaLine(
+                                zoneMultiAlignment,
+                                glossTable,
+                                primaryPositions);
+                    })
+                    .ToArray()
+            };
+
+            return align;
+        }
+
     }
 }

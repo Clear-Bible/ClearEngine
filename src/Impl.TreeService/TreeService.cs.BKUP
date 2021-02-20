@@ -123,39 +123,6 @@ namespace ClearBible.Clear3.Impl.TreeService
         }
 
 
-        // NOTE: This is for fixing issue with non-contiguous source verses.
-        public XElement GetTreeNodeNonContiguous(List<VerseID> verseIDs)
-        {
-            // Get start chapter
-            VerseID start = verseIDs.First();
-            VerseID end = verseIDs.Last();
-            ChapterID chapterID = start.ChapterID;
-            PreloadTreesForChapter(chapterID);
-            
-            List<XElement> verseTrees = new List<XElement>();
-
-            foreach(VerseID verseID in verseIDs)
-            {
-                if (_trees2.TryGetValue(verseID, out XElement subTree))
-                {
-                    verseTrees.Add(subTree);
-                }                
-            }
-
-            if (verseTrees.Count == 1)
-            {
-                return verseTrees[0];
-            }
-            else
-            {
-                return CombineTrees(verseTrees);
-            }
-
-        } 
-
-
-
-
         /// <summary>
         /// Get a tree node that covers a specified verse range.
         /// The result might be a newly constructed node to cover

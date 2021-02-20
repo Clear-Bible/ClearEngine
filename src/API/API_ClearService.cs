@@ -433,6 +433,13 @@ namespace ClearBible.Clear3.API
     /// 
     public interface IAutoAlignmentService
     {
+
+        ZoneMonoAlignment AlignZone2(
+            ITreeService iTreeService,
+            ZonePair zonePair,
+            IAutoAlignAssumptions autoAlignAssumptions);
+
+
         /// <summary>
         /// Perform tree-based auto-alignment for a single zone.
         /// </summary>

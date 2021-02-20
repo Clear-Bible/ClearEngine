@@ -16,6 +16,56 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// 
     public class ZoneAlignment
     {
+
+
+        public static ZoneMonoAlignment AlignZone2(
+            ITreeService iTreeService,
+            ZonePair zonePair,
+            IAutoAlignAssumptions autoAlignAssumptions)
+        {
+            // Convert ITreeService to concrete type for internal
+            // use.
+            TreeService.TreeService treeService =
+                (TreeService.TreeService)iTreeService;
+
+            // Extract VerseID list from SourceZone
+            List<VerseID> verseIDs = new List<VerseID>();
+
+            foreach (Source source in zonePair.SourceZone.List)
+            {
+                verseIDs.Add(source.SourceID.VerseID);
+            } 
+
+            // Get the syntax tree node corresponding to the source
+            // verse range.
+            XElement treeNode = treeService.GetTreeNodeNonContiguous(
+                verseIDs
+            );
+
+            // TODO: WORKING-HERE!
+
+            // Construct a context for the zone with the source
+            // points and target points.
+            ZoneContext zoneContext = new ZoneContext(
+                GetSourcePoints(treeNode),
+                GetTargetPoints(zonePair.TargetZone.List));
+
+            // Perform an auto alignment based on the zone context,
+            // the tree service, and the requirements.
+            List<MonoLink> monoLinks =
+                GetMonoLinks(
+                    treeNode,
+                    zoneContext.SourcePoints,
+                    zoneContext.TargetPoints,
+                    autoAlignAssumptions);
+
+            return new ZoneMonoAlignment(zoneContext, monoLinks);
+        }
+
+
+
+
+
         /// <summary>
         /// Perform tree-based auto-alignment for a single zone.
         /// </summary>
@@ -100,6 +150,44 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     term,
                     sourceID = term.SourceID(),
                     surface = term.Surface(),
+                    altId = $"{term.Surface()}-{term.SourceID().AsCanonicalString}",
+                    treePosition = n
+                })
+                .OrderBy(x => x.sourceID.AsCanonicalString)
+                .Select((x, m) => new SourcePoint(
+                    Lemma: x.term.Lemma(),
+                    Terminal: x.term,
+                    SourceID: x.sourceID,
+                    AltID: x.altId,
+                    TreePosition: x.treePosition,
+                    RelativeTreePosition: x.treePosition / totalSourcePoints,
+                    SourcePosition: m))
+                .ToList();
+        }
+
+        // TODO: DELETE-IT later. This is a bakup of GetSourcePoints() above.
+        public static List<SourcePoint> GetSourcePoints_BKUP(XElement treeNode)
+        {
+            // Get the terminal nodes beneath the specified syntax
+            // tree node.
+            List<XElement> terminals = treeNode.GetTerminalNodes();
+
+            // Prepare to compute fractional positions.
+            double totalSourcePoints = terminals.Count();
+
+            // Starting from the terminal nodes, get the source ID and
+            // surface text for each terminal, then group the sequence
+            // by the surface text and number the nodes within these
+            // subgroups to create alternate IDs, then sort by source ID
+            // (to achieve manuscript order), and finally produce an
+            // appropriate SourcePoint for each member for the sequence.
+            return
+                terminals
+                .Select((term, n) => new
+                {
+                    term,
+                    sourceID = term.SourceID(),
+                    surface = term.Surface(),
                     treePosition = n
                 })
                 .GroupBy(x => x.surface)
@@ -108,10 +196,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     {
                         x.term,
                         x.sourceID,
-                        altID = $"{x.surface}-{groupIndex + 1}",
+                        // TODO: DELETE-IT later
+                        // TODO: WORKING-HERE
+                        //altID = $"{x.surface}-{groupIndex + 1}",
+                        altID = $"{x.surface}-{x.term.SourceID().AsCanonicalString}",
                         x.treePosition
                     }))
-                .OrderBy(x => x.sourceID.AsCanonicalString)
+                //.OrderBy(x => x.sourceID.AsCanonicalString)
                 .Select((x, m) => new SourcePoint(
                     Lemma: x.term.Lemma(),
                     Terminal: x.term,
@@ -185,10 +276,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             )
         {
             // Prepare to look up source points by alternate ID.
-            Dictionary<string, string> sourceAltIdMap =
-                sourcePoints.ToDictionary(
-                    sp => sp.SourceID.AsCanonicalString,
-                    sp => sp.AltID);
+            Dictionary<string, string> sourceAltIdMap = null;
+            try 
+            {
+                sourceAltIdMap =
+                    sourcePoints.ToDictionary(
+                        sp => sp.SourceID.AsCanonicalString,
+                        sp => sp.AltID);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Related SourcePoints");
+                foreach (SourcePoint spoint in sourcePoints)
+                {
+                    Console.WriteLine(spoint.ToString());
+                }
+            }
 
             // Get the verseID from the tree, and the old links
             // corresponding to that verse.

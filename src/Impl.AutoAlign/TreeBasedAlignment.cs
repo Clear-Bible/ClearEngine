@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Impl.TreeService;
 
+
 namespace ClearBible.Clear3.Impl.AutoAlign
 {
     /// <summary>
@@ -228,13 +229,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int maxPaths,
             List<List<Candidate>> childCandidatesList)
         {
-            // Compute the maximum number of alternatives as the product of
+            // - Compute the maximum number of alternatives as the product of
             // the numbers of alternatives for all of the children.
-            // FIXME: what about overflow?
+            // - Peek if the next product of current number and size of candidate
+            // is bigger than Int32.MaxValue. If so, set maxArcs = Int32.MaxValue
+            // in order to prevent an integer overflow.
+            int maxNum = Int32.MaxValue;
             int maxArcs =
                 childCandidatesList
                 .Select(candidates => candidates.Count)
-                .Aggregate(1, (product, n) => product * n);
+                .Aggregate(
+                    1, 
+                    (nArcs, n) => nArcs > maxNum / n ? maxNum : nArcs * n
+                );     
+
 
             // Compute the maximum length of the sublists of alternatives
             // for the children.
@@ -245,9 +253,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Max();
 
             // If the maximum number of alternatives exceeds maxPaths:
-            // FIXME: I think the test maxArcs <0 is in case the product
-            // above overflows; is this strategy adequate?
-            if (maxArcs > maxPaths || maxArcs <= 0)
+            if (maxArcs > maxPaths)
             {
                 // Adjust maxdepths so that its n-th power is at most
                 // maxPaths, where n is the number of children.
@@ -268,8 +274,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         maxDepth,
                         childCandidatesList);
             }
-            catch
+            catch (OutOfMemoryException ome)
             {
+                string mssg = 
+                    "Excessive memory use in creating alternative alignment paths.";
+                // Log exception
+                Console.WriteLine($"{mssg}: {ome}");
+
+                // Throw descriptive Clear3 exception 
+                throw new ExcessiveMemoryUsageException(mssg, ome);
+            }
+            catch (Exception e) // Handling other (unknown) exceptions
+            {
+                string mssg = 
+                    "Exception happened in creating alternative alignment paths";
+                Console.WriteLine($"{mssg}: {e}");
+                throw new ClientException(mssg, e);
+
+                /* 
+                // TODO: DELETE-IT later.
+
                 // I think this block is meant to catch memory overflow.
                 // It is leftover from Clear2.
 
@@ -303,6 +327,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 depth_N_paths = CreatePaths(
                     maxPaths / 2,
                     childCandidatesList);
+                */
             }
 
             return depth_N_paths;

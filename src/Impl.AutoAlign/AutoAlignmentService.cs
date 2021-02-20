@@ -23,6 +23,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// 
     public class AutoAlignmentService : IAutoAlignmentService
     {
+        
+        public ZoneMonoAlignment AlignZone2(
+            ITreeService iTreeService,
+            ZonePair zonePair,
+            IAutoAlignAssumptions autoAlignAssumptions)
+        {
+            // Delegate to AlignZone static method of
+            // the ZoneAlignment class.
+            return ZoneAlignment.AlignZone2(
+                iTreeService,
+                zonePair,
+                autoAlignAssumptions);
+        }
+        
+        
+        
         /// <summary>
         /// (Implementation of IAutoAlignmentService.AlignZone)
         /// </summary>

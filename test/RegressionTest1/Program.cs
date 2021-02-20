@@ -180,7 +180,7 @@ namespace RegressionTest1
             // the content words included) to state the zone alignment
             // problems for the tree-based auto-aligner.
 
-            List<ZoneAlignmentProblem> zoneAlignmentProblems =
+            List<ZoneAlignmentProblem> zoneAlignmentProblems = 
                 parallelCorpora.List
                 .Select(zonePair =>
                     new ZoneAlignmentProblem(
@@ -225,12 +225,23 @@ namespace RegressionTest1
 
             Console.WriteLine("Auto Alignment");
 
+            /*
+            // TODO: DELETE-IT later
             LegacyPersistentAlignment alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
                     zoneAlignmentProblems,
                     treeService,
                     glossTable,
                     assumptions);
+            */
+
+            LegacyPersistentAlignment alignment =
+                AutoAlignFromModelsNoGroupsSubTask.Run2(
+                    parallelCorpora.List,
+                    treeService,
+                    glossTable,
+                    assumptions
+                );
 
 
             // Export the persistent-format datum to a file.

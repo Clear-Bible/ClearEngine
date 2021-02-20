@@ -41,8 +41,8 @@ namespace RegressionTest3
 
             // Establish input and output folders.
 
-            string inputFolder = Path.Combine(".", "Input");
-            string outputFolder = Path.Combine(".", "Output");
+            string inputFolder = Path.Combine(".", "Input2");
+            string outputFolder = Path.Combine(".", "Output2");
 
             string InPath(string path) => Path.Combine(inputFolder, path);
             string OutPath(string path) => Path.Combine(outputFolder, path);

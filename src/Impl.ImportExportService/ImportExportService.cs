@@ -54,6 +54,9 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             // Prepare to collect TargetVerse objects.
             List<TargetVerse> targetsList2 = new();
 
+            // Comment chars that is used to indicate comment lines inside of verse file.
+            string commentChars = "//";
+
             // Reading from the input file:
             using (StreamReader sr = new StreamReader(path, Encoding.UTF8))
             {
@@ -63,6 +66,11 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                 // For each input line:
                 while ((line = sr.ReadLine()) != null)
                 {
+
+                    // Ignore comment line inside of Verse.txt file
+                    // indicated with currently used comment chars
+                    if (line.StartsWith(commentChars)) continue;    
+
                     // Only process lines with more than 9 characters.
                     if (line.Trim().Length < 9) continue;
 
@@ -275,12 +283,21 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             }
 
             // How to report an error:
-            void error(int index, string msg)
+
+            void error(int index, string reason)
+            {
+                string mssg = $"{filePath} line {index + 1}: {reason}";
+                throw new InvalidInputException(mssg);
+            }
+
+            /* TODO: DELETE-IT later.
+            void error_BKUP(int index, string msg)
             {
                 throw new ClearException(
                     $"{filePath} line {index + 1}: {msg}",
                     StatusCode.InvalidInput);
             }
+            */
         }
 
 

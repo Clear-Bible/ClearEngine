@@ -8,6 +8,7 @@
     <ProjectReference Include="..\API\Api.csproj" />
     <ProjectReference Include="..\Impl.TreeService\Impl.TreeService.csproj" />
     <ProjectReference Include="..\Impl.Miscellaneous\Impl.Miscellaneous.csproj" />
+    <!-- <ProjectReference Include="..\Clear3ServiceException\Clear3ServiceException.csproj" /> -->
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

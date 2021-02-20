@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace ClearBible.Clear3.API
 {
+
+    /*
+    // TODO: DELETE-IT later.
+
     /// <summary>
     /// An exception that Clear3 services can throw.
     /// </summary>
@@ -43,6 +47,8 @@ namespace ClearBible.Clear3.API
         NullOrBlankKey,
         KeyIsNotPresent
     }
+
+     END OF DELETE-IT */
 
 
     /// <summary>
