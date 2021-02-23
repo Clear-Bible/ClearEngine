@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.IO;
 using System.Collections;
-using System.Globalization;
 
 using Models;
+
 using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Machine.Translation;
@@ -167,7 +164,7 @@ namespace TransModels
                     {
                         int sourceIndex = alignment.SourceIndex;
                         int targetIndex = alignment.TargetIndex;
-                        double prob = alignment.AlignmentProbability;
+                        double prob = alignment.AlignmentScore;
                         try
                         {
                             var sourceID = sourceIDs[sourceIndex];
@@ -400,7 +397,7 @@ namespace TransModels
             {
                 for (int j = 0; j < model.TargetWords.Count; j++)
                 {
-                   double prob = model.GetTranslationProbability(i, j); // Used to crash before return at the end of this function on KHOV NT
+                   double prob = model.GetTranslationScore(i, j); // Used to crash before return at the end of this function on KHOV NT
                     if (prob > epsilon)
                     {
                         string sourceWord = model.SourceWords[i];
@@ -437,7 +434,7 @@ namespace TransModels
             {
                 for (int j = 0; j < model.DirectWordAlignmentModel.TargetWords.Count; j++)
                 {
-                    double prob = model.DirectWordAlignmentModel.GetTranslationProbability(i, j);
+                    double prob = model.DirectWordAlignmentModel.GetTranslationScore(i, j);
                     if (prob > epsilon)
                     {
                         string sourceWord = model.DirectWordAlignmentModel.SourceWords[i];

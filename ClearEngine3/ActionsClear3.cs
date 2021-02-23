@@ -127,7 +127,7 @@ namespace ClearEngine3
             tokenLemmaFilename = (string)clearSettings["TokenLemmaFile"]; // e.g. "tokens.lower.txt", Not currently used
 
             sourceFilenameM = (string)clearSettings["SourceFileM"]; // e.g. 
-            sourceIdFilenameM = (string)clearSettings["SourceIdFileM"]; // e.g. 
+            sourceIdFilenameM = (string)clearSettings["SourceIdTextFileM"]; // e.g. 
             sourceIdLemmaFilenameM = (string)clearSettings["SourceIdLemmaFileM"]; // e.g. 
 
             sourceFilename = (string)clearSettings["SourceFile"]; // e.g. "source.txt"
@@ -140,10 +140,10 @@ namespace ClearEngine3
             targetPuncFilename = (string)clearSettings["TargetPuncFile"]; // e.g. "target.punc.txt"
             targetPuncLowerFilename = (string)clearSettings["TargetPuncLowerFile"]; // "target.punc.lower.txt", Not currently used
 
-            sourceFilename2 = (string)clearSettings["SourceFile2"]; // e.g "sourceFile.cw.txt", Should update variable to ...File
-            sourceIdFilename2 = (string)clearSettings["SourceIdFile2"]; // e.g "sourceFile.id.cw.txt", Should update variable to ...File
-            targetFilename2 = (string)clearSettings["TargetFile2"]; // e.g "targetFile.cw.txt", Should update variable to ...File
-            targetIdFilename2 = (string)clearSettings["TargetIdFile2"]; // e.g "targetFile.id.cw.txt", Should update variable to ...File
+            sourceFilenameCW = (string)clearSettings["SourceFile2"]; // e.g "sourceFile.cw.txt", Should update variable to ...File
+            sourceIdFilenameCW = (string)clearSettings["SourceIdFile2"]; // e.g "sourceFile.id.cw.txt", Should update variable to ...File
+            targetFilenameCW = (string)clearSettings["TargetFile2"]; // e.g "targetFile.cw.txt", Should update variable to ...File
+            targetIdFilenameCW = (string)clearSettings["TargetIdFile2"]; // e.g "targetFile.id.cw.txt", Should update variable to ...File
 
             //============================ Output Files Only ============================
             // Files not part of the state, nor used as output/input to pass data between different functions
@@ -174,9 +174,10 @@ namespace ClearEngine3
             translationFolder = Path.Combine(processingFolder, project);
             translationConfigFile = Path.Combine(translationFolder, translationConfigFilename);
 
+            // If there is not a specific translaiton configuration file (which there should be), use the generic/default one.
             if (!File.Exists(translationConfigFile))
             {
-                translationConfigFile = Path.Combine(resourcesFolder, translationConfigFilename);
+                translationConfigFile = translationConfigFilename;
             }
 
             translationSettings = Configuration.GetSettings(translationConfigFile);
@@ -231,15 +232,15 @@ namespace ClearEngine3
             sourceIdLemmaFile = Path.Combine(targetFolder, sourceIdLemmaFilename);
             targetFile = Path.Combine(targetFolder, targetFilename);
             targetIdFile = Path.Combine(targetFolder, targetIdFilename);
-            targetLowerIdFile = Path.Combine(targetFolder, targetIdLemmaFilename);
+            targetIdLemmaFile = Path.Combine(targetFolder, targetIdLemmaFilename);
 
             targetPuncFile = Path.Combine(targetFolder, targetPuncFilename);
             targetPuncLowerFile = Path.Combine(targetFolder, targetPuncLowerFilename);
 
-            sourceFile2 = Path.Combine(targetFolder, sourceFilename2);
-            sourceIdFile2 = Path.Combine(targetFolder, sourceIdFilename2);
-            targetFile2 = Path.Combine(targetFolder, targetFilename2);
-            targetIdFile2 = Path.Combine(targetFolder, targetIdFilename2);
+            sourceFileCW = Path.Combine(targetFolder, sourceFilenameCW);
+            sourceIdFileCW = Path.Combine(targetFolder, sourceIdFilenameCW);
+            targetFileCW = Path.Combine(targetFolder, targetFilenameCW);
+            targetIdFileCW = Path.Combine(targetFolder, targetIdFilenameCW);
 
             //============================ Output Files Only ============================
             jsonOutput = Path.Combine(targetFolder, jsonOutputFilename);
@@ -569,14 +570,14 @@ namespace ClearEngine3
             dt = DateTime.Now;
             Console.WriteLine(dt.ToString("G"));
 
-            ExportTranslationModel(translationModel, transModelFile);
-            ExportAlignmentModel(alignmentModel, alignModelFile);
-
             // Within the SMTService.DefaultSMT, it writes and reads from the file, so any double differences is already done.
             // No need to read them in again.
 
             // transModel = importExportService.ImportTranslationModel(transModelFile);
             // alignmentModel = importExportService.ImportAlignmentModel(alignModelFile);
+
+            Persistence.ExportTranslationModel(translationModel, transModelFile);
+            Persistence.ExportAlignmentModel(alignmentModel, alignModelFile);
 
             // 2020.06.29 CL: We updated alignModel so also need to update preAlignment.
             // preAlignment = Data.BuildPreAlignmentTable(alignModel);
@@ -616,6 +617,7 @@ namespace ClearEngine3
                 treeService,
                 simpleVersification);
 
+            Persistence.ExportParallelCorpora(parallelCorpora, sourceFile, sourceIdLemmaFile, targetFile, targetIdLemmaFile);
 
             // Remove functions words from the parallel corpora, leaving
             // only the content words for the SMT step to follow.
@@ -625,6 +627,8 @@ namespace ClearEngine3
                    parallelCorpora,
                    sourceFunctionWords,
                    targetFunctionWords);
+
+            Persistence.ExportParallelCorpora(parallelCorporaCW, sourceFileCW, sourceIdFileCW, targetFileCW, targetIdFileCW);
 
             return ("Parallel files have been created.");
         }
@@ -715,137 +719,6 @@ namespace ClearEngine3
             Do_Button1(); // Auto align
 
             return ("Done Processing.");
-        }
-
-        public static void ExportTranslationModel(TranslationModel model, string filename)
-        {
-            StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8);
-
-            foreach (var entry in model.Dictionary)
-            {
-                var source = entry.Key;
-                var translations = entry.Value;
-
-                foreach (var entry2 in translations)
-                {
-                    var target = entry2.Key;
-                    var probability = entry2.Value;
-
-                    sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}\t{2}", source.Text, target.Text, probability.Double));
-                }
-            }
-
-            sw.Close();
-
-            // 2020.07.09 CL: Modified to also write a sorted file. More convenient than running another program after this is done in order to compare.
-            WriteTransModelSorted(model, filename);
-        }
-
-        // 2020.07.09 CL: Although this is inefficient code, by reading in the file again, we make sure we will have the same double value (replicate read method)
-        // Basically uses the same code as the independent program previously written. Could use model rather than read in file.
-        static void WriteTransModelSorted(TranslationModel model, string file)
-        {
-            int extIndex = file.LastIndexOf('.');
-            string fileOut = file.Substring(0, extIndex) + "-sorted" + file.Substring(extIndex);
-
-            StreamWriter sw = new StreamWriter(fileOut, false, Encoding.UTF8);
-
-            var translationsProb = new SortedDictionary<string, double>(); // Use this to sort the data
-
-            foreach (var entry in model.Dictionary)
-            {
-                var source = entry.Key.Text;
-                var translations = entry.Value;
-
-                foreach (var entry2 in translations)
-                {
-                    var target = entry2.Key.Text;
-                    var prob = entry2.Value.Double;
-
-                    string keyFraction = string.Format("{0}", 1 - prob); // Subtract from 1 to get probability in decreasing order.
-                    string keyProb = source + " \t " + keyFraction + " \t " + target; // Need to include Ibaas in key since keys but be unique.
-
-                    if (!translationsProb.ContainsKey(keyProb)) // Entry doesn't exist
-                    {
-                        translationsProb.Add(keyProb, prob); // Frequency order is from low to high. We would have to change the default function for comparing strings to change this order.
-                    }
-                    else // This should never be the case that there would be duplicate key but different probablity.
-                    {
-                        double oldProb = translationsProb[keyProb];
-                        Console.WriteLine("Duplicate Data in WriteTransModelSorted: {0} {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb);
-                        sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "// Duplicate Data in WriteTransModelSorted: source = {0} target = {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb));
-                    }
-                }
-            }
-
-            // Write ordered file by source then frequency
-            foreach (KeyValuePair<string, double> entry in translationsProb)
-            {
-                string[] parts = entry.Key.Split('\t');
-                string source = parts[0].Trim();
-                string target = parts[2].Trim();
-                double prob = entry.Value;
-
-                sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}\t{2}", source, target, prob)); // If we want to make this sorted file more readable, we could change it to .txt files with " # " or "\t#\t" as the separator.
-            }
-
-            sw.Close();
-        }
-
-        public static void ExportAlignmentModel(AlignmentModel table, string filename)
-        {
-            StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8);
-
-            foreach (var entry in table.Dictionary)
-            {
-                var bareLink = entry.Key;
-                var prob = entry.Value;
-
-                sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}-{1}\t{2}", bareLink.SourceID.AsCanonicalString, bareLink.TargetID.AsCanonicalString, prob.Double));
-            }
-
-            sw.Close();
-
-            WriteAlignModelSorted(table, filename);
-        }
-
-        // 2020.07.09 CL: Although this is inefficient code, by reading in the file again, we make sure we will have the same double value (replicate read method)
-        // Basically uses the same code as the independent program previously written. Could use model rather than read in file.
-        static void WriteAlignModelSorted(AlignmentModel table, string file)
-        {
-            int extIndex = file.LastIndexOf('.');
-            string fileOut = file.Substring(0, extIndex) + "-sorted" + file.Substring(extIndex);
-
-            StreamWriter sw = new StreamWriter(fileOut, false, Encoding.UTF8);
-
-            var sortedModel = new SortedDictionary<string, double>(); // Use this to sort the data
-
-            foreach (var entry in table.Dictionary)
-            {
-                var bareLink = entry.Key;
-                var prob = entry.Value.Double;
-                string pair = bareLink.SourceID.AsCanonicalString + "-" + bareLink.TargetID.AsCanonicalString;
-
-                if (!sortedModel.ContainsKey(pair)) // Entry doesn't exist
-                {
-                    sortedModel.Add(pair, prob);
-                }
-                else // This should never be the case, but it might if the previous file was not created correctly.
-                {
-                    double oldProb = sortedModel[pair];
-                    Console.WriteLine("Duplicate Data: {0} with probability {1}. Old probablity is {2}.", pair, prob, oldProb);
-                }
-            }
-
-            // Write ordered file
-            foreach (KeyValuePair<string, double> entry in sortedModel)
-            {
-                string pair = entry.Key;
-                double prob = entry.Value;
-
-                sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}", pair, prob)); // If we want to make this sorted file more readable, we could change it to .txt files with " # " or "\t#\t" as the separator.
-            }
-            sw.Close();
         }
 
         private static IClear30ServiceAPI clearService;
@@ -1001,21 +874,21 @@ namespace ClearEngine3
         private static string targetIdFilename;
         private static string targetIdFile;
         private static string targetIdLemmaFilename;
-        private static string targetLowerIdFile;
+        private static string targetIdLemmaFile;
 
         private static string targetPuncFilename;
         private static string targetPuncFile;
         private static string targetPuncLowerFilename;
         private static string targetPuncLowerFile;
 
-        private static string sourceFilename2;
-        private static string sourceFile2;
-        private static string sourceIdFilename2;
-        private static string sourceIdFile2;
-        private static string targetFilename2;
-        private static string targetFile2;
-        private static string targetIdFilename2;
-        private static string targetIdFile2;
+        private static string sourceFilenameCW;
+        private static string sourceFileCW;
+        private static string sourceIdFilenameCW;
+        private static string sourceIdFileCW;
+        private static string targetFilenameCW;
+        private static string targetFileCW;
+        private static string targetIdFilenameCW;
+        private static string targetIdFileCW;
 
         private static string versesFilename; // Input file with verses on separate lines previxed with verseID.
         private static string versesFile; // Input file with verses on separate lines previxed with verseID.
