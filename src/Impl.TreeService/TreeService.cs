@@ -132,9 +132,18 @@ namespace ClearBible.Clear3.Impl.TreeService
             ChapterID chapterID = start.ChapterID;
             PreloadTreesForChapter(chapterID);
             
-            List<XElement> verseTrees = new List<XElement>();
+            // Remove redundant items in verseIDs using HashSet
+            HashSet<VerseID> verseIDSet = new HashSet<VerseID>(new VerseIDComparer());
 
             foreach(VerseID verseID in verseIDs)
+            {
+                verseIDSet.Add(verseID);
+            }
+
+            List<VerseID> distinctVerseIDs = verseIDSet.ToList();
+            List<XElement> verseTrees = new List<XElement>();
+
+            foreach(VerseID verseID in distinctVerseIDs)
             {
                 if (_trees2.TryGetValue(verseID, out XElement subTree))
                 {
@@ -154,8 +163,6 @@ namespace ClearBible.Clear3.Impl.TreeService
         } 
 
 
-
-
         /// <summary>
         /// Get a tree node that covers a specified verse range.
         /// The result might be a newly constructed node to cover
@@ -163,6 +170,9 @@ namespace ClearBible.Clear3.Impl.TreeService
         /// fits in the chapter of the starting verse together with
         /// the chapter before and the chapter after (where these
         /// chapters exist in the same book).
+        //  MK : This method has a limitation and only processes 
+        //       contiguous verseIDs. Currently, it is not used.
+        //       Keep this for legacy purpose.
         /// </summary>
         /// <param name="start">Starting verse.</param>
         /// <param name="end">Ending verse.</param>
@@ -315,6 +325,16 @@ namespace ClearBible.Clear3.Impl.TreeService
             // resulting sequence by source ID (thereby achieving
             // manuscript order), and convert the results to
             // a sequence of Source objects.
+
+
+            // TODO: DELETE-IT later
+            // NOTE: For debugging
+            if ( verseID.AsCanonicalString.Equals("010100110011") )
+            {
+                Console.WriteLine("You hit the target verse id");
+            }
+
+
             return new SourceVerse(
                 GetChapterSubrange(
                     verseID.Book,
@@ -571,4 +591,18 @@ namespace ClearBible.Clear3.Impl.TreeService
         /// 
         public int Span => int.Parse(_tag.Substring(11, 3));
     }
+
+    
+    class VerseIDComparer : IEqualityComparer<VerseID> {
+
+        public bool Equals(VerseID x, VerseID y) {
+            return x.AsCanonicalString == y.AsCanonicalString ;
+        }
+
+        public int GetHashCode(VerseID obj) {
+            return obj.AsCanonicalString.GetHashCode();
+        }
+    }
+        
+
 }

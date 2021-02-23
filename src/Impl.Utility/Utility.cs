@@ -49,6 +49,9 @@ namespace ClearBible.Clear3.Impl.Utility
                     })
                     .ToList();
 
+                // TODO: Remove redundant items
+                  
+
                 // If any Target objects were found:
                 if (targets.Any())
                 {
@@ -59,14 +62,28 @@ namespace ClearBible.Clear3.Impl.Utility
                             treeService.GetSourceVerse(sVerseID).List)
                         .ToList();
 
+
                     // If any Source objects were found:
                     if (sources.Any())
                     {
+
+                        // TODO: Verify why sources has redundant source ids.
+                        HashSet<Source> sourceSet = new HashSet<Source>( new SourceComparer() );
+
+                        foreach (Source source in sources) 
+                        {
+                            sourceSet.Add(source);
+                        }
+
+
+
                         // Add a new ZonePair to the collection.
                         zonePairs.Add(
                             new ZonePair(
-                                new SourceZone(sources),
-                                new TargetZone(targets)));
+                                //new SourceZone(sources),
+                                new SourceZone((List<Source>)sourceSet.ToList()),
+                                new TargetZone(targets))
+                            );
                     }
                 }
             }
@@ -100,4 +117,17 @@ namespace ClearBible.Clear3.Impl.Utility
                     .ToList());
         }
     }
+
+    class SourceComparer : IEqualityComparer<Source> {
+
+        public bool Equals(Source x, Source y) {
+            return x.SourceID.AsCanonicalString == y.SourceID.AsCanonicalString ;
+        }
+
+        public int GetHashCode(Source obj) {
+            return obj.SourceID.AsCanonicalString.GetHashCode();
+        }
+    }        
+
+
 }

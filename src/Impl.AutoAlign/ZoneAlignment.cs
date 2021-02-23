@@ -143,7 +143,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // subgroups to create alternate IDs, then sort by source ID
             // (to achieve manuscript order), and finally produce an
             // appropriate SourcePoint for each member for the sequence.
-            return
+            List<SourcePoint> sourcePoints = 
                 terminals
                 .Select((term, n) => new
                 {
@@ -163,6 +163,26 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     RelativeTreePosition: x.treePosition / totalSourcePoints,
                     SourcePosition: m))
                 .ToList();
+
+            // Remove redundant items in the list before return it.
+            /*
+            var sourcePointItr = sourcePoints.Distinct(
+                new SourcePointComparer() );
+
+            List<SourcePoint> distinctSourcePoints = new List<SourcePoint>();
+            
+            foreach(SourcePoint curr in sourcePointItr)
+            {
+                distinctSourcePoints.Add(curr);
+            }
+
+            Console.WriteLine(distinctSourcePoints);
+
+
+            return distinctSourcePoints;
+            */
+
+            return sourcePoints;
         }
 
         // TODO: DELETE-IT later. This is a bakup of GetSourcePoints() above.
@@ -304,11 +324,28 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<string, string> existingLinks =
                 assumptions.OldLinksForVerse(verseIDFromTree);
 
+            HashSet<SourcePoint> spSet = new HashSet<SourcePoint>(new SourcePointComparer());
+
+            foreach(SourcePoint curr in sourcePoints)
+            {
+                spSet.Add(curr);
+            }
+
+
             // Create index of source points by SourceID.
+            Dictionary<SourceID, SourcePoint> sourcePointsByID =
+                spSet.ToDictionary(
+                    sp => sp.SourceID,
+                    sp => sp);
+
+            // TODO: THis is a backup.
+            // Create index of source points by SourceID.
+            /*
             Dictionary<SourceID, SourcePoint> sourcePointsByID =
                 sourcePoints.ToDictionary(
                     sp => sp.SourceID,
                     sp => sp);
+            */
 
             // Find possible choices of target point for each
             // relevant source point.
@@ -668,4 +705,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 (sourcePos[0] > sourcePos[1] && targetPos[0] < targetPos[1]);
         }
     }
+
+    class SourcePointComparer : IEqualityComparer<SourcePoint> {
+
+        public bool Equals(SourcePoint x, SourcePoint y) {
+            return x.AltID == y.AltID ;
+        }
+
+        public int GetHashCode(SourcePoint obj) {
+            return obj.AltID.GetHashCode();
+        }
+    }    
+
 }

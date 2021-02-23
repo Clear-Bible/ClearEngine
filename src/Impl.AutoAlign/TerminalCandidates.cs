@@ -15,6 +15,64 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// 
     public class TerminalCandidates
     {
+
+
+        public static Dictionary<SourceID, List<Candidate>>
+            GetTerminalCandidates(
+                XElement treeNode,
+                Dictionary<SourceID, SourcePoint> sourcePointsByID,
+                Dictionary<string, string> idMap,
+                List<TargetPoint> targetPoints,
+                Dictionary<string, string> existingLinks,
+                IAutoAlignAssumptions assumptions)
+        {
+            Dictionary<SourceID, List<Candidate>> candidateTable2 = new();
+
+            // For each terminal node beneath the root node of the
+            // syntax tree for this zone:
+            foreach (XElement terminalNode in treeNode.GetTerminalNodes())
+            {
+                // Get data about the source point associated with
+                // this terminal node.
+                SourceID sourceID = terminalNode.SourceID();
+                SourcePoint sourcePoint =
+                    sourcePointsByID[terminalNode.SourceID()];                            
+                string strong = terminalNode.Strong();               
+
+                // Compute the alternative candidates for this source point.
+                List<Candidate> topCandidates2 =
+                    GetTerminalCandidatesForWord(
+                        sourcePoint,
+                        strong,
+                        targetPoints,
+                        existingLinks,
+                        assumptions);
+
+                // Add the candidates found to the table of alternatives
+                // for terminals.
+                if (!candidateTable2.ContainsKey(sourceID)) 
+                {
+                    candidateTable2.Add(sourceID, topCandidates2);
+                }
+                
+
+                // Resolve conflicts, which means:
+                // where there are conflicting non-first candidates where one
+                // of them is more probable than its competitors, remove those
+                // competitors that are less probable and uncertain.
+                ResolveConflicts(candidateTable2);               
+            }
+
+            // For those candidate table entries where the list of alternaties
+            // is empty, replace the empty list with a list containing
+            // one empty Candidate.
+            FillGaps(
+                candidateTable2,
+                sourcePointsByID);
+
+            return candidateTable2;
+        }
+
         /// <summary>
         /// Find the suitable choices of target point for each suitable
         /// source point.
@@ -45,7 +103,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// </returns>
         /// 
         public static Dictionary<SourceID, List<Candidate>>
-            GetTerminalCandidates(
+            GetTerminalCandidates_BKUP(
                 XElement treeNode,
                 Dictionary<SourceID, SourcePoint> sourcePointsByID,
                 Dictionary<string, string> idMap,
