@@ -434,7 +434,7 @@ namespace ClearBible.Clear3.API
     public interface IAutoAlignmentService
     {
 
-        ZoneMonoAlignment AlignZone2(
+        ZoneMonoAlignment AlignZone(
             ITreeService iTreeService,
             ZonePair zonePair,
             IAutoAlignAssumptions autoAlignAssumptions);
@@ -468,7 +468,7 @@ namespace ClearBible.Clear3.API
         // and return Task<ZoneMonoAlignment>
         // to enable parallel implementation strategies.
         // 
-        ZoneMonoAlignment AlignZone(
+        ZoneMonoAlignment AlignZoneLegacy(
             ITreeService iTreeService,
             ZoneAlignmentProblem zoneAlignmentFacts,
             IAutoAlignAssumptions autoAlignAssumptions);

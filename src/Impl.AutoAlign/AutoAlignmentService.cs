@@ -24,7 +24,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     public class AutoAlignmentService : IAutoAlignmentService
     {
         
-        public ZoneMonoAlignment AlignZone2(
+        /// <summary>
+        /// Implementation of IAutoAlignmentService.AlignZone that handles 
+        /// non-contiguous source verses.
+        /// </summary>
+        public ZoneMonoAlignment AlignZone(
             ITreeService iTreeService,
             ZonePair zonePair,
             IAutoAlignAssumptions autoAlignAssumptions)
@@ -41,9 +45,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         
         /// <summary>
         /// (Implementation of IAutoAlignmentService.AlignZone)
+        ///  It is a legacy method that works only with contiguous source verses.
         /// </summary>
         /// 
-        public ZoneMonoAlignment AlignZone(
+        public ZoneMonoAlignment AlignZoneLegacy(
             ITreeService iTreeService,
             ZoneAlignmentProblem zoneAlignmentFacts,
             IAutoAlignAssumptions autoAlignAssumptions)

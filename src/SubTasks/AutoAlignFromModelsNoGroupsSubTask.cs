@@ -10,7 +10,8 @@ namespace ClearBible.Clear3.SubTasks
 
     public class AutoAlignFromModelsNoGroupsSubTask
     {
-        public static LegacyPersistentAlignment Run(
+        // Old run method that uses only contiguous source verses
+        public static LegacyPersistentAlignment RunLegacy(
             List<ZoneAlignmentProblem> zoneAlignmentFactsList,
             ITreeService treeService,
             Dictionary<string, Gloss> glossTable,
@@ -39,7 +40,7 @@ namespace ClearBible.Clear3.SubTasks
                     .Select(zoneAlignmentFacts =>
                     {
                         ZoneMonoAlignment zoneMonoAlignment =
-                            autoAlignmentService.AlignZone(
+                            autoAlignmentService.AlignZoneLegacy(
                                 treeService,
                                 zoneAlignmentFacts,
                                 assumptions);
@@ -60,8 +61,8 @@ namespace ClearBible.Clear3.SubTasks
             return align;
         }
 
-        // TODO: WORKING-HERE
-        public static LegacyPersistentAlignment Run2(
+        
+        public static LegacyPersistentAlignment Run(
             List<ZonePair> zonePairs,
             ITreeService treeService,
             Dictionary<string, Gloss> glossTable,
@@ -90,7 +91,7 @@ namespace ClearBible.Clear3.SubTasks
                     .Select(zonePair =>
                     {
                         ZoneMonoAlignment zoneMonoAlignment =
-                            autoAlignmentService.AlignZone2(
+                            autoAlignmentService.AlignZone(
                                 treeService,
                                 zonePair,
                                 assumptions);

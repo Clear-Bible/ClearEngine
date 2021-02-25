@@ -236,7 +236,7 @@ namespace RegressionTest1
             */
 
             LegacyPersistentAlignment alignment =
-                AutoAlignFromModelsNoGroupsSubTask.Run2(
+                AutoAlignFromModelsNoGroupsSubTask.Run(
                     parallelCorpora.List,   // ZonePair - non-contiguous
                     treeService,
                     glossTable,
