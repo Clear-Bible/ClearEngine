@@ -123,27 +123,27 @@ namespace ClearEngine3
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
             //
-            tokenFilename = (string)clearSettings["TokenFile"]; // e.g. "tokens.txt"
-            tokenLemmaFilename = (string)clearSettings["TokenLemmaFile"]; // e.g. "tokens.lower.txt", Not currently used
+            // tokenFilename = (string)clearSettings["TokenFile"]; // e.g. "tokens.txt"
+            // tokenLemmaFilename = (string)clearSettings["TokenLemmaFile"]; // e.g. "tokens.lower.txt", Not currently used
 
-            sourceFilenameM = (string)clearSettings["SourceFileM"]; // e.g. 
-            sourceIdFilenameM = (string)clearSettings["SourceIdTextFileM"]; // e.g. 
-            sourceIdLemmaFilenameM = (string)clearSettings["SourceIdLemmaFileM"]; // e.g. 
+            // sourceTextFilenameM = (string)clearSettings["SourceTextFileM"]; // e.g. 
+            // sourceIdFilenameM = (string)clearSettings["SourceIdFileM"]; // e.g. 
+            // sourceLemmaFilenameM = (string)clearSettings["SourceLemmaFileM"]; // e.g. 
 
-            sourceFilename = (string)clearSettings["SourceFile"]; // e.g. "source.txt"
+            // sourceTextFilename = (string)clearSettings["SourceTextFile"]; // e.g. "source.txt"
             sourceIdFilename = (string)clearSettings["SourceIdFile"]; // e.g. "source.id.txt"
-            sourceIdLemmaFilename = (string)clearSettings["SourceIdLemmaFile"]; // e.g. source.id.lemma.txt"
-            targetFilename = (string)clearSettings["TargetFile"]; // e.g. "target.txt"
+            sourceLemmaFilename = (string)clearSettings["SourceLemmaFile"]; // e.g. source.id.lemma.txt"
+            // targetTextFilename = (string)clearSettings["TargetTextFile"]; // e.g. "target.txt"
             targetIdFilename = (string)clearSettings["TargetIdFile"]; // e.g. "target.id.txt"
-            targetIdLemmaFilename = (string)clearSettings["TargetIdLemmaFile"]; // e.g "target.id.lemma.txt"
+            targetLemmaFilename = (string)clearSettings["TargetLemmaFile"]; // e.g "target.id.lemma.txt"
 
             targetPuncFilename = (string)clearSettings["TargetPuncFile"]; // e.g. "target.punc.txt"
             targetPuncLowerFilename = (string)clearSettings["TargetPuncLowerFile"]; // "target.punc.lower.txt", Not currently used
 
-            sourceFilenameCW = (string)clearSettings["SourceFile2"]; // e.g "sourceFile.cw.txt", Should update variable to ...File
-            sourceIdFilenameCW = (string)clearSettings["SourceIdFile2"]; // e.g "sourceFile.id.cw.txt", Should update variable to ...File
-            targetFilenameCW = (string)clearSettings["TargetFile2"]; // e.g "targetFile.cw.txt", Should update variable to ...File
-            targetIdFilenameCW = (string)clearSettings["TargetIdFile2"]; // e.g "targetFile.id.cw.txt", Should update variable to ...File
+            sourceLemmaFilenameCW = (string)clearSettings["SourceLemmaFileCW"]; // e.g "sourceFile.cw.txt", Should update variable to ...File
+            sourceIdFilenameCW = (string)clearSettings["SourceIdFileCW"]; // e.g "sourceFile.id.cw.txt", Should update variable to ...File
+            targetLemmaFilenameCW = (string)clearSettings["TargetLemmaFileCW"]; // e.g "targetFile.cw.txt", Should update variable to ...File
+            targetIdFilenameCW = (string)clearSettings["TargetIdFileCW"]; // e.g "targetFile.id.cw.txt", Should update variable to ...File
 
             //============================ Output Files Only ============================
             // Files not part of the state, nor used as output/input to pass data between different functions
@@ -211,7 +211,7 @@ namespace ClearEngine3
             targetFolder = Path.Combine(translationFolder, testament);
 
             // Set file information in resourcesFolder
-            sourceFolder = Path.Combine(resourcesFolder, sourceFoldername); // e.g. "Manuscript",folder with the original language files.
+            // sourceFolder = Path.Combine(resourcesFolder, sourceFoldername); // e.g. "Manuscript",folder with the original language files.
             treeFolder = Path.Combine(resourcesFolder, treeFoldername); // e.g. "Trees", folder with manuscript trees. Fixed. Doesn't change. Input to CLEAR, Andi's own XML format
             initialFilesFolder = Path.Combine(resourcesFolder, initialFilesFoldername); // e.g. "Initial Files"
             freqPhrasesFile = Path.Combine(resourcesFolder, freqPhrasesFilename); // e.g. "freqPhrases.tsv"
@@ -220,26 +220,26 @@ namespace ClearEngine3
             glossFile = Path.Combine(resourcesFolder, glossFilename); // e.g. "Gloss.tsv"
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
-            tokFile = Path.Combine(targetFolder, tokenFilename);
-            tokLowerFile = Path.Combine(targetFolder, tokenLemmaFilename);
+            // tokFile = Path.Combine(targetFolder, tokenFilename);
+            // tokLowerFile = Path.Combine(targetFolder, tokenLemmaFilename);
 
-            sourceFileM = Path.Combine(sourceFolder, sourceFilenameM);
-            sourceIdFileM = Path.Combine(sourceFolder, sourceIdFilenameM);
-            sourceIdLemmaFileM = Path.Combine(sourceFolder, sourceIdLemmaFilenameM);
+            // sourceTextFileM = Path.Combine(sourceFolder, sourceTextFilenameM);
+            // sourceIdFileM = Path.Combine(sourceFolder, sourceIdFilenameM);
+            // sourceLemmaFileM = Path.Combine(sourceFolder, sourceLemmaFilenameM);
 
-            sourceFile = Path.Combine(targetFolder, sourceFilename);
+            // sourceTextFile = Path.Combine(targetFolder, sourceTextFilename);
             sourceIdFile = Path.Combine(targetFolder, sourceIdFilename);
-            sourceIdLemmaFile = Path.Combine(targetFolder, sourceIdLemmaFilename);
-            targetFile = Path.Combine(targetFolder, targetFilename);
+            sourceLemmaFile = Path.Combine(targetFolder, sourceLemmaFilename);
+            // targetTextFile = Path.Combine(targetFolder, targetTextFilename);
             targetIdFile = Path.Combine(targetFolder, targetIdFilename);
-            targetIdLemmaFile = Path.Combine(targetFolder, targetIdLemmaFilename);
+            targetLemmaFile = Path.Combine(targetFolder, targetLemmaFilename);
 
             targetPuncFile = Path.Combine(targetFolder, targetPuncFilename);
             targetPuncLowerFile = Path.Combine(targetFolder, targetPuncLowerFilename);
 
-            sourceFileCW = Path.Combine(targetFolder, sourceFilenameCW);
+            sourceLemmaFileCW = Path.Combine(targetFolder, sourceLemmaFilenameCW);
             sourceIdFileCW = Path.Combine(targetFolder, sourceIdFilenameCW);
-            targetFileCW = Path.Combine(targetFolder, targetFilenameCW);
+            targetLemmaFileCW = Path.Combine(targetFolder, targetLemmaFilenameCW);
             targetIdFileCW = Path.Combine(targetFolder, targetIdFilenameCW);
 
             //============================ Output Files Only ============================
@@ -490,8 +490,7 @@ namespace ClearEngine3
 
             Console.WriteLine("Auto Aligning");
 
-            DateTime dt = DateTime.Now;
-            Console.WriteLine(dt.ToString("G"));
+            ShowTime();
 
             LegacyPersistentAlignment alignment =
                 AutoAlignFromModelsNoGroupsSubTask.Run(
@@ -500,15 +499,14 @@ namespace ClearEngine3
                     glossTable,
                     assumptions);
 
-            dt = DateTime.Now;
-            Console.WriteLine(dt.ToString("G"));
-
             // Export the persistent-format datum to a file.
 
             string json = JsonConvert.SerializeObject(
                 alignment.Lines,
                 Formatting.Indented);
             File.WriteAllText(jsonOutput, json);
+
+            ShowTime();
 
             return ("Verse aligned.  Output in " + jsonOutput);
         }
@@ -551,8 +549,7 @@ namespace ClearEngine3
                 if (parts.Length < 3) runSpec += ":" + thotIterations;
             }
 
-            DateTime dt = DateTime.Now;
-            Console.WriteLine(dt.ToString("G"));
+            ShowTime();
 
             // Train a statistical translation model using the parallel
             // corpora with content words only, producing an estimated
@@ -567,8 +564,7 @@ namespace ClearEngine3
                 (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(parallelCorpora, runSpec, epsilon);
             }
 
-            dt = DateTime.Now;
-            Console.WriteLine(dt.ToString("G"));
+            ShowTime();
 
             // Within the SMTService.DefaultSMT, it writes and reads from the file, so any double differences is already done.
             // No need to read them in again.
@@ -578,6 +574,8 @@ namespace ClearEngine3
 
             Persistence.ExportTranslationModel(translationModel, transModelFile);
             Persistence.ExportAlignmentModel(alignmentModel, alignModelFile);
+
+            ShowTime();
 
             // 2020.06.29 CL: We updated alignModel so also need to update preAlignment.
             // preAlignment = Data.BuildPreAlignmentTable(alignModel);
@@ -589,6 +587,8 @@ namespace ClearEngine3
         {
             Console.WriteLine("Tokenizing Verses");
 
+            ShowTime();
+
             targetVerseCorpus =
                 importExportService.ImportTargetVerseCorpusFromLegacy(
                     versesFile,
@@ -596,8 +596,10 @@ namespace ClearEngine3
                     puncs,
                     lang);
 
+            ShowTime();
+
             // return (versesFile + " has been tokenized to " + targetPuncFile + " and " + targetPuncLowerFile + ".");
-            return (versesFile + " has been tokenized to " + targetPuncFile + ".");
+            return (versesFile + " has been tokenized and targetVerseCorpus has been created.");
         }
 
 
@@ -612,15 +614,19 @@ namespace ClearEngine3
 
             Console.WriteLine("Creating Parallel Corpora");
             */
+            ShowTime();
+
             parallelCorpora = utility.CreateParallelCorpora(
                 targetVerseCorpus,
                 treeService,
                 simpleVersification);
 
-            Persistence.ExportParallelCorpora(parallelCorpora, sourceFile, sourceIdLemmaFile, targetFile, targetIdLemmaFile);
+            Persistence.ExportParallelCorpora(parallelCorpora, sourceLemmaFile, sourceIdFile, targetLemmaFile, targetIdFile);
 
             // Remove functions words from the parallel corpora, leaving
             // only the content words for the SMT step to follow.
+
+            ShowTime();
 
             parallelCorporaCW =
                utility.FilterFunctionWordsFromParallelCorpora(
@@ -628,7 +634,9 @@ namespace ClearEngine3
                    sourceFunctionWords,
                    targetFunctionWords);
 
-            Persistence.ExportParallelCorpora(parallelCorporaCW, sourceFileCW, sourceIdFileCW, targetFileCW, targetIdFileCW);
+            Persistence.ExportParallelCorpora(parallelCorporaCW, sourceLemmaFileCW, sourceIdFileCW, targetLemmaFileCW, targetIdFileCW);
+
+            ShowTime();
 
             return ("Parallel files have been created.");
         }
@@ -721,6 +729,12 @@ namespace ClearEngine3
             return ("Done Processing.");
         }
 
+        private static void ShowTime()
+        {
+            DateTime dt = DateTime.Now;
+            Console.WriteLine(dt.ToString("G"));
+        }
+
         private static IClear30ServiceAPI clearService;
         private static IImportExportService importExportService;
         private static IUtility utility;
@@ -740,7 +754,7 @@ namespace ClearEngine3
         private static string resourcesFolder; // 2020.07.11 CL: The folder where all the CLEAR Engine resources are kept.
         private static string processingFolder; // 2020.07.11 CL: The folder where all the CLEAR Engine translation projects are kept.
         private static string sourceFoldername; // the folder where all the manuscript files are kept.  They are static and do not change over time.
-        private static string sourceFolder; // the folder where all the manuscript files are kept.  They are static and do not change over time.
+        // private static string sourceFolder; // the folder where all the manuscript files are kept.  They are static and do not change over time.
         private static string targetFolder; // the folder where the target language data is kept.  Each different translaton has a different folder.
         private static string treeFoldername; // the folder where syntatic trees are kept.
         private static string treeFolder; // the folder where syntatic trees are kept.
@@ -852,41 +866,41 @@ namespace ClearEngine3
         private static ParallelCorpora parallelCorpora;
         private static ParallelCorpora parallelCorporaCW;
 
-        private static string tokenFilename;
-        private static string tokFile;
-        private static string tokenLemmaFilename;
-        private static string tokLowerFile;
-        private static string sourceFilenameM;
-        private static string sourceFileM;
-        private static string sourceIdFilenameM;
-        private static string sourceIdFileM;
-        private static string sourceIdLemmaFilenameM;
-        private static string sourceIdLemmaFileM;
+        // private static string tokenFilename;
+        // private static string tokFile;
+        // private static string tokenLemmaFilename;
+        // private static string tokLowerFile;
+        // private static string sourceTextFilenameM;
+        // private static string sourceTextFileM;
+        // private static string sourceIdFilenameM;
+        // private static string sourceIdFileM;
+        // private static string sourceLemmaFilenameM;
+        // private static string sourceLemmaFileM;
 
-        private static string sourceFilename;
-        private static string sourceFile;
+        // private static string sourceTextFilename;
+        // private static string sourceTextFile;
         private static string sourceIdFilename;
         private static string sourceIdFile;
-        private static string sourceIdLemmaFilename;
-        private static string sourceIdLemmaFile;
-        private static string targetFilename;
-        private static string targetFile;
+        private static string sourceLemmaFilename;
+        private static string sourceLemmaFile;
+        // private static string targetTextFilename;
+        // private static string targetTextFile;
         private static string targetIdFilename;
         private static string targetIdFile;
-        private static string targetIdLemmaFilename;
-        private static string targetIdLemmaFile;
+        private static string targetLemmaFilename;
+        private static string targetLemmaFile;
 
         private static string targetPuncFilename;
         private static string targetPuncFile;
         private static string targetPuncLowerFilename;
         private static string targetPuncLowerFile;
 
-        private static string sourceFilenameCW;
-        private static string sourceFileCW;
+        private static string sourceLemmaFilenameCW;
+        private static string sourceLemmaFileCW;
         private static string sourceIdFilenameCW;
         private static string sourceIdFileCW;
-        private static string targetFilenameCW;
-        private static string targetFileCW;
+        private static string targetLemmaFilenameCW;
+        private static string targetLemmaFileCW;
         private static string targetIdFilenameCW;
         private static string targetIdFileCW;
 

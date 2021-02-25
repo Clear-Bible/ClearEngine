@@ -9,18 +9,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Api">
-      <HintPath>..\src\API\bin\Debug\net5.0\Api.dll</HintPath>
-    </Reference>
-    <Reference Include="Clear3Service">
-      <HintPath>..\src\SubTasks\bin\Debug\net5.0\Clear3Service.dll</HintPath>
-    </Reference>
-    <Reference Include="SubTasks">
-      <HintPath>..\src\SubTasks\bin\Debug\net5.0\SubTasks.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="SIL.Machine.Translation.Thot" Version="2.4.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\src\API\Api.csproj" />
+    <ProjectReference Include="..\src\Clear3Service\Clear3Service.csproj" />
+    <ProjectReference Include="..\src\SubTasks\SubTasks.csproj" />
   </ItemGroup>
 </Project>

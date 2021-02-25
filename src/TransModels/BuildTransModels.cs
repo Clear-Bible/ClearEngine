@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,8 +16,8 @@ namespace TransModels
     {
         // Given parallel files, build both the translation model and alignment model
         public static void BuildModels(
-            string sourceFile, // source text in verse per line format
-            string targetFile, // target text in verse per line format
+            string sourceLemmaFile, // source text in verse per line format
+            string targetLemmaFile, // target text in verse per line format
             string sourceIdFile, // source text in verse per line format, with ID for each word
             string targetIdFile, // target text in verse per line format, with ID for each word
             string runSpec, // specification for the number of iterations to run for the IBM model and the HMM model (e.g. 1:10;H:5 -- IBM model 10 iterations and HMM model 5 iterations)
@@ -29,15 +30,15 @@ namespace TransModels
             if (runSpec.StartsWith("Machine;"))
             {
                 var machineRunSpec = runSpec.Substring(runSpec.IndexOf(';') + 1);
-                BuildModelsMachine.BuildMachineModels(sourceFile, targetFile, sourceIdFile, targetIdFile, machineRunSpec, epsilon, transModelFile, alignModelFile);
+                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, machineRunSpec, epsilon, transModelFile, alignModelFile);
             }
             else
             {
                 ModelBuilder modelBuilder = new ModelBuilder();
 
                 // Setting these are required before training
-                modelBuilder.SourceFile = sourceFile;
-                modelBuilder.TargetFile = targetFile;
+                modelBuilder.SourceFile = sourceLemmaFile;
+                modelBuilder.TargetFile = targetLemmaFile;
                 modelBuilder.RunSpecification = runSpec;
 
                 // If you don't specify, you get no symmetry. Heuristics avaliable are "Diag", "Max",  "Min", "None", "Null"
@@ -59,12 +60,12 @@ namespace TransModels
             }
         }
 
-        private static Hashtable GetAlignmentModel(
+        private static SortedDictionary<string, double> GetAlignmentModel(
             string sourceIdFile,
             string targetIdFile,
             ModelBuilder modelBuilder)
         {
-            var alignModel = new Hashtable();
+            var alignModel = new SortedDictionary<string, double>();
             string[] sourceIdList = File.ReadAllLines(sourceIdFile);
             string[] targetIdList = File.ReadAllLines(targetIdFile);
 
@@ -79,8 +80,10 @@ namespace TransModels
                 // It may happen that the target line is blank since all words were identified as function words if doing only content words.
                 if ((sourceLine != "") && (targetLine != ""))
                 {
-                    var sourceIDs = SplitIDs(sourceLine);
-                    var targetIDs = SplitIDs(targetLine);
+                    // var sourceIDs = SplitIDs(sourceLine);
+                    // var targetIDs = SplitIDs(targetLine);
+                    var sourceIDs = sourceLine.Split();
+                    var targetIDs = targetLine.Split();
 
                     foreach (Alignment alignment in alignments)
                     {
@@ -108,33 +111,7 @@ namespace TransModels
             return alignModel;
         }
 
-        public static string[] SplitIDs(string line)
-        {
-            string[] wordIDs = line.Split();
-            string ids = string.Empty;
-
-            foreach (var wordID in wordIDs)
-            {
-                ids += wordID.Substring(wordID.LastIndexOf('_') + 1) + " ";
-            }
-
-            return ids.Trim().Split();
-        }
-
-        public static string[] SplitWords(string line)
-        {
-            string[] wordIDs = line.Split();
-            string words = string.Empty;
-
-            foreach (var wordID in wordIDs)
-            {
-                words += wordID.Substring(0, wordID.LastIndexOf('_')) + " ";
-            }
-
-            return words.Trim().Split();
-        }
-
-        public static void WriteAlignModel(Hashtable table, string file)
+        public static void WriteAlignModel(SortedDictionary<string, double> table, string file)
         {
             StreamWriter sw = new StreamWriter(file, false, Encoding.UTF8);
 
@@ -150,48 +127,10 @@ namespace TransModels
             sw.Close();
         }
 
-        public static void WriteAlignModelSorted(Hashtable table, string file)
+        // May not need OrderedDictionary. If not, use Dictionary<string, string>
+        public static OrderedDictionary ReadAlignModel(string file)
         {
-            int extIndex = file.LastIndexOf(".");
-            string fileOut = file.Substring(0, extIndex) + "-sorted" + file.Substring(extIndex);
-
-            StreamWriter sw = new StreamWriter(fileOut, false, Encoding.UTF8);
-
-            SortedDictionary<string, double> sortedModel = new SortedDictionary<string, double>();
-
-            IDictionaryEnumerator tableEnum = table.GetEnumerator();
-
-            while (tableEnum.MoveNext())
-            {
-                string pair = (string)tableEnum.Key;
-                double prob = (double)tableEnum.Value;
-
-                if (!sortedModel.ContainsKey(pair))
-                {
-                    sortedModel.Add(pair, prob);
-                }
-                else
-                {
-                    double oldProb = sortedModel[pair];
-                    Console.WriteLine("ERROR in WriteAlignModelSorted() Duplicate Data: {0} with probability {1}. Old probablity is {2}.", pair, prob, oldProb);
-                }
-            }
-
-            // Write ordered file
-            foreach (KeyValuePair<string, double> entry in sortedModel)
-            {
-                string pair = entry.Key;
-                double prob = entry.Value;
-
-                sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}", pair, prob));
-            }
-
-            sw.Close();
-        }
-
-        public static Hashtable ReadAlignModel(string file)
-        {
-            Hashtable alignModel = new Hashtable();
+            var alignModel = new OrderedDictionary();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -208,74 +147,45 @@ namespace TransModels
             return alignModel;
         }
 
-        public static void WriteTransModel(Hashtable model, string file)
+        public static void WriteTransModel(Dictionary<string, Dictionary<string, double>> model, string file)
         {
             StreamWriter sw = new StreamWriter(file, false, Encoding.UTF8);
 
-            IDictionaryEnumerator modelEnum = model.GetEnumerator();
+            var translationsProb = new SortedDictionary<string, double>();
 
-            while (modelEnum.MoveNext())
+            foreach (var modelEnum in model)
             {
-                string source = (string)modelEnum.Key;
-                Hashtable translations = (Hashtable)modelEnum.Value;
+                string source = modelEnum.Key;
+                var translations = modelEnum.Value;
 
-                IDictionaryEnumerator transEnum = translations.GetEnumerator();
-
-                while (transEnum.MoveNext())
+                if ((source != "NULL") && (source != "UNKNOWN_WORD") && (source != "<UNUSED_WORD>"))
                 {
-                    string translation = (string)transEnum.Key;
-                    double transPro = (double)transEnum.Value;
-
-                    sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}\t{2}", source, translation, transPro));
-                }
-            }
-
-            sw.Close();
-        }
-
-        public static void WriteTransModelSorted(Hashtable model, string file)
-        {
-            int extIndex = file.LastIndexOf(".");
-            string fileOut = file.Substring(0, extIndex) + "-sorted" + file.Substring(extIndex);
-
-            StreamWriter sw = new StreamWriter(fileOut, false, Encoding.UTF8);
-
-            SortedDictionary<string, double> translationsProb = new SortedDictionary<string, double>();
-
-            IDictionaryEnumerator modelEnum = model.GetEnumerator();
-
-            while (modelEnum.MoveNext())
-            {
-                string source = (string)modelEnum.Key;
-                Hashtable translations = (Hashtable)modelEnum.Value;
-
-                IDictionaryEnumerator transEnum = translations.GetEnumerator();
-
-                while (transEnum.MoveNext())
-                {
-                    string target = (string)transEnum.Key;
-                    double prob = (double)transEnum.Value;
-
-                    // 2020.07.21 CL: Changed to use " \t " as separators in keys because SortedDictionary seems to order \t after a space.
-                    // Subtract from 1 to get probability in decreasing order.
-                    string keyFraction = string.Format("{0}", 1 - prob);
-                    // Need to include target in the key since keys but be unique.
-                    string keyProb = source + " \t " + keyFraction + " \t " + target;
-
-                    if (!translationsProb.ContainsKey(keyProb)) // Entry doesn't exist
+                    foreach (var transEnum in translations)
                     {
-                        translationsProb.Add(keyProb, prob); // Frequency order is from low to high. We would have to change the default function for comparing strings to change this order.
-                    }
-                    else // This should never be the case that there would be duplicate key but different probablity.
-                    {
-                        double oldProb = translationsProb[keyProb];
-                        Console.WriteLine("Duplicate Data in WriteTransModelSorted: {0} {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb);
-                        sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "// Duplicate Data in WriteTransModelSorted: source = {0} target = {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb));
+                        string target = transEnum.Key;
+                        double prob = transEnum.Value;
+
+                        // 2020.07.21 CL: Changed to use " \t " as separators in keys because SortedDictionary seems to order \t after a space.
+                        // Subtract from 1 to get probability in decreasing order.
+                        string keyFraction = string.Format("{0}", 1 - prob);
+                        // Need to include target in the key since keys but be unique.
+                        string keyProb = source + " \t " + keyFraction + " \t " + target;
+
+                        if (!translationsProb.ContainsKey(keyProb)) // Entry doesn't exist
+                        {
+                            translationsProb.Add(keyProb, prob); // Frequency order is from low to high. We would have to change the default function for comparing strings to change this order.
+                        }
+                        else // This should never be the case that there would be duplicate key but different probablity.
+                        {
+                            double oldProb = translationsProb[keyProb];
+                            Console.WriteLine("Duplicate Data in WriteTransModelSorted: {0} {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb);
+                            sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "// Duplicate Data in WriteTransModelSorted: source = {0} target = {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb));
+                        }
                     }
                 }
             }
 
-            foreach (KeyValuePair<string, double> entry in translationsProb)
+            foreach (var entry in translationsProb)
             {
                 string[] parts = entry.Key.Split('\t');
                 string source = parts[0].Trim();
@@ -288,9 +198,10 @@ namespace TransModels
             sw.Close();
         }
 
-        public static Hashtable ReadTransModel(string file)
+        // It may not be necessary to use OrderedDictionary. If not, use Dictionary<string, Dictionary<string, double>>
+        public static OrderedDictionary ReadTransModel(string file)
         {
-            Hashtable transModel = new Hashtable();
+            var transModel = new OrderedDictionary();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -300,16 +211,16 @@ namespace TransModels
                 {
                     string source = parts[0];
                     string target = parts[1];
-                    double prob = Double.Parse(parts[2]);
+                    double prob = double.Parse(parts[2]);
 
-                    if (transModel.ContainsKey(source))
+                    if (transModel.Contains(source))
                     {
-                        Hashtable translations = (Hashtable)transModel[source];
+                        OrderedDictionary translations = (OrderedDictionary)transModel[source];
                         translations.Add(target, prob);
                     }
                     else
                     {
-                        Hashtable translations = new Hashtable();
+                        var translations = new OrderedDictionary();
                         translations.Add(target, prob);
                         transModel.Add(source, translations);
                     }

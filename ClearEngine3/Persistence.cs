@@ -16,25 +16,25 @@ namespace ClearEngine3
     {
         public static void ExportParallelCorpora(
             ParallelCorpora parallelCorpora,
-            string sourceFilename,
-            string sourceIdFilename,
-            string targetFileName,
-            string targetIdFilename)
+            string sourceLemmaFile,
+            string sourceIdFile,
+            string targetLemmaFile,
+            string targetIdFile)
         {
-            using (StreamWriter sw1 = new StreamWriter(sourceFilename, false, Encoding.UTF8))
-            using (StreamWriter sw2 = new StreamWriter(sourceIdFilename, false, Encoding.UTF8))
-            using (StreamWriter sw3 = new StreamWriter(targetFileName, false, Encoding.UTF8))
-            using (StreamWriter sw4 = new StreamWriter(targetIdFilename, false, Encoding.UTF8))
+            using (StreamWriter swSourceLemmaFile = new StreamWriter(sourceLemmaFile, false, Encoding.UTF8))
+            using (StreamWriter swSourceIdFile = new StreamWriter(sourceIdFile, false, Encoding.UTF8))
+            using (StreamWriter swTargetLemmaFile = new StreamWriter(targetLemmaFile, false, Encoding.UTF8))
+            using (StreamWriter swTargetIdFile = new StreamWriter(targetIdFile, false, Encoding.UTF8))
             {
                 foreach (ZonePair zp in parallelCorpora.List)
                 {
-                    sw1.WriteLine(string.Join(" ",
+                    swSourceLemmaFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => s.Lemma.Text)));
-                    sw2.WriteLine(string.Join(" ",
+                    swSourceIdFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => $"x_{s.SourceID.AsCanonicalString}")));
-                    sw3.WriteLine(string.Join(" ",
+                    swTargetLemmaFile.WriteLine(string.Join(" ",
                         zp.TargetZone.List.Select(t => t.TargetText.Text.ToLower())));
-                    sw4.WriteLine(string.Join(" ",
+                    swTargetIdFile.WriteLine(string.Join(" ",
                         zp.TargetZone.List.Select(t => $"x_{t.TargetID.AsCanonicalString}")));
                 }
             }
@@ -51,16 +51,16 @@ namespace ClearEngine3
             TargetID TargetID);
         */
         public static ParallelCorpora ImportParallelCorpora(
-            string sourceFilename,
-            string sourceIdFilename,
-            string targetFileName,
-            string targetIdFilename)
+            string sourceLemmaFile,
+            string sourceIdFile,
+            string targetLemmaFile,
+            string targetIdFile)
         {
             // Prepare to collect ZonePair objects.
             List<ZonePair> zonePairs = new();
 
-            string[] sourceLines = File.ReadAllLines(sourceFilename);
-            foreach (string line in sourceLines)
+            string[] sourceLinesLemma = File.ReadAllLines(sourceLemmaFile);
+            foreach (string line in sourceLinesLemma)
             {
                 string[] parts = line.Split(' ');
                 foreach (var part in parts)
@@ -69,8 +69,8 @@ namespace ClearEngine3
                 }
             }
 
-            string[] sourceIdLines = File.ReadAllLines(sourceIdFilename);
-            foreach (string line in sourceIdLines)
+            string[] sourceLinesId = File.ReadAllLines(sourceIdFile);
+            foreach (string line in sourceLinesId)
             {
                 string[] parts = line.Split(' ');
                 foreach (var part in parts)
@@ -79,8 +79,8 @@ namespace ClearEngine3
                 }
             }
 
-            string[] targetLines = File.ReadAllLines(targetFileName);
-            foreach (string line in targetLines)
+            string[] targetLinesLemma = File.ReadAllLines(targetLemmaFile);
+            foreach (string line in targetLinesLemma)
             {
                 string[] parts = line.Split(' ');
                 foreach (var part in parts)
@@ -89,8 +89,8 @@ namespace ClearEngine3
                 }
             }
 
-            string[] targetIdLines = File.ReadAllLines(targetIdFilename);
-            foreach (string line in targetIdLines)
+            string[] targetLinesId = File.ReadAllLines(targetIdFile);
+            foreach (string line in targetLinesId)
             {
                 string[] parts = line.Split(' ');
                 foreach (var part in parts)

@@ -81,15 +81,25 @@ namespace ClearBible.Clear3.Impl.ResourceService
 
             // Locate the destination directory within the resource folder,
             // creating or re-creating it if necessary.
-            //
+            // 2021.02.26 CL: Changed to use the same folder as ClearEngine2
             string destinationPath =
-                Path.Combine(ResourceFolder, "treebank", "Clear3Dev");
+                    // Path.Combine(ResourceFolder, "treebank", "Clear3Dev");
+                    Path.Combine(ResourceFolder, "Trees");
             DirectoryInfo destinationDir = new DirectoryInfo(destinationPath);
+
+            // 2021.02.26 CL: Don't delete and recreate each time. Only create if it doesn't already exist.
+            /*
             if (destinationDir.Exists)
             {
                 destinationDir.Delete(recursive: true);
             }
             destinationDir.Create();
+            */
+
+            if (!destinationDir.Exists)
+            {
+                destinationDir.Create();
+            }
 
             // Locate the source directory for the Clear3Dev treebank.
             //
@@ -100,12 +110,19 @@ namespace ClearBible.Clear3.Impl.ResourceService
             // Copy each file in the source directory to the destination
             // directory.
             //
-            foreach (FileInfo sourceFileInfo in sourceDir.EnumerateFiles())
+            // 2021.02.26 CL: If destinationPath has no files, copy files from sourcePath
+
+            string[] files = Directory.GetFiles(destinationPath);
+
+            if (files.Length == 0)
             {
-                string sourceFilePath = sourceFileInfo.FullName;
-                string destinationFilePath =
-                    Path.Combine(destinationPath, sourceFileInfo.Name);
-                File.Copy(sourceFilePath, destinationFilePath);
+                foreach (FileInfo sourceFileInfo in sourceDir.EnumerateFiles())
+                {
+                    string sourceFilePath = sourceFileInfo.FullName;
+                    string destinationFilePath =
+                        Path.Combine(destinationPath, sourceFileInfo.Name);
+                    File.Copy(sourceFilePath, destinationFilePath);
+                }
             }
 
             // Add (or replace) the LocalResource record for
@@ -145,7 +162,8 @@ namespace ClearBible.Clear3.Impl.ResourceService
             }
 
             return new TreeService(
-                Path.Combine(ResourceFolder, "treebank", "Clear3Dev"),
+                // Path.Combine(ResourceFolder, "treebank", "Clear3Dev"),
+                Path.Combine(ResourceFolder, "Trees"),
                 BookNames.LoadBookNames3a());
         }
 
