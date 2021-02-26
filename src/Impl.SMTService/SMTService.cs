@@ -74,7 +74,8 @@ namespace ClearBible.Clear3.Impl.SMTService
                 foreach (ZonePair zp in parallelCorpora.List)
                 {
                     sw.WriteLine(string.Join(" ",
-                        zp.SourceZone.List.Select(s => $"x_{s.SourceID.AsCanonicalString}")));
+                        // zp.SourceZone.List.Select(s => $"x_{s.SourceID.AsCanonicalString}")));
+                        zp.SourceZone.List.Select(s => s.SourceID.AsCanonicalString)));
                 }
             }
 
@@ -94,7 +95,8 @@ namespace ClearBible.Clear3.Impl.SMTService
                 foreach (ZonePair zp in parallelCorpora.List)
                 {
                     sw.WriteLine(string.Join(" ",
-                        zp.TargetZone.List.Select(t => $"x_{t.TargetID.AsCanonicalString}")));
+                        // zp.TargetZone.List.Select(t => $"x_{t.TargetID.AsCanonicalString}")));
+                        zp.TargetZone.List.Select(t => t.TargetID.AsCanonicalString)));
                 }
             }
 
