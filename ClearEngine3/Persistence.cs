@@ -31,11 +31,14 @@ namespace ClearEngine3
                     swSourceLemmaFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => s.Lemma.Text)));
                     swSourceIdFile.WriteLine(string.Join(" ",
-                        zp.SourceZone.List.Select(s => $"x_{s.SourceID.AsCanonicalString}")));
+                        // zp.SourceZone.List.Select(s => $"x_{s.SourceID.AsCanonicalString}")));
+                        zp.SourceZone.List.Select(s => s.SourceID.AsCanonicalString)));
                     swTargetLemmaFile.WriteLine(string.Join(" ",
-                        zp.TargetZone.List.Select(t => t.TargetText.Text.ToLower())));
+                        // zp.TargetZone.List.Select(t => t.TargetText.Text.ToLower())));
+                        zp.TargetZone.List.Select(t => t.TargetText.Text.ToLowerInvariant())));
                     swTargetIdFile.WriteLine(string.Join(" ",
-                        zp.TargetZone.List.Select(t => $"x_{t.TargetID.AsCanonicalString}")));
+                        // zp.TargetZone.List.Select(t => $"x_{t.TargetID.AsCanonicalString}")));
+                        zp.TargetZone.List.Select(t => t.TargetID.AsCanonicalString)));
                 }
             }
         }
