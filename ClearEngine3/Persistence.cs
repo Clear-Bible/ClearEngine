@@ -141,6 +141,7 @@ namespace ClearEngine3
             return new ParallelCorpora(zonePairs);
         }
 
+        
         public static void ExportTranslationModel(TranslationModel model, string filename)
         {
             StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8);
@@ -162,8 +163,9 @@ namespace ClearEngine3
             sw.Close();
 
             // 2020.07.09 CL: Modified to also write a sorted file. More convenient than running another program after this is done in order to compare.
-            WriteTransModelSorted(model, filename);
+            // WriteTransModelSorted(model, filename);
         }
+        
 
         // 2020.07.09 CL: Although this is inefficient code, by reading in the file again, we make sure we will have the same double value (replicate read method)
         // Basically uses the same code as the independent program previously written. Could use model rather than read in file.
@@ -196,8 +198,9 @@ namespace ClearEngine3
                     else // This should never be the case that there would be duplicate key but different probablity.
                     {
                         double oldProb = translationsProb[keyProb];
-                        Console.WriteLine("Duplicate Data in WriteTransModelSorted: {0} {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb);
-                        sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "// Duplicate Data in WriteTransModelSorted: source = {0} target = {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb));
+                        string errorMsg = string.Format(CultureInfo.InvariantCulture, "Duplicate Data in WriteTransModelSorted: {0} {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb);
+                        Console.WriteLine(errorMsg);
+                        sw.WriteLine(errorMsg);
                     }
                 }
             }
@@ -216,6 +219,7 @@ namespace ClearEngine3
             sw.Close();
         }
 
+        
         public static void ExportAlignmentModel(AlignmentModel table, string filename)
         {
             StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8);
@@ -230,8 +234,9 @@ namespace ClearEngine3
 
             sw.Close();
 
-            WriteAlignModelSorted(table, filename);
+            // WriteAlignModelSorted(table, filename);
         }
+        
 
         // 2020.07.09 CL: Although this is inefficient code, by reading in the file again, we make sure we will have the same double value (replicate read method)
         // Basically uses the same code as the independent program previously written. Could use model rather than read in file.
