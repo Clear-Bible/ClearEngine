@@ -89,10 +89,18 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                                     getTargetMorph(s),
                                     getTargetId(s)))
                                 .ToList()),
-                        FirstSourceVerseID:
-                            getSourceVerseID(sourceStrings.First()),
-                        LastSourceVerseID:
-                            getSourceVerseID(sourceStrings.Last()));
+                        SourceZone:
+                            new SourceZone(
+                                sourceStrings
+                                .Select(s => new Source(
+                                    getSourceMorph(s),
+                                    getSourceLemma(s),
+                                    getSourceId(s)))
+                                .ToList()));
+                        // FirstSourceVerseID:
+                        //     getSourceVerseID(sourceStrings.First()),
+                        // LastSourceVerseID:
+                        //     getSourceVerseID(sourceStrings.Last()));
                 })
                 .ToList();
 
@@ -108,8 +116,17 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             TargetID getTargetId(string s) =>
                 new TargetID(getAfterLastUnderscore(s));
 
-            VerseID getSourceVerseID(string s) =>
-                (new SourceID(getAfterLastUnderscore(s))).VerseID;
+            SourceText getSourceMorph(string s) =>
+               new SourceText(getBeforeLastUnderscore(s));
+
+            Lemma getSourceLemma(string s) =>
+                new Lemma(getBeforeLastUnderscore(s));
+
+            SourceID getSourceId(string s) =>
+                new SourceID(getAfterLastUnderscore(s));
+
+            // VerseID getSourceVerseID(string s) =>
+            //     (new SourceID(getAfterLastUnderscore(s))).VerseID;
 
             string getBeforeLastUnderscore(string s) =>
                 s.Substring(0, s.LastIndexOf("_"));

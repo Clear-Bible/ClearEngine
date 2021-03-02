@@ -167,12 +167,19 @@ namespace ClearBible.Clear3.API
     /// tree-based auto-alignment algorithm; the source zone must
     /// be a sequence of contiguous verses, and is specified by
     /// identifying the first and last source verses.
+    ///
+    /// FIXME: CL: Need to change the record to be a
+    /// list of source VerseIDs rather than first and last.
+    /// Once it is fixed, it seems there are redundant records.
+    /// This looks just like ZonePair.
     /// </summary>
     /// 
     public record ZoneAlignmentProblem(
         TargetZone TargetZone,
-        VerseID FirstSourceVerseID,
-        VerseID LastSourceVerseID);
+        SourceZone SourceZone);
+        // List<VerseID> SourceVerseIDs);
+        // VerseID FirstSourceVerseID,
+        // VerseID LastSourceVerseID);
 
 
     /// <summary>

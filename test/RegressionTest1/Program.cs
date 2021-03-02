@@ -185,8 +185,9 @@ namespace RegressionTest1
                 .Select(zonePair =>
                     new ZoneAlignmentProblem(
                         zonePair.TargetZone,
-                        zonePair.SourceZone.List.First().SourceID.VerseID,
-                        zonePair.SourceZone.List.Last().SourceID.VerseID))
+                        zonePair.SourceZone))
+                        // zonePair.SourceZone.List.First().SourceID.VerseID,
+                        // zonePair.SourceZone.List.Last().SourceID.VerseID))
                 .ToList();
 
 

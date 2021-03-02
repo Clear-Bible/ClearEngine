@@ -445,14 +445,19 @@ namespace ClearEngine3
             // Use the parallel corpora (with both the function words and
             // the content words included) to state the zone alignment
             // problems for the tree-based auto-aligner.
+            //
+            // CL: Fixed to have a ZoneAlignmentProblem be a TargetZone and SourceZone
+            // Although ZonePair and ZoneAlignmentProblem are essentially the same,
+            // Keeping them as different records helps distinguish between them.
 
             List<ZoneAlignmentProblem> zoneAlignmentProblems =
                 parallelCorpora.List
                 .Select(zonePair =>
                     new ZoneAlignmentProblem(
                         zonePair.TargetZone,
-                        zonePair.SourceZone.List.First().SourceID.VerseID,
-                        zonePair.SourceZone.List.Last().SourceID.VerseID))
+                        zonePair.SourceZone))
+                        // zonePair.SourceZone.List.First().SourceID.VerseID,
+                        // zonePair.SourceZone.List.Last().SourceID.VerseID))
                 .ToList();
 
 
@@ -695,7 +700,7 @@ namespace ClearEngine3
 
         public static string Do_Button11()
         {
-            Console.WriteLine("Iniializing Clear's State");
+            Console.WriteLine("Initializing Clear's State");
 
             InitializeState();
 

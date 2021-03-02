@@ -26,6 +26,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// <param name="zoneAlignmentFacts">
         /// A statement of the zone alignment problem to be posed
         /// to the auto-alignment algorithm.
+        /// CL: Changed to from first and last source VerseID to SourceZone
+        /// because we need the list of source VerseIDs.
         /// </param>
         /// <param name="autoAlignAssumptions">
         /// Assumptions that condition the auto-alignment algorithm,
@@ -50,9 +52,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Get the syntax tree node corresponding to the source
             // verse range.
+            // CL: No longer a range but a list of source VerseIDs.
+            /*
             XElement treeNode = treeService.GetTreeNode(
-                    zoneAlignmentFacts.FirstSourceVerseID,
-                    zoneAlignmentFacts.LastSourceVerseID);
+                        zoneAlignmentFacts.FirstSourceVerseID,
+                        zoneAlignmentFacts.LastSourceVerseID);
+            */
+
+            XElement treeNode = treeService.GetTreeNode(
+                        zoneAlignmentFacts.SourceZone);
+            // zoneAlignmentFacts.FirstSourceVerseID,
+            // zoneAlignmentFacts.LastSourceVerseID);
 
             // Construct a context for the zone with the source
             // points and target points.
@@ -71,7 +81,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return new ZoneMonoAlignment(zoneContext, monoLinks);
         }
-
 
         /// <summary>
         /// Get the source points in manuscript order corresponding to
