@@ -14,134 +14,98 @@ namespace ClearEngine3
 {
     public class Persistence
     {
+        // For Clear3, we don't need to export Lemmas since ParallelCorpora does not store lemmas, but they could be used by Clear2 and converted in another place in Clear3.
+        // For Clear2, it doesn't need the source text, but it is part of ParallelCopora in Clear3.
+        // It would be nice to make what Clear2 and Clear3 uses to be the same and minimal.
         public static void ExportParallelCorpora(
             ParallelCorpora parallelCorpora,
+            string sourceTextFile,
             string sourceLemmaFile,
             string sourceIdFile,
+            string targetTextFile,
             string targetLemmaFile,
             string targetIdFile)
         {
+            using (StreamWriter swSourceTextFile = new StreamWriter(sourceTextFile, false, Encoding.UTF8))
             using (StreamWriter swSourceLemmaFile = new StreamWriter(sourceLemmaFile, false, Encoding.UTF8))
             using (StreamWriter swSourceIdFile = new StreamWriter(sourceIdFile, false, Encoding.UTF8))
+            using (StreamWriter swTargetTextFile = new StreamWriter(targetTextFile, false, Encoding.UTF8))
             using (StreamWriter swTargetLemmaFile = new StreamWriter(targetLemmaFile, false, Encoding.UTF8))
             using (StreamWriter swTargetIdFile = new StreamWriter(targetIdFile, false, Encoding.UTF8))
             {
                 foreach (ZonePair zp in parallelCorpora.List)
                 {
+                    swSourceTextFile.WriteLine(string.Join(" ",
+                        zp.SourceZone.List.Select(s => s.SourceText.Text)));
                     swSourceLemmaFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => s.Lemma.Text)));
                     swSourceIdFile.WriteLine(string.Join(" ",
-                        // zp.SourceZone.List.Select(s => $"x_{s.SourceID.AsCanonicalString}")));
                         zp.SourceZone.List.Select(s => s.SourceID.AsCanonicalString)));
+                    swTargetTextFile.WriteLine(string.Join(" ",
+                        zp.TargetZone.List.Select(t => t.TargetText.Text)));
                     swTargetLemmaFile.WriteLine(string.Join(" ",
-                        // zp.TargetZone.List.Select(t => t.TargetText.Text.ToLower())));
                         zp.TargetZone.List.Select(t => t.TargetText.Text.ToLowerInvariant())));
                     swTargetIdFile.WriteLine(string.Join(" ",
-                        // zp.TargetZone.List.Select(t => $"x_{t.TargetID.AsCanonicalString}")));
                         zp.TargetZone.List.Select(t => t.TargetID.AsCanonicalString)));
                 }
             }
         }
 
-        /*
-        public record Source(
-            SourceText SourceText,
-            Lemma Lemma,
-            SourceID SourceID);
-
-        public record Target(
-            TargetText TargetText,
-            TargetID TargetID);
-        */
-        public static ParallelCorpora ImportParallelCorpora(
+        public static ParallelCorpora ImportParallelCorpus(
+            string sourceTextFile,
             string sourceLemmaFile,
             string sourceIdFile,
-            string targetLemmaFile,
+            string targetTextFile,
             string targetIdFile)
         {
-            // Prepare to collect ZonePair objects.
+            string[] sourceTextLines = File.ReadAllLines(sourceTextFile);
+            string[] sourceLemmaLines = File.ReadAllLines(sourceLemmaFile);
+            string[] sourceIdLines = File.ReadAllLines(sourceIdFile);
+            string[] targetTextLines = File.ReadAllLines(targetTextFile);
+            string[] targetIdLines = File.ReadAllLines(targetIdFile);
+
+            if (sourceIdLines.Length != targetIdLines.Length)
+            {
+                throw new InvalidDataException(
+                    "Parallel files must have same number of lines.");
+            }
+
             List<ZonePair> zonePairs = new();
 
-            string[] sourceLinesLemma = File.ReadAllLines(sourceLemmaFile);
-            foreach (string line in sourceLinesLemma)
+            for (int i = 0; i < sourceIdLines.Length; i++)
             {
-                string[] parts = line.Split(' ');
-                foreach (var part in parts)
+                string[] sourceText = sourceTextLines[i].Split();
+                string[] sourceLemmas = sourceLemmaLines[i].Split();
+                string[] sourceIDs = sourceIdLines[i].Split();
+                string[] targetText = targetTextLines[i].Split();
+                string[] targetIDs = targetIdLines[i].Split();
+
+
+                List<Source> sourceList = new();
+                for (int j = 0; j < sourceIDs.Length; j++)
                 {
-
+                    var source = new Source(
+                        new SourceText(sourceText[j]),
+                        new Lemma(sourceLemmas[j]),
+                        new SourceID(sourceIDs[j]));
+                    sourceList.Add(source);
                 }
-            }
 
-            string[] sourceLinesId = File.ReadAllLines(sourceIdFile);
-            foreach (string line in sourceLinesId)
-            {
-                string[] parts = line.Split(' ');
-                foreach (var part in parts)
+                List<Target> targetList = new();
+                for (int j = 0; j < targetIDs.Length; j++)
                 {
-
+                    var target = new Target(
+                        new TargetText(targetText[j]),
+                        new TargetID(targetIDs[j]));
+                    targetList.Add(target);
                 }
+
+                zonePairs.Add(new ZonePair(new SourceZone(sourceList), new TargetZone(targetList)));
             }
-
-            string[] targetLinesLemma = File.ReadAllLines(targetLemmaFile);
-            foreach (string line in targetLinesLemma)
-            {
-                string[] parts = line.Split(' ');
-                foreach (var part in parts)
-                {
-
-                }
-            }
-
-            string[] targetLinesId = File.ReadAllLines(targetIdFile);
-            foreach (string line in targetLinesId)
-            {
-                string[] parts = line.Split(' ');
-                foreach (var part in parts)
-                {
-
-                }
-            }
-            /*
-
-            foreach (SimpleZoneSpec zoneSpec in simpleVersification.List)
-            {
-                // Get the Target objects for the verses in this zone,
-                // in order.
-                List<Target> targets =
-                    zoneSpec.TargetVerses
-                    .SelectMany(tVerseID =>
-                    {
-                        if (targetVerseTable.TryGetValue(tVerseID,
-                            out TargetVerse targetVerse))
-                        {
-                            return targetVerse.List;
-                        }
-                        else return Enumerable.Empty<Target>();
-                    })
-                    .ToList();
-
-                    // Get the Source objects for the zone.
-                    List<Source> sources =
-                        zoneSpec.SourceVerses
-                        .SelectMany(sVerseID =>
-                            treeService.GetSourceVerse(sVerseID).List)
-                        .ToList();
-
-                    // If any Source objects were found:
-
-                        // Add a new ZonePair to the collection.
-                        zonePairs.Add(
-                            new ZonePair(
-                                new SourceZone(sources),
-                                new TargetZone(targets)));
-
-            }
-            */
 
             return new ParallelCorpora(zonePairs);
         }
 
-        
         public static void ExportTranslationModel(TranslationModel model, string filename)
         {
             StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8);

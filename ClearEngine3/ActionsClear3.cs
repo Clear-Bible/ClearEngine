@@ -130,20 +130,22 @@ namespace ClearEngine3
             // sourceIdFilenameM = (string)clearSettings["SourceIdFileM"]; // e.g. 
             // sourceLemmaFilenameM = (string)clearSettings["SourceLemmaFileM"]; // e.g. 
 
-            // sourceTextFilename = (string)clearSettings["SourceTextFile"]; // e.g. "source.txt"
-            sourceIdFilename = (string)clearSettings["SourceIdFile"]; // e.g. "source.id.txt"
-            sourceLemmaFilename = (string)clearSettings["SourceLemmaFile"]; // e.g. source.id.lemma.txt"
-            // targetTextFilename = (string)clearSettings["TargetTextFile"]; // e.g. "target.txt"
-            targetIdFilename = (string)clearSettings["TargetIdFile"]; // e.g. "target.id.txt"
-            targetLemmaFilename = (string)clearSettings["TargetLemmaFile"]; // e.g "target.id.lemma.txt"
+            sourceTextFilename = (string)clearSettings["SourceTextFile"];
+            sourceIdFilename = (string)clearSettings["SourceIdFile"];
+            sourceLemmaFilename = (string)clearSettings["SourceLemmaFile"];
+            targetTextFilename = (string)clearSettings["TargetTextFile"];
+            targetIdFilename = (string)clearSettings["TargetIdFile"];
+            targetLemmaFilename = (string)clearSettings["TargetLemmaFile"];
 
             targetPuncFilename = (string)clearSettings["TargetPuncFile"]; // e.g. "target.punc.txt"
             targetPuncLowerFilename = (string)clearSettings["TargetPuncLowerFile"]; // "target.punc.lower.txt", Not currently used
 
-            sourceLemmaFilenameCW = (string)clearSettings["SourceLemmaFileCW"]; // e.g "sourceFile.cw.txt", Should update variable to ...File
-            sourceIdFilenameCW = (string)clearSettings["SourceIdFileCW"]; // e.g "sourceFile.id.cw.txt", Should update variable to ...File
-            targetLemmaFilenameCW = (string)clearSettings["TargetLemmaFileCW"]; // e.g "targetFile.cw.txt", Should update variable to ...File
-            targetIdFilenameCW = (string)clearSettings["TargetIdFileCW"]; // e.g "targetFile.id.cw.txt", Should update variable to ...File
+            sourceTextFilenameCW = (string)clearSettings["SourceTextFileCW"];
+            sourceLemmaFilenameCW = (string)clearSettings["SourceLemmaFileCW"];
+            sourceIdFilenameCW = (string)clearSettings["SourceIdFileCW"];
+            targetTextFilenameCW = (string)clearSettings["TargetTextFileCW"];
+            targetLemmaFilenameCW = (string)clearSettings["TargetLemmaFileCW"];
+            targetIdFilenameCW = (string)clearSettings["TargetIdFileCW"];
 
             //============================ Output Files Only ============================
             // Files not part of the state, nor used as output/input to pass data between different functions
@@ -227,18 +229,20 @@ namespace ClearEngine3
             // sourceIdFileM = Path.Combine(sourceFolder, sourceIdFilenameM);
             // sourceLemmaFileM = Path.Combine(sourceFolder, sourceLemmaFilenameM);
 
-            // sourceTextFile = Path.Combine(targetFolder, sourceTextFilename);
+            sourceTextFile = Path.Combine(targetFolder, sourceTextFilename);
             sourceIdFile = Path.Combine(targetFolder, sourceIdFilename);
             sourceLemmaFile = Path.Combine(targetFolder, sourceLemmaFilename);
-            // targetTextFile = Path.Combine(targetFolder, targetTextFilename);
+            targetTextFile = Path.Combine(targetFolder, targetTextFilename);
             targetIdFile = Path.Combine(targetFolder, targetIdFilename);
             targetLemmaFile = Path.Combine(targetFolder, targetLemmaFilename);
 
             targetPuncFile = Path.Combine(targetFolder, targetPuncFilename);
             targetPuncLowerFile = Path.Combine(targetFolder, targetPuncLowerFilename);
 
+            sourceTextFileCW = Path.Combine(targetFolder, sourceTextFilenameCW);
             sourceLemmaFileCW = Path.Combine(targetFolder, sourceLemmaFilenameCW);
             sourceIdFileCW = Path.Combine(targetFolder, sourceIdFilenameCW);
+            targetTextFileCW = Path.Combine(targetFolder, targetTextFilenameCW);
             targetLemmaFileCW = Path.Combine(targetFolder, targetLemmaFilenameCW);
             targetIdFileCW = Path.Combine(targetFolder, targetIdFilenameCW);
 
@@ -545,6 +549,11 @@ namespace ClearEngine3
         {
             Console.WriteLine("Building Models");
 
+            // A waste to have to read in then write out in DefaultSMT() and then read in during BuildModels().
+
+            if (parallelCorpora == null) parallelCorpora = Persistence.ImportParallelCorpus(sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetIdFile);
+            if (parallelCorporaCW == null) parallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextFileCW, sourceLemmaFileCW, sourceIdFileCW, targetTextFileCW, targetIdFileCW);
+
             if (runSpec.StartsWith("Machine;"))
             {
                 var machineRunSpec = runSpec.Substring(runSpec.IndexOf(';') + 1);
@@ -611,14 +620,7 @@ namespace ClearEngine3
         public static string Do_Button8()
         {
             Console.WriteLine("Creating Parallel Corpora");
-            /*
-            GroupVerses.CreateParallelFiles(sourceFileM, sourceIdFileM, sourceIdLemmaFileM, targetPuncFile, sourceFile, sourceIdFile, sourceIdLemmaFile, targetFile, targetIdFile, versificationList);
 
-            // Use the versification with the target verses to line up
-            // translated zones with sourced zones.
-
-            Console.WriteLine("Creating Parallel Corpora");
-            */
             ShowTime();
 
             parallelCorpora = utility.CreateParallelCorpora(
@@ -626,10 +628,7 @@ namespace ClearEngine3
                 treeService,
                 simpleVersification);
 
-            Persistence.ExportParallelCorpora(parallelCorpora, sourceLemmaFile, sourceIdFile, targetLemmaFile, targetIdFile);
-
-            // Remove functions words from the parallel corpora, leaving
-            // only the content words for the SMT step to follow.
+            Persistence.ExportParallelCorpora(parallelCorpora, sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetIdFile);
 
             ShowTime();
 
@@ -639,7 +638,7 @@ namespace ClearEngine3
                    sourceFunctionWords,
                    targetFunctionWords);
 
-            Persistence.ExportParallelCorpora(parallelCorporaCW, sourceLemmaFileCW, sourceIdFileCW, targetLemmaFileCW, targetIdFileCW);
+            Persistence.ExportParallelCorpora(parallelCorporaCW, sourceTextFileCW, sourceLemmaFileCW, sourceIdFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
 
             ShowTime();
 
@@ -882,14 +881,14 @@ namespace ClearEngine3
         // private static string sourceLemmaFilenameM;
         // private static string sourceLemmaFileM;
 
-        // private static string sourceTextFilename;
-        // private static string sourceTextFile;
+        private static string sourceTextFilename;
+        private static string sourceTextFile;
         private static string sourceIdFilename;
         private static string sourceIdFile;
         private static string sourceLemmaFilename;
         private static string sourceLemmaFile;
-        // private static string targetTextFilename;
-        // private static string targetTextFile;
+        private static string targetTextFilename;
+        private static string targetTextFile;
         private static string targetIdFilename;
         private static string targetIdFile;
         private static string targetLemmaFilename;
@@ -900,10 +899,14 @@ namespace ClearEngine3
         private static string targetPuncLowerFilename;
         private static string targetPuncLowerFile;
 
+        private static string sourceTextFilenameCW;
+        private static string sourceTextFileCW;
         private static string sourceLemmaFilenameCW;
         private static string sourceLemmaFileCW;
         private static string sourceIdFilenameCW;
         private static string sourceIdFileCW;
+        private static string targetTextFilenameCW;
+        private static string targetTextFileCW;
         private static string targetLemmaFilenameCW;
         private static string targetLemmaFileCW;
         private static string targetIdFilenameCW;
