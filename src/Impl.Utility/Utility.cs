@@ -80,13 +80,13 @@ namespace ClearBible.Clear3.Impl.Utility
 
 
         /// <summary>
-        /// (Implementation of IUtility.FilterFunctionWordsFromParallelCorpora)
+        /// (Implementation of IUtility.FilterWordsFromParallelCorpora)
         /// </summary>
         /// 
-        public ParallelCorpora FilterFunctionWordsFromParallelCorpora(
+        public ParallelCorpora FilterWordsFromParallelCorpora(
             ParallelCorpora toBeFiltered,
-            List<string> sourceFunctionWords,
-            List<string> targetFunctionWords)
+            List<string> sourceWordsToFilter,
+            List<string> targetWordsToFilter)
         {
             return
                 new ParallelCorpora(
@@ -95,11 +95,12 @@ namespace ClearBible.Clear3.Impl.Utility
                         new ZonePair(
                             new SourceZone(
                                 zonePair.SourceZone.List
-                                .Where(source => !sourceFunctionWords.Contains(source.Lemma.Text))
+                                .Where(source => !sourceWordsToFilter.Contains(source.SourceLemma.Text))
                                 .ToList()),
                             new TargetZone(
                                 zonePair.TargetZone.List
-                                .Where(target => !targetFunctionWords.Contains(target.TargetText.Text.ToLower()))
+                                // .Where(target => !targetFunctionWords.Contains(target.TargetText.Text.ToLower()))
+                                .Where(target => !targetWordsToFilter.Contains(target.TargetLemma.Text))
                                 .ToList())))
                     .ToList());
         }

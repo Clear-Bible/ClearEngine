@@ -115,12 +115,15 @@ namespace RegressionTest3
 
             // Specify the assumptions to be used during the
             // auto-alignment.
-            
+
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
                     translationModel: transModel,
+                    translationModelTC: transModel,
+                    useLemmaCatModel: false,
                     manTransModel: manTransModel,
                     alignProbs: alignmentModel,
+                    alignProbsPre: alignmentModel,
                     useAlignModel: true,
                     puncs: puncs,
                     stopWords: stopWords,

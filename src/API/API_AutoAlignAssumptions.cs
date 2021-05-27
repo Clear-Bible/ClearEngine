@@ -28,6 +28,12 @@ namespace ClearBible.Clear3.API
         bool UseAlignModel { get; }
 
         /// <summary>
+        /// True if lemma_cat was used to create the SMT models.
+        /// </summary>
+        /// 
+        bool UseLemmaCatModel { get; }
+
+        /// <summary>
         /// The maximum number of alternatives that the auto-aligner should
         /// permit during its generation of alternatives using tree traversal.
         /// </summary>

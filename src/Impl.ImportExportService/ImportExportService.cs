@@ -25,7 +25,8 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             string path,
             ISegmenter segmenter,
             List<string> puncs,
-            string lang)
+            string lang,
+            string culture)
         {
             List<TargetVerse> targetsList2 = new();
 
@@ -43,13 +44,14 @@ namespace ClearBible.Clear3.Impl.ImportExportService
 
                     string verseText = line.Substring(line.IndexOf(" ") + 1);
 
-                    string[] segments = segmenter.GetSegments(verseText, puncs, lang);
+                    (string[] segments, string[] lemmas) = segmenter.GetSegments(verseText, puncs, lang, culture);
 
                     TargetVerse targets = new TargetVerse(
                         segments
                         .Select((segment, j) =>
                             new Target(
                                 new TargetText(segment),
+                                new TargetLemma(lemmas[j]),
                                 new TargetID(verseID, j + 1)))
                         .ToList());
 
@@ -86,13 +88,23 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                             new TargetZone(
                                 targetStrings
                                 .Select(s => new Target(
-                                    getTargetMorph(s),
+                                    getTargetText(s),
+                                    getTargetLemma(s),
                                     getTargetId(s)))
                                 .ToList()),
-                        FirstSourceVerseID:
-                            getSourceVerseID(sourceStrings.First()),
-                        LastSourceVerseID:
-                            getSourceVerseID(sourceStrings.Last()));
+                        SourceZone:
+                            new SourceZone(
+                                sourceStrings
+                                .Select(s => new Source(
+                                    getSourceText(s),
+                                    getSourceLemma(s),
+                                    getSourceCategory(s),
+                                    getSourceId(s)))
+                                .ToList()));
+                        // FirstSourceVerseID:
+                        //     getSourceVerseID(sourceStrings.First()),
+                        // LastSourceVerseID:
+                        //     getSourceVerseID(sourceStrings.Last()));
                 })
                 .ToList();
 
@@ -102,14 +114,31 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             IEnumerable<string> fields(string line) =>
                 line.Split(' ').Where(s => !String.IsNullOrWhiteSpace(s));
 
-            TargetText getTargetMorph(string s) =>
+            TargetText getTargetText(string s) =>
                 new TargetText(getBeforeLastUnderscore(s));
+
+            // No separate lemma in legacy parallel corpus. Use Text.
+            TargetLemma getTargetLemma(string s) =>
+                new TargetLemma(getBeforeLastUnderscore(s));
 
             TargetID getTargetId(string s) =>
                 new TargetID(getAfterLastUnderscore(s));
 
-            VerseID getSourceVerseID(string s) =>
-                (new SourceID(getAfterLastUnderscore(s))).VerseID;
+            SourceText getSourceText(string s) =>
+               new SourceText(getBeforeLastUnderscore(s));
+
+            SourceLemma getSourceLemma(string s) =>
+                new SourceLemma(getBeforeLastUnderscore(s));
+
+            // No category in legacy parallel corpus
+            Category getSourceCategory(string s) =>
+                new Category(string.Empty);
+
+            SourceID getSourceId(string s) =>
+                new SourceID(getAfterLastUnderscore(s));
+
+            // VerseID getSourceVerseID(string s) =>
+            //     (new SourceID(getAfterLastUnderscore(s))).VerseID;
 
             string getBeforeLastUnderscore(string s) =>
                 s.Substring(0, s.LastIndexOf("_"));
@@ -128,15 +157,15 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                 .Where(fields => fields.Count == 3)
                 .Select(fields => new
                 {
-                    lemma = new Lemma(fields[0].Trim()),
-                    targetMorph = new TargetText(fields[1].Trim()),
+                    sourceLemma = new SourceLemma(fields[0].Trim()),
+                    targetLemma = new TargetLemma(fields[1].Trim()),
                     score = new Score(Double.Parse(fields[2].Trim()))
                 })
-                .GroupBy(row => row.lemma)
+                .GroupBy(row => row.sourceLemma)
                 .ToDictionary(
                     group => group.Key,
                     group => group.ToDictionary(
-                        row => row.targetMorph,
+                        row => row.targetLemma,
                         row => row.score)));
         }
 

@@ -26,6 +26,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// <param name="zoneAlignmentFacts">
         /// A statement of the zone alignment problem to be posed
         /// to the auto-alignment algorithm.
+        /// CL: Changed to from first and last source VerseID to SourceZone
+        /// because we need the list of source VerseIDs.
         /// </param>
         /// <param name="autoAlignAssumptions">
         /// Assumptions that condition the auto-alignment algorithm,
@@ -50,9 +52,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Get the syntax tree node corresponding to the source
             // verse range.
+            // CL: No longer a range but a list of source VerseIDs.
+            /*
             XElement treeNode = treeService.GetTreeNode(
-                    zoneAlignmentFacts.FirstSourceVerseID,
-                    zoneAlignmentFacts.LastSourceVerseID);
+                        zoneAlignmentFacts.FirstSourceVerseID,
+                        zoneAlignmentFacts.LastSourceVerseID);
+            */
+
+            XElement treeNode = treeService.GetTreeNode(
+                        zoneAlignmentFacts.SourceZone);
+            // zoneAlignmentFacts.FirstSourceVerseID,
+            // zoneAlignmentFacts.LastSourceVerseID);
 
             // Construct a context for the zone with the source
             // points and target points.
@@ -71,7 +81,6 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             return new ZoneMonoAlignment(zoneContext, monoLinks);
         }
-
 
         /// <summary>
         /// Get the source points in manuscript order corresponding to
@@ -114,6 +123,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .OrderBy(x => x.sourceID.AsCanonicalString)
                 .Select((x, m) => new SourcePoint(
                     Lemma: x.term.Lemma(),
+                    Category: x.term.Category(),
                     Terminal: x.term,
                     SourceID: x.term.SourceID(),
                     AltID: x.altID,
@@ -147,6 +157,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .Select((target, position) => new
                 {
                     text = target.TargetText.Text,
+                    lemma = target.TargetLemma.Text,
                     targetID = target.TargetID,
                     position
                 })
@@ -156,13 +167,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     {
                         x.text,
                         x.targetID,
+                        x.lemma,
                         x.position,
                         altID = $"{x.text}-{groupIndex + 1}"
                     }))
                 .OrderBy(x => x.position)
                 .Select(x => new TargetPoint(
                     Text: x.text,
-                    Lower: x.text.ToLower(),
+                    // Lower: x.text.ToLower(),
+                    Lemma: x.lemma,
                     TargetID: x.targetID,
                     AltID: x.altID,
                     Position: x.position,
@@ -207,6 +220,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Find possible choices of target point for each
             // relevant source point.
+            //
+            // CL: Like GetTerminalCandidates()
             Dictionary<SourceID, List<Candidate>> terminalCandidates2 =
                TerminalCandidates.GetTerminalCandidates(
                    treeNode,
@@ -218,7 +233,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Traverse the syntax tree starting from the terminals
             // and working back to the root to construct alignments
-            // and eventually the best one. 
+            // and eventually the best one.
+            //
+            // CL: Like AlignNodes()?
             Candidate topCandidate2 = TreeBasedAlignment.AlignTree(
                 treeNode,
                 targetPoints.Count,
@@ -238,6 +255,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Attempt to add links for source points that have not
             // been linked yet.
+            //
+            // CL: Like AlignTheRest()?
             AuxiliaryAlignment.ImproveAlignment(
                 openMonoLinks,
                 targetPoints,
@@ -386,11 +405,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 .ToList();
 
             bool targetWordNotEmpty(OpenMonoLink link) =>
-                link.OpenTargetBond.MaybeTargetPoint.Lower != string.Empty;
+                link.OpenTargetBond.MaybeTargetPoint.Lemma != string.Empty;
 
             Tuple<string, string> targetTextAndId(OpenMonoLink link) =>
                 Tuple.Create(
-                    link.OpenTargetBond.MaybeTargetPoint.Lower,
+                    link.OpenTargetBond.MaybeTargetPoint.Lemma,
                     link.OpenTargetBond.MaybeTargetPoint.ID);
         }
 

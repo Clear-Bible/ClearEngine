@@ -124,6 +124,87 @@ namespace ClearBible.Clear3.Impl.TreeService
 
 
         /// <summary>
+        /// Get a tree node from a list of VerseIDs rather than just a start and end ID.
+        /// </summary>
+        /// <param name="verseIDs"></param>
+        /// <returns>
+        /// A single tree node.
+        /// </returns>
+        public XElement GetTreeNode(SourceZone sourceZone)
+        {
+            var verseIDs = GetSourceVerseIDs(sourceZone);
+            ChapterID chapterID = verseIDs.First().ChapterID;
+            PreloadTreesForChapter(chapterID);
+
+            List<XElement> verseTrees = GetVerseTrees(verseIDs).ToList();
+
+            if (verseTrees.Count == 1)
+            {
+                return verseTrees[0];
+            }
+            else
+            {
+                return CombineTrees(verseTrees);
+            }
+        }
+
+        /// <summary>
+        /// Get a list of source VerseIDs from a source zone.
+        /// This is used to get source tree nodes for the zone.
+        /// We no longer assume contiguous zone.
+        ///
+        /// FIXME: Probably could use a Linq approach to do the same thing.
+        /// </summary>
+        /// <param name="sourceZone"></param>
+        /// <returns>
+        /// A list of source VerseIDs.
+        /// </returns>
+        ///
+
+        private static List<VerseID> GetSourceVerseIDs(SourceZone sourceZone)
+        {
+            var sourceVerseIDs = new List<VerseID>();
+
+            foreach (var source in sourceZone.List)
+            {
+                var verseID = source.SourceID.VerseID;
+                if (!sourceVerseIDs.Contains(verseID))
+                {
+                    sourceVerseIDs.Add(verseID);
+                }
+            }
+
+            return sourceVerseIDs;
+        }
+
+
+        /// <summary>
+        /// Takes a list of source verseIDs and collects the tree nodes
+        /// for each verse.
+        /// </summary>
+        /// <param name="verseIDs"></param>
+        /// <returns>
+        /// An IEnumberable of the XElement node
+        /// </returns>
+        IEnumerable<XElement> GetVerseTrees(List<VerseID> verseIDs)
+        {
+            foreach (var verseID in verseIDs)
+            {
+                if (_trees2.TryGetValue(
+                        verseID,
+                        out XElement subTree))
+                {
+                    yield return subTree;
+                }
+                else
+                {
+                    yield break;
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Get a tree node that covers a specified verse range.
         /// The result might be a newly constructed node to cover
         /// more than one verse.  Assumes that the verse range
@@ -300,12 +381,14 @@ namespace ClearBible.Clear3.Impl.TreeService
                         // lemma = e.Lemma(),
                         text = e.Surface().Replace(' ', '~'),
                         lemma = e.Lemma().Replace(' ', '~'),
+                        category = e.Category(), // 2021.05.26 CL: Added so we can use category.
                         sourceID = e.SourceID()
                     }))
                 .OrderBy(x => x.sourceID.AsCanonicalString)
                 .Select(x => new Source(
                     new SourceText(x.text),
-                    new Lemma(x.lemma),
+                    new SourceLemma(x.lemma),
+                    new Category(x.category), // 2021.05.26 CL: Added so we can use category.
                     x.sourceID))
                 .ToList());
         }
