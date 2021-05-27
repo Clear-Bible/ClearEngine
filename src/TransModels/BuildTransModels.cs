@@ -9,6 +9,11 @@ using System.Collections;
 using System.Globalization;
 
 using Models;
+using SIL.Machine.Corpora;
+using SIL.Machine.Tokenization;
+using SIL.Machine.Translation;
+using SIL.Machine.Translation.Thot;
+using SIL.ObjectModel;
 
 namespace TransModels
 {
@@ -27,10 +32,9 @@ namespace TransModels
             )
         {
             // Check if using Machine models
-            if (runSpec.StartsWith("Machine;"))
+            if (!runSpec.StartsWith("HMM;"))
             {
-                var machineRunSpec = runSpec.Substring(runSpec.IndexOf(';') + 1);
-                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, machineRunSpec, epsilon, transModelFile, alignModelFile);
+                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
             }
             else
             {
@@ -39,57 +43,82 @@ namespace TransModels
                 // Setting these are required before training
                 modelBuilder.SourceFile = sourceLemmaFile;
                 modelBuilder.TargetFile = targetLemmaFile;
-                modelBuilder.RunSpecification = runSpec;
+                modelBuilder.RunSpecification = runSpec.Substring(runSpec.IndexOf(';') + 1);
 
                 // If you don't specify, you get no symmetry. Heuristics avaliable are "Diag", "Max",  "Min", "None", "Null"
                 modelBuilder.Symmetrization = SymmetrizationType.Min;
 
-                //Train the model
                 using (ConsoleProgressBar progressBar = new ConsoleProgressBar(Console.Out))
                 {
                     modelBuilder.Train(progressBar);
                 }
 
-                // Dump the translation table with threshold epsilon
-                // Create a Hashtable with ModelBuilder.m_corpus1_Dict and ModelBuilter.m_corpus2_Dict
                 var transModel = modelBuilder.GetTranslationTable(epsilon);
                 WriteTransModel(transModel, transModelFile);
 
-                var alignModel = GetAlignmentModel(sourceIdFile, targetIdFile, modelBuilder);
+                var corporaAlignments = GetCorporaAlignments(modelBuilder);
+                var alignModel = GetAlignmentModel(corporaAlignments, sourceIdFile, targetIdFile);
                 WriteAlignModel(alignModel, alignModelFile);
+
+                // string pharaohFile = alignModelFile.Replace(".tsv", "_pharaoh.txt");
+                // WritePharaohAlignments(corporaAlignments, pharaohFile);
             }
         }
 
-        private static SortedDictionary<string, double> GetAlignmentModel(
-            string sourceIdFile,
-            string targetIdFile,
+        private static IReadOnlyCollection<IReadOnlyCollection<AlignedWordPair>> GetCorporaAlignments(
             ModelBuilder modelBuilder)
         {
-            var alignModel = new SortedDictionary<string, double>();
+            var corporaAlignments = new List<IReadOnlyCollection<AlignedWordPair>>();
+
+            Models.Alignments allModelAlignments = modelBuilder.GetAlignments(0);
+
+            foreach (List<Alignment> modelAlignments in allModelAlignments)
+            {
+                var alignments = new List<AlignedWordPair>();
+
+                foreach (Alignment modelAlignment in modelAlignments)
+                {
+                    var alignedWordPair = new AlignedWordPair(modelAlignment.Source, modelAlignment.Target);
+
+                    alignedWordPair.AlignmentScore = modelAlignment.AlignProb;
+
+                    alignments.Add(alignedWordPair);
+                }
+
+                corporaAlignments.Add(alignments);
+            }
+
+            return corporaAlignments;
+        }
+
+        public static SortedDictionary<string, double> GetAlignmentModel(
+            IReadOnlyCollection<IReadOnlyCollection<AlignedWordPair>> corporaAlignments,
+            string sourceIdFile,
+            string targetIdFile)
+        {
+            // Should the lengths of the two lists below be checked to make sure they are the same or do we just trsut they are?
             string[] sourceIdList = File.ReadAllLines(sourceIdFile);
             string[] targetIdList = File.ReadAllLines(targetIdFile);
 
-            Models.Alignments allAlignments = modelBuilder.GetAlignments(0);
+            var alignModel = new SortedDictionary<string, double>();
 
             int i = 0;
-            foreach (List<Alignment> alignments in allAlignments)
+            foreach (var alignments in corporaAlignments)
             {
-                string sourceLine = sourceIdList[i];
-                string targetLine = targetIdList[i];
+                string sourceIdLine = sourceIdList[i];
+                string targetIdLine = targetIdList[i];
 
-                // It may happen that the target line is blank since all words were identified as function words if doing only content words.
-                if ((sourceLine != "") && (targetLine != ""))
+                // It is possible a line may be blank. On the source side it may be because there are no content words when doing content word only processing (e.g. Psalms verse 000).
+                if ((sourceIdLine != "") && (targetIdLine != ""))
                 {
-                    // var sourceIDs = SplitIDs(sourceLine);
-                    // var targetIDs = SplitIDs(targetLine);
-                    var sourceIDs = sourceLine.Split();
-                    var targetIDs = targetLine.Split();
+                    var sourceIDs = sourceIdLine.Split();
+                    var targetIDs = targetIdLine.Split();
 
-                    foreach (Alignment alignment in alignments)
+                    foreach (var alignment in alignments)
                     {
-                        int sourceIndex = alignment.Source;
-                        int targetIndex = alignment.Target;
-                        double prob = alignment.AlignProb;
+                        int sourceIndex = alignment.SourceIndex;
+                        int targetIndex = alignment.TargetIndex;
+                        double prob = alignment.AlignmentScore;
                         try
                         {
                             var sourceID = sourceIDs[sourceIndex];
@@ -111,6 +140,27 @@ namespace TransModels
             return alignModel;
         }
 
+        // Not sure if we need this since I have tools and AlignModel to JSON and JSON to Pharaoh. I may also write a tool to convert AlignModel directly to Pharaoh.
+        public static void WritePharaohAlignments(
+            IReadOnlyCollection<IReadOnlyCollection<AlignedWordPair>> corporaAlignments,
+            string file)
+        {
+            StreamWriter sw = new StreamWriter(file, false, Encoding.UTF8);
+
+            foreach (var alignments in corporaAlignments)
+            {
+                string pharaohLine = string.Empty;
+
+                foreach (var alignment in alignments)
+                {
+                    pharaohLine += string.Format("{0}-{1} ", alignment.SourceIndex, alignment.TargetIndex);
+                }
+                sw.WriteLine(pharaohLine.Trim());
+            }
+
+            sw.Close();
+        }
+
         public static void WriteAlignModel(SortedDictionary<string, double> table, string file)
         {
             StreamWriter sw = new StreamWriter(file, false, Encoding.UTF8);
@@ -127,10 +177,15 @@ namespace TransModels
             sw.Close();
         }
 
-        // May not need OrderedDictionary. If not, use Dictionary<string, string>
-        public static OrderedDictionary ReadAlignModel(string file)
+        // May not need OrderedDictionary. If not, use Dictionary<string, double>
+        // 2021.03.03 CL: Check if file exists. If not, return an empty model.
+        // 2021.03.10 CL: Using Ordered dictionary did not solve the inconsistent alignment problem.
+        // Changed from Hashtable to OrderedDictionary to Dictionary<string, double>
+        public static Dictionary<string, double> ReadAlignModel(string file, bool mustExist)
         {
-            var alignModel = new OrderedDictionary();
+            var alignModel = new Dictionary<string, double>();
+
+            if (!mustExist && !File.Exists(file)) return alignModel;
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -175,11 +230,12 @@ namespace TransModels
                         {
                             translationsProb.Add(keyProb, prob); // Frequency order is from low to high. We would have to change the default function for comparing strings to change this order.
                         }
-                        else // This should never be the case that there would be duplicate key but different probablity.
+                        else // This should never be the case that there would be duplicate source, target, and same probablity. In fact, should never have same source and target.
                         {
                             double oldProb = translationsProb[keyProb];
-                            Console.WriteLine("Duplicate Data in WriteTransModelSorted: {0} {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb);
-                            sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "// Duplicate Data in WriteTransModelSorted: source = {0} target = {1} with probability {2}. Old probability is {3}.", source, target, prob, oldProb));
+                            string errorMsg = string.Format(CultureInfo.InvariantCulture, "Duplicate Data in WriteTransModel: source={0} target={1} with same probability {2}. Old probability is {3}.", source, target, prob, oldProb);
+                            Console.WriteLine(errorMsg);
+                            sw.WriteLine(errorMsg);
                         }
                     }
                 }
@@ -199,9 +255,13 @@ namespace TransModels
         }
 
         // It may not be necessary to use OrderedDictionary. If not, use Dictionary<string, Dictionary<string, double>>
-        public static OrderedDictionary ReadTransModel(string file)
+        // 2021.03.03 CL: Check if file exists. If not, return an empty model.
+        // 2021.03.10 CL: Using OrderedDictionary does not solve the inconsistency problem. Changed to Dictionary<string, Dictionary<string, double>>
+        public static Dictionary<string, Dictionary<string, double>> ReadTransModel(string file, bool mustExist)
         {
-            var transModel = new OrderedDictionary();
+            var transModel = new Dictionary<string, Dictionary<string, double>>();
+
+            if (!mustExist && !File.Exists(file)) return transModel;
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -213,14 +273,14 @@ namespace TransModels
                     string target = parts[1];
                     double prob = double.Parse(parts[2]);
 
-                    if (transModel.Contains(source))
+                    if (transModel.ContainsKey(source))
                     {
-                        OrderedDictionary translations = (OrderedDictionary)transModel[source];
+                        var translations = transModel[source];
                         translations.Add(target, prob);
                     }
                     else
                     {
-                        var translations = new OrderedDictionary();
+                        var translations = new Dictionary<string, double>();
                         translations.Add(target, prob);
                         transModel.Add(source, translations);
                     }
@@ -229,6 +289,13 @@ namespace TransModels
 
             return transModel;
         }
+    }
+
+    public class AlignmentWordPair
+    {
+        public int SourceIndex;
+        public int TargetIndex;
+        public double AlignmentScore;
     }
 }
 

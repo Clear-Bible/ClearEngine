@@ -7,11 +7,11 @@ using System.IO;
 using System.Collections;
 using System.Globalization;
 
-using Models;
 using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Machine.Translation;
 using SIL.Machine.Translation.Thot;
+using SIL.ObjectModel;
 
 namespace TransModels
 {
@@ -28,21 +28,6 @@ namespace TransModels
             string alignModelFile  // this method updates it
             )
         {
-            BuildMachineModelsDamien(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
-            // BuildMachineModelsCharles(sourceFile, targetFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
-        }
-
-        public static void BuildMachineModelsDamien(
-            string sourceLemmaFile,
-            string targetLemmaFile,
-            string sourceIdFile,
-            string targetIdFile,
-            string runSpec,
-            double epsilon,
-            string transModelFile,
-            string alignModelFile
-            )
-        {
             var wordTokenizer = new WhitespaceTokenizer(); // In SIL.Machine.Tokenization
             var sourceCorpus = new TextFileTextCorpus(wordTokenizer, sourceLemmaFile); // In SIL.Machine.Corpora
             var targetCorpus = new TextFileTextCorpus(wordTokenizer, targetLemmaFile); // In SIL.Machine.Corpora
@@ -51,12 +36,19 @@ namespace TransModels
             // Current runspec for Machine is:
             // <model>:<heuristic>:<iterations>
             // Probably need to do some error checking
-            string[] parts = runSpec.Split(':');
+            string[] parts = runSpec.Split(';');
             var smtModel = parts[0];
-            int iterations = 4;
+            // Default
             string heuristic = "Intersection";
-            if (parts.Length > 1) heuristic = parts[1];
-            if (parts.Length > 2) iterations = int.Parse(parts[2]);
+            int iterations = 4;
+            if ((parts.Length > 1) && (parts[1] != ""))
+            {
+                heuristic = parts[1];
+            }
+            if ((parts.Length > 2) && (parts[2] != ""))
+            {
+                iterations = int.Parse(parts[2]);
+            }
 
             using (IWordAlignmentModel model = CreateModel(smtModel, heuristic, iterations))  // In SIL.Machine.Translation
             {
@@ -68,15 +60,17 @@ namespace TransModels
                 }
 
                 var transTable = model.GetTranslationTable(epsilon);
-                // var transModel = ConvertTranslationTableToHashtable(transTable);
                 BuildTransModels.WriteTransModel(transTable, transModelFile);
-                    
-                var alignModel = GetAlignmentModel(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, model);
+
+                var corporaAlignments = GetCorporaAlignments(sourceLemmaFile, targetLemmaFile, model);
+                var alignModel = BuildTransModels.GetAlignmentModel(corporaAlignments, sourceIdFile, targetIdFile);
                 BuildTransModels.WriteAlignModel(alignModel, alignModelFile);
+
+                // string pharaohFile = alignModelFile.Replace(".tsv", "_pharaoh.txt");
+                // BuildTransModels.WritePharaohAlignments(corporaAlignments, pharaohFile);
             }
         }
 
-        // static IWordAlignmentModel CreateModel(string smtModel, string heuristic)
         static IWordAlignmentModel CreateModel(string smtModel, string heuristic, int iterations)
         {
             switch (smtModel)
@@ -136,93 +130,43 @@ namespace TransModels
             }
         }
 
-        static SortedDictionary<string, double> GetAlignmentModel(
+        // To make our functions more compatible with Machine interfaces, I decided to refactor the process of creating the alignment model that Clear uses into two steps.
+        // This is the first one that will create what is typically the alignments
+        static IReadOnlyCollection<IReadOnlyCollection<AlignedWordPair>> GetCorporaAlignments(
             string sourceLemmaFile,
             string targetLemmaFile,
-            string sourceIdFile,
-            string targetIdFile,
             IWordAlignmentModel model)
         {
             // Should the lengths of the two lists below be checked to make sure they are the same or do we just trsut they are?
             string[] sourceLemmaList = File.ReadAllLines(sourceLemmaFile);
             string[] targetLemmaList = File.ReadAllLines(targetLemmaFile);
-            string[] sourceIdList = File.ReadAllLines(sourceIdFile);
-            string[] targetIdList = File.ReadAllLines(targetIdFile);
 
-            var alignModel = new SortedDictionary<string, double>();
+            var corporaAlignments = new List<IReadOnlyCollection<AlignedWordPair>>();
+            var emptyAlignments = new List<AlignedWordPair>();
 
-            for (int i = 0; i < sourceIdList.Length; i++)
+            for (int i = 0; i < sourceLemmaList.Length; i++)
             {
                 string sourceLemmaLine = sourceLemmaList[i];
                 string targetLemmaLine = targetLemmaList[i];
-                string sourceIdLine = sourceIdList[i];
-                string targetIdLine = targetIdList[i];
 
-                // It is possible a line may be blank. On the source side it may be because there are no content words when doing content word only processing (e.g. Psalms verse 000).
-                if ((sourceIdLine != "") && (targetIdLine != ""))
+                if ((sourceLemmaLine != "") && (targetLemmaLine != ""))
                 {
                     var sWords = sourceLemmaLine.Split();
                     var tWords = targetLemmaLine.Split();
 
-                    WordAlignmentMatrix alignments = model.GetBestAlignment(sWords, tWords);
+                    WordAlignmentMatrix bestAlignments = model.GetBestAlignment(sWords, tWords);
+                    var modelAlignments = bestAlignments.GetAlignedWordPairs(model, sWords, tWords);
 
-                    var sourceIDs = sourceIdLine.Split();
-                    var targetIDs = targetIdLine.Split();
-
-                    foreach (AlignedWordPair alignment in alignments.GetAlignedWordPairs(model, sWords, tWords))
-                    {
-                        int sourceIndex = alignment.SourceIndex;
-                        int targetIndex = alignment.TargetIndex;
-                        double prob = alignment.AlignmentScore;
-                        try
-                        {
-                            var sourceID = sourceIDs[sourceIndex];
-                            var targetID = targetIDs[targetIndex];
-
-                            string pair = sourceID + "-" + targetID;
-                            alignModel.Add(pair, prob);
-                        }
-                        catch
-                        {
-                            Console.WriteLine("ERROR in GetAlignmentModel() Index out of bound: Line {0}, source {1}/{2} target {3}/{4}", i + 1, sourceIndex, sourceIDs.Length, targetIndex, targetIDs.Length);
-                        }
-                    }
+                    corporaAlignments.Add(bestAlignments.GetAlignedWordPairs(model, sWords, tWords));
                 }
-            }
-
-            return alignModel;
-        }
-
-        private static Hashtable ConvertTranslationTableToHashtable(Dictionary<string, Dictionary<string, double>> transTable)
-        {
-            var transModel = new Hashtable();
-
-            foreach (var entry in transTable)
-            {
-                var source = entry.Key;
-
-                if ((source != "NULL") && (source != "UNKNOWN_WORD") && (source != "<UNUSED_WORD>"))
+                else
                 {
-                    var translations = entry.Value;
-                    var newTranslations = new Hashtable();
-
-                    foreach (var translation in translations)
-                    {
-                        var target = translation.Key;
-                        var prob = translation.Value;
-
-                        newTranslations.Add(target, prob);
-                    }
-
-                    if (newTranslations.Count != 0)
-                    {
-                        transModel.Add(source, newTranslations);
-                    }
-                }
+                    corporaAlignments.Add(emptyAlignments);
+                }    
             }
 
-            return transModel;
+            return corporaAlignments;
         }
-    }
+    }  
 }
 

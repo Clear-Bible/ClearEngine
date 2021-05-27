@@ -133,7 +133,8 @@ namespace RegressionTest1
                     versePath,
                     clearService.DefaultSegmenter,
                     puncs,
-                    lang);
+                    lang,
+                    "en-US");
 
 
             // Import the versification.
@@ -159,7 +160,7 @@ namespace RegressionTest1
             // only the content words for the SMT step to follow.
 
             ParallelCorpora parallelCorporaCW =
-               utility.FilterFunctionWordsFromParallelCorpora(
+               utility.FilterWordsFromParallelCorpora(
                    parallelCorpora,
                    sourceFunctionWords,
                    targetFunctionWords);
@@ -203,7 +204,10 @@ namespace RegressionTest1
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
                     transModel2,
+                    transModel2,
+                    false,
                     manTransModel,
+                    alignProbs2,
                     alignProbs2,
                     useAlignModel,
                     puncs,

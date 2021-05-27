@@ -1,40 +1,41 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections;
-using System.IO;
 
-namespace ClearEngine3
+namespace Clear3
 {
     public enum Command
     {
-        Story1, AutoAlign,
-        Story2, IncrementalUpdate,
-        Story3, RebuildModel, // Rebuild the model with these 3 files:
-        Story4, AlignToGateway, // Align to the gateway translation，using (1) target translation, (2) alignment between manuscript and gateway
-        Story5, ManuscriptToTarget, // Create manuscript-to-target alignment through gateway-to-target alignment
-        Story6, BuildModels, // Build Translation Model with these files and specs
-        Story7, TokenizeVerses, // Tokenize a verse text file
-        Story8, CreateParallelFiles, // Create Parallel Files
-        Story9, ProcessAll, // Process from Copy the initial files (empty) to Create manTransModel and TM
-        Story10, CopyInitialFiles, // Copy the initial files (empty) to the target folder
-        Story11, InitializeState, // Initialize the State
-        Story12, DoStart, // Process from Initialize State to AutoAlign
-        Story13, FreshStart, // Process from Copy the initial files (empty) to AutoAlign
-        Menu, Help,
+        DetleteStateFiles, // Delete existing state files (for a fresh start)
+        InitializeState, // Initialize the State
+        TokenizeVerses, // Tokenize a verse text file
+        CreateParallelFiles, // Create Parallel Files
+        BuildModels, // Build Translation Model with these files and specs
+        AutoAlign,
+        IncrementalUpdate,
+        GlobalUpdate, // Rebuild the model with these 3 files:
+        AlignToGateway, // Align to the gateway translation，using (1) target translation, (2) alignment between manuscript and gateway
+        ManuscriptToTarget, // Create manuscript-to-target alignment through gateway-to-target alignment
+        ProcessAll, // Process from Copy the initial files (empty) to Create manTransModel and TM
+        FreshStart, // Process from Copy the initial files (empty) to AutoAlign
+        DoStart, // Process from Initialize State to AutoAlign
+        Menu,
+        Help,
     }
     public enum Options
     {
-        SetProject,
+        SetProject, 
         SetTestament,
         SetContentWordsOnly,
+        SetUseAlignModel,
         SetRunSpec,
         SetEpsilon,
         SetThotModel,
         SetThotHeuristic,
         SetThotIterations,
         SetSmtContentWordsOnly,
+        SetTcContentWordsOnly,
+        SetUseLemmaCatModel,
+        SetUseNoPuncModel,
     }
 
     static class Program
@@ -53,15 +54,15 @@ namespace ClearEngine3
             else
             {
                 LoadTables();
-                if (CheckCommandLine(args))
+                if (CommandLineIsGood(args))
                 {
                     ActionsClear3.InitializeConfig();
                     ProcessArgs(args);
                 }
-            }
+            }            
         }
 
-        static bool CheckCommandLine(string[] args)
+        static bool CommandLineIsGood(string[] args)
         {
             bool cmdLineError = false;
 
@@ -103,7 +104,7 @@ namespace ClearEngine3
                             cmdLineError = true;
                         }
                         else if (!GoodParameter(arg, args[i]))
-                        {
+                        {   
                             cmdLineError = true;
                         }
                     }
@@ -132,7 +133,7 @@ namespace ClearEngine3
                     good = true;
                     break;
                 case Options.SetTestament:
-                    if ((param == "OT") || (param == "NT"))
+                    if ((param == "OT") || (param == "NT") || (param == "OT-NT"))
                     {
                         good = true;
                     }
@@ -141,24 +142,14 @@ namespace ClearEngine3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be OT or NT", optionStr, param));
                     }
                     break;
-                case Options.SetContentWordsOnly:
-                    if ((param == "true") || (param == "false"))
-                    {
-                        good = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be true or false", optionStr, param));
-                    }
-                    break;
                 case Options.SetRunSpec:
-                    if (param.StartsWith("Machine;") || (param == "1:10;H:5"))
+                    if (param.StartsWith("HMM;") || param.StartsWith("IBM1;") || param.StartsWith("IBM2;") || param.StartsWith("FastAlign;"))
                     {
                         good = true;
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should start with 'Machine;' or be '1:10;H:5'", optionStr, param));
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should start with 'HMM;', 'IBM1;', 'IBM2;', or 'FastAlign;'", optionStr, param));
                     }
                     break;
                 case Options.SetEpsilon:
@@ -201,7 +192,12 @@ namespace ClearEngine3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be an integer", optionStr, param));
                     }
                     break;
+                case Options.SetContentWordsOnly:
+                case Options.SetUseAlignModel:
                 case Options.SetSmtContentWordsOnly:
+                case Options.SetTcContentWordsOnly:
+                case Options.SetUseLemmaCatModel:
+                case Options.SetUseNoPuncModel:
                     if ((param == "true") || (param == "false"))
                     {
                         good = true;
@@ -218,6 +214,7 @@ namespace ClearEngine3
 
             return good;
         }
+
 
         static void ProcessArgs(string[] args)
         {
@@ -244,12 +241,13 @@ namespace ClearEngine3
                         default: // This should never happen unless I forgot to revise the mainCommands
                             Console.WriteLine(string.Format("Error: Command {0} has no case statement.", args[0]));
                             break;
-                    }
+                    }                   
                 }
             }
 
             if (!wasSingleCommand)
             {
+                // Since we check the command line already, no need to do it here. We should assume the command line is good.
                 bool cmdLineError = false;
 
                 for (int i = 0; (!cmdLineError && (i < args.Length)); i++)
@@ -291,7 +289,7 @@ namespace ClearEngine3
                         if (optionCommands.ContainsKey(arg))
                         {
                             i++;
-                            if ((i < args.Length) && (args[i].Substring(0, 1) != "-"))
+                            if ((i < args.Length) && (args[i].Substring(0,1) != "-"))
                             {
                                 string param = args[i];
                                 if (!ProcessOption(arg, param))
@@ -319,65 +317,53 @@ namespace ClearEngine3
                         {
                             if (!initialized)
                             {
-                                ActionsClear3.InitializeFiles();
-                                ActionsClear3.Initialize();
+                                ActionsClear3.InitializeClear30Service();
+                                ActionsClear3.InitializeTargetFiles();
+                                ActionsClear3.InitializeProcessingSettings();
                             }
 
                             Command command = runCommands[runCommand];
 
                             switch (command)
                             {
-                                case Command.Story1:
-                                case Command.AutoAlign:
-                                    Console.WriteLine(ActionsClear3.Do_Button1());
+                                case Command.DetleteStateFiles:
+                                    Console.WriteLine(ActionsClear3.DeleteStateFiles());
                                     break;
-                                case Command.Story2:
-                                case Command.IncrementalUpdate:
-                                    Console.WriteLine(ActionsClear3.Do_Button2());
-                                    break;
-                                case Command.Story3:
-                                case Command.RebuildModel:
-                                    Console.WriteLine(ActionsClear3.Do_Button3());
-                                    break;
-                                case Command.Story4:
-                                case Command.AlignToGateway:
-                                    Console.WriteLine(ActionsClear3.Do_Button4());
-                                    break;
-                                case Command.Story5:
-                                case Command.ManuscriptToTarget:
-                                    Console.WriteLine(ActionsClear3.Do_Button5());
-                                    break;
-                                case Command.Story6:
-                                case Command.BuildModels:
-                                    Console.WriteLine(ActionsClear3.Do_Button6());
-                                    break;
-                                case Command.Story7:
-                                case Command.TokenizeVerses:
-                                    Console.WriteLine(ActionsClear3.Do_Button7());
-                                    break;
-                                case Command.Story8:
-                                case Command.CreateParallelFiles:
-                                    Console.WriteLine(ActionsClear3.Do_Button8());
-                                    break;
-                                case Command.Story9:
-                                case Command.ProcessAll:
-                                    Console.WriteLine(ActionsClear3.Do_Button9());
-                                    break;
-                                case Command.Story10:
-                                case Command.CopyInitialFiles:
-                                    Console.WriteLine(ActionsClear3.Do_Button10());
-                                    break;
-                                case Command.Story11:
                                 case Command.InitializeState:
-                                    Console.WriteLine(ActionsClear3.Do_Button11());
+                                    Console.WriteLine(ActionsClear3.InitializeState());
                                     break;
-                                case Command.Story12:
-                                case Command.DoStart:
-                                    Console.WriteLine(ActionsClear3.Do_Button12());
+                                case Command.TokenizeVerses:
+                                    Console.WriteLine(ActionsClear3.TokenizeVerses());
                                     break;
-                                case Command.Story13:
+                                case Command.CreateParallelFiles:
+                                    Console.WriteLine(ActionsClear3.CreateParallelCorpus());
+                                    break;
+                                case Command.BuildModels:
+                                    Console.WriteLine(ActionsClear3.BuildModels());
+                                    break;
+                                case Command.AutoAlign:
+                                    Console.WriteLine(ActionsClear3.AutoAlign());
+                                    break;
+                                case Command.IncrementalUpdate:
+                                    Console.WriteLine(ActionsClear3.IncrementalUpdate());
+                                    break;
+                                case Command.GlobalUpdate:
+                                    Console.WriteLine(ActionsClear3.GlobalUpdate());
+                                    break;
+                                case Command.AlignToGateway:
+                                    Console.WriteLine(ActionsClear3.AlignG2T());
+                                    break;
+                                case Command.ManuscriptToTarget:
+                                    Console.WriteLine(ActionsClear3.AlignM2T());
+                                    break;
+                                case Command.ProcessAll:
+                                    Console.WriteLine(ActionsClear3.ProcessAll());
+                                    break;
                                 case Command.FreshStart:
-                                    Console.WriteLine(ActionsClear3.Do_Button13());
+                                    Console.WriteLine(ActionsClear3.FreshStart());
+                                    break;
+                                case Command.DoStart:
+                                    Console.WriteLine(ActionsClear3.DoStart());
                                     break;
                                 default: // This should never happen unless I forgot to revise the mainCommands
                                     Console.WriteLine(string.Format("Error: Command {0} has no case statement.", arg));
@@ -395,6 +381,7 @@ namespace ClearEngine3
             }
         }
 
+
         private static bool ProcessOption(string optionStr, string param)
         {
             Options option = optionCommands[optionStr];
@@ -404,17 +391,22 @@ namespace ClearEngine3
             {
                 case Options.SetProject:
                     ActionsClear3.SetProject(param);
-                    Console.WriteLine("Project set to {0}", param);
+                    Console.WriteLine("project set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetTestament:
                     ActionsClear3.SetTestament(param);
-                    Console.WriteLine("Testament set to {0}", param);
+                    Console.WriteLine("testament set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetContentWordsOnly:
                     ActionsClear3.SetContentWordsOnly(param);
-                    Console.WriteLine("ContentWordsOnly set to {0}", param);
+                    Console.WriteLine("contentWordsOnly set to {0}", param);
+                    initialized = false;
+                    break;
+                case Options.SetUseAlignModel:
+                    ActionsClear3.SetUseAlignModel(param);
+                    Console.WriteLine("useAlignModel set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetRunSpec:
@@ -444,7 +436,22 @@ namespace ClearEngine3
                     break;
                 case Options.SetSmtContentWordsOnly:
                     ActionsClear3.SetSmtContentWordsOnly(param);
-                    Console.WriteLine("smtContentWordsOnly set to {0}", param);
+                    Console.WriteLine("contentWordsOnlySMT set to {0}", param);
+                    initialized = false;
+                    break;
+                case Options.SetTcContentWordsOnly:
+                    ActionsClear3.SetTcContentWordsOnly(param);
+                    Console.WriteLine("contentWordsOnlyTC set to {0}", param);
+                    initialized = false;
+                    break;
+                case Options.SetUseLemmaCatModel:
+                    ActionsClear3.SetUseLemmaCatModel(param);
+                    Console.WriteLine("useLemmaCatModel set to {0}", param);
+                    initialized = false;
+                    break;
+                case Options.SetUseNoPuncModel:
+                    ActionsClear3.SetUseNoPuncModel(param);
+                    Console.WriteLine("useNoPuncModel set to {0}", param);
                     initialized = false;
                     break;
                 default: // This should never happen unless I forgot to revise the mainCommands
@@ -456,23 +463,24 @@ namespace ClearEngine3
             return hasCase;
         }
 
+
         private static void ProcessMenu()
         {
             var menuChoices = new Dictionary<string, string>()
             {
-                {"1", "story1"},
-                {"2", "story2"},
-                {"3", "story3"},
-                {"4", "story4"},
-                {"5", "story5"},
-                {"6", "story6"},
-                {"7", "story7"},
-                {"8", "story8"},
-                {"9", "story9"},
-                {"10", "story10"},
-                {"11", "story11"},
-                {"12", "story12"},
-                {"13", "story13"},
+                {"1", "DeleteStateFiles"},
+                {"2", "InitializeState"},
+                {"3", "TokenizeVerses"}, 
+                {"4", "CreateParallelFiles"}, 
+                {"5", "BuildModels"}, 
+                {"6", "AutoAlign"}, 
+                {"7", "IncrementalUpdate"}, 
+                {"8", "GlobalUpdate"}, 
+                {"9", "AlignToGateway"},
+                {"10", "ManuscriptToTarget"},
+                {"11", "ProcessAll"},
+                {"12", "FreshStart"},
+                {"13", "DoStart"},
                 {"h", "help"},
             };
 
@@ -495,32 +503,34 @@ namespace ClearEngine3
                     {
                         Console.WriteLine(string.Format("Invalid input: {0}", choice));
                     }
-                }
+                }                
             }
         }
+
 
         private static void DisplayMenu()
         {
             Console.WriteLine();
             Console.WriteLine("MENU:");
-            Console.WriteLine("\t1. Story1 or AutoAlign");
-            Console.WriteLine("\t2. Story2 or IncrementalUpdate");
-            Console.WriteLine("\t3. Story3 or RebuildModel");
-            Console.WriteLine("\t4. Story4 or AlignToGateway");
-            Console.WriteLine("\t5. Story5 or ManuscriptToTarget");
-            Console.WriteLine("\t6. Story6 or BuildTranslationModel");
-            Console.WriteLine("\t7. Story7 or TokenizeVerses");
-            Console.WriteLine("\t8. Story8 or CreateParallelFiles");
-            Console.WriteLine("\t9. Story9 or ProcessAll");
-            Console.WriteLine("\t10.Story10 or CopyInitialFiles");
-            Console.WriteLine("\t11. Story11 or InitializeState");
-            Console.WriteLine("\t12. Story12 or DoStart");
-            Console.WriteLine("\t13. Story13 or FreshStart");
-            Console.WriteLine("\th. Help");
-            Console.WriteLine("\tx. Exit");
+            Console.WriteLine("\t1.  DeleteStateFiles");
+            Console.WriteLine("\t2.  InitializeState");
+            Console.WriteLine("\t3.  TokenizeVerses");
+            Console.WriteLine("\t4.  CreateParallelFiles");
+            Console.WriteLine("\t5.  BuildModels");
+            Console.WriteLine("\t6.  AutoAlign");
+            Console.WriteLine("\t7.  IncrementalUpdate");
+            Console.WriteLine("\t8.  GlobalUpdate");
+            Console.WriteLine("\t9.  AlignToGateway");
+            Console.WriteLine("\t10. ManuscriptToTarget");
+            Console.WriteLine("\t11. ProcessAll");
+            Console.WriteLine("\t12. FreshStart");
+            Console.WriteLine("\t13. DoStart");
+            Console.WriteLine("\th.  Help");
+            Console.WriteLine("\tx.  Exit");
             Console.WriteLine();
             Console.Write("Type Your Choice (1-12, h, x): ");
         }
+
 
         private static void ProcessHelp()
         {
@@ -531,6 +541,8 @@ namespace ClearEngine3
             Console.WriteLine("\t\tSets the testament to be processed to <testament>, which can only be OT or NT");
             Console.WriteLine("\t-c <bool>, --content-words-only=<bool>");
             Console.WriteLine("\t\tSets the contentWordsOnly boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-a <bool>, --use-align-model=<bool>");
+            Console.WriteLine("\t\tSets the useAlignModel boolean to <bool>, which can only be true or false");
             Console.WriteLine("\t-e <double>, --epsilon=<double>");
             Console.WriteLine("\t\tSets epsilon (threshold) to <double>, e.g. 0.1");
             Console.WriteLine("\t-h <heuristic>, --heuristic=<heuristic>");
@@ -541,51 +553,55 @@ namespace ClearEngine3
             Console.WriteLine("\t\tSets the Thot model to <model>, e.g. FastAlign");
             Console.WriteLine("\t-r <runspec>, --runspec=<runspec>");
             Console.WriteLine("\t\tSets the runSpec to <runspec>, e.g. 1:10;H:5 or Machine;FastAlign:Inter");
-            Console.WriteLine("\t-s <bool>, --smt-content-words-only=<bool>");
-            Console.WriteLine("\t\tSets the smtContentWordsOnly boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-smt <bool>, --smt-content-words-only=<bool>");
+            Console.WriteLine("\t\tSets the contentWordsOnlySMT boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-tc <bool>, --tc-content-words-only=<bool>");
+            Console.WriteLine("\t\tSets the contentWordsOnlyTC boolean to <bool>, which can only be true or false");
             Console.WriteLine("Here are the following commands:");
-            Console.WriteLine("\tStory1 or AutoAlign");
-            Console.WriteLine("\tStory2 or IncrementalUpdate");
-            Console.WriteLine("\tStory3 or RebuildModel");
-            Console.WriteLine("\tStory4 or AlignToGateway");
-            Console.WriteLine("\tStory5 or ManuscriptToTarget");
-            Console.WriteLine("\tStory6 or BuildnModels");
-            Console.WriteLine("\tStory7 or TokenizeVerses");
-            Console.WriteLine("\tStory8 or CreateParallelFiles");
-            Console.WriteLine("\tStory9 or ProcessAll");
-            Console.WriteLine("\tStory10 or CopyInitialFiles");
-            Console.WriteLine("\tStory11 or InitializeState");
-            Console.WriteLine("\tStory12 or DoStart");
-            Console.WriteLine("\tStory13 or FreshStart");
+            Console.WriteLine("\tDeleteStateFiles");
+            Console.WriteLine("\tInitializeState");
+            Console.WriteLine("\tTokenizeVerses");
+            Console.WriteLine("\tCreateParallelFiles");
+            Console.WriteLine("\tBuildnModels");
+            Console.WriteLine("\tAutoAlign");
+            Console.WriteLine("\tIncrementalUpdate");
+            Console.WriteLine("\tGlobalUpdate");
+            Console.WriteLine("\tAlignToGateway");
+            Console.WriteLine("\tManuscriptToTarget");
+            Console.WriteLine("\tProcessAll");
+            Console.WriteLine("\tFreshStart");
+            Console.WriteLine("\tDoStart");
             Console.WriteLine("\tMenu");
             Console.WriteLine("\tHelp or ?");
             Console.Write("Press [Return] to continue.");
             Console.ReadLine();
         }
 
+
         private static void LoadTables()
         {
             singleCommands = new Dictionary<string, Command>()
             {
                 {"menu", Command.Menu },
-                {"help", Command.Help }, {"?", Command.Help},
+                {"help", Command.Help },
+                {"?", Command.Help},
             };
 
             runCommands = new Dictionary<string, Command>()
             {
-                {"story1", Command.Story1 }, {"autoalign", Command.AutoAlign },
-                {"story2", Command.Story2 }, {"incrementalupdate", Command.IncrementalUpdate },
-                {"story3", Command.Story3 }, {"rebuildmodel", Command.RebuildModel },
-                {"story4", Command.Story4 }, {"aligntogateway", Command.AlignToGateway },
-                {"story5", Command.Story5 }, {"manuscripttotarget", Command.ManuscriptToTarget },
-                {"story6", Command.Story6 }, {"buildmodels", Command.BuildModels },
-                {"story7", Command.Story7 }, {"tokenizeverses", Command.TokenizeVerses },
-                {"story8", Command.Story8 }, {"createparallelfiles", Command.CreateParallelFiles },
-                {"story9", Command.Story9 }, {"processall", Command.ProcessAll },
-                {"story10", Command.Story10 }, {"copyinitialfiles", Command.CopyInitialFiles },
-                {"story11", Command.Story11 }, {"initializestate", Command.InitializeState },
-                {"story12", Command.Story12 }, {"dostart", Command.DoStart },
-                {"story13", Command.Story12 }, {"freshstart", Command.FreshStart },
+                {"deletestatefiles", Command.DetleteStateFiles },
+                {"initializestate", Command.InitializeState },
+                {"tokenizeverses", Command.TokenizeVerses },
+                {"createparallelfiles", Command.CreateParallelFiles },
+                {"buildmodels", Command.BuildModels },
+                {"autoalign", Command.AutoAlign },
+                {"incrementalupdate", Command.IncrementalUpdate },
+                {"globalupdate", Command.GlobalUpdate },
+                {"aligntogateway", Command.AlignToGateway },
+                {"manuscripttotarget", Command.ManuscriptToTarget },
+                {"processall", Command.ProcessAll },
+                {"freshstart", Command.FreshStart },
+                {"dostart", Command.DoStart },
             };
 
             optionCommands = new Dictionary<string, Options>()
@@ -593,14 +609,19 @@ namespace ClearEngine3
                 {"-p", Options.SetProject }, {"--project", Options.SetProject },
                 {"-t", Options.SetTestament }, {"--testament", Options.SetTestament },
                 {"-c", Options.SetContentWordsOnly }, {"--content-words-only", Options.SetContentWordsOnly },
+                {"-a", Options.SetUseAlignModel }, {"--use-align-model", Options.SetUseAlignModel },
                 {"-r", Options.SetRunSpec }, {"--runspec", Options.SetRunSpec },
                 {"-e", Options.SetEpsilon }, {"--epsilon", Options.SetEpsilon },
                 {"-m", Options.SetThotModel }, {"--model", Options.SetThotModel },
                 {"-h", Options.SetThotHeuristic }, {"--hueristic", Options.SetThotHeuristic },
                 {"-i", Options.SetThotIterations }, {"--iterations", Options.SetThotIterations },
-                {"-s", Options.SetSmtContentWordsOnly }, {"--smt-content-words-only", Options.SetSmtContentWordsOnly },
+                {"-smt", Options.SetSmtContentWordsOnly }, {"--smt-content-words-only", Options.SetSmtContentWordsOnly },
+                {"-tc", Options.SetTcContentWordsOnly }, {"--tc-content-words-only", Options.SetTcContentWordsOnly },
+                {"-lc", Options.SetUseLemmaCatModel }, {"--use-lemma-cat-model", Options.SetUseLemmaCatModel },
+                {"-np", Options.SetUseNoPuncModel }, {"--use-no-punc-model", Options.SetUseNoPuncModel },
             };
         }
+
 
         private static bool initialized = false;
         private static Dictionary<string, Command> singleCommands;

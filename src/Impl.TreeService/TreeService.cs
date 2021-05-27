@@ -381,12 +381,14 @@ namespace ClearBible.Clear3.Impl.TreeService
                         // lemma = e.Lemma(),
                         text = e.Surface().Replace(' ', '~'),
                         lemma = e.Lemma().Replace(' ', '~'),
+                        category = e.Category(), // 2021.05.26 CL: Added so we can use category.
                         sourceID = e.SourceID()
                     }))
                 .OrderBy(x => x.sourceID.AsCanonicalString)
                 .Select(x => new Source(
                     new SourceText(x.text),
-                    new Lemma(x.lemma),
+                    new SourceLemma(x.lemma),
+                    new Category(x.category), // 2021.05.26 CL: Added so we can use category.
                     x.sourceID))
                 .ToList());
         }

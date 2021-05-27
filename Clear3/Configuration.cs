@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 using System.Collections;
 using System.Xml;
 
-namespace ClearEngine3
+namespace Clear3
 {
     class Configuration
     {
-        public static Hashtable GetSettings(string configFile)
+        public static Dictionary<string, string> GetSettings(string configFile)
         {
-            Hashtable settings = new Hashtable();
+            var settings = new Dictionary<string, string>();
 
             XmlDocument configDoc = new XmlDocument();
 

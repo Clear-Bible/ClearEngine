@@ -106,7 +106,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// linked to the unlinked source point, or null if no suitable target
         /// point can be found.
         /// </returns>
-        /// 
+        ///
+        /// CL: Like Align2.AlignWord()
         public static OpenTargetBond AlignUnlinkedSourcePoint(
             SourcePoint sourceNode,
             List<TargetPoint> targetPoints,
@@ -146,7 +147,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 if (assumptions.IsStopWord(sourceNode.Lemma) &&
                     !assumptions.IsGoodLink(
                         sourceNode.Lemma,
-                        targetPoint.Lower))
+                        targetPoint.Lemma))
                 {
                     return null;
                 }
@@ -155,9 +156,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // and the target point is neither punctuation nor stop word:
                 if (!assumptions.IsBadLink(
                         sourceNode.Lemma,
-                        targetPoint.Lower) &&
-                    !assumptions.IsPunctuation(targetPoint.Lower) &&
-                    !assumptions.IsStopWord(targetPoint.Lower))
+                        targetPoint.Lemma) &&
+                    !assumptions.IsPunctuation(targetPoint.Lemma) &&
+                    !assumptions.IsStopWord(targetPoint.Lemma))
                 {
                     // Find it appropriate to link to this target word
                     // with a (log) probability of 0.
@@ -409,19 +410,22 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // keep only those not already linked, take the resulting
             // sequence only until punctuation is found, and convert to
             // MaybeTargetPoint objects.
+            //
+            // CL: In the original Aligne2.GetTopCandidate(), it would check if the source and target lemmas are in the transModel.
+            // It doesn't seem to do that here, but instead does it later in GetTopCandidate()
             var ansr =
                 positions
                 .Where(n => n >= 0 && n < targetPoints.Count)
                 .Select(n => targetPoints[n])
                 .Select(targetPoint => new
                 {
-                    targetPoint.Lower,
+                    targetPoint.Lemma,
                     targetPoint
                 })
                 .Where(x =>
-                    !assumptions.ContentWordsOnly || isContentWord(x.Lower))
-                .Where(x => isNotLinkedAlready(x.Lower))
-                .TakeWhile(x => isNotPunctuation(x.Lower))
+                    !assumptions.ContentWordsOnly || isContentWord(x.Lemma))
+                .Where(x => isNotLinkedAlready(x.Lemma))
+                .TakeWhile(x => isNotPunctuation(x.Lemma))
                 .Select(x => new MaybeTargetPoint(x.targetPoint))
                 .ToList();
 
@@ -508,11 +512,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Helper function to test that target point is not punctuation.
             bool notPunctuation(MaybeTargetPoint tw) =>
-                !assumptions.IsPunctuation(tw.Lower);
+                !assumptions.IsPunctuation(tw.Lemma);
 
             // Helper function to test that target point is not a stopword.
             bool notTargetStopWord(MaybeTargetPoint tw) =>
-                !assumptions.IsStopWord(tw.Lower);
+                !assumptions.IsStopWord(tw.Lemma);
 
             // Helper function to test that target point is not already linked.
             bool notAlreadyLinked(MaybeTargetPoint tw) =>
@@ -520,18 +524,27 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             // Helper function to test that candidate is not a bad link.
             bool notBadLink(MaybeTargetPoint tw) =>
-                !assumptions.IsBadLink(sWord.Lemma, tw.Lower);
+                !assumptions.IsBadLink(sWord.Lemma, tw.Lemma);
 
             // Helper function to test that if source point is a stopword
             // then candidate is a good link.
             bool sourceStopWordImpliesIsGoodLink(MaybeTargetPoint tw) =>
                 !assumptions.IsStopWord(sWord.Lemma) ||
-                assumptions.IsGoodLink(sWord.Lemma, tw.Lower);
+                assumptions.IsGoodLink(sWord.Lemma, tw.Lemma);
+
+            // 2021.05.27 CL: This is where we need to check if we used lemma_cat to develop the translation model.
+            // We need to use a lemmaKey instead of just the lemma, making the key lemma_cat if UseLemmaCatModel.
+
+            string lemmaKey = sWord.Lemma;
+            if (assumptions.UseLemmaCatModel)
+            {
+                lemmaKey += "_" + sWord.Category;
+            }
 
             // Helper function to obtain the score for a candidate
             // from the estimated translation model.
             double getTranslationModelScore(MaybeTargetPoint tw) =>
-                assumptions.GetTranslationModelScore(sWord.Lemma, tw.Lower);
+                assumptions.GetTranslationModelScore(sWord.Lemma, tw.Lemma);
 
             // If the probabilities table has any entries:
             if (probs.Count > 0)
@@ -577,7 +590,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // text and position of the candidate, and call the
             // standard hashing function on this string.
             int hashCodeOfWordAndPosition(MaybeTargetPoint tw) =>
-                $"{tw.Lower}-{tw.Position}".GetHashCode();
+                $"{tw.Lemma}-{tw.Position}".GetHashCode();
 
             // Starting from the candidates table, order the
             // entries by probability in descending order and

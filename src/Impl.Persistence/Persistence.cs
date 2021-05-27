@@ -116,7 +116,7 @@ namespace ClearBible.Clear3.Impl.Persistence
             string groupKey =
                 string.Join(
                     " ",
-                    targets.Select(t => t.TargetPoint.Lower))
+                    targets.Select(t => t.TargetPoint.Lemma))
                 .Trim();
 
             // If the group key occurs in the primary positions table:

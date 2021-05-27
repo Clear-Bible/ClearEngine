@@ -10,7 +10,7 @@ using ClearBible.Clear3.API;
 using ClearBible.Clear3.Service;
 using ClearBible.Clear3.SubTasks;
 
-namespace ClearEngine3
+namespace Clear3
 {
     public class Persistence
     {
@@ -22,6 +22,7 @@ namespace ClearEngine3
             string sourceTextFile,
             string sourceLemmaFile,
             string sourceIdFile,
+            string sourceLemmaCatFile,
             string targetTextFile,
             string targetLemmaFile,
             string targetIdFile)
@@ -29,6 +30,7 @@ namespace ClearEngine3
             using (StreamWriter swSourceTextFile = new StreamWriter(sourceTextFile, false, Encoding.UTF8))
             using (StreamWriter swSourceLemmaFile = new StreamWriter(sourceLemmaFile, false, Encoding.UTF8))
             using (StreamWriter swSourceIdFile = new StreamWriter(sourceIdFile, false, Encoding.UTF8))
+            using (StreamWriter swSourceLemmaCatFile = new StreamWriter(sourceLemmaCatFile, false, Encoding.UTF8))
             using (StreamWriter swTargetTextFile = new StreamWriter(targetTextFile, false, Encoding.UTF8))
             using (StreamWriter swTargetLemmaFile = new StreamWriter(targetLemmaFile, false, Encoding.UTF8))
             using (StreamWriter swTargetIdFile = new StreamWriter(targetIdFile, false, Encoding.UTF8))
@@ -38,30 +40,40 @@ namespace ClearEngine3
                     swSourceTextFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => s.SourceText.Text)));
                     swSourceLemmaFile.WriteLine(string.Join(" ",
-                        zp.SourceZone.List.Select(s => s.Lemma.Text)));
+                        zp.SourceZone.List.Select(s => s.SourceLemma.Text)));
+                   
                     swSourceIdFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => s.SourceID.AsCanonicalString)));
+                    swSourceLemmaCatFile.WriteLine(string.Join(" ",
+                        zp.SourceZone.List.Select(s => s.SourceLemma.Text), "_",
+                        zp.SourceZone.List.Select(s => s.Category.Text)));
                     swTargetTextFile.WriteLine(string.Join(" ",
                         zp.TargetZone.List.Select(t => t.TargetText.Text)));
                     swTargetLemmaFile.WriteLine(string.Join(" ",
-                        zp.TargetZone.List.Select(t => t.TargetText.Text.ToLowerInvariant())));
+                        zp.TargetZone.List.Select(t => t.TargetLemma.Text)));
                     swTargetIdFile.WriteLine(string.Join(" ",
                         zp.TargetZone.List.Select(t => t.TargetID.AsCanonicalString)));
                 }
             }
         }
 
+        // Even though we write all the files associated with a parallel corpus at the same time,
+        // We want to import them based upon being give three files for source and target.
+        // We will not distinguish between lemma and lemma_cat here, which means we will not read in
+        // a category since it is not used by ClearEngine3. We just added it so we could write it out.
         public static ParallelCorpora ImportParallelCorpus(
             string sourceTextFile,
             string sourceLemmaFile,
             string sourceIdFile,
             string targetTextFile,
+            string targetLemmaFile,
             string targetIdFile)
         {
             string[] sourceTextLines = File.ReadAllLines(sourceTextFile);
-            string[] sourceLemmaLines = File.ReadAllLines(sourceLemmaFile);
+            string[] sourceLemmaLines = File.ReadAllLines(sourceLemmaFile);            
             string[] sourceIdLines = File.ReadAllLines(sourceIdFile);
             string[] targetTextLines = File.ReadAllLines(targetTextFile);
+            string[] targetLemmaLines = File.ReadAllLines(targetLemmaFile);
             string[] targetIdLines = File.ReadAllLines(targetIdFile);
 
             if (sourceIdLines.Length != targetIdLines.Length)
@@ -78,6 +90,7 @@ namespace ClearEngine3
                 string[] sourceLemmas = sourceLemmaLines[i].Split();
                 string[] sourceIDs = sourceIdLines[i].Split();
                 string[] targetText = targetTextLines[i].Split();
+                string[] targetLemmas = targetLemmaLines[i].Split();
                 string[] targetIDs = targetIdLines[i].Split();
 
 
@@ -86,7 +99,8 @@ namespace ClearEngine3
                 {
                     var source = new Source(
                         new SourceText(sourceText[j]),
-                        new Lemma(sourceLemmas[j]),
+                        new SourceLemma(sourceLemmas[j]),
+                        new Category(string.Empty),
                         new SourceID(sourceIDs[j]));
                     sourceList.Add(source);
                 }
@@ -96,6 +110,7 @@ namespace ClearEngine3
                 {
                     var target = new Target(
                         new TargetText(targetText[j]),
+                        new TargetLemma(targetLemmas[j]),
                         new TargetID(targetIDs[j]));
                     targetList.Add(target);
                 }
