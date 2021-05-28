@@ -256,5 +256,33 @@ namespace Clear3
             sw.Close();
         }
 
+        //
+        public static void ExportTargetVerseCorpus(TargetVerseCorpus targetVerseCorpus, string textFile, string lemmaFile, string idFile)
+        {
+            using (StreamWriter swText = new StreamWriter(textFile, false, Encoding.UTF8))
+            using (StreamWriter swLemma = new StreamWriter(lemmaFile, false, Encoding.UTF8))
+            using (StreamWriter swID = new StreamWriter(idFile, false, Encoding.UTF8))
+            {
+                foreach (var targetVerse in targetVerseCorpus.List)
+                {
+                    string verseID = targetVerse.List[0].TargetID.AsCanonicalString.Substring(0, 8);
+                    string textLine = string.Empty;
+                    string lemmaLine = string.Empty;
+                    string idLine = string.Empty;
+
+                    foreach (var target in targetVerse.List)
+                    {
+                        textLine += target.TargetText.Text + " ";
+                        lemmaLine += target.TargetLemma.Text + " ";
+                        idLine += target.TargetID.AsCanonicalString + " ";
+                    }
+
+                    swText.WriteLine("{0}  {1}", verseID, textLine.Trim());
+                    swLemma.WriteLine("{0}  {1}", verseID, lemmaLine.Trim());
+                    swID.WriteLine("{0}  {1}", verseID, idLine.Trim());
+                }
+            }
+        }
+
     }
 }

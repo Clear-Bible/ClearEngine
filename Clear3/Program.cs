@@ -317,7 +317,6 @@ namespace Clear3
                         {
                             if (!initialized)
                             {
-                                ActionsClear3.InitializeClear30Service();
                                 ActionsClear3.InitializeTargetFiles();
                                 ActionsClear3.InitializeProcessingSettings();
                             }

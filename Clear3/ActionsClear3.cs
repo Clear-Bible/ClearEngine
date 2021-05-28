@@ -90,6 +90,8 @@ namespace Clear3
 
             clearConfigFilename = "CLEAR.config"; // default configuration file
             ReadConfig(clearConfigFilename);
+
+            InitializeClear30Service();
         }
 
         // CL: 2020.08.21 Modified to use a .config (XML) file to store all of the filenames and booleans rather than embedding them in the code.
@@ -129,12 +131,14 @@ namespace Clear3
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
             //
-            // tokenFilename = clearSettings["TokenFile"]; // e.g. "tokens.txt"
-            // tokenLemmaFilename = clearSettings["TokenLemmaFile"]; // e.g. "tokens.lower.txt", Not currently used
+            tokenTextFilename = clearSettings["TokenTextFile"];
+            tokenLemmaFilename = clearSettings["TokenLemmaFile"];
+            tokenIdFilename = clearSettings["TokenIdFile"];
 
             // sourceTextFilenameM = clearSettings["SourceTextFileM"]; // e.g. 
             // sourceIdFilenameM = clearSettings["SourceIdFileM"]; // e.g. 
-            // sourceLemmaFilenameM = clearSettings["SourceLemmaFileM"]; // e.g. 
+            // sourceLemmaFilenameM = clearSettings["SourceLemmaFileM"]; // e.g.
+            // sourceLemmaCatFilenameM = clearSettings["SourceLemmaCatFileM"];
 
             sourceTextFilename = clearSettings["SourceTextFile"];
             sourceLemmaFilename = clearSettings["SourceLemmaFile"];
@@ -277,7 +281,7 @@ namespace Clear3
 
         }
 
-        public static void InitializeClear30Service()
+        private static void InitializeClear30Service()
         {
             // Get ready to use the Clear3 API.
 
@@ -342,9 +346,9 @@ namespace Clear3
             targetFolder = Path.Combine(translationFolder, testament);
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
-            // tokenTextFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenTextFilename);
-            // tokenLemmaFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenLemmaFilename);
-            // tokenIdFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenIdFilename);
+            tokenTextFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenTextFilename);
+            tokenLemmaFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenLemmaFilename);
+            tokenIdFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenIdFilename);
 
             // Parallel Corpus Files
 
@@ -648,6 +652,10 @@ namespace Clear3
 
             ShowTime();
 
+            Persistence.ExportTargetVerseCorpus(targetVerseCorpus, tokenTextFile, tokenLemmaFile, tokenIdFile);
+
+            ShowTime();
+
             return (versesFile + " has been tokenized and targetVerseCorpus has been created.");
         }
 
@@ -768,6 +776,8 @@ namespace Clear3
 
                 Persistence.ExportTranslationModel(translationModel, transModelFileCW);
                 Persistence.ExportAlignmentModel(alignmentModel, alignModelFileCW);
+
+                ShowTime();
 
                 return ("Models built: " + transModelFileCW + "; " + alignModelFileCW);
             }
@@ -1152,16 +1162,21 @@ namespace Clear3
         private static ParallelCorpora parallelCorporaNoPunc;
         private static ParallelCorpora parallelCorporaNoPuncCW;
 
-        // private static string tokenFilename;
-        // private static string tokFile;
-        // private static string tokenLemmaFilename;
-        // private static string tokLowerFile;
+        private static string tokenTextFilename;
+        private static string tokenTextFile;
+        private static string tokenLemmaFilename;
+        private static string tokenLemmaFile;
+        private static string tokenIdFilename;
+        private static string tokenIdFile;
+
         // private static string sourceTextFilenameM;
         // private static string sourceTextFileM;
         // private static string sourceIdFilenameM;
         // private static string sourceIdFileM;
         // private static string sourceLemmaFilenameM;
         // private static string sourceLemmaFileM;
+        // private static string sourceLemmaCatFilenameM;
+        // private static string sourceLemmaCatFileM;
 
         private static string sourceTextFilename;
         private static string sourceTextFile;
