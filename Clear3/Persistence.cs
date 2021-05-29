@@ -40,12 +40,11 @@ namespace Clear3
                     swSourceTextFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => s.SourceText.Text)));
                     swSourceLemmaFile.WriteLine(string.Join(" ",
-                        zp.SourceZone.List.Select(s => s.SourceLemma.Text)));
-                   
+                        zp.SourceZone.List.Select(s => s.SourceLemma.Text)));                   
                     swSourceIdFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => s.SourceID.AsCanonicalString)));
-                    swSourceLemmaCatFile.WriteLine(string.Join(" ",
-                        zp.SourceZone.List.Select(s => s.SourceLemma.Text), "_",
+                    swSourceLemmaCatFile.WriteLine(CreateLemmaCat(
+                        zp.SourceZone.List.Select(s => s.SourceLemma.Text),
                         zp.SourceZone.List.Select(s => s.Category.Text)));
                     swTargetTextFile.WriteLine(string.Join(" ",
                         zp.TargetZone.List.Select(t => t.TargetText.Text)));
@@ -55,6 +54,21 @@ namespace Clear3
                         zp.TargetZone.List.Select(t => t.TargetID.AsCanonicalString)));
                 }
             }
+        }
+
+        // CL: There may be a better way to do this using Linq, but for now, this works.
+        private static string CreateLemmaCat(IEnumerable<string> lemmas1, IEnumerable<string> categories1)
+        {
+            var lemmaList = lemmas1.ToList();
+            var categoryList = categories1.ToList();
+            string lemmaCatLine = string.Empty;
+
+            for (int i = 0; i < lemmaList.Count; i++)
+            {
+                lemmaCatLine += string.Format("{0}_{1} ", lemmaList[i], categoryList[i]);
+            }
+
+            return lemmaCatLine.Trim();
         }
 
         // Even though we write all the files associated with a parallel corpus at the same time,
