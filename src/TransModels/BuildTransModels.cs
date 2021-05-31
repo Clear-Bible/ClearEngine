@@ -32,11 +32,7 @@ namespace TransModels
             )
         {
             // Check if using Machine models
-            if (!runSpec.StartsWith("HMM;"))
-            {
-                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
-            }
-            else
+            if (runSpec.StartsWith("HMM;"))
             {
                 ModelBuilder modelBuilder = new ModelBuilder();
 
@@ -59,9 +55,14 @@ namespace TransModels
                 var corporaAlignments = GetCorporaAlignments(modelBuilder);
                 var alignModel = GetAlignmentModel(corporaAlignments, sourceIdFile, targetIdFile);
                 WriteAlignModel(alignModel, alignModelFile);
-
-                // string pharaohFile = alignModelFile.Replace(".tsv", "_pharaoh.txt");
-                // WritePharaohAlignments(corporaAlignments, pharaohFile);
+            }
+            else if (runSpec.StartsWith("IBM4;"))
+            {
+                BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
+            }
+            else
+            {
+                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
             }
         }
 
@@ -140,27 +141,7 @@ namespace TransModels
             return alignModel;
         }
 
-        // Not sure if we need this since I have tools and AlignModel to JSON and JSON to Pharaoh. I may also write a tool to convert AlignModel directly to Pharaoh.
-        public static void WritePharaohAlignments(
-            IReadOnlyCollection<IReadOnlyCollection<AlignedWordPair>> corporaAlignments,
-            string file)
-        {
-            StreamWriter sw = new StreamWriter(file, false, Encoding.UTF8);
-
-            foreach (var alignments in corporaAlignments)
-            {
-                string pharaohLine = string.Empty;
-
-                foreach (var alignment in alignments)
-                {
-                    pharaohLine += string.Format("{0}-{1} ", alignment.SourceIndex, alignment.TargetIndex);
-                }
-                sw.WriteLine(pharaohLine.Trim());
-            }
-
-            sw.Close();
-        }
-
+        //
         public static void WriteAlignModel(SortedDictionary<string, double> table, string file)
         {
             StreamWriter sw = new StreamWriter(file, false, Encoding.UTF8);

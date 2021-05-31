@@ -65,9 +65,6 @@ namespace TransModels
                 var corporaAlignments = GetCorporaAlignments(sourceLemmaFile, targetLemmaFile, model);
                 var alignModel = BuildTransModels.GetAlignmentModel(corporaAlignments, sourceIdFile, targetIdFile);
                 BuildTransModels.WriteAlignModel(alignModel, alignModelFile);
-
-                // string pharaohFile = alignModelFile.Replace(".tsv", "_pharaoh.txt");
-                // BuildTransModels.WritePharaohAlignments(corporaAlignments, pharaohFile);
             }
         }
 
@@ -155,7 +152,6 @@ namespace TransModels
                     var tWords = targetLemmaLine.Split();
 
                     WordAlignmentMatrix bestAlignments = model.GetBestAlignment(sWords, tWords);
-                    var modelAlignments = bestAlignments.GetAlignedWordPairs(model, sWords, tWords);
 
                     corporaAlignments.Add(bestAlignments.GetAlignedWordPairs(model, sWords, tWords));
                 }

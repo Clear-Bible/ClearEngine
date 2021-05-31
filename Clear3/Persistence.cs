@@ -40,12 +40,11 @@ namespace Clear3
                     swSourceTextFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => s.SourceText.Text)));
                     swSourceLemmaFile.WriteLine(string.Join(" ",
-                        zp.SourceZone.List.Select(s => s.SourceLemma.Text)));
-                   
+                        zp.SourceZone.List.Select(s => s.SourceLemma.Text)));                   
                     swSourceIdFile.WriteLine(string.Join(" ",
                         zp.SourceZone.List.Select(s => s.SourceID.AsCanonicalString)));
-                    swSourceLemmaCatFile.WriteLine(string.Join(" ",
-                        zp.SourceZone.List.Select(s => s.SourceLemma.Text), "_",
+                    swSourceLemmaCatFile.WriteLine(CreateLemmaCat(
+                        zp.SourceZone.List.Select(s => s.SourceLemma.Text),
                         zp.SourceZone.List.Select(s => s.Category.Text)));
                     swTargetTextFile.WriteLine(string.Join(" ",
                         zp.TargetZone.List.Select(t => t.TargetText.Text)));
@@ -55,6 +54,21 @@ namespace Clear3
                         zp.TargetZone.List.Select(t => t.TargetID.AsCanonicalString)));
                 }
             }
+        }
+
+        // CL: There may be a better way to do this using Linq, but for now, this works.
+        private static string CreateLemmaCat(IEnumerable<string> lemmas1, IEnumerable<string> categories1)
+        {
+            var lemmaList = lemmas1.ToList();
+            var categoryList = categories1.ToList();
+            string lemmaCatLine = string.Empty;
+
+            for (int i = 0; i < lemmaList.Count; i++)
+            {
+                lemmaCatLine += string.Format("{0}_{1} ", lemmaList[i], categoryList[i]);
+            }
+
+            return lemmaCatLine.Trim();
         }
 
         // Even though we write all the files associated with a parallel corpus at the same time,
@@ -254,6 +268,34 @@ namespace Clear3
                 sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}", pair, prob)); // If we want to make this sorted file more readable, we could change it to .txt files with " # " or "\t#\t" as the separator.
             }
             sw.Close();
+        }
+
+        //
+        public static void ExportTargetVerseCorpus(TargetVerseCorpus targetVerseCorpus, string textFile, string lemmaFile, string idFile)
+        {
+            using (StreamWriter swText = new StreamWriter(textFile, false, Encoding.UTF8))
+            using (StreamWriter swLemma = new StreamWriter(lemmaFile, false, Encoding.UTF8))
+            using (StreamWriter swID = new StreamWriter(idFile, false, Encoding.UTF8))
+            {
+                foreach (var targetVerse in targetVerseCorpus.List)
+                {
+                    string verseID = targetVerse.List[0].TargetID.AsCanonicalString.Substring(0, 8);
+                    string textLine = string.Empty;
+                    string lemmaLine = string.Empty;
+                    string idLine = string.Empty;
+
+                    foreach (var target in targetVerse.List)
+                    {
+                        textLine += target.TargetText.Text + " ";
+                        lemmaLine += target.TargetLemma.Text + " ";
+                        idLine += target.TargetID.AsCanonicalString + " ";
+                    }
+
+                    swText.WriteLine("{0}  {1}", verseID, textLine.Trim());
+                    swLemma.WriteLine("{0}  {1}", verseID, lemmaLine.Trim());
+                    swID.WriteLine("{0}  {1}", verseID, idLine.Trim());
+                }
+            }
         }
 
     }

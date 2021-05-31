@@ -90,6 +90,8 @@ namespace Clear3
 
             clearConfigFilename = "CLEAR.config"; // default configuration file
             ReadConfig(clearConfigFilename);
+
+            InitializeClear30Service();
         }
 
         // CL: 2020.08.21 Modified to use a .config (XML) file to store all of the filenames and booleans rather than embedding them in the code.
@@ -129,12 +131,14 @@ namespace Clear3
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
             //
-            // tokenFilename = clearSettings["TokenFile"]; // e.g. "tokens.txt"
-            // tokenLemmaFilename = clearSettings["TokenLemmaFile"]; // e.g. "tokens.lower.txt", Not currently used
+            tokenTextFilename = clearSettings["TokenTextFile"];
+            tokenLemmaFilename = clearSettings["TokenLemmaFile"];
+            tokenIdFilename = clearSettings["TokenIdFile"];
 
             // sourceTextFilenameM = clearSettings["SourceTextFileM"]; // e.g. 
             // sourceIdFilenameM = clearSettings["SourceIdFileM"]; // e.g. 
-            // sourceLemmaFilenameM = clearSettings["SourceLemmaFileM"]; // e.g. 
+            // sourceLemmaFilenameM = clearSettings["SourceLemmaFileM"]; // e.g.
+            // sourceLemmaCatFilenameM = clearSettings["SourceLemmaCatFileM"];
 
             sourceTextFilename = clearSettings["SourceTextFile"];
             sourceLemmaFilename = clearSettings["SourceLemmaFile"];
@@ -277,7 +281,7 @@ namespace Clear3
 
         }
 
-        public static void InitializeClear30Service()
+        private static void InitializeClear30Service()
         {
             // Get ready to use the Clear3 API.
 
@@ -342,9 +346,9 @@ namespace Clear3
             targetFolder = Path.Combine(translationFolder, testament);
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
-            // tokenTextFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenTextFilename);
-            // tokenLemmaFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenLemmaFilename);
-            // tokenIdFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenIdFilename);
+            tokenTextFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenTextFilename);
+            tokenLemmaFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenLemmaFilename);
+            tokenIdFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenIdFilename);
 
             // Parallel Corpus Files
 
@@ -443,7 +447,7 @@ namespace Clear3
 
             epsilon = Double.Parse(strEpsilon); // Must exceed this to be counted into model, e.g. "0.1"
             contentWordsOnlySMT = (strContentWordsOnlySMT == "true"); // e.g. "true" Only use content words for building models
-            contentWordsOnlyTC = (strContentWordsOnlyTC == "true"); // e.g. "true" Only use content words for building models
+            contentWordsOnlyTC = (strContentWordsOnlyTC == "true"); // e.g. "true" Only use content words for finding terminal candidates
             contentWordsOnly = (strContentWordsOnly == "true"); // e.g. "true" Only align content words
 
             useAlignModel = (strUseAlignModel == "true"); // e.g. "true"
@@ -648,6 +652,10 @@ namespace Clear3
 
             ShowTime();
 
+            Persistence.ExportTargetVerseCorpus(targetVerseCorpus, tokenTextFile, tokenLemmaFile, tokenIdFile);
+
+            ShowTime();
+
             return (versesFile + " has been tokenized and targetVerseCorpus has been created.");
         }
 
@@ -672,7 +680,7 @@ namespace Clear3
                 sourceFunctionWords,
                 targetFunctionWords);
 
-            Persistence.ExportParallelCorpora(parallelCorporaCW, sourceTextFileCW, sourceLemmaFileCW, sourceLemmaCatFileCW, sourceIdFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
+            Persistence.ExportParallelCorpora(parallelCorporaCW, sourceTextFileCW, sourceLemmaFileCW, sourceIdFileCW, sourceLemmaCatFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
 
             ShowTime();
 
@@ -681,7 +689,7 @@ namespace Clear3
                  puncs,
                  puncs);
 
-            Persistence.ExportParallelCorpora(parallelCorpora, sourceTextNoPuncFile, sourceLemmaNoPuncFile, sourceLemmaCatNoPuncFile, sourceIdNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
+            Persistence.ExportParallelCorpora(parallelCorpora, sourceTextNoPuncFile, sourceLemmaNoPuncFile, sourceIdNoPuncFile, sourceLemmaCatNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
 
             ShowTime();
 
@@ -690,7 +698,7 @@ namespace Clear3
                  puncs,
                  puncs);
 
-            Persistence.ExportParallelCorpora(parallelCorporaNoPuncCW, sourceTextNoPuncFileCW, sourceLemmaNoPuncFileCW, sourceLemmaCatNoPuncFileCW, sourceIdNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
+            Persistence.ExportParallelCorpora(parallelCorporaNoPuncCW, sourceTextNoPuncFileCW, sourceLemmaNoPuncFileCW, sourceIdNoPuncFileCW, sourceLemmaCatNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
 
             ShowTime();
 
@@ -700,8 +708,6 @@ namespace Clear3
         // Was Do_Button6()
         public static string BuildModels()
         {
-            Console.Write("Building Models");
-
             // Create a new runSpec if thotModel is specified, otherwise, use exisiting runSpec set by command line or processing.config.
 
             if (thotModel == "HMM")
@@ -713,43 +719,9 @@ namespace Clear3
                 runSpec = string.Format("{0};{1};{2}", thotModel, thotHeuristic, thotIterations);
             }
 
+            (ParallelCorpora smtParallelCorpora, ParallelCorpora smtParallelCorporaCW) = InitializeParallelCorpora();
 
-            if (parallelCorpora == null) parallelCorpora = Persistence.ImportParallelCorpus(sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetIdFile);
-            if (parallelCorporaCW == null) parallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextFileCW, sourceLemmaFileCW, sourceIdFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
-
-            // Default parallel corpora
-            ParallelCorpora smtParallelCorpora = parallelCorpora;
-            ParallelCorpora smtParallelCorporaCW = parallelCorporaCW;
-
-            // Update files for different scenarios
-            if (useLemmaCatModel)
-            {
-                Console.Write(" with Source Lemma_Cat");
-
-                if (useNoPuncModel)
-                {
-                    Console.Write(" with No Source and Target Punctuations");
-
-                    smtParallelCorpora = Persistence.ImportParallelCorpus(sourceTextNoPuncFile, sourceLemmaCatNoPuncFile, sourceIdNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
-                    smtParallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextNoPuncFileCW, sourceLemmaCatNoPuncFileCW, sourceIdNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
-                }
-                else
-                {
-                    smtParallelCorpora = Persistence.ImportParallelCorpus(sourceTextFile, sourceLemmaCatFile, sourceIdFile, targetTextFile, targetLemmaFile, targetIdFile);
-                    smtParallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextFileCW, sourceLemmaCatFileCW, sourceIdFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
-
-                }
-            }
-            else if (useNoPuncModel)
-            {
-                Console.Write(" with No Source and Target Punctuations");
-
-                if (parallelCorporaNoPunc == null) parallelCorporaNoPunc = Persistence.ImportParallelCorpus(sourceTextNoPuncFile, sourceLemmaNoPuncFile, sourceIdNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
-                if (parallelCorporaNoPuncCW == null) parallelCorporaNoPuncCW = Persistence.ImportParallelCorpus(sourceTextNoPuncFileCW, sourceLemmaNoPuncFileCW, sourceIdNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
-
-                smtParallelCorpora = parallelCorporaNoPunc;
-                smtParallelCorporaCW = parallelCorporaNoPuncCW;
-            }
+            Console.Write("Building Models");
 
             // Train a statistical translation model using the parallel corpora producing an estimated translation model and estimated alignment.
             // There are three possible scenarios for how to use parallel corpus with all words or content only words.
@@ -758,48 +730,41 @@ namespace Clear3
             if (contentWordsOnlySMT)
             {
                 Console.WriteLine(" with Content Words Only.");
-
                 ShowTime();
 
                 (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorporaCW, runSpec, epsilon);
 
+                ShowTime();
                 translationModelRest = translationModel;
                 alignmentModelPre = alignmentModel;
-
                 Persistence.ExportTranslationModel(translationModel, transModelFileCW);
                 Persistence.ExportAlignmentModel(alignmentModel, alignModelFileCW);
+                ShowTime();
 
                 return ("Models built: " + transModelFileCW + "; " + alignModelFileCW);
             }
             else if (contentWordsOnlyTC)
             {
                 Console.WriteLine(" with Content Words Only for Finding Terminal Candidates.");
-
                 ShowTime();
 
                 (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorporaCW, runSpec, epsilon);
 
                 ShowTime();
-
                 Persistence.ExportTranslationModel(translationModel, transModelFileCW);
                 Persistence.ExportAlignmentModel(alignmentModel, alignModelFileCW);
-
                 ShowTime();
 
                 Console.WriteLine("Building Models (for All Words).");
-
                 ShowTime();
 
                 (var translationModelAllWords, var alignmentModelAllWords) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec, epsilon);
 
                 ShowTime();
-
                 translationModelRest = translationModelAllWords;
                 alignmentModelPre = alignmentModelAllWords;
-
                 Persistence.ExportTranslationModel(translationModelAllWords, transModelFile);
                 Persistence.ExportAlignmentModel(alignmentModelAllWords, alignModelFile);
-
                 ShowTime();
 
                 return ("Models built: " + transModelFile + "; " + alignModelFile + "; " + transModelFileCW + "; " + alignModelFileCW);
@@ -807,23 +772,79 @@ namespace Clear3
             else
             {
                 Console.WriteLine(".");
-
                 ShowTime();
 
                 (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec, epsilon);
 
                 ShowTime();
-
                 translationModelRest = translationModel;
                 alignmentModelPre = alignmentModel;
-
                 Persistence.ExportTranslationModel(translationModel, transModelFile);
                 Persistence.ExportAlignmentModel(alignmentModel, alignModelFile);
-
                 ShowTime();
 
                 return ("Models built: " + transModelFile + "; " + alignModelFile);
             }
+        }
+
+        // returns the two sets (all words and content words only) parallel corpora based upon different settings for building models
+        private static (ParallelCorpora, ParallelCorpora) InitializeParallelCorpora()
+        {
+            // Initialize the content words only and all words corpora
+            ParallelCorpora smtParallelCorpora;
+            ParallelCorpora smtParallelCorporaCW;
+
+            Console.Write("Building Models: Initializing parallel corpora");
+
+            // Update files for different scenarios
+            if (useLemmaCatModel)
+            {
+                Console.Write(" with Source Lemma_Cat");
+
+                if (useNoPuncModel)
+                {
+                    Console.WriteLine(" with No Source and No Target Punctuations.");
+                    ShowTime();
+
+                    smtParallelCorpora = Persistence.ImportParallelCorpus(sourceTextNoPuncFile, sourceLemmaCatNoPuncFile, sourceIdNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
+                    smtParallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextNoPuncFileCW, sourceLemmaCatNoPuncFileCW, sourceIdNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
+                }
+                else
+                {
+                    Console.WriteLine(".");
+                    ShowTime();
+
+                    smtParallelCorpora = Persistence.ImportParallelCorpus(sourceTextFile, sourceLemmaCatFile, sourceIdFile, targetTextFile, targetLemmaFile, targetIdFile);
+                    smtParallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextFileCW, sourceLemmaCatFileCW, sourceIdFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
+
+                }
+            }
+            else if (useNoPuncModel)
+            {
+                Console.Write(" with No Source and No Target Punctuations.");
+                ShowTime();
+
+                if (parallelCorporaNoPunc == null) parallelCorporaNoPunc = Persistence.ImportParallelCorpus(sourceTextNoPuncFile, sourceLemmaNoPuncFile, sourceIdNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
+                if (parallelCorporaNoPuncCW == null) parallelCorporaNoPuncCW = Persistence.ImportParallelCorpus(sourceTextNoPuncFileCW, sourceLemmaNoPuncFileCW, sourceIdNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
+
+                smtParallelCorpora = parallelCorporaNoPunc;
+                smtParallelCorporaCW = parallelCorporaNoPuncCW;
+            }
+            else
+            {
+                Console.WriteLine(".");
+                ShowTime();
+
+                if (parallelCorpora == null) parallelCorpora = Persistence.ImportParallelCorpus(sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetIdFile);
+                if (parallelCorporaCW == null) parallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextFileCW, sourceLemmaFileCW, sourceIdFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
+
+                smtParallelCorpora = parallelCorpora;
+                smtParallelCorporaCW = parallelCorporaCW;
+            }
+
+            ShowTime();
+
+            return (smtParallelCorpora, smtParallelCorporaCW);
         }
 
         // Was Do_Button1()
@@ -1152,16 +1173,21 @@ namespace Clear3
         private static ParallelCorpora parallelCorporaNoPunc;
         private static ParallelCorpora parallelCorporaNoPuncCW;
 
-        // private static string tokenFilename;
-        // private static string tokFile;
-        // private static string tokenLemmaFilename;
-        // private static string tokLowerFile;
+        private static string tokenTextFilename;
+        private static string tokenTextFile;
+        private static string tokenLemmaFilename;
+        private static string tokenLemmaFile;
+        private static string tokenIdFilename;
+        private static string tokenIdFile;
+
         // private static string sourceTextFilenameM;
         // private static string sourceTextFileM;
         // private static string sourceIdFilenameM;
         // private static string sourceIdFileM;
         // private static string sourceLemmaFilenameM;
         // private static string sourceLemmaFileM;
+        // private static string sourceLemmaCatFilenameM;
+        // private static string sourceLemmaCatFileM;
 
         private static string sourceTextFilename;
         private static string sourceTextFile;
