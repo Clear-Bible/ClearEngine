@@ -32,11 +32,7 @@ namespace TransModels
             )
         {
             // Check if using Machine models
-            if (!runSpec.StartsWith("HMM;"))
-            {
-                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
-            }
-            else
+            if (runSpec.StartsWith("HMM;"))
             {
                 ModelBuilder modelBuilder = new ModelBuilder();
 
@@ -59,6 +55,14 @@ namespace TransModels
                 var corporaAlignments = GetCorporaAlignments(modelBuilder);
                 var alignModel = GetAlignmentModel(corporaAlignments, sourceIdFile, targetIdFile);
                 WriteAlignModel(alignModel, alignModelFile);
+            }
+            else if (runSpec.StartsWith("IBM4;"))
+            {
+                BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
+            }
+            else
+            {
+                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
             }
         }
 

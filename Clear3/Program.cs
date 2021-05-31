@@ -143,13 +143,13 @@ namespace Clear3
                     }
                     break;
                 case Options.SetRunSpec:
-                    if (param.StartsWith("HMM;") || param.StartsWith("IBM1;") || param.StartsWith("IBM2;") || param.StartsWith("FastAlign;"))
+                    if (param.StartsWith("HMM;") || param.StartsWith("IBM1;") || param.StartsWith("IBM2;") || param.StartsWith("IBM4;") || param.StartsWith("FastAlign;"))
                     {
                         good = true;
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should start with 'HMM;', 'IBM1;', 'IBM2;', or 'FastAlign;'", optionStr, param));
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should start with 'HMM;', 'IBM1;', 'IBM2;', 'IBM4;', or 'FastAlign;'", optionStr, param));
                     }
                     break;
                 case Options.SetEpsilon:
@@ -163,7 +163,7 @@ namespace Clear3
                     }
                     break;
                 case Options.SetThotModel:
-                    if ((param == "IBM1") || (param == "IBM2") || (param == "HMM") || (param == "FastAlign"))
+                    if ((param == "IBM1") || (param == "IBM2") || (param == "IBM4") || (param == "HMM") || (param == "FastAlign"))
                     {
                         good = true;
                     }

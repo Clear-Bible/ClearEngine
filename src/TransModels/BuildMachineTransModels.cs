@@ -152,7 +152,6 @@ namespace TransModels
                     var tWords = targetLemmaLine.Split();
 
                     WordAlignmentMatrix bestAlignments = model.GetBestAlignment(sWords, tWords);
-                    var modelAlignments = bestAlignments.GetAlignedWordPairs(model, sWords, tWords);
 
                     corporaAlignments.Add(bestAlignments.GetAlignedWordPairs(model, sWords, tWords));
                 }

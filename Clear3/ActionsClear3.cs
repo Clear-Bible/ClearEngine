@@ -447,7 +447,7 @@ namespace Clear3
 
             epsilon = Double.Parse(strEpsilon); // Must exceed this to be counted into model, e.g. "0.1"
             contentWordsOnlySMT = (strContentWordsOnlySMT == "true"); // e.g. "true" Only use content words for building models
-            contentWordsOnlyTC = (strContentWordsOnlyTC == "true"); // e.g. "true" Only use content words for building models
+            contentWordsOnlyTC = (strContentWordsOnlyTC == "true"); // e.g. "true" Only use content words for finding terminal candidates
             contentWordsOnly = (strContentWordsOnly == "true"); // e.g. "true" Only align content words
 
             useAlignModel = (strUseAlignModel == "true"); // e.g. "true"
