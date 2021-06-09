@@ -48,19 +48,19 @@ namespace Clear3
             strEpsilon = arg;
         }
 
-        public static void SetThotModel(string arg)
+        public static void SetSmtModel(string arg)
         {
-            thotModel = arg;
+            smtModel = arg;
         }
 
-        public static void SetThotHeuristic(string arg)
+        public static void SetSmtHeuristic(string arg)
         {
-            thotHeuristic = arg;
+            smtHeuristic = arg;
         }
 
-        public static void SetThotIterations(string arg)
+        public static void SetSmtIterations(string arg)
         {
-            thotIterations = arg;
+            smtIterations = arg;
         }
 
         public static void SetSmtContentWordsOnly(string arg)
@@ -83,10 +83,25 @@ namespace Clear3
             strUseNoPuncModel = arg;
         }
 
+        public static void SetReuseTokenFiles(string arg)
+        {
+            strReuseTokenFiles = arg;
+        }
+
+        public static void SetReuseParallelCorporaFiles(string arg)
+        {
+            strReuseParallelCorporaFiles = arg;
+        }
+
+        public static void SetReuseSmtModelFiles(string arg)
+        {
+            strReuseSmtModelFiles = arg;
+        }
+
         public static void InitializeConfig()
         {
             Console.WriteLine();
-            Console.WriteLine("Running ClearEngine 3");
+            Console.WriteLine("Running ClearEngine3");
 
             clearConfigFilename = "CLEAR.config"; // default configuration file
             ReadConfig(clearConfigFilename);
@@ -119,10 +134,7 @@ namespace Clear3
             translationConfigFilename = clearSettings["TranslationConfigFile"];
 
             // Set file information in resourcesFolder
-            sourceFoldername = clearSettings["SourceFolder"];
-            treeFoldername = clearSettings["TreeFolder"];
-            initialFilesFoldername = clearSettings["InitialFilesFolder"];
-            freqPhrasesFilename = clearSettings["FreqPhrasesFile"];
+            // treeFoldername = clearSettings["TreeFolder"];
             sourceFuncWordsFilename = clearSettings["SourceFuncWordsFile"];
             puncsFilename = clearSettings["PuncsFile"];
             glossFilename = clearSettings["GlossFile"];
@@ -135,52 +147,14 @@ namespace Clear3
             tokenLemmaFilename = clearSettings["TokenLemmaFile"];
             tokenIdFilename = clearSettings["TokenIdFile"];
 
-            // sourceTextFilenameM = clearSettings["SourceTextFileM"]; // e.g. 
-            // sourceIdFilenameM = clearSettings["SourceIdFileM"]; // e.g. 
-            // sourceLemmaFilenameM = clearSettings["SourceLemmaFileM"]; // e.g.
-            // sourceLemmaCatFilenameM = clearSettings["SourceLemmaCatFileM"];
-
             sourceTextFilename = clearSettings["SourceTextFile"];
             sourceLemmaFilename = clearSettings["SourceLemmaFile"];
             sourceIdFilename = clearSettings["SourceIdFile"];
             sourceLemmaCatFilename = clearSettings["SourceLemmaCatFile"];
 
-            sourceTextNoPuncFilename = clearSettings["SourceTextNoPuncFile"];
-            sourceLemmaNoPuncFilename = clearSettings["SourceLemmaNoPuncFile"];
-            sourceIdNoPuncFilename = clearSettings["SourceIdNoPuncFile"];
-            sourceLemmaCatNoPuncFilename = clearSettings["SourceLemmaCatNoPuncFile"];
-
             targetTextFilename = clearSettings["TargetTextFile"];
             targetLemmaFilename = clearSettings["TargetLemmaFile"];
             targetIdFilename = clearSettings["TargetIdFile"];
-
-            targetTextNoPuncFilename = clearSettings["TargetTextNoPuncFile"];
-            targetLemmaNoPuncFilename = clearSettings["TargetLemmaNoPuncFile"];
-            targetIdNoPuncFilename = clearSettings["TargetIdNoPuncFile"];
-
-            // Not Currently Used
-            // targetPuncFilename = clearSettings["TargetPuncFile"];
-            // targetPuncLowerFilename = clearSettings["TargetPuncLowerFile"];
-
-            // For Content Words Only Versions
-
-            sourceTextFilenameCW = clearSettings["SourceTextFileCW"];
-            sourceLemmaFilenameCW = clearSettings["SourceLemmaFileCW"];
-            sourceIdFilenameCW = clearSettings["SourceIdFileCW"];
-            sourceLemmaCatFilenameCW = clearSettings["SourceLemmaCatFileCW"];
-
-            sourceTextNoPuncFilenameCW = clearSettings["SourceTextNoPuncFileCW"];
-            sourceLemmaNoPuncFilenameCW = clearSettings["SourceLemmaNoPuncFileCW"];
-            sourceIdNoPuncFilenameCW = clearSettings["SourceIdNoPuncFileCW"];
-            sourceLemmaCatNoPuncFilenameCW = clearSettings["SourceLemmaCatNoPuncFileCW"];
-
-            targetTextFilenameCW = clearSettings["TargetTextFileCW"];
-            targetLemmaFilenameCW = clearSettings["TargetLemmaFileCW"];
-            targetIdFilenameCW = clearSettings["TargetIdFileCW"];
-
-            targetTextNoPuncFilenameCW = clearSettings["TargetTextNoPuncFileCW"];
-            targetLemmaNoPuncFilenameCW = clearSettings["TargetLemmaNoPuncFileCW"];
-            targetIdNoPuncFilenameCW = clearSettings["TargetIdNoPuncFileCW"];
 
             //============================ Output Files Only ============================
             // Files not part of the state, nor used as output/input to pass data between different functions
@@ -188,16 +162,8 @@ namespace Clear3
             jsonOutputFilename = clearSettings["JsonOutputFile"]; // e.g "alignment.json", Should update variable to ...File
             jsonFilename = clearSettings["JsonFile"]; // e.g "alignment.json", Should merge with jsonOutput
 
-            // Output file. Has the alignment in .json format, which is more readable than XML format. Gateway language alignment. Manuscript to gateway, or gateway to target?
-            t2gJsonFilename = clearSettings["T2GJsonFile"]; // e.g. "gAlignment.json"
-
             //============================ Input Files Only ============================
             versesFilename = clearSettings["VersesFile"]; // e.g. "Verses.txt"
-            rawFilename = clearSettings["RawFile"]; // e.g. "Verses.txt"
-            checkedAlignmentsFilename = clearSettings["CheckedAlignmentsFile"]; // e.g. "CheckedAlignments.json"
-            m_g_jsonFilename = clearSettings["M_G_JsonFile"]; // e.g "m_g_alignment.json", the CLEAR json where manuscript, gTranslation and gLinks are instantiated but translation and links are still empty
-            gAlignmentFilename = clearSettings["GAlignmentFile"]; // e.g. "gAlignment.json"
-            auto_m_t_alignmentFilename = clearSettings["Auto_M_T_AlignmentFile"]; // e.g. "auto_m_t_alignment.json"
 
             // Initialize state related filenames
             InitializeStateFilenames();
@@ -210,17 +176,10 @@ namespace Clear3
         {
             // Set file information in resourcesFolder
             // sourceFolder = Path.Combine(resourcesFolder, sourceFoldername); // e.g. "Manuscript",folder with the original language files.
-            treeFolder = Path.Combine(resourcesFolder, treeFoldername); // e.g. "Trees", folder with manuscript trees. Fixed. Doesn't change. Input to CLEAR, Andi's own XML format
-            initialFilesFolder = Path.Combine(resourcesFolder, initialFilesFoldername); // e.g. "Initial Files"
-            freqPhrasesFile = Path.Combine(resourcesFolder, freqPhrasesFilename); // e.g. "freqPhrases.tsv"
+            // treeFolder = Path.Combine(resourcesFolder, treeFoldername); // e.g. "Trees", folder with manuscript trees. Fixed. Doesn't change. Input to CLEAR, Andi's own XML format
             sourceFuncWordsFile = Path.Combine(resourcesFolder, sourceFuncWordsFilename); // e.g. "sourceFuncwords.txt"
             puncsFile = Path.Combine(resourcesFolder, puncsFilename); // e.g. "puncs.txt"
             glossFile = Path.Combine(resourcesFolder, glossFilename); // e.g. "Gloss.tsv"
-
-            // sourceTextFileM = Path.Combine(sourceFolder, sourceTextFilenameM);
-            // sourceLemmaFileM = Path.Combine(sourceFolder, sourceLemmaFilenameM);
-            // sourceIdFileM = Path.Combine(sourceFolder, sourceIdFilenameM);
-            // sourceLemmaCatFileM = Path.Combine(sourceFolder, sourceLemmaCatFilenameM);
 
             InitializeResources();
         }
@@ -229,16 +188,6 @@ namespace Clear3
         private static void InitializeResources()
         {
             // Initialize data structures that are only done once (i.e. not related to processing of verses).
-            /*
-            puncs = Data.ReadWordList(puncsFile); // input of punc marks
-            glossTable = Data.ReadGlossTable(glossFile); // input of glosses
-            sourceFuncWords = Data.ReadWordList(sourceFuncWordsFile);
-            versificationList = Versification.ReadVersificationList(versificationFile, versificationType, "id"); // Read in the versification
-            */
-            // freqPhrases not used yet in Clear3
-            // freqPhrases = Data.ReadFreqPhrases(freqPhrasesFile); // Used in Story2 and Story3
-
-
 
             // Import auxiliary assumptions from files: punctuation,
             // stop words, function words, manual translation model,
@@ -278,7 +227,6 @@ namespace Clear3
 
             treeService = GetStandardTreeServiceSubtask.Run(
                 resourcesFolder);
-
         }
 
         private static void InitializeClear30Service()
@@ -310,7 +258,7 @@ namespace Clear3
             // Set variables related to which language, translation, and testament to process.
 
             lang = translationSettings["Language"]; // e.g. "English"
-            culture = translationSettings["CSharpCulture"]; // e.g. en-US
+            targetCSharpCulture = translationSettings["CSharpCulture"]; // e.g. en-US
             translation = translationSettings["Translation"]; // e.g. NIV84
 
             // 2021.03.29 CL: Decided to prefix some of the state filenames with "<translation>.<testament>." since this makes it easier to identify
@@ -346,71 +294,42 @@ namespace Clear3
             targetFolder = Path.Combine(translationFolder, testament);
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
-            tokenTextFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenTextFilename);
-            tokenLemmaFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenLemmaFilename);
-            tokenIdFile = Path.Combine(targetFolder, translationTestamentPrefix + tokenIdFilename);
+            tokensFoldername = clearSettings["TokensFoldername"];
+            tokensFolder = Path.Combine(targetFolder, tokensFoldername);
+            if (!Directory.Exists(tokensFolder))
+            {
+                Directory.CreateDirectory(tokensFolder);
+            }
+
+            tokenTextFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenTextFilename);
+            tokenLemmaFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenLemmaFilename);
+            tokenIdFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenIdFilename);
 
             // Parallel Corpus Files
 
-            string corpusFolder = Path.Combine(targetFolder, "Corpus");
-            if (!Directory.Exists(corpusFolder))
+            corporaFoldername = clearSettings["CorporaFoldername"];
+            corporaFolder = Path.Combine(targetFolder, corporaFoldername);
+            if (!Directory.Exists(corporaFolder))
             {
-                Directory.CreateDirectory(corpusFolder);
+                Directory.CreateDirectory(corporaFolder);
             }
 
-            sourceTextFile = Path.Combine(corpusFolder, translationTestamentPrefix + sourceTextFilename);
-            sourceLemmaFile = Path.Combine(corpusFolder, translationTestamentPrefix + sourceLemmaFilename);
-            sourceIdFile = Path.Combine(corpusFolder, translationTestamentPrefix + sourceIdFilename);
-            sourceLemmaCatFile = Path.Combine(corpusFolder, translationTestamentPrefix + sourceLemmaCatFilename);
+            sourceTextFile = Path.Combine(corporaFolder, translationTestamentPrefix + sourceTextFilename);
+            sourceLemmaFile = Path.Combine(corporaFolder, translationTestamentPrefix + sourceLemmaFilename);
+            sourceIdFile = Path.Combine(corporaFolder, translationTestamentPrefix + sourceIdFilename);
+            sourceLemmaCatFile = Path.Combine(corporaFolder, translationTestamentPrefix + sourceLemmaCatFilename);
 
-            sourceTextNoPuncFile = Path.Combine(corpusFolder, translationTestamentPrefix + sourceTextNoPuncFilename);
-            sourceLemmaNoPuncFile = Path.Combine(corpusFolder, translationTestamentPrefix + sourceLemmaNoPuncFilename);
-            sourceIdNoPuncFile = Path.Combine(corpusFolder, translationTestamentPrefix + sourceIdNoPuncFilename);
-            sourceLemmaCatNoPuncFile = Path.Combine(corpusFolder, translationTestamentPrefix + sourceLemmaCatNoPuncFilename);
-
-            targetTextFile = Path.Combine(corpusFolder, translationTestamentPrefix + targetTextFilename);
-            targetLemmaFile = Path.Combine(corpusFolder, translationTestamentPrefix + targetLemmaFilename);
-            targetIdFile = Path.Combine(corpusFolder, translationTestamentPrefix + targetIdFilename);
-
-            targetTextNoPuncFile = Path.Combine(corpusFolder, translationTestamentPrefix + targetTextNoPuncFilename);
-            targetLemmaNoPuncFile = Path.Combine(corpusFolder, translationTestamentPrefix + targetLemmaNoPuncFilename);
-            targetIdNoPuncFile = Path.Combine(corpusFolder, translationTestamentPrefix + targetIdNoPuncFilename);
-
-            // Not currently used
-            // targetPuncFile = Path.Combine(targetFolder, translationTestamentPrefix + targetPuncFilename);
-            // targetPuncLowerFile = Path.Combine(targetFolder, translationTestamentPrefix + targetPuncLowerFilename);
-
-            sourceTextFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + sourceTextFilenameCW);
-            sourceLemmaFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + sourceLemmaFilenameCW);
-            sourceIdFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + sourceIdFilenameCW);
-            sourceLemmaCatFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + sourceLemmaCatFilenameCW);
-
-            sourceTextNoPuncFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + sourceTextNoPuncFilenameCW);
-            sourceLemmaNoPuncFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + sourceLemmaNoPuncFilenameCW);
-            sourceIdNoPuncFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + sourceIdNoPuncFilenameCW);
-            sourceLemmaCatNoPuncFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + sourceLemmaCatNoPuncFilenameCW);
-
-            targetTextFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + targetTextFilenameCW);
-            targetLemmaFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + targetLemmaFilenameCW);
-            targetIdFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + targetIdFilenameCW);
-
-            targetTextNoPuncFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + targetTextNoPuncFilenameCW);
-            targetLemmaNoPuncFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + targetLemmaNoPuncFilenameCW);
-            targetIdNoPuncFileCW = Path.Combine(corpusFolder, translationTestamentPrefix + targetIdNoPuncFilenameCW);
+            targetTextFile = Path.Combine(corporaFolder, translationTestamentPrefix + targetTextFilename);
+            targetLemmaFile = Path.Combine(corporaFolder, translationTestamentPrefix + targetLemmaFilename);
+            targetIdFile = Path.Combine(corporaFolder, translationTestamentPrefix + targetIdFilename);
 
             //============================ Output Files Only ============================
 
             jsonOutput = Path.Combine(targetFolder, translationTestamentPrefix + jsonOutputFilename);
             jsonFile = Path.Combine(targetFolder, translationTestamentPrefix + jsonFilename);
-            t2gJsonFile = Path.Combine(targetFolder, translationTestamentPrefix + t2gJsonFilename);
 
             //============================ Input Files Only ============================
             versesFile = Path.Combine(targetFolder, translationTestamentPrefix + versesFilename);
-            rawFile = Path.Combine(targetFolder, translationTestamentPrefix + rawFilename);
-            checkedAlignmentsFile = Path.Combine(targetFolder, translationTestamentPrefix + checkedAlignmentsFilename);
-            m_g_jsonFile = Path.Combine(targetFolder, translationTestamentPrefix + m_g_jsonFilename);
-            gAlignment = Path.Combine(targetFolder, translationTestamentPrefix + gAlignmentFilename);
-            auto_m_t_alignment = Path.Combine(targetFolder, translationTestamentPrefix + auto_m_t_alignmentFilename);
 
             InitializeStateFiles();
         }
@@ -429,16 +348,20 @@ namespace Clear3
             // Set Processing Parameters
             if (runSpec == null) runSpec = processingSettings["RunSpec"]; // e.g. 1:10;H:5, Machine;FastAlign, Machine;FastAlign:Intersection:7
             if (strEpsilon == null) strEpsilon = processingSettings["Epsilon"]; // Must exceed this to be counted into model, e.g. "0.1"
-            if (thotModel == null) thotModel = processingSettings["ThotModel"];
-            if (thotHeuristic == null) thotHeuristic = processingSettings["ThotHeuristic"];
-            if (thotIterations == null) thotIterations = processingSettings["ThotIterations"];
+            if (smtModel == null) smtModel = processingSettings["SmtModel"];
+            if (smtHeuristic == null) smtHeuristic = processingSettings["SmtHeuristic"];
+            if (smtIterations == null) smtIterations = processingSettings["SmtIterations"];
             if (strContentWordsOnlySMT == null) strContentWordsOnlySMT = processingSettings["ContentWordsOnlySMT"]; // e.g. "true" Only use content words for building models
             if (strContentWordsOnlyTC == null) strContentWordsOnlyTC = processingSettings["ContentWordsOnlyTC"]; // e.g. "true" Only use content words for building models
             if (strContentWordsOnly == null) strContentWordsOnly = processingSettings["ContentWordsOnly"]; // e.g. "true" Only align content words
 
             if (strUseAlignModel == null) strUseAlignModel = processingSettings["UseAlignModel"]; // e.g. "true"
             if (strUseLemmaCatModel == null) strUseLemmaCatModel = processingSettings["UseLemmaCatModel"]; // e.g. "true"
-            if (strUseNoPuncModel == null) strUseNoPuncModel = processingSettings["UseNoPuncModel"]; // e.g. "true"
+            if (strUseNoPuncModel == null) strUseNoPuncModel = processingSettings["UseNoPuncModel"]; // e.g. "true
+                                                                                                     //
+            if (strReuseTokenFiles == null) strReuseTokenFiles = processingSettings["ReuseTokenFiles"]; // e.g. "true"
+            if (strReuseParallelCorporaFiles == null) strReuseParallelCorporaFiles = processingSettings["ReuseParallelCorporaFiles"]; // e.g. "true"
+            if (strReuseSmtModelFiles == null) strReuseSmtModelFiles = processingSettings["ReuseSmtModelFiles"]; // e.g. "true"
 
             if (strBadLinkMinCount == null) strBadLinkMinCount = processingSettings["BadLinkMinCount"]; // e.g. "3", the minimal count required for treating a link as bad
             if (strGoodLinkMinCount == null) strGoodLinkMinCount = processingSettings["GoodLinkMinCount"]; // e.g. "3" the minimal count required for treating a link as bad
@@ -453,6 +376,10 @@ namespace Clear3
             useAlignModel = (strUseAlignModel == "true"); // e.g. "true"
             useLemmaCatModel = (strUseLemmaCatModel == "true"); // e.g. "true"
             useNoPuncModel = (strUseNoPuncModel == "true"); // e.g. "true"
+
+            reuseTokenFiles = (strReuseTokenFiles == "true"); // e.g. "true"
+            reuseParallelCorporaFiles = (strReuseParallelCorporaFiles == "true"); // e.g. "true"
+            reuseSmtModelFiles = (strReuseSmtModelFiles == "true"); // e.g. "true"
 
             badLinkMinCount = Int32.Parse(strBadLinkMinCount); // e.g. "3", the minimal count required for treating a link as bad
             goodLinkMinCount = Int32.Parse(strGoodLinkMinCount); // e.g. "3" the minimal count required for treating a link as bad
@@ -473,14 +400,12 @@ namespace Clear3
             // They are input and output files. You must have them though they can be empty.
             // Has probablities of a manuscript language translated into a target word. Story #1 needs to read in this file after creating it with #6.
             transModelFilename = clearSettings["TransModelFile"]; // e.g. "transModel.tsv"
-            transModelFilenameCW = clearSettings["TransModelFileCW"]; // e.g. "transModel.cw.tsv"
 
             // Input and Output file. If you already have manually checked alignment, it will give statistics. Must have but can be empty.
             manTransModelFilename = clearSettings["ManTransModelFile"];  // e.g. "manTransModel.tsv"
 
             // Must Have. Input and Output file. Token based alignment data, so for a particular verse and word, what are the statistics for translation. Story #1 needs to read in this file after creating it with #6.
             alignModelFilename = clearSettings["AlignModelFile"]; // e.g. "alignModel.tsv"
-            alignModelFilenameCW = clearSettings["AlignModelFileCW"]; // e.g. "alignModel.cw.tsv"
 
             // Input file. Must create this. Contains word the aligner should ignore. These are because they tend to not align well across languages, such as English aux verbs.
             stopWordFilename = clearSettings["StopWordFile"]; // e.g. "stopWords.txt"
@@ -493,9 +418,6 @@ namespace Clear3
 
             // If empty, it will do 1-to-1 alignment. Otherwise, it shows where groups of verses are mapped to other groups of verses. Can do many-to-1 and 1-to-many. Can do dynamic alignment.
             groupFilename = clearSettings["GroupFile"]; // e.g. "groups.tsv"
-
-            // Input and Output file. Must have. Translation memory, can be empty. 
-            tmFilename = clearSettings["TmFile"]; // e.g. "tm.tsv"
 
             // 2020.07.10 CL: Made targetFuncWordsFile a global variable to Form1
             targetFuncWordsFilename = clearSettings["TargetFuncWordsFile"]; // e.g. "targetFuncWords.txt"
@@ -512,16 +434,23 @@ namespace Clear3
         private static void InitializeStateFiles()
         {
             //============================ CLEAR State Files ============================
-            transModelFile = Path.Combine(targetFolder, translationTestamentPrefix + transModelFilename);
-            transModelFileCW = Path.Combine(targetFolder, translationTestamentPrefix + transModelFilenameCW);
+            // SMT Model Files
+
+            modelsFoldername = clearSettings["ModelsFoldername"];
+            modelsFolder = Path.Combine(targetFolder, modelsFoldername);
+            if (!Directory.Exists(modelsFolder))
+            {
+                Directory.CreateDirectory(modelsFolder);
+            }
+
+            transModelFile = Path.Combine(modelsFolder, translationTestamentPrefix + transModelFilename);
+            alignModelFile = Path.Combine(modelsFolder, translationTestamentPrefix + alignModelFilename);
+
             manTransModelFile = Path.Combine(targetFolder, translationTestamentPrefix + manTransModelFilename);
-            alignModelFile = Path.Combine(targetFolder, translationTestamentPrefix + alignModelFilename);
-            alignModelFileCW = Path.Combine(targetFolder, translationTestamentPrefix + alignModelFilenameCW);
             groupFile = Path.Combine(targetFolder, translationTestamentPrefix + groupFilename);
             stopWordFile = Path.Combine(targetFolder, translationTestamentPrefix + stopWordFilename);
             badLinkFile = Path.Combine(targetFolder, translationTestamentPrefix + badLinkFilename);
             goodLinkFile = Path.Combine(targetFolder, translationTestamentPrefix + goodLinkFilename);
-            tmFile = Path.Combine(targetFolder, translationTestamentPrefix + tmFilename);
             targetFuncWordsFile = Path.Combine(targetFolder, translationTestamentPrefix + targetFuncWordsFilename);
             strongFile = Path.Combine(targetFolder, translationTestamentPrefix + strongFilename);
             oldJson = Path.Combine(targetFolder, translationTestamentPrefix + oldJsonFilename);
@@ -533,25 +462,33 @@ namespace Clear3
         {
             Console.WriteLine("Deleting State Files");
 
-            File.Delete(transModelFile);
-            File.Delete(alignModelFile);
-            File.Delete(transModelFileCW);
-            File.Delete(alignModelFileCW);
+
+            DeleteFilesInFolder(tokensFolder, "*.txt");
+            DeleteFilesInFolder(corporaFolder, "*.txt");
+            DeleteFilesInFolder(modelsFolder, "*.tsv");
+            DeleteFilesInFolder(modelsFolder, "*.txt"); // For IBM Pharaoh files
+
             File.Delete(stopWordFile);
             File.Delete(badLinkFile);
             File.Delete(goodLinkFile);
             File.Delete(groupFile);
             File.Delete(strongFile);
             File.Delete(oldJson);
-            File.Delete(t2gJsonFile);
-            File.Delete(checkedAlignmentsFile);
             File.Delete(manTransModelFile);
-            File.Delete(tmFile);
 
             return ("Deleted State Files.");
         }
 
-        // Was Do_Button11()
+        static void DeleteFilesInFolder(string folder, string fileType)
+        {
+            var files = Directory.GetFiles(folder, fileType);
+            foreach (var file in files)
+            {
+                File.Delete(file);
+            }
+        }
+
+        //
         public static string InitializeState()
         {
             Console.WriteLine("Initializing Clear's State");
@@ -562,41 +499,38 @@ namespace Clear3
             // 2020.07.10 CL: There seem to be some of these that do not change because of processing through CLEAR. They may change based upon analysis by another program.
             // 2021.03.03 CL: Changed some of functions that read in data so if it doesn't exist, it will just return an empty data structure or null.
 
+            /*
             if (contentWordsOnlySMT)
             {
-                if (File.Exists(transModelFileCW)) translationModel = importExportService.ImportTranslationModel(transModelFileCW);
-                if (File.Exists(alignModelFileCW)) alignmentModel = importExportService.ImportAlignmentModel(alignModelFileCW);
-                
+                (string smtTransModelFileCW, string smtAlignModelFileCW) = InitializeSmtModelFiles(true);
+
+                translationModel = importExportService.ImportTranslationModel(smtTransModelFileCW);
+                alignmentModel = importExportService.ImportAlignmentModel(smtAlignModelFileCW);
                 translationModelRest = translationModel;
-                // preAlignment = Data.BuildPreAlignmentTable(alignModel);
+                alignmentModelPre = alignmentModel;
             }
             else if (contentWordsOnlyTC)
             {
-                if (File.Exists(transModelFileCW)) translationModel = importExportService.ImportTranslationModel(transModelFileCW);
-                if (File.Exists(alignModelFileCW)) alignmentModel = importExportService.ImportAlignmentModel(alignModelFileCW);
+                (string smtTransModelFileCW, string smtAlignModelFileCW) = InitializeSmtModelFiles(true);
 
-                if (File.Exists(transModelFile)) translationModelRest = importExportService.ImportTranslationModel(transModelFile);
-                // var tmpAlignModel = BuildTransModels.ReadAlignModel(alignModelFile, mustExistFlag);
-                // preAlignment = Data.BuildPreAlignmentTable(tmpAlignModel);
+                translationModel = importExportService.ImportTranslationModel(smtTransModelFileCW);
+                alignmentModel = importExportService.ImportAlignmentModel(smtAlignModelFileCW);
+
+                (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false);
+
+                translationModelRest = importExportService.ImportTranslationModel(smtTransModelFile);
+                alignmentModelPre = importExportService.ImportAlignmentModel(smtAlignModelFile);
             }
             else
             {
-                if (File.Exists(transModelFile)) translationModel = importExportService.ImportTranslationModel(transModelFile);
-                if (File.Exists(alignModelFile)) alignmentModel = importExportService.ImportAlignmentModel(alignModelFile);
+                (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false);
 
+                translationModel = importExportService.ImportTranslationModel(smtTransModelFile);
+                alignmentModel = importExportService.ImportAlignmentModel(smtAlignModelFile);
                 translationModelRest = translationModel;
-                // preAlignment = Data.BuildPreAlignmentTable(alignModel);
+                alignmentModelPre = alignmentModel;
             }
-
-            // preAlignment Not used yet in Clear3
-            // preAlignment = Data.BuildPreAlignmentTable(alignModel); // Has key as sourceID and value as targetID
-
-            // tm Not used yet in Clear3
-            // tm = AutoAligner.ReadTM(tmFile); // tm is a Hashtable with the Key the source Strongs number, and the Value is a list of translations. 
-
-            // translationModel = importExportService.ImportTranslationModel(transModelFile);
-            // alignmentModel = importExportService.ImportAlignmentModel(alignModelFile);
-
+            */
 
             (List<string> puncs,
              List<string> stopWordsTemp,
@@ -635,93 +569,152 @@ namespace Clear3
             return ("Initialized State.");
         }
 
-        // Was Do_Button7()
+        //
         public static string TokenizeVerses()
         {
             Console.WriteLine("Tokenizing Verses");
 
-            ShowTime();
+            if (reuseTokenFiles && File.Exists(tokenTextFile) && File.Exists(tokenLemmaFile) && File.Exists(tokenTextFile))
+            {
+                Console.WriteLine("  Reusing token files.");
+            }
+            else
+            {
+                Console.WriteLine("  Creating token files.");
 
-            targetVerseCorpus =
-                importExportService.ImportTargetVerseCorpusFromLegacy(
-                    versesFile,
-                    clearService.DefaultSegmenter,
-                    puncs,
-                    lang,
-                    culture);
+                ShowTime();
 
-            ShowTime();
+                targetVerseCorpus =
+                    importExportService.ImportTargetVerseCorpusFromLegacy(
+                        versesFile,
+                        clearService.DefaultSegmenter,
+                        puncs,
+                        lang,
+                        targetCSharpCulture);
 
-            Persistence.ExportTargetVerseCorpus(targetVerseCorpus, tokenTextFile, tokenLemmaFile, tokenIdFile);
+                Persistence.ExportTargetVerseCorpus(targetVerseCorpus, tokenTextFile, tokenLemmaFile, tokenIdFile);
 
-            ShowTime();
+                ShowTime();
+            }
 
-            return (versesFile + " has been tokenized and targetVerseCorpus has been created.");
+            return "Tokenizing Verses: Done.";
         }
 
-        // Was Do_Button8()
+        //
         public static string CreateParallelCorpus()
         {
             Console.WriteLine("Creating Parallel Corpora");
 
             ShowTime();
 
-            parallelCorpora = utility.CreateParallelCorpora(
-                targetVerseCorpus,
-                treeService,
-                simpleVersification);
+            string returnMessage = string.Empty;
 
-            Persistence.ExportParallelCorpora(parallelCorpora, sourceTextFile, sourceLemmaFile, sourceIdFile, sourceLemmaCatFile, targetTextFile, targetLemmaFile, targetIdFile);
+            // Create basic files
+            if (reuseParallelCorporaFiles &&
+                File.Exists(sourceLemmaFile) && File.Exists(sourceIdFile) && File.Exists(sourceTextFile) && File.Exists(sourceLemmaCatFile) &&
+                File.Exists(targetLemmaFile) && File.Exists(targetIdFile) && File.Exists(targetTextFile))
+            {
+                Console.WriteLine("  Reusing basic parallel corpus files.");
+
+                if (parallelCorpora == null) parallelCorpora = Persistence.ImportParallelCorpus(sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetIdFile);
+            }
+            else
+            {
+                Console.WriteLine("  Creating basic parallel corpus files.");
+
+                if (targetVerseCorpus == null) targetVerseCorpus = Persistence.ImportTargetVerseCorpus(tokenTextFile, tokenLemmaFile, tokenIdFile);
+                parallelCorpora = utility.CreateParallelCorpora(targetVerseCorpus, treeService, simpleVersification);
+                Persistence.ExportParallelCorpora(parallelCorpora, sourceTextFile, sourceLemmaFile, sourceIdFile, sourceLemmaCatFile, targetTextFile, targetLemmaFile, targetIdFile);
+            }
+
+            // Create Content Words Only Files
+            if (contentWordsOnlySMT || contentWordsOnlyTC)
+            {
+                (string sourceLemmaFileCW, string sourceIdFileCW, string sourceTextFileCW, string sourceLemmaCatFileCW,
+                    string targetLemmaFileCW, string targetIdFileCW, string targetTextFileCW) = InitializeCreateParallelCorporaFiles(false, true);
+
+                if (reuseParallelCorporaFiles &&
+                    File.Exists(sourceLemmaFileCW) && File.Exists(sourceIdFileCW) && File.Exists(sourceTextFileCW) && File.Exists(sourceLemmaCatFileCW) &&
+                    File.Exists(targetLemmaFileCW) && File.Exists(targetIdFileCW) && File.Exists(targetTextFileCW))
+                {
+                    Console.WriteLine("  Reusing content words only parallel corpus files.");   
+                }
+                else
+                {
+                    Console.WriteLine("  Creating content words only parallel corpus files.");
+
+                    parallelCorporaCW = utility.FilterWordsFromParallelCorpora(parallelCorpora, sourceFunctionWords, targetFunctionWords);
+                    Persistence.ExportParallelCorpora(parallelCorporaCW, sourceTextFileCW, sourceLemmaFileCW, sourceIdFileCW, sourceLemmaCatFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
+                }
+
+                if (useNoPuncModel)
+                {
+                    (string sourceLemmaNoPuncFileCW, string sourceIdNoPuncFileCW, string sourceTextNoPuncFileCW, string sourceLemmaCatNoPuncFileCW,
+                        string targetLemmaNoPuncFileCW, string targetIdNoPuncFileCW, string targetTextNoPuncFileCW) = InitializeCreateParallelCorporaFiles(true, true);
+
+                    // Create Content Words Only and No Punctuation Files
+                    if (reuseParallelCorporaFiles &&
+                        File.Exists(sourceLemmaNoPuncFileCW) && File.Exists(sourceIdNoPuncFileCW) && File.Exists(sourceTextNoPuncFileCW) && File.Exists(sourceLemmaCatNoPuncFileCW) &&
+                        File.Exists(targetLemmaNoPuncFileCW) && File.Exists(targetIdNoPuncFileCW) && File.Exists(targetTextNoPuncFileCW))
+                    {
+                        Console.WriteLine("  Reusing content words only and no punctuation parallel corpus files files.");
+
+                        parallelCorporaNoPuncCW = Persistence.ImportParallelCorpus(sourceTextNoPuncFileCW, sourceLemmaNoPuncFileCW, sourceIdNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
+                    }
+                    else
+                    {
+                        Console.WriteLine("  Creating content words only and no punctuation parallel corpus files.");
+
+                        if (parallelCorporaCW == null) parallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextFileCW, sourceLemmaFileCW, sourceIdFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
+                        parallelCorporaNoPuncCW = utility.FilterWordsFromParallelCorpora(parallelCorporaCW, puncs, puncs);
+                        Persistence.ExportParallelCorpora(parallelCorporaNoPuncCW, sourceTextNoPuncFileCW, sourceLemmaNoPuncFileCW, sourceIdNoPuncFileCW, sourceLemmaCatNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
+                    }
+                }
+            }
+
+            if (useNoPuncModel)
+            {
+                (string sourceLemmaNoPuncFile, string sourceIdNoPuncFile, string sourceTextNoPuncFile, string sourceLemmaCatNoPuncFile,
+                    string targetLemmaNoPuncFile, string targetIdNoPuncFile, string targetTextNoPuncFile) = InitializeCreateParallelCorporaFiles(true, false);
+
+                // Create No Punctuation Files
+                if (reuseParallelCorporaFiles &&
+                    File.Exists(sourceLemmaNoPuncFile) && File.Exists(sourceIdNoPuncFile) && File.Exists(sourceTextNoPuncFile) && File.Exists(sourceLemmaCatNoPuncFile) &&
+                    File.Exists(targetLemmaNoPuncFile) && File.Exists(targetIdNoPuncFile) && File.Exists(targetTextNoPuncFile))
+                {
+                    Console.WriteLine("  Reusing no punctuation parallel corpus files.");
+                }
+                else
+                {
+                    Console.WriteLine("  Creating no punctuation parallel corpus files.");
+
+                    parallelCorporaNoPunc = utility.FilterWordsFromParallelCorpora(parallelCorpora, puncs, puncs);
+                    Persistence.ExportParallelCorpora(parallelCorporaNoPunc, sourceTextNoPuncFile, sourceLemmaNoPuncFile, sourceIdNoPuncFile, sourceLemmaCatNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
+                }
+            }
 
             ShowTime();
 
-            parallelCorporaCW = utility.FilterWordsFromParallelCorpora(
-                parallelCorpora,
-                sourceFunctionWords,
-                targetFunctionWords);
-
-            Persistence.ExportParallelCorpora(parallelCorporaCW, sourceTextFileCW, sourceLemmaFileCW, sourceIdFileCW, sourceLemmaCatFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
-
-            ShowTime();
-
-            parallelCorporaNoPunc = utility.FilterWordsFromParallelCorpora(
-                 parallelCorpora,
-                 puncs,
-                 puncs);
-
-            Persistence.ExportParallelCorpora(parallelCorpora, sourceTextNoPuncFile, sourceLemmaNoPuncFile, sourceIdNoPuncFile, sourceLemmaCatNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
-
-            ShowTime();
-
-            parallelCorporaNoPuncCW = utility.FilterWordsFromParallelCorpora(
-                 parallelCorpora,
-                 puncs,
-                 puncs);
-
-            Persistence.ExportParallelCorpora(parallelCorporaNoPuncCW, sourceTextNoPuncFileCW, sourceLemmaNoPuncFileCW, sourceIdNoPuncFileCW, sourceLemmaCatNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
-
-            ShowTime();
-
-            return ("Parallel files have been created.");
+            return "Creating Parallel Corpora: Done.";
         }
 
-        // Was Do_Button6()
+        //
         public static string BuildModels()
         {
+            Console.WriteLine("Building Models");
+
+            string returnMessage = string.Empty;
+
             // Create a new runSpec if thotModel is specified, otherwise, use exisiting runSpec set by command line or processing.config.
 
-            if (thotModel == "HMM")
+            if (smtModel == "HMM")
             {
                 runSpec = "HMM;1:10;H:5";
             }
-            else if (thotModel != "")
+            else if (smtModel != "")
             {
-                runSpec = string.Format("{0};{1};{2}", thotModel, thotHeuristic, thotIterations);
+                runSpec = string.Format("{0};{1};{2}", smtModel, smtHeuristic, smtIterations);
             }
-
-            (ParallelCorpora smtParallelCorpora, ParallelCorpora smtParallelCorporaCW) = InitializeParallelCorpora();
-
-            Console.Write("Building Models");
 
             // Train a statistical translation model using the parallel corpora producing an estimated translation model and estimated alignment.
             // There are three possible scenarios for how to use parallel corpus with all words or content only words.
@@ -729,122 +722,242 @@ namespace Clear3
             // No need to read them in again.
             if (contentWordsOnlySMT)
             {
-                Console.WriteLine(" with Content Words Only.");
-                ShowTime();
+                (string smtTransModelFileCW, string smtAlignModelFileCW) = InitializeSmtModelFiles(true);
 
-                (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorporaCW, runSpec, epsilon);
+                if (reuseSmtModelFiles &&
+                    File.Exists(smtTransModelFileCW) && File.Exists(smtAlignModelFileCW))
+                {
+                    Console.WriteLine("  Reusing (Content Word Only) SMT Model Files.");
+                    returnMessage = "Building Models: Done.";
 
-                ShowTime();
+                    ShowTime();
+
+                    translationModel = Persistence.ImportTranslationModel(smtTransModelFileCW);
+                    alignmentModel = Persistence.ImportAlignmentModel(smtAlignModelFileCW);
+
+                    ShowTime();
+                }
+                else
+                {
+                    Console.WriteLine("  Building Models (Content Words Only).");
+                    returnMessage = string.Format("Built Models: {0}  {1}", smtTransModelFileCW, smtAlignModelFileCW);
+
+                    ShowTime();
+
+                    ParallelCorpora smtParallelCorporaCW = InitializeParallelCorpora(true);
+                    (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorporaCW, runSpec, epsilon);
+
+                    ShowTime();
+
+                    Persistence.ExportTranslationModel(translationModel, smtTransModelFileCW);
+                    Persistence.ExportAlignmentModel(alignmentModel, smtAlignModelFileCW);
+
+                    ShowTime();
+                }
+
                 translationModelRest = translationModel;
                 alignmentModelPre = alignmentModel;
-                Persistence.ExportTranslationModel(translationModel, transModelFileCW);
-                Persistence.ExportAlignmentModel(alignmentModel, alignModelFileCW);
-                ShowTime();
 
-                return ("Models built: " + transModelFileCW + "; " + alignModelFileCW);
+                return returnMessage;
             }
             else if (contentWordsOnlyTC)
             {
-                Console.WriteLine(" with Content Words Only for Finding Terminal Candidates.");
-                ShowTime();
+                (string smtTransModelFileCW, string smtAlignModelFileCW) = InitializeSmtModelFiles(true);
 
-                (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorporaCW, runSpec, epsilon);
+                if (reuseSmtModelFiles &&
+                    File.Exists(smtTransModelFileCW) && File.Exists(smtAlignModelFileCW))
+                {
+                    Console.WriteLine("  Reusing (Content Word Only) SMT Model Files for Finding Terminal Candidates.");
 
-                ShowTime();
-                Persistence.ExportTranslationModel(translationModel, transModelFileCW);
-                Persistence.ExportAlignmentModel(alignmentModel, alignModelFileCW);
-                ShowTime();
+                    ShowTime();
 
-                Console.WriteLine("Building Models (for All Words).");
-                ShowTime();
+                    translationModel = Persistence.ImportTranslationModel(smtTransModelFileCW);
+                    alignmentModel = Persistence.ImportAlignmentModel(smtAlignModelFileCW);
 
-                (var translationModelAllWords, var alignmentModelAllWords) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec, epsilon);
+                    ShowTime();
+                }
+                else
+                {
+                    Console.WriteLine("  Building Models (Content Words Only) for Finding Terminal Candidates.");
+                    returnMessage += string.Format(" {0} {1}", smtTransModelFileCW, smtAlignModelFileCW);
 
-                ShowTime();
-                translationModelRest = translationModelAllWords;
-                alignmentModelPre = alignmentModelAllWords;
-                Persistence.ExportTranslationModel(translationModelAllWords, transModelFile);
-                Persistence.ExportAlignmentModel(alignmentModelAllWords, alignModelFile);
-                ShowTime();
+                    ShowTime();
 
-                return ("Models built: " + transModelFile + "; " + alignModelFile + "; " + transModelFileCW + "; " + alignModelFileCW);
+                    ParallelCorpora smtParallelCorporaCW = InitializeParallelCorpora(true);
+                    (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorporaCW, runSpec, epsilon);
+
+                    ShowTime();
+
+                    Persistence.ExportTranslationModel(translationModel, smtTransModelFileCW);
+                    Persistence.ExportAlignmentModel(alignmentModel, smtAlignModelFileCW);
+
+                    ShowTime();
+                }
+
+                (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false);
+
+                if (reuseSmtModelFiles &&
+                    File.Exists(smtTransModelFile) && File.Exists(smtAlignModelFile))
+                {
+                    Console.WriteLine("  Reusing (All Words) SMT Model Files for Aligning the Rest.");
+
+                    ShowTime();
+
+                    translationModelRest = Persistence.ImportTranslationModel(smtTransModelFile);
+                    alignmentModelPre = Persistence.ImportAlignmentModel(smtAlignModelFile);
+
+                    ShowTime();
+                }
+                else
+                {
+                    Console.WriteLine("  Building Models (All Words) for Aligning the Rest.");
+                    returnMessage += string.Format(" {0} {1}", smtTransModelFile, smtAlignModelFile);
+
+                    ShowTime();
+
+                    ParallelCorpora smtParallelCorpora = InitializeParallelCorpora(false);
+                    (translationModelRest, alignmentModelPre) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec, epsilon);
+
+                    ShowTime();
+
+                    Persistence.ExportTranslationModel(translationModelRest, smtTransModelFile);
+                    Persistence.ExportAlignmentModel(alignmentModelPre, smtAlignModelFile);
+
+                    ShowTime();
+                }
+
+                if (returnMessage == string.Empty)
+                {
+                    returnMessage = "Building Models: Done.";
+                }
+                else
+                {
+                    returnMessage = "Built Models:" + returnMessage;
+                }
+
+                return returnMessage;
             }
             else
             {
-                Console.WriteLine(".");
-                ShowTime();
+                (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false);
 
-                (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec, epsilon);
+                if (reuseSmtModelFiles &&
+                    File.Exists(smtTransModelFile) && File.Exists(smtAlignModelFile))
+                {
+                    Console.WriteLine("  Reusing (All Words) SMT Model Files.");
+                    returnMessage = "Building Models: Done.";
 
-                ShowTime();
+                    ShowTime();
+
+                    translationModel = Persistence.ImportTranslationModel(smtTransModelFile);
+                    alignmentModel = Persistence.ImportAlignmentModel(smtAlignModelFile);
+
+                    ShowTime();
+                }
+                else
+                {
+                    Console.WriteLine("  Building Models (All Words).");
+                    returnMessage += string.Format("Built Models: {0} {1}", smtTransModelFile, smtAlignModelFile);
+
+                    ParallelCorpora smtParallelCorpora = InitializeParallelCorpora(false);
+                    (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec, epsilon);
+
+                    ShowTime();
+
+                    Persistence.ExportTranslationModel(translationModel, smtTransModelFile);
+                    Persistence.ExportAlignmentModel(alignmentModel, smtAlignModelFile);
+
+                    ShowTime();
+                }
+                    
                 translationModelRest = translationModel;
                 alignmentModelPre = alignmentModel;
-                Persistence.ExportTranslationModel(translationModel, transModelFile);
-                Persistence.ExportAlignmentModel(alignmentModel, alignModelFile);
-                ShowTime();
 
-                return ("Models built: " + transModelFile + "; " + alignModelFile);
+                return returnMessage;
             }
         }
 
         // returns the two sets (all words and content words only) parallel corpora based upon different settings for building models
-        private static (ParallelCorpora, ParallelCorpora) InitializeParallelCorpora()
+        private static ParallelCorpora InitializeParallelCorpora(bool useContentWordsOnly)
         {
-            // Initialize the content words only and all words corpora
-            ParallelCorpora smtParallelCorpora;
-            ParallelCorpora smtParallelCorporaCW;
+            (string smtSourceTextFile, string smtSourceLemmaFile, string smtSourceIdFile, string smtTargetTextFile, string smtTargetLemmaFile, string smtTargetIdFile) = InitializeParallelCorporaFilesForSMT(useContentWordsOnly);
 
-            Console.Write("Building Models: Initializing parallel corpora");
+            ParallelCorpora smtParallelCorpora = Persistence.ImportParallelCorpus(smtSourceTextFile, smtSourceLemmaFile, smtSourceIdFile, smtTargetTextFile, smtTargetLemmaFile, smtTargetIdFile);
 
-            // Update files for different scenarios
-            if (useLemmaCatModel)
-            {
-                Console.Write(" with Source Lemma_Cat");
+            return smtParallelCorpora;
+        }
 
-                if (useNoPuncModel)
-                {
-                    Console.WriteLine(" with No Source and No Target Punctuations.");
-                    ShowTime();
+        // returns the two sets (all words and content words only) files based upon different settings for building models
+        private static (string, string, string, string, string, string) InitializeParallelCorporaFilesForSMT(bool useContentWordsOnly)
+        {
+            string suffix = CreateCorporaSuffix(useLemmaCatModel, useNoPuncModel, useContentWordsOnly);
+            string filteredSuffix = CreateCorporaFilteredSuffix(useNoPuncModel, useContentWordsOnly);
 
-                    smtParallelCorpora = Persistence.ImportParallelCorpus(sourceTextNoPuncFile, sourceLemmaCatNoPuncFile, sourceIdNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
-                    smtParallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextNoPuncFileCW, sourceLemmaCatNoPuncFileCW, sourceIdNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
-                }
-                else
-                {
-                    Console.WriteLine(".");
-                    ShowTime();
+            string smtSourceTextFile = sourceTextFile.Replace(".source", suffix + ".source");
+            string smtSourceLemmaFile = sourceLemmaFile.Replace(".source", suffix + ".source");
+            string smtSourceIdFile = sourceIdFile.Replace(".source", filteredSuffix + ".source");
 
-                    smtParallelCorpora = Persistence.ImportParallelCorpus(sourceTextFile, sourceLemmaCatFile, sourceIdFile, targetTextFile, targetLemmaFile, targetIdFile);
-                    smtParallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextFileCW, sourceLemmaCatFileCW, sourceIdFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
+            string smtTargetTextFile = targetTextFile.Replace(".target", filteredSuffix + ".target");
+            string smtTargetLemmaFile = targetLemmaFile.Replace(".target", filteredSuffix + ".target");
+            string smtTargetIdFile = targetIdFile.Replace(".target", filteredSuffix + ".target");
 
-                }
-            }
-            else if (useNoPuncModel)
-            {
-                Console.Write(" with No Source and No Target Punctuations.");
-                ShowTime();
+            return (smtSourceTextFile, smtSourceLemmaFile, smtSourceIdFile, smtTargetTextFile, smtTargetLemmaFile, smtTargetIdFile);
+        }
 
-                if (parallelCorporaNoPunc == null) parallelCorporaNoPunc = Persistence.ImportParallelCorpus(sourceTextNoPuncFile, sourceLemmaNoPuncFile, sourceIdNoPuncFile, targetTextNoPuncFile, targetLemmaNoPuncFile, targetIdNoPuncFile);
-                if (parallelCorporaNoPuncCW == null) parallelCorporaNoPuncCW = Persistence.ImportParallelCorpus(sourceTextNoPuncFileCW, sourceLemmaNoPuncFileCW, sourceIdNoPuncFileCW, targetTextNoPuncFileCW, targetLemmaNoPuncFileCW, targetIdNoPuncFileCW);
+        // returns the two sets (all words and content words only) files based upon different settings for building models
+        // produce sourceLemma, sourceId, sourceText, sourceLemmaCat, targetLemma, targetId, targetText files
+        private static (string, string, string, string, string, string, string) InitializeCreateParallelCorporaFiles(bool useNoPunc, bool useContentWordsOnly)
+        {
+            string filteredSuffix = CreateCorporaFilteredSuffix(useNoPunc, useContentWordsOnly);
 
-                smtParallelCorpora = parallelCorporaNoPunc;
-                smtParallelCorporaCW = parallelCorporaNoPuncCW;
-            }
-            else
-            {
-                Console.WriteLine(".");
-                ShowTime();
+            // Default parallel corpus files
 
-                if (parallelCorpora == null) parallelCorpora = Persistence.ImportParallelCorpus(sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetIdFile);
-                if (parallelCorporaCW == null) parallelCorporaCW = Persistence.ImportParallelCorpus(sourceTextFileCW, sourceLemmaFileCW, sourceIdFileCW, targetTextFileCW, targetLemmaFileCW, targetIdFileCW);
+            string corporaSourceLemmaFile = sourceLemmaFile.Replace(".source", filteredSuffix + ".source");
+            string corporaSourceIdFile = sourceIdFile.Replace(".source", filteredSuffix + ".source");
+            string corporaSourceTextFile = sourceTextFile.Replace(".source", filteredSuffix + ".source");
+            string corporaSourceLemmaCatFile = sourceLemmaCatFile.Replace(".source", filteredSuffix + ".source");
 
-                smtParallelCorpora = parallelCorpora;
-                smtParallelCorporaCW = parallelCorporaCW;
-            }
+            string corporaTargetLemmaFile = targetLemmaFile.Replace(".target", filteredSuffix + ".target");
+            string corporaTargetIdFile = targetIdFile.Replace(".target", filteredSuffix + ".target");
+            string corporaTargetTextFile = targetTextFile.Replace(".target", filteredSuffix + ".target");
 
-            ShowTime();
+            return (
+                corporaSourceLemmaFile, corporaSourceIdFile, corporaSourceTextFile, corporaSourceLemmaCatFile,
+                corporaTargetLemmaFile, corporaTargetIdFile, corporaTargetTextFile
+                );
+        }
 
-            return (smtParallelCorpora, smtParallelCorporaCW);
+        //
+        private static (string, string) InitializeSmtModelFiles(bool useContentWordsOnly)
+        {
+            string suffix = CreateCorporaSuffix(useLemmaCatModel, useNoPuncModel, useContentWordsOnly);
+            string modelSuffix = string.Format(".{0}.lemma{1}", smtModel.ToLower(), suffix);
+
+            string smtTransModelFile = transModelFile.Replace(".tsv", modelSuffix + ".tsv");
+            string smtAlignModelFile = alignModelFile.Replace(".tsv", modelSuffix + ".tsv");
+
+            return (smtTransModelFile, smtAlignModelFile);
+        }
+
+        private static string CreateCorporaSuffix(bool useLemmaCat, bool useNoPunc, bool useContentWordsOnly)
+        {
+            string suffix = string.Empty;
+
+            if (useLemmaCat) suffix += ".cat";
+            if (useNoPunc) suffix += ".nopunc";
+            if (useContentWordsOnly) suffix += ".cw";
+
+            return suffix;
+        }
+
+        private static string CreateCorporaFilteredSuffix(bool useNoPunc, bool useContentWordsOnly)
+        {
+            string suffix = string.Empty;
+
+            if (useNoPunc) suffix += ".nopunc";
+            if (useContentWordsOnly) suffix += ".cw";
+
+            return suffix;
         }
 
         // Was Do_Button1()
@@ -958,7 +1071,9 @@ namespace Clear3
         public static string ProcessAll()
         {
             Console.WriteLine("Doing ProcessAll command");
+            Console.WriteLine("ProcessAll command not implemented");
 
+            /*
             DeleteStateFiles(); // Delete State files
             InitializeState(); // Initialize State
             TokenizeVerses(); // Tokenize
@@ -971,6 +1086,7 @@ namespace Clear3
             File.Copy(jsonOutput, checkedAlignmentsFile);
 
             GlobalUpdate(); // Global update
+            */
 
             return "Done Processing.";
         }
@@ -1010,9 +1126,36 @@ namespace Clear3
             Console.WriteLine(dt.ToString("G"));
         }
 
+        // Variable not in Clear2
+
         private static IClear30ServiceAPI clearService;
         private static IImportExportService importExportService;
         private static IUtility utility;
+
+        private static TargetVerseCorpus targetVerseCorpus;
+        private static ITreeService treeService;
+        private static ParallelCorpora parallelCorpora;
+        private static ParallelCorpora parallelCorporaCW;
+        private static ParallelCorpora parallelCorporaNoPunc;
+        private static ParallelCorpora parallelCorporaNoPuncCW;
+
+        // Variables that are different in Clear2
+
+        private static TranslationModel translationModel; // translation model
+        private static TranslationModel translationModelRest; // translation model for all words
+        private static TranslationModel manTransModel; // the translation model created from manually checked alignments
+        private static AlignmentModel alignmentModel; // alignment model
+        private static AlignmentModel alignmentModelPre; // alignment model
+        private static List<string> puncs; // list of punctuation marks
+        private static SimpleVersification simpleVersification;
+        private static GroupTranslationsTable groups; // one-to-many, many-to-one, and many-to-many mappings
+        private static List<string> stopWords; // list of target words not to be linked
+        private static List<string> sourceFunctionWords; // function words
+        private static List<string> targetFunctionWords;
+        private static Dictionary<string, Dictionary<string, int>> strongs;
+        private static Dictionary<string, Dictionary<string, string>> oldLinks;
+
+        // Variables that are the same as in Clear2
 
         private static string clearConfigFilename;
         private static Dictionary<string, string> clearSettings; // Input from .config file
@@ -1024,68 +1167,66 @@ namespace Clear3
         private static string translationConfigFilename;
         private static string translationFolder;
         private static string translationConfigFile;
-
         private static Dictionary<string, string> translationSettings;
 
         private static string resourcesFolder; // 2020.07.11 CL: The folder where all the CLEAR Engine resources are kept.
         private static string processingFolder; // 2020.07.11 CL: The folder where all the CLEAR Engine translation projects are kept.
-        private static string sourceFoldername; // the folder where all the manuscript files are kept.  They are static and do not change over time.
-        // private static string sourceFolder; // the folder where all the manuscript files are kept.  They are static and do not change over time.
         private static string targetFolder; // the folder where the target language data is kept.  Each different translaton has a different folder.
-        private static string treeFoldername; // the folder where syntatic trees are kept.
-        private static string treeFolder; // the folder where syntatic trees are kept.
-        private static string initialFilesFoldername; // 2020.07.16 CL: Added this to define where the initial files are located.
-        private static string initialFilesFolder; // 2020.07.16 CL: Added this to define where the initial files are located.
+        // private static string treeFoldername; // the folder where syntatic trees are kept.
+        // private static string treeFolder; // the folder where syntatic trees are kept.
 
         private static string project; // 2020.09.25 CL: The name of the folder inside the projectsFolder. We may have multiple translations for the same language. This is used to identify the folder used.
         private static string lang; // language of target language
-        private static string culture; // Used in C# routines that consider language and culture, such as .ToLower()
+        private static string targetCSharpCulture; // Used in C# routines that consider language and culture, such as .ToLower()
         private static string translation; // 2020.09.25 CL: This is now the name of the translation, sometimes including a numbers to indicate the year of the copyright, e.g. NIV84
         private static string testament; // 2020.07.11 CL: Which testament we are working on. I think at some point, we should not need to distinguish between them.
 
         private static string runSpec; // 1:10;H:5
         private static double epsilon; // Must exceed this to be counted into model, 0.1
-        private static string thotModel; // For SIL auto aligner interations
-        private static string thotHeuristic; // For SIL auto aligner interations
-        private static string thotIterations; // For SIL auto aligner interations
+        private static string smtModel; // For SIL auto aligner interations
+        private static string smtHeuristic; // For SIL auto aligner interations
+        private static string smtIterations; // For SIL auto aligner interations
+
+        private static bool useAlignModel; // whether to use the alignment model
+        private static bool contentWordsOnly; // whether to align content words
         private static bool contentWordsOnlySMT; // Use only content words for creating the statistical models: transModel and alignModel
         private static bool contentWordsOnlyTC; // Use only content words for creating the statistical translation model: transModel
         private static bool useLemmaCatModel; // whether to use the lemma_cat in creating the SMT models
         private static bool useNoPuncModel; // whether to use the target corpora without punctuations in creating the SMT models
-        private static bool useAlignModel; // whether to use the alignment model
-        private static bool contentWordsOnly; // whether to align content words
+
+        private static bool reuseTokenFiles; // If token files already exist, use them rather than creating them over again.
+        private static bool reuseParallelCorporaFiles; // If parallel corpora files already exist, use them rather than creating them over again.
+        private static bool reuseSmtModelFiles; // If SMT model files already exist, use them rather than creating them over again.
 
         private static string strEpsilon;
+        private static string strUseAlignModel;
+        private static string strContentWordsOnly;
         private static string strContentWordsOnlySMT;
         private static string strContentWordsOnlyTC;
         private static string strUseLemmaCatModel;
         private static string strUseNoPuncModel;
-        private static string strUseAlignModel;
-        private static string strContentWordsOnly;
+
+        private static string strReuseTokenFiles;
+        private static string strReuseParallelCorporaFiles;
+        private static string strReuseSmtModelFiles;
 
         private static string translationTestamentPrefix;
 
+        private static string tokensFoldername;
+        private static string tokensFolder;
+        private static string corporaFoldername;
+        private static string corporaFolder;
+        private static string modelsFoldername;
+        private static string modelsFolder;
+
         private static string transModelFilename; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
         private static string transModelFile; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
-        private static string transModelFilenameCW; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
-        private static string transModelFileCW; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
-
-        private static TranslationModel translationModel; // translation model
-        private static TranslationModel translationModelRest; // translation model for all words
 
         private static string manTransModelFilename; // the file that contains the translation model created from manually checked alignments
         private static string manTransModelFile; // the file that contains the translation model created from manually checked alignments
-        private static TranslationModel manTransModel; // the translation model created from manually checked alignments
 
         private static string alignModelFilename; // the file that contains the alignment model;
         private static string alignModelFile; // the file that contains the alignment model;
-        private static string alignModelFilenameCW; // the file that contains the alignment model;
-        private static string alignModelFileCW; // the file that contains the alignment model;
-
-        // private static AlignmentModel alignModel; // alignment model
-        private static AlignmentModel alignmentModel; // alignment model
-        private static AlignmentModel alignmentModelPre; // alignment model
-        // private static AlignmentModel preAlignment; // alignment table
 
         private static string glossFilename; // 2020.07.11 CL: The file where the source glosses are kept.
         private static string glossFile; // 2020.07.11 CL: The file where the source glosses are kept.
@@ -1093,37 +1234,23 @@ namespace Clear3
 
         private static string puncsFilename; // 2020.07.11 CL: The file where the source punctuations kept.
         private static string puncsFile; // 2020.07.11 CL: The file where the source punctuations kept.
-        private static List<string> puncs; // list of punctuation marks
-        // private static HashSet<string> puncs; // list of punctuation marks
 
         private static string versificationFilenameDefault; // default versification
         private static string versificationTypeDefault; // default versification type
         private static string versificationFilename; // versification file
         private static string versificationFile; // versification file
         private static string versificationType; // versification type
-        // private static ArrayList versificationList; // list of source-target verse pairs
-        private static SimpleVersification simpleVersification;
 
         private static string jsonOutputFilename; // output of aligner in JSON
         private static string jsonOutput; // output of aligner in JSON
         private static string jsonFilename; // output of aligner in JSON
         private static string jsonFile; // output of aligner in JSON
 
-        private static string t2gJsonFilename; // alignment between gateway translation and target translation
-        private static string t2gJsonFile; // alignment between gateway translation and target translation
-        private static string gAlignment;
-        private static string gAlignmentFilename;
-        private static string auto_m_t_alignmentFilename;
-        private static string auto_m_t_alignment;
-
         private static string groupFilename; // the file that contains the one-to-many, many-to-one, and many-to-many mappings
         private static string groupFile; // the file that contains the one-to-many, many-to-one, and many-to-many mappings
-        private static GroupTranslationsTable groups; // one-to-many, many-to-one, and many-to-many mappings
 
         private static string stopWordFilename; // contains the list of target words not to be linked
         private static string stopWordFile; // contains the list of target words not to be linked
-        private static List<string> stopWords; // list of target words not to be linked
-        // private static HashSet<string> stopWords; // list of target words not to be linked
 
         private static int badLinkMinCount; // the minimal count required for treating a link as bad
         private static string badLinkFilename; // contains the list of pairs of words that should not be linked
@@ -1138,40 +1265,17 @@ namespace Clear3
         private static string strBadLinkMinCount;
         private static string strGoodLinkMinCount;
 
-        private static string tmFilename; // translation memory file
-        private static string tmFile; // translation memory file
-        // private static Hashtable tm; // translation memory
-
-        private static string freqPhrasesFilename; // the file that contains frequent phrases
-        private static string freqPhrasesFile; // the file that contains frequent phrases
-        // private static Hashtable freqPhrases; // table of frequent phrases
-
         private static string sourceFuncWordsFilename;
         private static string sourceFuncWordsFile;
-        // private static List<string> sourceFuncWords; // function words
-        private static List<string> sourceFunctionWords; // function words
-        // private static HashSet<string> sourceFunctionWords; // function words
 
         private static string targetFuncWordsFilename; // 2020.07.10 CL: Added this to make it global to this form since targetFuncWords is global.
         private static string targetFuncWordsFile; // 2020.07.10 CL: Added this to make it global to this form since targetFuncWords is global.
-        // private static List<string> targetFuncWords;
-        private static List<string> targetFunctionWords;
-        // private static HashSet<string> targetFunctionWords;
 
         private static string strongFilename;
         private static string strongFile;
-        private static Dictionary<string, Dictionary<string, int>> strongs;
 
         private static string oldJsonFilename;
         private static string oldJson;
-        private static Dictionary<string, Dictionary<string, string>> oldLinks;
-
-        private static TargetVerseCorpus targetVerseCorpus;
-        private static ITreeService treeService;
-        private static ParallelCorpora parallelCorpora;
-        private static ParallelCorpora parallelCorporaCW;
-        private static ParallelCorpora parallelCorporaNoPunc;
-        private static ParallelCorpora parallelCorporaNoPuncCW;
 
         private static string tokenTextFilename;
         private static string tokenTextFile;
@@ -1179,15 +1283,6 @@ namespace Clear3
         private static string tokenLemmaFile;
         private static string tokenIdFilename;
         private static string tokenIdFile;
-
-        // private static string sourceTextFilenameM;
-        // private static string sourceTextFileM;
-        // private static string sourceIdFilenameM;
-        // private static string sourceIdFileM;
-        // private static string sourceLemmaFilenameM;
-        // private static string sourceLemmaFileM;
-        // private static string sourceLemmaCatFilenameM;
-        // private static string sourceLemmaCatFileM;
 
         private static string sourceTextFilename;
         private static string sourceTextFile;
@@ -1198,15 +1293,6 @@ namespace Clear3
         private static string sourceLemmaCatFilename;
         private static string sourceLemmaCatFile;
 
-        private static string sourceTextNoPuncFilename;
-        private static string sourceTextNoPuncFile;
-        private static string sourceIdNoPuncFilename;
-        private static string sourceIdNoPuncFile;
-        private static string sourceLemmaNoPuncFilename;
-        private static string sourceLemmaNoPuncFile;
-        private static string sourceLemmaCatNoPuncFilename;
-        private static string sourceLemmaCatNoPuncFile;
-
         private static string targetTextFilename;
         private static string targetTextFile;
         private static string targetIdFilename;
@@ -1214,58 +1300,7 @@ namespace Clear3
         private static string targetLemmaFilename;
         private static string targetLemmaFile;
 
-        private static string targetTextNoPuncFilename;
-        private static string targetTextNoPuncFile;
-        private static string targetIdNoPuncFilename;
-        private static string targetIdNoPuncFile;
-        private static string targetLemmaNoPuncFilename;
-        private static string targetLemmaNoPuncFile;
-
-        // private static string targetPuncFilename;
-        // private static string targetPuncFile;
-        // private static string targetPuncLowerFilename;
-        // private static string targetPuncLowerFile;
-
-        private static string sourceTextFilenameCW;
-        private static string sourceTextFileCW;
-        private static string sourceIdFilenameCW;
-        private static string sourceIdFileCW;
-        private static string sourceLemmaFilenameCW;
-        private static string sourceLemmaFileCW;
-        private static string sourceLemmaCatFilenameCW;
-        private static string sourceLemmaCatFileCW;
-
-        private static string sourceTextNoPuncFilenameCW;
-        private static string sourceTextNoPuncFileCW;
-        private static string sourceIdNoPuncFilenameCW;
-        private static string sourceIdNoPuncFileCW;
-        private static string sourceLemmaNoPuncFilenameCW;
-        private static string sourceLemmaNoPuncFileCW;
-        private static string sourceLemmaCatNoPuncFilenameCW;
-        private static string sourceLemmaCatNoPuncFileCW;
-
-        private static string targetTextFilenameCW;
-        private static string targetTextFileCW;
-        private static string targetIdFilenameCW;
-        private static string targetIdFileCW;
-        private static string targetLemmaFilenameCW;
-        private static string targetLemmaFileCW;
-
-        private static string targetTextNoPuncFilenameCW;
-        private static string targetTextNoPuncFileCW;
-        private static string targetIdNoPuncFilenameCW;
-        private static string targetIdNoPuncFileCW;
-        private static string targetLemmaNoPuncFilenameCW;
-        private static string targetLemmaNoPuncFileCW;
-
         private static string versesFilename; // Input file with verses on separate lines previxed with verseID.
         private static string versesFile; // Input file with verses on separate lines previxed with verseID.
-        private static string rawFilename; // Input file with verses on separate lines previxed with verseID.
-        private static string rawFile; // Input file with verses on separate lines previxed with verseID.
-        private static string checkedAlignmentsFilename; // input to global update
-        private static string checkedAlignmentsFile; // input to global update
-        private static string m_g_jsonFilename;
-        private static string m_g_jsonFile;
-
     }
 }

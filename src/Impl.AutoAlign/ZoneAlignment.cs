@@ -231,6 +231,18 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                    existingLinks,
                    assumptions);
 
+            // Debugging
+            foreach (var entry in terminalCandidates2)
+            {
+                foreach (var candidate in entry.Value)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+            }
+
             // Traverse the syntax tree starting from the terminals
             // and working back to the root to construct alignments
             // and eventually the best one.

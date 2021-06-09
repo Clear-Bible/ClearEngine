@@ -75,6 +75,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         existingLinks,
                         assumptions);
 
+                // Debugging
+                foreach (var candidate in topCandidates2)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+
                 // Add the candidates found to the table of alternatives
                 // for terminals.
                 candidateTable2.Add(sourceID, topCandidates2);
@@ -273,6 +282,49 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // (as given by the estimated translation model modified
                 // by the estimated alignment).
                 //
+
+                // Debugging
+                var candidates = targetPoints
+                    .Where(tp => !assumptions.IsBadLink(lemma, tp.Lemma))
+                    .Where(tp => !assumptions.IsPunctuation(tp.Lemma))
+                    .Where(tp => !assumptions.IsStopWord(tp.Lemma))
+                    .Select(targetPoint =>
+                    {
+                        bool ok = tryGetScoreForTargetText(
+                            targetPoint.Lemma,
+                            out double score);
+                        return new { ok, targetPoint, score };
+                    })
+                    .Where(x => x.ok)
+                    .Select(x => new
+                    {
+                        x.targetPoint,
+                        score = Math.Log(
+                            getAdjustedScore(
+                                x.score,
+                                x.targetPoint.TargetID.AsCanonicalString))
+                    })
+                    .GroupBy(x => x.score)
+                    .OrderByDescending(group => group.Key)
+                    .Take(1)
+                    .SelectMany(group =>
+                        group
+                        .Select(x => Candidate.NewPoint(
+                            sourcePoint,
+                            x.targetPoint,
+                            x.score)))
+                    .ToList();
+
+                // Debugging
+                foreach (var candidate in candidates)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+                return candidates;
+                /*
                 return 
                     targetPoints
                     .Where(tp => !assumptions.IsBadLink(lemma, tp.Lemma))
@@ -304,6 +356,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             x.targetPoint,
                             x.score)))
                     .ToList();
+                */
             }
 
             // Otherwise, there are no alternatives.
