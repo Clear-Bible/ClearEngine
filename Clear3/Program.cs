@@ -25,17 +25,24 @@ namespace Clear3
     {
         SetProject, 
         SetTestament,
+
         SetContentWordsOnly,
         SetUseAlignModel,
         SetRunSpec,
         SetEpsilon,
-        SetThotModel,
-        SetThotHeuristic,
-        SetThotIterations,
+        SetSmtModel,
+        SetSmtHeuristic,
+        SetSmtIterations,
+
         SetSmtContentWordsOnly,
         SetTcContentWordsOnly,
+
         SetUseLemmaCatModel,
         SetUseNoPuncModel,
+
+        SetReuseTokenFiles,
+        SetReuseParallelCorporaFiles,
+        SetReuseSmtModelFiles,
     }
 
     static class Program
@@ -143,7 +150,7 @@ namespace Clear3
                     }
                     break;
                 case Options.SetRunSpec:
-                    if (param.StartsWith("HMM;") || param.StartsWith("IBM1;") || param.StartsWith("IBM2;") || param.StartsWith("IBM4;") || param.StartsWith("FastAlign;"))
+                    if (param.StartsWith("HMM;") || param.StartsWith("IBM1;") || param.StartsWith("IBM2;") || param.StartsWith("IBM3;") || param.StartsWith("IBM4;") || param.StartsWith("FastAlign;"))
                     {
                         good = true;
                     }
@@ -162,8 +169,8 @@ namespace Clear3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be a number", optionStr, param));
                     }
                     break;
-                case Options.SetThotModel:
-                    if ((param == "IBM1") || (param == "IBM2") || (param == "IBM4") || (param == "HMM") || (param == "FastAlign"))
+                case Options.SetSmtModel:
+                    if ((param == "IBM1") || (param == "IBM2") || (param == "IBM3") || (param == "IBM4") || (param == "HMM") || (param == "FastAlign"))
                     {
                         good = true;
                     }
@@ -172,7 +179,7 @@ namespace Clear3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported model", optionStr, param));
                     }
                     break;
-                case Options.SetThotHeuristic:
+                case Options.SetSmtHeuristic:
                     if ((param == "Intersection") || (param == "Union") || (param == "Grow") || (param == "GrowDiag") || (param == "GrowDiagFinal") || (param == "GrowDiagFinalAnd") || (param == "Och"))
                     {
                         good = true;
@@ -182,7 +189,7 @@ namespace Clear3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported hueristic", optionStr, param));
                     }
                     break;
-                case Options.SetThotIterations:
+                case Options.SetSmtIterations:
                     if (int.TryParse(param, out int iterations))
                     {
                         good = true;
@@ -198,6 +205,9 @@ namespace Clear3
                 case Options.SetTcContentWordsOnly:
                 case Options.SetUseLemmaCatModel:
                 case Options.SetUseNoPuncModel:
+                case Options.SetReuseTokenFiles:
+                case Options.SetReuseParallelCorporaFiles:
+                case Options.SetReuseSmtModelFiles:
                     if ((param == "true") || (param == "false"))
                     {
                         good = true;
@@ -390,67 +400,82 @@ namespace Clear3
             {
                 case Options.SetProject:
                     ActionsClear3.SetProject(param);
-                    Console.WriteLine("project set to {0}", param);
+                    Console.WriteLine("  project set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetTestament:
                     ActionsClear3.SetTestament(param);
-                    Console.WriteLine("testament set to {0}", param);
+                    Console.WriteLine("  testament set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetContentWordsOnly:
                     ActionsClear3.SetContentWordsOnly(param);
-                    Console.WriteLine("contentWordsOnly set to {0}", param);
+                    Console.WriteLine("  contentWordsOnly set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetUseAlignModel:
                     ActionsClear3.SetUseAlignModel(param);
-                    Console.WriteLine("useAlignModel set to {0}", param);
+                    Console.WriteLine("  useAlignModel set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetRunSpec:
                     ActionsClear3.SetRunSpec(param);
-                    Console.WriteLine("runSpec set to {0}", param);
+                    Console.WriteLine("  runSpec set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetEpsilon:
                     ActionsClear3.SetEpsilon(param);
-                    Console.WriteLine("epsilon set to {0}", param);
+                    Console.WriteLine("  epsilon set to {0}", param);
                     initialized = false;
                     break;
-                case Options.SetThotModel:
-                    ActionsClear3.SetThotModel(param);
-                    Console.WriteLine("thotModel set to {0}", param);
+                case Options.SetSmtModel:
+                    ActionsClear3.SetSmtModel(param);
+                    Console.WriteLine("  smtModel set to {0}", param);
                     initialized = false;
                     break;
-                case Options.SetThotHeuristic:
-                    ActionsClear3.SetThotHeuristic(param);
-                    Console.WriteLine("thotHeuristic set to {0}", param);
+                case Options.SetSmtHeuristic:
+                    ActionsClear3.SetSmtHeuristic(param);
+                    Console.WriteLine("  smtHeuristic set to {0}", param);
                     initialized = false;
                     break;
-                case Options.SetThotIterations:
-                    ActionsClear3.SetThotIterations(param);
-                    Console.WriteLine("thotIterations set to {0}", param);
+                case Options.SetSmtIterations:
+                    ActionsClear3.SetSmtIterations(param);
+                    Console.WriteLine("  smtIterations set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetSmtContentWordsOnly:
                     ActionsClear3.SetSmtContentWordsOnly(param);
-                    Console.WriteLine("contentWordsOnlySMT set to {0}", param);
+                    Console.WriteLine("  contentWordsOnlySMT set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetTcContentWordsOnly:
                     ActionsClear3.SetTcContentWordsOnly(param);
-                    Console.WriteLine("contentWordsOnlyTC set to {0}", param);
+                    Console.WriteLine("  contentWordsOnlyTC set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetUseLemmaCatModel:
                     ActionsClear3.SetUseLemmaCatModel(param);
-                    Console.WriteLine("useLemmaCatModel set to {0}", param);
+                    Console.WriteLine("  useLemmaCatModel set to {0}", param);
                     initialized = false;
                     break;
                 case Options.SetUseNoPuncModel:
                     ActionsClear3.SetUseNoPuncModel(param);
-                    Console.WriteLine("useNoPuncModel set to {0}", param);
+                    Console.WriteLine("  useNoPuncModel set to {0}", param);
+                    initialized = false;
+                    break;
+                case Options.SetReuseTokenFiles:
+                    ActionsClear3.SetReuseTokenFiles(param);
+                    Console.WriteLine("  reuseTokenFiles set to {0}", param);
+                    initialized = false;
+                    break;
+                case Options.SetReuseParallelCorporaFiles:
+                    ActionsClear3.SetReuseParallelCorporaFiles(param);
+                    Console.WriteLine("  reuseParallelCorporaFiles set to {0}", param);
+                    initialized = false;
+                    break;
+                case Options.SetReuseSmtModelFiles:
+                    ActionsClear3.SetReuseSmtModelFiles(param);
+                    Console.WriteLine("  reuseSmtModelFiles set to {0}", param);
                     initialized = false;
                     break;
                 default: // This should never happen unless I forgot to revise the mainCommands
@@ -538,6 +563,7 @@ namespace Clear3
             Console.WriteLine("\t\tSets the project to be processed to <project>.");
             Console.WriteLine("\t-t <testament>, --testament=<testament>");
             Console.WriteLine("\t\tSets the testament to be processed to <testament>, which can only be OT or NT");
+
             Console.WriteLine("\t-c <bool>, --content-words-only=<bool>");
             Console.WriteLine("\t\tSets the contentWordsOnly boolean to <bool>, which can only be true or false");
             Console.WriteLine("\t-a <bool>, --use-align-model=<bool>");
@@ -545,17 +571,31 @@ namespace Clear3
             Console.WriteLine("\t-e <double>, --epsilon=<double>");
             Console.WriteLine("\t\tSets epsilon (threshold) to <double>, e.g. 0.1");
             Console.WriteLine("\t-h <heuristic>, --heuristic=<heuristic>");
-            Console.WriteLine("\t\tSets the Thot model heursitic to <heursitic>, e.g. Intersection");
+            Console.WriteLine("\t\tSets the SMT model heursitic to <heursitic>, e.g. Intersection");
             Console.WriteLine("\t-i <int>, --iterations=<int>");
-            Console.WriteLine("\t\tSets number of iterations for Thot model to <int>, e.g. 7");
+            Console.WriteLine("\t\tSets number of iterations for SMT model to <int>, e.g. 7");
             Console.WriteLine("\t-m <model>, --model=<model>");
-            Console.WriteLine("\t\tSets the Thot model to <model>, e.g. FastAlign");
+            Console.WriteLine("\t\tSets the SMT model to <model>, e.g. FastAlign");
             Console.WriteLine("\t-r <runspec>, --runspec=<runspec>");
             Console.WriteLine("\t\tSets the runSpec to <runspec>, e.g. 1:10;H:5 or Machine;FastAlign:Inter");
+
             Console.WriteLine("\t-smt <bool>, --smt-content-words-only=<bool>");
             Console.WriteLine("\t\tSets the contentWordsOnlySMT boolean to <bool>, which can only be true or false");
             Console.WriteLine("\t-tc <bool>, --tc-content-words-only=<bool>");
             Console.WriteLine("\t\tSets the contentWordsOnlyTC boolean to <bool>, which can only be true or false");
+
+            Console.WriteLine("\t-lc <bool>, --use-lemma-cat-model=<bool>");
+            Console.WriteLine("\t\tSets the useLemmaCatModel boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-np <bool>, --use-no-punc-model=<bool>");
+            Console.WriteLine("\t\tSets the useNoPuncModel boolean to <bool>, which can only be true or false");
+
+            Console.WriteLine("\t-rt <bool>, --reuse-token-files=<bool>");
+            Console.WriteLine("\t\tSets the reuseTokenFiles boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-rc <bool>, --reuse-parallel-corpora-files=<bool>");
+            Console.WriteLine("\t\tSets the reuseParallelCorporaFiles boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-rm <bool>, --reuse-smt-model-files=<bool>");
+            Console.WriteLine("\t\tSets the reuseSmtModelFiles boolean to <bool>, which can only be true or false");
+
             Console.WriteLine("Here are the following commands:");
             Console.WriteLine("\tDeleteStateFiles");
             Console.WriteLine("\tInitializeState");
@@ -607,17 +647,24 @@ namespace Clear3
             {
                 {"-p", Options.SetProject }, {"--project", Options.SetProject },
                 {"-t", Options.SetTestament }, {"--testament", Options.SetTestament },
+
                 {"-c", Options.SetContentWordsOnly }, {"--content-words-only", Options.SetContentWordsOnly },
                 {"-a", Options.SetUseAlignModel }, {"--use-align-model", Options.SetUseAlignModel },
                 {"-r", Options.SetRunSpec }, {"--runspec", Options.SetRunSpec },
                 {"-e", Options.SetEpsilon }, {"--epsilon", Options.SetEpsilon },
-                {"-m", Options.SetThotModel }, {"--model", Options.SetThotModel },
-                {"-h", Options.SetThotHeuristic }, {"--hueristic", Options.SetThotHeuristic },
-                {"-i", Options.SetThotIterations }, {"--iterations", Options.SetThotIterations },
+                {"-m", Options.SetSmtModel }, {"--model", Options.SetSmtModel },
+                {"-h", Options.SetSmtHeuristic }, {"--hueristic", Options.SetSmtHeuristic },
+                {"-i", Options.SetSmtIterations }, {"--iterations", Options.SetSmtIterations },
+
                 {"-smt", Options.SetSmtContentWordsOnly }, {"--smt-content-words-only", Options.SetSmtContentWordsOnly },
                 {"-tc", Options.SetTcContentWordsOnly }, {"--tc-content-words-only", Options.SetTcContentWordsOnly },
+
                 {"-lc", Options.SetUseLemmaCatModel }, {"--use-lemma-cat-model", Options.SetUseLemmaCatModel },
                 {"-np", Options.SetUseNoPuncModel }, {"--use-no-punc-model", Options.SetUseNoPuncModel },
+
+                {"-rt", Options.SetReuseTokenFiles }, {"--reuse-token-files", Options.SetReuseTokenFiles },
+                {"-rc", Options.SetReuseParallelCorporaFiles }, {"--reuse-parallel-corpora-files", Options.SetReuseParallelCorporaFiles },
+                {"-rm", Options.SetReuseSmtModelFiles }, {"--reuse-smt-model-files", Options.SetReuseSmtModelFiles },
             };
         }
 

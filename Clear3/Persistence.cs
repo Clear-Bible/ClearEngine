@@ -135,6 +135,8 @@ namespace Clear3
             return new ParallelCorpora(zonePairs);
         }
 
+
+
         public static void ExportTranslationModel(TranslationModel model, string filename)
         {
             StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8);
@@ -212,7 +214,50 @@ namespace Clear3
             sw.Close();
         }
 
-        
+        //
+        public static TranslationModel ImportTranslationModel(string filename)
+        {
+            var translationModel = new Dictionary<SourceLemma, Dictionary<TargetLemma, Score>>();
+
+            string[] lines = File.ReadAllLines(filename);
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var line = lines[i];
+                string[] parts = line.Split('\t');
+
+                if (parts.Length == 3)
+                {
+                    var source = parts[0];
+                    var target = parts[1];
+                    double prob = double.Parse(parts[2]);
+
+                    var sourceLemma = new SourceLemma(source);
+                    var targetLemma = new TargetLemma(target);
+                    var score = new Score(prob);
+
+                    if (translationModel.ContainsKey(sourceLemma))
+                    {
+                        var translations = translationModel[sourceLemma];
+                        translations.Add(targetLemma, score);
+                    }
+                    else
+                    {
+                        var translations = new Dictionary<TargetLemma, Score>();
+                        translations.Add(targetLemma, score);
+                        translationModel.Add(sourceLemma, translations);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("ERROR in ImportTranslationModel() - Improper format of line {0}: {1}", i, line);
+                }
+            }
+
+            return new TranslationModel(translationModel);
+        }
+
+        //
         public static void ExportAlignmentModel(AlignmentModel table, string filename)
         {
             StreamWriter sw = new StreamWriter(filename, false, Encoding.UTF8);
@@ -271,6 +316,46 @@ namespace Clear3
         }
 
         //
+        public static AlignmentModel ImportAlignmentModel(string filename)
+        {
+            var alignmentModel = new Dictionary<BareLink, Score>();
+
+            string[] lines = File.ReadAllLines(filename);
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                var line = lines[i];
+                string[] parts = line.Split('\t');
+
+                if (parts.Length == 2)
+                {
+                    var ids = parts[0].Split('-');
+                    var sourceID = new SourceID(ids[0]);
+                    var targetID = new TargetID(ids[1]);
+                    double prob = double.Parse(parts[1]);
+
+                    var bareLink = new BareLink(sourceID, targetID);
+                    var score = new Score(prob);
+
+                    if (!alignmentModel.ContainsKey(bareLink))
+                    {
+                        alignmentModel.Add(bareLink, score);
+                    }
+                    else
+                    {
+                        Console.WriteLine("ERROR in ImportAlignmentModel() - Duplicate link in line {0}: {1}", i, line);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("ERROR in ImportAlignmentModel() - Improper format of line {0}: {1}", i, line);
+                }
+            }
+
+            return new AlignmentModel(alignmentModel);
+        }
+
+        //
         public static void ExportTargetVerseCorpus(TargetVerseCorpus targetVerseCorpus, string textFile, string lemmaFile, string idFile)
         {
             using (StreamWriter swText = new StreamWriter(textFile, false, Encoding.UTF8))
@@ -298,5 +383,46 @@ namespace Clear3
             }
         }
 
+        //
+        public static TargetVerseCorpus ImportTargetVerseCorpus(string textFile, string lemmaFile, string idFile)
+        {
+            var targetVerseCorpus = new List<TargetVerse>();
+
+            string[] textLines = File.ReadAllLines(textFile);
+            string[] lemmaLines = File.ReadAllLines(lemmaFile);
+            string[] idLines = File.ReadAllLines(idFile);
+            
+            for (int i = 0; i < lemmaLines.Length; i++)
+            {
+                var textLine = textLines[i];
+                var lemmaLine = lemmaLines[i];
+                var idLine = idLines[i];
+
+                var words = textLine.Substring(textLine.IndexOf(' ')).Trim().Split();
+                var lemmas = lemmaLine.Substring(lemmaLine.IndexOf(' ')).Trim().Split();
+                var ids = idLine.Substring(idLine.IndexOf(' ')).Trim().Split();
+
+                var verse = new List<Target>();
+
+                for (int j = 0; j < lemmas.Length; j++)
+                {
+                    var word = words[j];
+                    var lemma = lemmas[j];
+                    var id = ids[j];
+
+                    var targetText = new TargetText(word);
+                    var targetLemma = new TargetLemma(lemma);
+                    var targetID = new TargetID(id);
+
+                    var target = new Target(targetText, targetLemma, targetID);
+                    verse.Add(target);
+                }
+
+                var targetVerse = new TargetVerse(verse);
+                targetVerseCorpus.Add(targetVerse);
+            }           
+
+            return new TargetVerseCorpus(targetVerseCorpus);
+        }
     }
 }

@@ -163,6 +163,7 @@ namespace ClearBible.Clear3.Impl.ResourceService
 
             return new TreeService(
                 // Path.Combine(ResourceFolder, "treebank", "Clear3Dev"),
+                // We should probably pass in the name of the folder where the trees are.
                 Path.Combine(ResourceFolder, "Trees"),
                 BookNames.LoadBookNames3a());
         }

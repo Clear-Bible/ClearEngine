@@ -238,6 +238,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 new SourceLemma(lemma),
                 out Dictionary<TargetLemma, Score> translations))
             {
+                // Debugging
+                foreach (var entry in translations)
+                {
+                    if (double.IsNaN(entry.Value.Double))
+                    {
+                        ;
+                    }
+                }
+
+
                 tryGetScoreForTargetText =
                     (string targetLemma, out double score) =>
                     {

@@ -37,13 +37,29 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// possible choice is expressed as a Candidate, and each
         /// source ID is expressed as the canonical string.
         /// </param>
-        /// 
+        /// Like Align.AlignNodes()? Looks like a wrapper around AlignNodes()
         public static Candidate AlignTree(
             XElement treeNode,
             int numberTargets,
             int maxPaths,
             Dictionary<SourceID, List<Candidate>> terminalCandidates)
         {
+            // Debugging
+            foreach (var entry in terminalCandidates)
+            {
+                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41001008011"))
+                {
+                    ;
+                }
+                foreach (var candidate in entry.Value)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+            }
+
             // Prepare to keep track of the best alignments for subnodes
             // of the syntax tree.  The key is the TreeNodeStackID
             // as a canonical string.  The value is a list of the best
@@ -97,6 +113,35 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             Dictionary<TreeNodeStackID, List<Candidate>> alignments,
             Dictionary<SourceID, List<Candidate>> terminalCandidates)
         {
+            foreach (var entry in alignments)
+            {
+                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
+                {
+                    ;
+                }
+                foreach (var candidate in entry.Value)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+            }
+            foreach (var entry in terminalCandidates)
+            {
+                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41001008011"))
+                {
+                    ;
+                }
+                foreach (var candidate in entry.Value)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+            }
+
             // First call ourselves recursively to populate the
             // alignments table for each of the subnodes.
             foreach (XElement subTree in treeNode.Elements())
@@ -109,6 +154,37 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     terminalCandidates);
             }
 
+            // Debugging. candidate2 has two items, the first is has one Candidate, the second has zero.
+            // alignments has 13 items, and the last one is empty.
+            foreach (var entry in alignments)
+            {
+                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
+                {
+                    ;
+                }
+                foreach (var candidate in entry.Value)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+            }
+            foreach (var entry in terminalCandidates)
+            {
+                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41001008011"))
+                {
+                    ;
+                }
+                foreach (var candidate in entry.Value)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+            }
+
             // Get the tree node stack ID for the entry that we
             // intend to populate in the candidates table.
             TreeNodeStackID nodeStackID = treeNode.TreeNodeStackID();
@@ -118,6 +194,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 SourceID sourceID = treeNode.SourceID();
                 alignments.Add(nodeStackID, terminalCandidates[sourceID]);
+
+                // Debugging
+                if (terminalCandidates[sourceID].Count == 0)
+                {
+                    ;
+                }
+                // Debugging
+                foreach (var entry in alignments)
+                {
+                    if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
+                    {
+                        ;
+                    }
+                }
             }
             // Otherwise this is a non-terminal node; if it has
             // multiple children:
@@ -125,11 +215,32 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             {
                 // Create candidates for this node, computed from
                 // the candidates for the child nodes.
+                //
+                // FIXME: 2021.06.07 CL: Discovered that for NRT NT using IBM1, candidate2 will have an empty inner list.
+                // alignments has a value with count == 0 for the last item in the dictionary. 
                 List<List<Candidate>> candidates2 =
                     treeNode
                     .Elements()
                     .Select(node => alignments[node.TreeNodeStackID()])
                     .ToList();
+
+                // Debugging. candidate2 has two items, the first is has one Candidate, the second has zero.
+                // alignments has 13 items, and the last one is empty.
+                foreach (var innerList in candidates2)
+                {
+                    if (innerList.Count == 0)
+                    {
+                        ;
+                    }
+                }
+                // Debugging
+                foreach (var entry in alignments)
+                {
+                    if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
+                    {
+                        ;
+                    }
+                }
 
                 // Keep only the best candidates, and store them into
                 // the alignments table.
@@ -137,8 +248,25 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     ComputeTopCandidates(
                         n, maxPaths,
                         candidates2);
+
+                // Debugging
+                foreach (var entry in alignments)
+                {
+                    if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
+                    {
+                        ;
+                    }
+                }
             }
 
+            // Debugging
+            foreach (var entry in alignments)
+            {
+                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
+                {
+                    ;
+                }
+            }
             // Otherwise this is a non-terminal node with only one
             // child.  Do nothing, because this node has the same
             // TreeNodeStackId and alternative candidates as the one
@@ -163,36 +291,112 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// <param name="childCandidateList">
         /// A list of alternatives for each of the children.
         /// </param>
-        ///
+        /// Like Candidates.ComputeTopCandidates()
         public static List<Candidate>
             ComputeTopCandidates(
                 int n,
                 int maxPaths,
                 List<List<Candidate>> childCandidateList)
         {
+            // Debugging
+            foreach (var child in childCandidateList)
+            {
+                if (child.Count == 0)
+                {
+                    ;
+                }
+                else
+                {
+                    foreach (var candidate in child)
+                    {
+                        if (double.IsNaN(candidate.LogScore))
+                        {
+                            ;
+                        }
+                    }
+                }
+            }
+
             // Combine the candidates of the children to get the
             // possibilities to be considered for this node.
             List<Candidate> allCandidates =
                 CreatePaths(
                     maxPaths, childCandidateList);
 
+            // This is what is in Clear2, and I think I might have added and Tim didn't see this change.
+            // This helps for some, but there are times when the childCandidateList has only one inner list and it is empty.
+            // In Clear2 at this point an inner list in childCandidateList is never empty.
+            if (allCandidates.Count == 0)
+            {
+                //     allCandidates = childCandidateList[0];
+                ;
+            }
+            // Debugging
+            foreach (var candidate in allCandidates)
+            {
+                if (double.IsNaN(candidate.LogScore))
+                {
+                    ;
+                }
+            }
+
             // Remove any possibility that has two source points linked
             // to the same target point.  (If all the possibilities have
             // conflicts, use the first possibility.)
+            //
+            // FIXME: 2021.06.07 CL: Got an index out of bounds on NRT NT using IBM1
+            // The childCandidateList has two items in our list/
+            // The first inner List has one Candidate, the second inner List has zero candidates.
+            // CreatePaths returns allCandidates as an empty List.
             List<Candidate> candidates =
                 allCandidates
                 .Where(cand => !cand.IsConflicted)
                 .DefaultIfEmpty(allCandidates[0])
                 .ToList();
 
+            // Debugging
+            foreach (var candidate in candidates)
+            {
+                if (double.IsNaN(candidate.LogScore))
+                {
+                    ;
+                }
+            }
+
             // Compute possibly adjusted probabilities for the candidates
             // which depend on the local conditions.
+
             Dictionary<Candidate, double> adjustedProbs =
                 AdjustProbsByDistanceAndOrder(candidates);
+
+            // Debugging
+            foreach (var entry in adjustedProbs)
+            {
+                if (double.IsNaN(entry.Key.LogScore) || double.IsNaN(entry.Value))
+                {
+                    ;
+                }
+            }
 
             // Sort the candidates by their adjusted probabilities, and use a
             // special hashing function to break ties.
             List<Candidate> sortedCandidates = SortPaths(adjustedProbs);
+
+            // Debugging
+            // We don't get zero, but a Candidate's LogScore may be NaN
+            if (sortedCandidates.Count == 0)
+            {
+                ;
+            }
+            // Debugging: Has a tail that the LogScore is NaN and so it seems the parent then is Nan.
+            foreach (var candidate in sortedCandidates)
+            {
+                if (double.IsNaN(candidate.LogScore))
+                {
+                    ;
+                }
+            }
+
 
             // Keep only the best candidate, together with any candidates
             // that follow it and have the same unadjusted probability.
@@ -200,6 +404,12 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // and do not propagate upward.)
             List<Candidate> topCandidates =
                 GetLeadingCandidates(sortedCandidates);
+
+            // Debugging
+            if (topCandidates.Count == 0)
+            {
+                ;
+            }
 
             return topCandidates;
         }
@@ -385,6 +595,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         {
             // Get the probability of the first candidate on
             // the list, or 0.0 if the list is empty.
+            //
+            // FIXME: 2021.06.07 CL: Some candidates have a LogScore == NaN (Not a Number)
+            // and so the leading Prob = 0, and then it returns an empty list.
             double leadingProb =
                 paths.Select(cand => cand.LogScore).FirstOrDefault();
 
