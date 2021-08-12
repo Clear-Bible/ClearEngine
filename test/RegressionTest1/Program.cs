@@ -108,17 +108,17 @@ namespace RegressionTest1
              Dictionary<string, Dictionary<string, int>> strongs)
              =
              ImportAuxAssumptionsSubTask.Run(
-                 puncsPath: common("puncs.txt"),
-                 stopWordsPath: common("stopWords.txt"),
-                 sourceFuncWordsPath: common("sourceFuncWords.txt"),
-                 targetFuncWordsPath: common("targetFuncWords.txt"),
-                 manTransModelPath: common("manTransModel.tsv"),
-                 goodLinksPath: common("goodLinks.tsv"),
-                 badLinksPath: common("badLinks.tsv"),
-                 glossTablePath: common("Gloss.tsv"),
-                 groupsPath: common("groups.tsv"),
-                 oldAlignmentPath: common("oldAlignment.json"),
-                 strongsPath: common("strongs.txt"));
+                 puncsPath: common("puncs.txt"),  // resource
+                 stopWordsPath: common("stopWords.txt"),  // resource
+                 sourceFuncWordsPath: common("sourceFuncWords.txt"),  // resource
+                 targetFuncWordsPath: common("targetFuncWords.txt"), // point to project specific
+                 manTransModelPath: common("manTransModel.tsv"),  // resource
+                 goodLinksPath: common("goodLinks.tsv"), // point to project specific
+                 badLinksPath: common("badLinks.tsv"), // point to project specific
+                 glossTablePath: common("Gloss.tsv"),  // resource
+                 groupsPath: common("groups.tsv"),  // resource
+                 oldAlignmentPath: common("oldAlignment.json"),  // point to project specific
+                 strongsPath: common("strongs.txt"));  // resource
 
 
             // Get the translation that is to be aligned.

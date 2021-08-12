@@ -327,7 +327,6 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         /// and the lowercased target text was found to be good (or bad)
         /// for the count number of times.
         /// </returns>
-        /// 
         public Dictionary<string, int> GetXLinks(string file)
         {
             Dictionary<string, int> xLinks = new Dictionary<string, int>();
@@ -335,17 +334,48 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
             {
-                string[] groups = line.Split("\t".ToCharArray());
-                if (groups.Length == 2)
+                string[] groups = line.Split('#');
+                if (groups.Length == 3)
                 {
-                    string badLink = groups[0].Trim();
-                    int count = Int32.Parse(groups[1]);
-                    xLinks.Add(badLink, count);
+                    string link = groups[0].Trim() + "#" + groups[1].Trim();
+                    int count = int.Parse(groups[2].Trim());
+                    if (!xLinks.ContainsKey(link))
+                    {
+                        xLinks.Add(link, count);
+                    }
+                    else
+                    {
+                        Console.WriteLine("WARNING GetXLinks {0}: Duplicate link {1}", file, link);
+                    }
                 }
+                else
+                {
+                    Console.WriteLine("WARNING GetXLinks {0}: Incorrect format {1}", file, line);
+                }
+                
             }
 
             return xLinks;
         }
+
+        //public Dictionary<string, int> GetXLinks(string file)
+        //{
+        //    Dictionary<string, int> xLinks = new Dictionary<string, int>();
+
+        //    string[] lines = File.ReadAllLines(file);
+        //    foreach (string line in lines)
+        //    {
+        //        string[] groups = line.Split("\t".ToCharArray());
+        //        if (groups.Length == 2)
+        //        {
+        //            string badLink = groups[0].Trim();
+        //            int count = Int32.Parse(groups[1]);
+        //            xLinks.Add(badLink, count);
+        //        }
+        //    }
+
+        //    return xLinks;
+        //}
 
 
         public Dictionary<string, Gloss> BuildGlossTableFromFile(string glossFile)
