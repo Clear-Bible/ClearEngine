@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageTags>ClearEngine ClearEngine3 SubTasks</PackageTags>
+    <RepositoryUrl>https://github.com/gbin-org/ClearEngine3</RepositoryUrl>
+    <PackageId>ClearBible.Clear3.SubTasks</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gbin-org/ClearEngine3</PackageProjectUrl>
+    <Company>Clear Bible, Inc.</Company>
+    <Authors>Clear Bible, Inc.</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>Copyright 2021, Clear Bible Inc.</Copyright>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClearBible.Clear3.API\ClearBible.Clear3.Api.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Clear3Service\ClearBible.Clear3.Clear3Service.csproj" />
+  </ItemGroup>
+</Project>

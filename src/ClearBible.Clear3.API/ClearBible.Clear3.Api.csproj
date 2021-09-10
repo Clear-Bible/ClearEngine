@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>ClearBible.Clear3.Api</PackageId>
+    <Authors>Clear Bible, Inc.</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/gbin-org/ClearEngine3</RepositoryUrl>
+    <PackageTags>ClearEngine ClearEngine3 API</PackageTags>
+    <PackageProjectUrl>https://github.com/gbin-org/ClearEngine3</PackageProjectUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>Copyright 2021, Clear Bible Inc.</Copyright>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+</Project>

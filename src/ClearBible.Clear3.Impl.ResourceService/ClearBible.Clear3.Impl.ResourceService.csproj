@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>ClearBible.Clear3.Impl.ResourceService</PackageId>
+    <Authors>Clear Bible, Inc.</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gbin-org/ClearEngine3</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gbin-org/ClearEngine3</RepositoryUrl>
+    <Copyright>Copyright 2021, Clear Bible Inc.</Copyright>
+    <PackageTags>ClearEngine ClearEngine3 Impl.ResourceService</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClearBible.Clear3.API\ClearBible.Clear3.Api.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.TreeService\ClearBible.Clear3.Impl.TreeService.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+</Project>

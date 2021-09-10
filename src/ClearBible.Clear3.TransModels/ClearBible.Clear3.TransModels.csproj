@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>ClearBible.Clear3.TransModels</PackageId>
+    <Authors>Clear Bible, Inc.</Authors>
+    <Copyright>Copyright 2021, Clear Bible Inc.</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gbin-org/ClearEngine3</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gbin-org/ClearEngine3</RepositoryUrl>
+    <PackageTags>ClearEngine ClearEngine3 TransModels</PackageTags>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SIL.Machine.Translation.Thot" Version="2.4.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClearBible.Clear3.Models\ClearBible.Clear3.Models.csproj" />
+  </ItemGroup>
+
+</Project>

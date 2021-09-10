@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>ClearBible.Clear3.Impl.ImportExportService</PackageId>
+    <Authors>Clear Bible, Inc.</Authors>
+    <Company>Clear Bible, Inc.</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/gbin-org/ClearEngine3</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gbin-org/ClearEngine3</RepositoryUrl>
+    <PackageTags>ClearEngine ClearEngine3 Impl.ImportExportService</PackageTags>
+    <Copyright>Copyright 2021, Clear Bible Inc.</Copyright>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClearBible.Clear3.API\ClearBible.Clear3.Api.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.Miscellaneous\ClearBible.Clear3.Impl.Miscellaneous.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+</Project>

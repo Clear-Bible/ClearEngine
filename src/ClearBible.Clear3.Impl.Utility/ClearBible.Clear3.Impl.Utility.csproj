@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>ClearBible.Clear3.Impl.Utility</PackageId>
+    <Authors>Clear Bible, Inc.</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gbin-org/ClearEngine3</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gbin-org/ClearEngine3</RepositoryUrl>
+    <Copyright>Copyright 2021, Clear Bible Inc.</Copyright>
+    <PackageTags>ClearEngine ClearEngine3 Impl.Utility</PackageTags>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClearBible.Clear3.API\ClearBible.Clear3.Api.csproj" />
+  </ItemGroup>
+</Project>

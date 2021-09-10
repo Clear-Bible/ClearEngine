@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>ClearBible.Clear3.Impl.SMTService</PackageId>
+    <Authors>Clear Bible, Inc.</Authors>
+    <Company>Clear Bible, Inc.</Company>
+    <Copyright>Copyright 2021, Clear Bible Inc.</Copyright>
+    <PackageProjectUrl>https://github.com/gbin-org/ClearEngine3</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gbin-org/ClearEngine3</RepositoryUrl>
+    <PackageTags>ClearEngine ClearEngine3 Impl.SMTService</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClearBible.Clear3.API\ClearBible.Clear3.Api.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.ImportExportService\ClearBible.Clear3.Impl.ImportExportService.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.TransModels\ClearBible.Clear3.TransModels.csproj" />
+  </ItemGroup>
+</Project>

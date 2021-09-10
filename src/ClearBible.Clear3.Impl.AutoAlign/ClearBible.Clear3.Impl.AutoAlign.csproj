@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>ClearBible.Clear3.Impl.AutoAlign</PackageId>
+    <Authors>Clear Bible, Inc.</Authors>
+    <Company>Clear Bible, Inc.</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gbin-org/ClearEngine3</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gbin-org/ClearEngine3</RepositoryUrl>
+    <PackageTags>ClearEngine ClearEngine3 Impl.AutoAlign</PackageTags>
+    <Copyright>Copyright 2021, Clear Bible Inc.</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClearBible.Clear3.API\ClearBible.Clear3.Api.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.Miscellaneous\ClearBible.Clear3.Impl.Miscellaneous.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.TreeService\ClearBible.Clear3.Impl.TreeService.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>ClearBible.Clear3.Clear3Service</PackageId>
+    <Authors>Clear Bible, Inc.</Authors>
+    <Company>Clear Bible, Inc.</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>ClearEngine ClearEngine3 Clear3Service</PackageTags>
+    <RepositoryUrl>https://github.com/gbin-org/ClearEngine3</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/gbin-org/ClearEngine3</PackageProjectUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>Copyright 2021, Clear Bible Inc.</Copyright>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClearBible.Clear3.API\ClearBible.Clear3.Api.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.AutoAlign\ClearBible.Clear3.Impl.AutoAlign.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.ImportExportService\ClearBible.Clear3.Impl.ImportExportService.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.Persistence\ClearBible.Clear3.Impl.Persistence.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.ResourceService\ClearBible.Clear3.Impl.ResourceService.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.Segmenter\ClearBible.Clear3.Impl.Segmenter.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.SMTService\ClearBible.Clear3.Impl.SMTService.csproj" />
+    <ProjectReference Include="..\ClearBible.Clear3.Impl.Utility\ClearBible.Clear3.Impl.Utility.csproj" />
+  </ItemGroup>
+</Project>
