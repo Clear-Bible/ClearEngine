@@ -104,6 +104,54 @@ namespace ClearBible.Clear3.API
         public string AsCanonicalString => _tag;
     }
 
+    /// <summary>
+    /// <para>
+    /// Identifies a particular segment instance in the translation
+    /// as described by its book, chapter, verse, word, and subsegment numbers
+    /// after lemmatization of the translation.
+    /// </para>
+    /// <para>
+    /// The TargetLemmaID object consists of a struct containing a single string
+    /// that encodes the identification in a canonical form.  This string is
+    /// available using the AsCanonicalString property.  A new TargetLemmaID can
+    /// be created from a canonical string if desired.
+    /// </para>
+    /// <para>
+    /// Once created, a TargetLemmaID is immutable.  Two TargetLemmaID objects are
+    /// Equal() if they contain the same canonical string, and will work as
+    /// dictionary keys on this basis.
+    /// </para>
+    /// <para>
+    /// To accomdate highly agglutinative languages, the subsegment has
+    /// two digits to allow one word to have more than 9 subsegments.
+    /// </para>
+    /// </summary>
+    /// FIXME: Finish using TargetLemmaIDs instead of bare strings in the
+    /// system at large.
+    /// 
+    public readonly struct TargetLemmaID
+    {
+        public int Book => int.Parse(_tag.Substring(0, 2));
+        public int Chapter => int.Parse(_tag.Substring(2, 3));
+        public int Verse => int.Parse(_tag.Substring(5, 3));
+        public int Word => int.Parse(_tag.Substring(8, 3));
+        public int Subsegment => int.Parse(_tag.Substring(11, 2));
+
+        public ChapterID ChapterID => new ChapterID(_tag.Substring(0, 5));
+        public VerseID VerseID => new VerseID(_tag.Substring(0, 8));
+
+        private readonly string _tag;
+
+        public TargetLemmaID(string tag) { _tag = tag; }
+
+        public TargetLemmaID(
+            int book, int chapter, int verse, int word, int subsegment)
+        {
+            _tag = $"{book:D2}{chapter:D3}{verse:D3}{word:D3}{subsegment:D1}";
+        }
+
+        public string AsCanonicalString => _tag;
+    }
 
     /// <summary>
     /// <para>

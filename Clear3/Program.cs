@@ -5,25 +5,27 @@ namespace Clear3
 {
     public enum Command
     {
-        DetleteStateFiles, // Delete existing state files (for a fresh start)
+        DeleteStateFiles, // Delete existing state files (for a fresh start)
         InitializeState, // Initialize the State
         TokenizeVerses, // Tokenize a verse text file
-        CreateParallelFiles, // Create Parallel Files
+        LemmatizeVerses, // Lemmatize a tokenized verse text file
+        CreateParallelCorpus, // Create Parallel Files
         BuildModels, // Build Translation Model with these files and specs
         AutoAlign,
         IncrementalUpdate,
         GlobalUpdate, // Rebuild the model with these 3 files:
-        AlignToGateway, // Align to the gateway translation，using (1) target translation, (2) alignment between manuscript and gateway
-        ManuscriptToTarget, // Create manuscript-to-target alignment through gateway-to-target alignment
+        AlignG2TviaM2G, // Align to the gateway translation，using (1) target translation, (2) alignment between manuscript and gateway
+        AlignM2TviaM2G, // Create manuscript-to-target alignment through gateway-to-target alignment
         ProcessAll, // Process from Copy the initial files (empty) to Create manTransModel and TM
         FreshStart, // Process from Copy the initial files (empty) to AutoAlign
         DoStart, // Process from Initialize State to AutoAlign
         Menu,
         Help,
     }
+
     public enum Options
     {
-        SetProject, 
+        SetProject,
         SetTestament,
 
         SetContentWordsOnly,
@@ -34,15 +36,20 @@ namespace Clear3
         SetSmtHeuristic,
         SetSmtIterations,
 
-        SetSmtContentWordsOnly,
-        SetTcContentWordsOnly,
+        SetContentWordsOnlySMT,
+        SetContentWordsOnlyTC,
 
         SetUseLemmaCatModel,
         SetUseNoPuncModel,
+        SetUseNormalizedTransModelProbabilities,
+        SetUseNormalizedAlignModelProbabilities,
 
         SetReuseTokenFiles,
+        SetReuseLemmaFiles,
         SetReuseParallelCorporaFiles,
         SetReuseSmtModelFiles,
+
+        SetLowerCaseMethod,
     }
 
     static class Program
@@ -60,13 +67,12 @@ namespace Clear3
             }
             else
             {
-                LoadTables();
                 if (CommandLineIsGood(args))
                 {
                     ActionsClear3.InitializeConfig();
                     ProcessArgs(args);
                 }
-            }            
+            }
         }
 
         static bool CommandLineIsGood(string[] args)
@@ -82,9 +88,15 @@ namespace Clear3
                     if ((arg.Length > 2) && (arg.Substring(0, 2) == "--"))
                     {
                         string[] parts = arg.Split('=');
-                        if (!optionCommands.ContainsKey(parts[0].ToLower()))
+                        var optionStr = parts[0].ToLower();
+                        if (!optionCommands.ContainsKey(optionStr))
                         {
                             Console.WriteLine(string.Format("Invalid Option: {0}", parts[0]));
+                            cmdLineError = true;
+                        }
+                        else if (!optionActions.ContainsKey(optionCommands[optionStr]))
+                        {
+                            Console.WriteLine(string.Format("Error: Option {0} has no delegate", parts[0]));
                             cmdLineError = true;
                         }
                         else if ((parts.Length != 2) || (parts[1] == ""))
@@ -99,10 +111,16 @@ namespace Clear3
                     }
                     else if ((arg.Length > 1) && (arg.Substring(0, 1) == "-"))
                     {
+                        var optionStr = arg.ToLower();
                         i++;
-                        if (!optionCommands.ContainsKey(arg))
+                        if (!optionCommands.ContainsKey(optionStr))
                         {
                             Console.WriteLine(string.Format("Invalid Option: {0}", arg));
+                            cmdLineError = true;
+                        }
+                        else if (!optionActions.ContainsKey(optionCommands[optionStr]))
+                        {
+                            Console.WriteLine(string.Format("Error: Option {0} has no delegate", arg));
                             cmdLineError = true;
                         }
                         else if ((i == args.Length) || (args[i].Substring(0, 1) == "-"))
@@ -111,7 +129,7 @@ namespace Clear3
                             cmdLineError = true;
                         }
                         else if (!GoodParameter(arg, args[i]))
-                        {   
+                        {
                             cmdLineError = true;
                         }
                     }
@@ -120,6 +138,11 @@ namespace Clear3
                         if (!runCommands.ContainsKey(arg.ToLower()))
                         {
                             Console.WriteLine(string.Format("Invalid Command: {0}", arg));
+                            cmdLineError = true;
+                        }
+                        else if (!commandFunctions.ContainsKey(runCommands[arg.ToLower()]))
+                        {
+                            Console.WriteLine(string.Format("Error: Command {0} has no delegate", arg));
                             cmdLineError = true;
                         }
                     }
@@ -149,14 +172,24 @@ namespace Clear3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be OT or NT", optionStr, param));
                     }
                     break;
-                case Options.SetRunSpec:
-                    if (param.StartsWith("HMM;") || param.StartsWith("IBM1;") || param.StartsWith("IBM2;") || param.StartsWith("IBM3;") || param.StartsWith("IBM4;") || param.StartsWith("FastAlign;"))
+                case Options.SetLowerCaseMethod:
+                    if ((param == "None") || (param == "ToLower") || (param == "ToLowerInvariant") || (param == "CultureInfo"))
                     {
                         good = true;
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should start with 'HMM;', 'IBM1;', 'IBM2;', 'IBM4;', or 'FastAlign;'", optionStr, param));
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported lowercase selection", optionStr, param));
+                    }
+                    break;
+                case Options.SetRunSpec:
+                    if (param.StartsWith("HMM-") || param.StartsWith("IBM1-") || param.StartsWith("IBM2-") || param.StartsWith("IBM3-") || param.StartsWith("IBM4-") || param.StartsWith("FastAlign-"))
+                    {
+                        good = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should start with 'HMM-', 'IBM1-', 'IBM2-', 'IBM3-', 'IBM4-', or 'FastAlign-'", optionStr, param));
                     }
                     break;
                 case Options.SetEpsilon:
@@ -201,11 +234,14 @@ namespace Clear3
                     break;
                 case Options.SetContentWordsOnly:
                 case Options.SetUseAlignModel:
-                case Options.SetSmtContentWordsOnly:
-                case Options.SetTcContentWordsOnly:
+                case Options.SetContentWordsOnlySMT:
+                case Options.SetContentWordsOnlyTC:
                 case Options.SetUseLemmaCatModel:
                 case Options.SetUseNoPuncModel:
+                case Options.SetUseNormalizedTransModelProbabilities:
+                case Options.SetUseNormalizedAlignModelProbabilities:
                 case Options.SetReuseTokenFiles:
+                case Options.SetReuseLemmaFiles:
                 case Options.SetReuseParallelCorporaFiles:
                 case Options.SetReuseSmtModelFiles:
                     if ((param == "true") || (param == "false"))
@@ -225,7 +261,8 @@ namespace Clear3
             return good;
         }
 
-
+        // Since we check the comand line before processing the command line, I think we can get rid of checking for errors.
+        // We should assume there are no errors in the command line.
         static void ProcessArgs(string[] args)
         {
 
@@ -251,7 +288,7 @@ namespace Clear3
                         default: // This should never happen unless I forgot to revise the mainCommands
                             Console.WriteLine(string.Format("Error: Command {0} has no case statement.", args[0]));
                             break;
-                    }                   
+                    }
                 }
             }
 
@@ -275,11 +312,7 @@ namespace Clear3
 
                             if (optionCommands.ContainsKey(option))
                             {
-                                if (!ProcessOption(option, param))
-                                {
-                                    Console.WriteLine(string.Format("Error: Option {0} has no case statement.", option));
-                                    cmdLineError = true;
-                                }
+                                cmdLineError = !ProcessOption(option, param);
                             }
                             else
                             {
@@ -299,13 +332,10 @@ namespace Clear3
                         if (optionCommands.ContainsKey(arg))
                         {
                             i++;
-                            if ((i < args.Length) && (args[i].Substring(0,1) != "-"))
+                            if ((i < args.Length) && (args[i].Substring(0, 1) != "-"))
                             {
                                 string param = args[i];
-                                if (!ProcessOption(arg, param))
-                                {
-                                    cmdLineError = true;
-                                }
+                                cmdLineError = !ProcessOption(arg, param);
                             }
                             else
                             {
@@ -321,191 +351,62 @@ namespace Clear3
                     }
                     else
                     {
-                        string runCommand = arg.ToLower();
-
-                        if (runCommands.ContainsKey(runCommand))
-                        {
-                            if (!initialized)
-                            {
-                                ActionsClear3.InitializeTargetFiles();
-                                ActionsClear3.InitializeProcessingSettings();
-                            }
-
-                            Command command = runCommands[runCommand];
-
-                            switch (command)
-                            {
-                                case Command.DetleteStateFiles:
-                                    Console.WriteLine(ActionsClear3.DeleteStateFiles());
-                                    break;
-                                case Command.InitializeState:
-                                    Console.WriteLine(ActionsClear3.InitializeState());
-                                    break;
-                                case Command.TokenizeVerses:
-                                    Console.WriteLine(ActionsClear3.TokenizeVerses());
-                                    break;
-                                case Command.CreateParallelFiles:
-                                    Console.WriteLine(ActionsClear3.CreateParallelCorpus());
-                                    break;
-                                case Command.BuildModels:
-                                    Console.WriteLine(ActionsClear3.BuildModels());
-                                    break;
-                                case Command.AutoAlign:
-                                    Console.WriteLine(ActionsClear3.AutoAlign());
-                                    break;
-                                case Command.IncrementalUpdate:
-                                    Console.WriteLine(ActionsClear3.IncrementalUpdate());
-                                    break;
-                                case Command.GlobalUpdate:
-                                    Console.WriteLine(ActionsClear3.GlobalUpdate());
-                                    break;
-                                case Command.AlignToGateway:
-                                    Console.WriteLine(ActionsClear3.AlignG2T());
-                                    break;
-                                case Command.ManuscriptToTarget:
-                                    Console.WriteLine(ActionsClear3.AlignM2T());
-                                    break;
-                                case Command.ProcessAll:
-                                    Console.WriteLine(ActionsClear3.ProcessAll());
-                                    break;
-                                case Command.FreshStart:
-                                    Console.WriteLine(ActionsClear3.FreshStart());
-                                    break;
-                                case Command.DoStart:
-                                    Console.WriteLine(ActionsClear3.DoStart());
-                                    break;
-                                default: // This should never happen unless I forgot to revise the mainCommands
-                                    Console.WriteLine(string.Format("Error: Command {0} has no case statement.", arg));
-                                    cmdLineError = true;
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine(string.Format("Invalid Command: {0}", arg));
-                            cmdLineError = true;
-                        }
+                        cmdLineError = !ProcessCommand(arg);
                     }
                 }
             }
         }
 
+        // Assumes no problems with the command string since it has already been check in CommandLineIsGood()
+        private static bool ProcessCommand(string commandStr)
+        {
+            if (!initialized)
+            {
+                ActionsClear3.InitializeTargetFiles();
+                ActionsClear3.InitializeProcessingSettings();
+            }
 
+            Command command = runCommands[commandStr.ToLower()];
+
+            (var succeeded, var message) = commandFunctions[command]();
+
+            Console.WriteLine(message);
+
+            return succeeded;
+        }
+
+        // Assumes no problems with the command string since it has already been check in CommandLineIsGood()
         private static bool ProcessOption(string optionStr, string param)
         {
             Options option = optionCommands[optionStr];
-            bool hasCase = true;
 
-            switch (option)
-            {
-                case Options.SetProject:
-                    ActionsClear3.SetProject(param);
-                    Console.WriteLine("  project set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetTestament:
-                    ActionsClear3.SetTestament(param);
-                    Console.WriteLine("  testament set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetContentWordsOnly:
-                    ActionsClear3.SetContentWordsOnly(param);
-                    Console.WriteLine("  contentWordsOnly set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetUseAlignModel:
-                    ActionsClear3.SetUseAlignModel(param);
-                    Console.WriteLine("  useAlignModel set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetRunSpec:
-                    ActionsClear3.SetRunSpec(param);
-                    Console.WriteLine("  runSpec set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetEpsilon:
-                    ActionsClear3.SetEpsilon(param);
-                    Console.WriteLine("  epsilon set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetSmtModel:
-                    ActionsClear3.SetSmtModel(param);
-                    Console.WriteLine("  smtModel set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetSmtHeuristic:
-                    ActionsClear3.SetSmtHeuristic(param);
-                    Console.WriteLine("  smtHeuristic set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetSmtIterations:
-                    ActionsClear3.SetSmtIterations(param);
-                    Console.WriteLine("  smtIterations set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetSmtContentWordsOnly:
-                    ActionsClear3.SetSmtContentWordsOnly(param);
-                    Console.WriteLine("  contentWordsOnlySMT set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetTcContentWordsOnly:
-                    ActionsClear3.SetTcContentWordsOnly(param);
-                    Console.WriteLine("  contentWordsOnlyTC set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetUseLemmaCatModel:
-                    ActionsClear3.SetUseLemmaCatModel(param);
-                    Console.WriteLine("  useLemmaCatModel set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetUseNoPuncModel:
-                    ActionsClear3.SetUseNoPuncModel(param);
-                    Console.WriteLine("  useNoPuncModel set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetReuseTokenFiles:
-                    ActionsClear3.SetReuseTokenFiles(param);
-                    Console.WriteLine("  reuseTokenFiles set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetReuseParallelCorporaFiles:
-                    ActionsClear3.SetReuseParallelCorporaFiles(param);
-                    Console.WriteLine("  reuseParallelCorporaFiles set to {0}", param);
-                    initialized = false;
-                    break;
-                case Options.SetReuseSmtModelFiles:
-                    ActionsClear3.SetReuseSmtModelFiles(param);
-                    Console.WriteLine("  reuseSmtModelFiles set to {0}", param);
-                    initialized = false;
-                    break;
-                default: // This should never happen unless I forgot to revise the mainCommands
-                    Console.WriteLine(string.Format("Error: Option {0} has no case statement.", optionStr));
-                    hasCase = false;
-                    break;
-            }
+            optionActions[option](param);
 
-            return hasCase;
+            Console.WriteLine("  {0} set to {1}", optionNames[option], param);
+            initialized = false;
+
+            return true;
         }
-
 
         private static void ProcessMenu()
         {
             var menuChoices = new Dictionary<string, string>()
             {
-                {"1", "DeleteStateFiles"},
-                {"2", "InitializeState"},
-                {"3", "TokenizeVerses"}, 
-                {"4", "CreateParallelFiles"}, 
-                {"5", "BuildModels"}, 
-                {"6", "AutoAlign"}, 
-                {"7", "IncrementalUpdate"}, 
-                {"8", "GlobalUpdate"}, 
-                {"9", "AlignToGateway"},
-                {"10", "ManuscriptToTarget"},
-                {"11", "ProcessAll"},
-                {"12", "FreshStart"},
-                {"13", "DoStart"},
-                {"h", "help"},
+                { "1", "DeleteStateFiles" },
+                { "2", "InitializeState" },
+                { "3", "TokenizeVerses" },
+                { "4", "LemmatizeVerses" },
+                { "5", "CreateParallelFiles" },
+                { "6", "BuildModels" },
+                { "7", "AutoAlign" },
+                { "8", "IncrementalUpdate" },
+                { "9", "GlobalUpdate" },
+                { "10", "AlignToGateway" },
+                { "11", "ManuscriptToTarget" },
+                { "12", "ProcessAll" },
+                { "13", "FreshStart" },
+                { "14", "DoStart" },
+                { "h", "help" },
             };
 
             string choice = string.Empty;
@@ -527,7 +428,7 @@ namespace Clear3
                     {
                         Console.WriteLine(string.Format("Invalid input: {0}", choice));
                     }
-                }                
+                }
             }
         }
 
@@ -539,16 +440,17 @@ namespace Clear3
             Console.WriteLine("\t1.  DeleteStateFiles");
             Console.WriteLine("\t2.  InitializeState");
             Console.WriteLine("\t3.  TokenizeVerses");
-            Console.WriteLine("\t4.  CreateParallelFiles");
-            Console.WriteLine("\t5.  BuildModels");
-            Console.WriteLine("\t6.  AutoAlign");
-            Console.WriteLine("\t7.  IncrementalUpdate");
-            Console.WriteLine("\t8.  GlobalUpdate");
-            Console.WriteLine("\t9.  AlignToGateway");
-            Console.WriteLine("\t10. ManuscriptToTarget");
-            Console.WriteLine("\t11. ProcessAll");
-            Console.WriteLine("\t12. FreshStart");
-            Console.WriteLine("\t13. DoStart");
+            Console.WriteLine("\t4.  LemmatizeVerses");
+            Console.WriteLine("\t5.  CreateParallelFiles");
+            Console.WriteLine("\t6.  BuildModels");
+            Console.WriteLine("\t7.  AutoAlign");
+            Console.WriteLine("\t8.  IncrementalUpdate");
+            Console.WriteLine("\t9.  GlobalUpdate");
+            Console.WriteLine("\t10. AlignToGateway");
+            Console.WriteLine("\t11. ManuscriptToTarget");
+            Console.WriteLine("\t12. ProcessAll");
+            Console.WriteLine("\t13. FreshStart");
+            Console.WriteLine("\t14. DoStart");
             Console.WriteLine("\th.  Help");
             Console.WriteLine("\tx.  Exit");
             Console.WriteLine();
@@ -575,7 +477,7 @@ namespace Clear3
             Console.WriteLine("\t-i <int>, --iterations=<int>");
             Console.WriteLine("\t\tSets number of iterations for SMT model to <int>, e.g. 7");
             Console.WriteLine("\t-m <model>, --model=<model>");
-            Console.WriteLine("\t\tSets the SMT model to <model>, e.g. FastAlign");
+            Console.WriteLine("\t\tSets the SMT model to <model>, which can only be IBM1, IBM2, IBM3, IBM4, HMM, FastAlign");
             Console.WriteLine("\t-r <runspec>, --runspec=<runspec>");
             Console.WriteLine("\t\tSets the runSpec to <runspec>, e.g. 1:10;H:5 or Machine;FastAlign:Inter");
 
@@ -586,11 +488,19 @@ namespace Clear3
 
             Console.WriteLine("\t-lc <bool>, --use-lemma-cat-model=<bool>");
             Console.WriteLine("\t\tSets the useLemmaCatModel boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-lcm <method>, --lowercase-method=<method>");
+            Console.WriteLine("\t\tSets the lowerCaseToLemma variable to <method>, which can only be None, ToLower, ToLowerInvarient, or CultureInfo");
             Console.WriteLine("\t-np <bool>, --use-no-punc-model=<bool>");
             Console.WriteLine("\t\tSets the useNoPuncModel boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-ntp <bool>, --use-normalized-transmodel-probabilities=<bool>");
+            Console.WriteLine("\t\tSets the useNormalizedTransModelProbabilities boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-nap <bool>, --use-normalized-alignmodel-probabilities=<bool>");
+            Console.WriteLine("\t\tSets the useNormalizedAlignModelProbabilities boolean to <bool>, which can only be true or false");
 
-            Console.WriteLine("\t-rt <bool>, --reuse-token-files=<bool>");
-            Console.WriteLine("\t\tSets the reuseTokenFiles boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-rt <bool>, --reuse-tokenized-files=<bool>");
+            Console.WriteLine("\t\tSets the reuseTokenizedFiles boolean to <bool>, which can only be true or false");
+            Console.WriteLine("\t-rl <bool>, --reuse-lemmatized-files=<bool>");
+            Console.WriteLine("\t\tSets the reuseLemmatizedFiles boolean to <bool>, which can only be true or false");
             Console.WriteLine("\t-rc <bool>, --reuse-parallel-corpora-files=<bool>");
             Console.WriteLine("\t\tSets the reuseParallelCorporaFiles boolean to <bool>, which can only be true or false");
             Console.WriteLine("\t-rm <bool>, --reuse-smt-model-files=<bool>");
@@ -600,13 +510,14 @@ namespace Clear3
             Console.WriteLine("\tDeleteStateFiles");
             Console.WriteLine("\tInitializeState");
             Console.WriteLine("\tTokenizeVerses");
+            Console.WriteLine("\tLemmatizeVerses");
             Console.WriteLine("\tCreateParallelFiles");
             Console.WriteLine("\tBuildnModels");
             Console.WriteLine("\tAutoAlign");
             Console.WriteLine("\tIncrementalUpdate");
             Console.WriteLine("\tGlobalUpdate");
             Console.WriteLine("\tAlignToGateway");
-            Console.WriteLine("\tManuscriptToTarget");
+            Console.WriteLine("\tAlignViaGateway");
             Console.WriteLine("\tProcessAll");
             Console.WriteLine("\tFreshStart");
             Console.WriteLine("\tDoStart");
@@ -616,63 +527,138 @@ namespace Clear3
             Console.ReadLine();
         }
 
-
-        private static void LoadTables()
-        {
-            singleCommands = new Dictionary<string, Command>()
-            {
-                {"menu", Command.Menu },
-                {"help", Command.Help },
-                {"?", Command.Help},
-            };
-
-            runCommands = new Dictionary<string, Command>()
-            {
-                {"deletestatefiles", Command.DetleteStateFiles },
-                {"initializestate", Command.InitializeState },
-                {"tokenizeverses", Command.TokenizeVerses },
-                {"createparallelfiles", Command.CreateParallelFiles },
-                {"buildmodels", Command.BuildModels },
-                {"autoalign", Command.AutoAlign },
-                {"incrementalupdate", Command.IncrementalUpdate },
-                {"globalupdate", Command.GlobalUpdate },
-                {"aligntogateway", Command.AlignToGateway },
-                {"manuscripttotarget", Command.ManuscriptToTarget },
-                {"processall", Command.ProcessAll },
-                {"freshstart", Command.FreshStart },
-                {"dostart", Command.DoStart },
-            };
-
-            optionCommands = new Dictionary<string, Options>()
-            {
-                {"-p", Options.SetProject }, {"--project", Options.SetProject },
-                {"-t", Options.SetTestament }, {"--testament", Options.SetTestament },
-
-                {"-c", Options.SetContentWordsOnly }, {"--content-words-only", Options.SetContentWordsOnly },
-                {"-a", Options.SetUseAlignModel }, {"--use-align-model", Options.SetUseAlignModel },
-                {"-r", Options.SetRunSpec }, {"--runspec", Options.SetRunSpec },
-                {"-e", Options.SetEpsilon }, {"--epsilon", Options.SetEpsilon },
-                {"-m", Options.SetSmtModel }, {"--model", Options.SetSmtModel },
-                {"-h", Options.SetSmtHeuristic }, {"--hueristic", Options.SetSmtHeuristic },
-                {"-i", Options.SetSmtIterations }, {"--iterations", Options.SetSmtIterations },
-
-                {"-smt", Options.SetSmtContentWordsOnly }, {"--smt-content-words-only", Options.SetSmtContentWordsOnly },
-                {"-tc", Options.SetTcContentWordsOnly }, {"--tc-content-words-only", Options.SetTcContentWordsOnly },
-
-                {"-lc", Options.SetUseLemmaCatModel }, {"--use-lemma-cat-model", Options.SetUseLemmaCatModel },
-                {"-np", Options.SetUseNoPuncModel }, {"--use-no-punc-model", Options.SetUseNoPuncModel },
-
-                {"-rt", Options.SetReuseTokenFiles }, {"--reuse-token-files", Options.SetReuseTokenFiles },
-                {"-rc", Options.SetReuseParallelCorporaFiles }, {"--reuse-parallel-corpora-files", Options.SetReuseParallelCorporaFiles },
-                {"-rm", Options.SetReuseSmtModelFiles }, {"--reuse-smt-model-files", Options.SetReuseSmtModelFiles },
-            };
-        }
-
-
         private static bool initialized = false;
-        private static Dictionary<string, Command> singleCommands;
-        private static Dictionary<string, Command> runCommands;
-        private static Dictionary<string, Options> optionCommands;
+
+        private static Dictionary<string, Command> singleCommands = new Dictionary<string, Command>()
+            {
+                { "menu", Command.Menu },
+                { "help", Command.Help },
+                { "?", Command.Help },
+            };
+
+        private static Dictionary<string, Command> runCommands = new Dictionary<string, Command>()
+            {
+                { "deletestatefiles", Command.DeleteStateFiles },
+                { "initializestate", Command.InitializeState },
+                { "tokenizeverses", Command.TokenizeVerses },
+                { "lemmatizeverses", Command.LemmatizeVerses },
+                { "createparallelfiles", Command.CreateParallelCorpus },
+                { "buildmodels", Command.BuildModels },
+                { "autoalign", Command.AutoAlign },
+                { "incrementalupdate", Command.IncrementalUpdate },
+                { "globalupdate", Command.GlobalUpdate },
+                { "aligntogateway", Command.AlignG2TviaM2G },
+                { "alignviagateway", Command.AlignM2TviaM2G },
+                { "processall", Command.ProcessAll },
+                { "freshstart", Command.FreshStart },
+                { "dostart", Command.DoStart },
+            };
+
+        private delegate (bool, string) Commands();
+
+        private static Dictionary<Command, Commands> commandFunctions = new Dictionary<Command, Commands>()
+            {
+                { Command.DeleteStateFiles, ActionsClear3.DeleteStateFiles },
+                { Command.InitializeState, ActionsClear3.InitializeState },
+                { Command.TokenizeVerses, ActionsClear3.TokenizeVerses },
+                { Command.LemmatizeVerses, ActionsClear3.LemmatizeVerses },
+                { Command.CreateParallelCorpus, ActionsClear3.CreateParallelCorpus },
+                { Command.BuildModels, ActionsClear3.BuildModels },
+                { Command.AutoAlign, ActionsClear3.AutoAlign },
+                { Command.IncrementalUpdate, ActionsClear3.IncrementalUpdate },
+                { Command.GlobalUpdate, ActionsClear3.GlobalUpdate },
+                { Command.AlignG2TviaM2G, ActionsClear3.AlignG2TviaM2G },
+                { Command.AlignM2TviaM2G, ActionsClear3.AlignM2TviaM2G },
+                { Command.ProcessAll, ActionsClear3.ProcessAll },
+                { Command.FreshStart, ActionsClear3.FreshStart },
+                { Command.DoStart, ActionsClear3.DoStart },
+            };
+
+        private static Dictionary<string, Options> optionCommands = new Dictionary<string, Options>()
+            {
+                { "-p", Options.SetProject }, { "--project", Options.SetProject },
+                { "-t", Options.SetTestament }, { "--testament", Options.SetTestament },
+
+                { "-c", Options.SetContentWordsOnly }, { "--content-words-only", Options.SetContentWordsOnly },
+                { "-a", Options.SetUseAlignModel }, { "--use-align-model", Options.SetUseAlignModel },
+                { "-r", Options.SetRunSpec }, { "--runspec", Options.SetRunSpec },
+                { "-e", Options.SetEpsilon }, { "--epsilon", Options.SetEpsilon },
+                { "-m", Options.SetSmtModel }, { "--model", Options.SetSmtModel },
+                { "-h", Options.SetSmtHeuristic }, { "--hueristic", Options.SetSmtHeuristic },
+                { "-i", Options.SetSmtIterations }, { "--iterations", Options.SetSmtIterations },
+
+                { "-smt", Options.SetContentWordsOnlySMT }, { "--smt-content-words-only", Options.SetContentWordsOnlySMT },
+                { "-tc", Options.SetContentWordsOnlyTC }, { "--tc-content-words-only", Options.SetContentWordsOnlyTC },
+
+                { "-lc", Options.SetUseLemmaCatModel }, { "--use-lemma-cat-model", Options.SetUseLemmaCatModel },
+                { "-lcm", Options.SetLowerCaseMethod }, { "--lowercase-method", Options.SetLowerCaseMethod },
+                { "-np", Options.SetUseNoPuncModel }, { "--use-no-punc-model", Options.SetUseNoPuncModel },
+                { "-ntp", Options.SetUseNormalizedTransModelProbabilities }, { "--use-normalized-transmodel-probabilities", Options.SetUseNormalizedTransModelProbabilities },
+                { "-nap", Options.SetUseNormalizedAlignModelProbabilities }, { "--use-normalized-alignmodel-probabilities", Options.SetUseNormalizedAlignModelProbabilities },
+
+                { "-rt", Options.SetReuseTokenFiles }, { "--reuse-tokenized-files", Options.SetReuseTokenFiles },
+                { "-rl", Options.SetReuseLemmaFiles }, { "--reuse-lemmatized-files", Options.SetReuseLemmaFiles },
+                { "-rc", Options.SetReuseParallelCorporaFiles }, { "--reuse-parallel-corpora-files", Options.SetReuseParallelCorporaFiles },
+                { "-rm", Options.SetReuseSmtModelFiles }, { "--reuse-smt-model-files", Options.SetReuseSmtModelFiles },
+            };
+
+        private static Dictionary<Options, string> optionNames = new Dictionary<Options, string>()
+            {
+                { Options.SetProject, "project" },
+                { Options.SetTestament, "testament" },
+
+                { Options.SetContentWordsOnly, "contentWordsOnly" },
+                { Options.SetUseAlignModel, "useAlignModel" },
+                { Options.SetRunSpec, "runSpec" },
+                { Options.SetEpsilon, "epsilon" },
+                { Options.SetSmtModel, "smtModel" },
+                { Options.SetSmtHeuristic, "smtHeuristic" },
+                { Options.SetSmtIterations, "smtIterations" },
+
+                { Options.SetContentWordsOnlySMT, "contentWordsOnlySMT" },
+                { Options.SetContentWordsOnlyTC, "contentWordsOnlyTC" },
+
+                { Options.SetUseLemmaCatModel, "useLemmaCatModel" },
+                { Options.SetLowerCaseMethod, "lowerCaseMethod" },
+                { Options.SetUseNoPuncModel, "useNoPuncModel" },
+                { Options.SetUseNormalizedTransModelProbabilities, "useNormalizedTransModelProbabilities" },
+                { Options.SetUseNormalizedAlignModelProbabilities, "useNormalizedAlignModelProbabilities" },
+
+                { Options.SetReuseTokenFiles, "reuseTokenFiles" },
+                { Options.SetReuseLemmaFiles, "reuseLemmaFiles" },
+                { Options.SetReuseParallelCorporaFiles, "reuseParallelCorporaFiles" },
+                { Options.SetReuseSmtModelFiles, "reuseSmtModelFiles" },
+            };
+
+        delegate void OptionActions(string param);
+
+        private static Dictionary<Options, OptionActions> optionActions = new Dictionary<Options, OptionActions>()
+            {
+                { Options.SetProject, ActionsClear3.SetProject },
+                { Options.SetTestament, ActionsClear3.SetTestament },
+
+                { Options.SetContentWordsOnly, ActionsClear3.SetContentWordsOnly },
+                { Options.SetUseAlignModel, ActionsClear3.SetUseAlignModel },
+                { Options.SetRunSpec, ActionsClear3.SetRunSpec },
+                { Options.SetEpsilon, ActionsClear3.SetEpsilon },
+                { Options.SetSmtModel, ActionsClear3.SetSmtModel },
+                { Options.SetSmtHeuristic, ActionsClear3.SetSmtHeuristic },
+                { Options.SetSmtIterations, ActionsClear3.SetSmtIterations },
+
+                { Options.SetContentWordsOnlySMT, ActionsClear3.SetContentWordsOnlySMT },
+                { Options.SetContentWordsOnlyTC, ActionsClear3.SetContentWordsOnlyTC },
+
+                { Options.SetUseLemmaCatModel, ActionsClear3.SetUseLemmaCatModel },
+                { Options.SetLowerCaseMethod, ActionsClear3.SetLowerCaseMethod },
+                { Options.SetUseNoPuncModel, ActionsClear3.SetUseNoPuncModel },
+                { Options.SetUseNormalizedTransModelProbabilities, ActionsClear3.SetUseNormalizedTransModelProbabilities },
+                { Options.SetUseNormalizedAlignModelProbabilities, ActionsClear3.SetUseNormalizedAlignModelProbabilities },
+
+                { Options.SetReuseTokenFiles, ActionsClear3.SetReuseTokenFiles },
+                { Options.SetReuseLemmaFiles, ActionsClear3.SetReuseLemmFiles },
+                { Options.SetReuseParallelCorporaFiles, ActionsClear3.SetReuseParallelCorporaFiles },
+                { Options.SetReuseSmtModelFiles, ActionsClear3.SetReuseSmtModelFiles },
+            };
 
     }
 }

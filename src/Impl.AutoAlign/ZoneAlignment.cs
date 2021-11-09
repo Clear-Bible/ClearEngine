@@ -158,10 +158,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 {
                     text = target.TargetText.Text,
                     lemma = target.TargetLemma.Text,
-                    targetID = target.TargetID,
+                    targetID = target.TargetID, // NOTE: OneToMany - will need to change this to TargetLemmaID if we decide to create a separate one and leave the original one alone. We won't if we decide to
                     position
                 })
-                .GroupBy(x => x.text)
+                .GroupBy(x => x.text) // NOTE: OneToMany - This is where it puts all of the targets with the same x.text into a group and then selects by the (index + 1) in the group
                 .SelectMany(group =>
                     group.Select((x, groupIndex) => new
                     {
@@ -169,7 +169,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         x.targetID,
                         x.lemma,
                         x.position,
-                        altID = $"{x.text}-{groupIndex + 1}"
+                        altID = $"{x.text}-{groupIndex + 1}" // NOTE: OneToMany - will need to change this so it will only create a new altID if the lemmaID is different from the wordID
                     }))
                 .OrderBy(x => x.position)
                 .Select(x => new TargetPoint(
@@ -181,6 +181,10 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     Position: x.position,
                     RelativePosition: x.position / totalTargetPoints))
                 .ToList();
+
+            
+            // NOTE: OneToMany - May need to replace this single Linq code with something that is the same in Clear2 since I need to check the ID of the surface text and lemma to see whether I should create a new AltID.
+            // Rather than try to change the Linq above, we could have code that goes through TargetPoint and modifies the AltID (or not have it done at all in the Linq statement).
         }
 
         /// <summary>

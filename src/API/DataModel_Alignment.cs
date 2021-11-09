@@ -133,7 +133,7 @@ namespace ClearBible.Clear3.API
     public record Target(
         TargetText TargetText,
         TargetLemma TargetLemma,
-        TargetID TargetID);
+        TargetID TargetID); // Change to TargetLemmaID?
 
 
     /// <summary>

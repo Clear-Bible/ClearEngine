@@ -19,6 +19,11 @@ namespace ClearBible.Clear3.Impl.ImportExportService
     /// (Implementation of IImportExportService.)
     /// </summary>
     ///
+    // 2021.07.24 CL: Need to modify to match the new definition of TargetVerseCorpus.
+    // We now want to have a separate lemmatization process that may have a one-to-many word-to-lemma.
+    // Therefore we need either a different TargetVerseCorpora datastructure that has two separate lists for text and lemma
+    // or to different data structures. The TargetVerseCorpus which is abou the text, and another one for the lemmas.
+    // 
     public class ImportExportService : IImportExportService
     {
         public TargetVerseCorpus ImportTargetVerseCorpusFromLegacy(
@@ -51,7 +56,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
                         .Select((segment, j) =>
                             new Target(
                                 new TargetText(segment),
-                                new TargetLemma(lemmas[j]),
+                                new TargetLemma(lemmas[j]), // NOTE: OneToMany - don't create this if we remove it from the data structure
                                 new TargetID(verseID, j + 1)))
                         .ToList());
 
@@ -62,7 +67,7 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             return new TargetVerseCorpus(targetsList2);
         }
 
-
+        // 2021.07.23 CL: Not used anymore except for Regression test
         public List<ZoneAlignmentProblem> ImportZoneAlignmentProblemsFromLegacy(
             string parallelSourcePath,
             string parallelTargetPath)
@@ -335,13 +340,24 @@ namespace ClearBible.Clear3.Impl.ImportExportService
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
             {
-                string[] groups = line.Split("\t".ToCharArray());
-                if (groups.Length == 2)
+                string[] groups = line.Split('#');
+                if (groups.Length == 3)
                 {
-                    string badLink = groups[0].Trim();
-                    int count = Int32.Parse(groups[1]);
-                    xLinks.Add(badLink, count);
+                    string link = groups[0].Trim() + "#" + groups[1].Trim();
+                    int count = int.Parse(groups[2].Trim());
+                    if (!xLinks.ContainsKey(link))
+                    {
+                        xLinks.Add(link, count);
+                    }
+                    else
+                    {
+                        Console.WriteLine("WARNING GetXLinks {0}: Duplicate link {1}", file, link);
+                    }
                 }
+                else
+                {
+                    Console.WriteLine("WARNING GetXLinks {0}: Incorrect format {1}", file, line);
+                }                
             }
 
             return xLinks;

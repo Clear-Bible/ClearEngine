@@ -355,7 +355,8 @@ namespace Clear3
             return new AlignmentModel(alignmentModel);
         }
 
-        //
+        // We will need to eventually change the TargetVerseCorpus data structure to reflect that there is no longer a one-to-one relationship between surface word and lemma.
+        // For now, we will just not write out the lemma file since it will be 
         public static void ExportTargetVerseCorpus(TargetVerseCorpus targetVerseCorpus, string textFile, string lemmaFile, string idFile)
         {
             using (StreamWriter swText = new StreamWriter(textFile, false, Encoding.UTF8))
@@ -377,13 +378,14 @@ namespace Clear3
                     }
 
                     swText.WriteLine("{0}  {1}", verseID, textLine.Trim());
-                    swLemma.WriteLine("{0}  {1}", verseID, lemmaLine.Trim());
+                    // swLemma.WriteLine("{0}  {1}", verseID, lemmaLine.Trim());
                     swID.WriteLine("{0}  {1}", verseID, idLine.Trim());
                 }
             }
         }
 
-        //
+        // We will need to eventually change the TargetVerseCorpus data structure to reflect that there is no longer a one-to-one relationship between surface word and lemma.
+        // For now, we will just not read in the lemma file since it will be 
         public static TargetVerseCorpus ImportTargetVerseCorpus(string textFile, string lemmaFile, string idFile)
         {
             var targetVerseCorpus = new List<TargetVerse>();

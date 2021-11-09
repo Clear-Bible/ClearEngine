@@ -13,6 +13,7 @@ using ClearBible.Clear3.API;
 using ClearBible.Clear3.Service;
 using ClearBible.Clear3.SubTasks;
 
+using Lemmatizer;
 
 namespace Clear3
 {
@@ -63,12 +64,12 @@ namespace Clear3
             smtIterations = arg;
         }
 
-        public static void SetSmtContentWordsOnly(string arg)
+        public static void SetContentWordsOnlySMT(string arg)
         {
             strContentWordsOnlySMT = arg;
         }
 
-        public static void SetTcContentWordsOnly(string arg)
+        public static void SetContentWordsOnlyTC(string arg)
         {
             strContentWordsOnlyTC = arg;
         }
@@ -83,9 +84,24 @@ namespace Clear3
             strUseNoPuncModel = arg;
         }
 
+        public static void SetUseNormalizedTransModelProbabilities(string arg)
+        {
+            strUseNormalizedTransModelProbabilities = arg;
+        }
+
+        public static void SetUseNormalizedAlignModelProbabilities(string arg)
+        {
+            strUseNormalizedAlignModelProbabilities = arg;
+        }
+
         public static void SetReuseTokenFiles(string arg)
         {
             strReuseTokenFiles = arg;
+        }
+
+        public static void SetReuseLemmFiles(string arg)
+        {
+            strReuseLemmaFiles = arg;
         }
 
         public static void SetReuseParallelCorporaFiles(string arg)
@@ -98,12 +114,16 @@ namespace Clear3
             strReuseSmtModelFiles = arg;
         }
 
+        public static void SetLowerCaseMethod(string arg)
+        {
+            lowerCaseMethod = arg;
+        }
+
         public static void InitializeConfig()
         {
             Console.WriteLine();
             Console.WriteLine("Running ClearEngine3");
 
-            clearConfigFilename = "CLEAR.config"; // default configuration file
             ReadConfig(clearConfigFilename);
 
             InitializeClear30Service();
@@ -121,49 +141,49 @@ namespace Clear3
             resourcesFolder = clearSettings["ResourcesFolder"]; // e.g. 
             processingFolder = clearSettings["ProcessingFolder"]; // e.g. 
 
-            runConfigFile = clearSettings["RunConfigFile"];
-            runSettings = Configuration.GetSettings(runConfigFile);
-
-            processingConfigFilename = clearSettings["ProcessingConfigFile"];
+            runConfigFilename = clearSettings["Run_Configuration_Filename"];
+            runSettings = Configuration.GetSettings(runConfigFilename);
 
             // Run and some processing settings can be overridden by command line parameters
             project = (string)runSettings["Project"]; // e.g. "NIV84-SIL-test"
             testament = (string)runSettings["Testament"]; // e.g. "OT" or "NT"
 
-            // Set Translation Parameters
-            translationConfigFilename = clearSettings["TranslationConfigFile"];
-
             // Set file information in resourcesFolder
+
             // treeFoldername = clearSettings["TreeFolder"];
-            sourceFuncWordsFilename = clearSettings["SourceFuncWordsFile"];
-            puncsFilename = clearSettings["PuncsFile"];
-            glossFilename = clearSettings["GlossFile"];
-            versificationFilenameDefault = clearSettings["Versification_File"];
-            versificationTypeDefault = clearSettings["Versification_Type"];
+            sourceFuncWordsFilename = clearSettings["Source_Function_Words_Filename"];
+            puncsFilename = clearSettings["Punctuations_Filename"];
+            glossFilename = clearSettings["Gloss_Filename"];
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
             //
-            tokenTextFilename = clearSettings["TokenTextFile"];
-            tokenLemmaFilename = clearSettings["TokenLemmaFile"];
-            tokenIdFilename = clearSettings["TokenIdFile"];
+            tokenTextFilename = clearSettings["Token_Text_Filename"];
+            tokenTextIdFilename = clearSettings["Token_Text_Id_Filename"];
+            tokenLemmaFilename = clearSettings["Token_Lemma_Filename"];
+            tokenLemmaIdFilename = clearSettings["Token_Lemma_Id_Filename"];
 
-            sourceTextFilename = clearSettings["SourceTextFile"];
-            sourceLemmaFilename = clearSettings["SourceLemmaFile"];
-            sourceIdFilename = clearSettings["SourceIdFile"];
-            sourceLemmaCatFilename = clearSettings["SourceLemmaCatFile"];
+            sourceTextFilename = clearSettings["Source_Text_Filename"];
+            sourceLemmaFilename = clearSettings["Source_Lemma_Filename"];
+            sourceIdFilename = clearSettings["Source_Id_Filename"];
+            sourceLemmaCatFilename = clearSettings["Source_Lemma_Cat_Filename"];
 
-            targetTextFilename = clearSettings["TargetTextFile"];
-            targetLemmaFilename = clearSettings["TargetLemmaFile"];
-            targetIdFilename = clearSettings["TargetIdFile"];
+            targetTextFilename = clearSettings["Target_Text_Filename"];
+            targetTextIdFilename = clearSettings["Target_Text_Id_Filename"];
+            targetLemmaFilename = clearSettings["Target_Lemma_Filename"];
+            targetLemmaIdFilename = clearSettings["Target_Lemma_Id_Filename"];
 
             //============================ Output Files Only ============================
             // Files not part of the state, nor used as output/input to pass data between different functions
             // Output file. Has the alignment in .json format, which is more readable than XML format.
-            jsonOutputFilename = clearSettings["JsonOutputFile"]; // e.g "alignment.json", Should update variable to ...File
-            jsonFilename = clearSettings["JsonFile"]; // e.g "alignment.json", Should merge with jsonOutput
+            jsonOutputFilename = clearSettings["Json_Output_Filename"]; // e.g "alignments.json", Should update variable to ...File
+            jsonLemmasOutputFilename = clearSettings["Json_Lemmas_Output_Filename"]; // e.g "alignment.json", Should update variable to ...File
+            jsonFilename = clearSettings["Json_Filename"]; // e.g "alignment.json", Should merge with jsonOutput
 
             //============================ Input Files Only ============================
-            versesFilename = clearSettings["VersesFile"]; // e.g. "Verses.txt"
+            versesFilename = clearSettings["Verses_Filename"]; // e.g. "Verses.txt"
+
+            //============================ Input Files Only from Lexicon ============================
+            lemmaDataFilename = clearSettings["Word_To_Lemmas_Filename"];
 
             // Initialize state related filenames
             InitializeStateFilenames();
@@ -216,7 +236,7 @@ namespace Clear3
                  badLinkFile,
                  glossFile,
                  groupFile,
-                 oldJson,
+                 oldJsonFile,
                  strongFile);
 
             puncs = puncsTemp;
@@ -243,17 +263,10 @@ namespace Clear3
         // Called by command line processor before doing actions (if it hasn't already been initialized).
         public static void InitializeTargetFiles()
         {
-            // Set Translation Parameters
-            translationFolder = Path.Combine(processingFolder, project);
-            translationConfigFile = Path.Combine(translationFolder, translationConfigFilename);
-
-            // If there is not a specific translaiton configuration file (which there should be), use the generic/default one.
-            if (!File.Exists(translationConfigFile))
-            {
-                translationConfigFile = translationConfigFilename;
-            }
-
-            translationSettings = Configuration.GetSettings(translationConfigFile);
+            // Set Project Configuration Parameters
+            projectFolder = Path.Combine(processingFolder, project);
+            projectSettings = Configuration.GetSettings(clearSettings, "Project_Configuration_Filename", projectFolder);
+            translationSettings = Configuration.GetSettings(projectSettings, "Translation_Configuration_Filename", projectFolder);
 
             // Set variables related to which language, translation, and testament to process.
 
@@ -273,16 +286,16 @@ namespace Clear3
 
             if (versificationType == "")
             {
-                versificationType = versificationTypeDefault;
+                versificationType = translationSettings["Versification_Default_Type"]; ;
             }
 
             if (versificationFilename == "")
             {
-                versificationFile = Path.Combine(resourcesFolder, versificationFilenameDefault); // e.g. "Versification.xml"
+                versificationFile = Path.Combine(resourcesFolder, translationSettings["Versification_Default_File"]); // e.g. "Versification.xml"
             }
             else
             {
-                versificationFile = Path.Combine(translationFolder, versificationFilename); // e.g. "niv84.extracted_versification.xml"
+                versificationFile = Path.Combine(projectFolder, versificationFilename); // e.g. "niv84.extracted_versification.xml"
             }
             // versificationList = Versification.ReadVersificationList(versificationFile, versificationType, "id"); // Read in the versification
 
@@ -291,10 +304,16 @@ namespace Clear3
                                     versificationType);
 
             // Set targetFolder to Language and NT or OT, e.g. "processingFolder\\<translation>\\<testament>"
-            targetFolder = Path.Combine(translationFolder, testament);
+            // 2021.07.21 CL: Changed to not assume folder names are "OT" and "NT", but the folder names are in the Project.config file.
+            testamentFoldername = projectSettings["New_Testament_Foldername"];
+            if (testament == "OT")
+            {
+                testamentFoldername = projectSettings["Old_Testament_Foldername"];
+            }
+            targetFolder = Path.Combine(projectFolder, testamentFoldername);
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
-            tokensFoldername = clearSettings["TokensFoldername"];
+            tokensFoldername = clearSettings["Tokens_Foldername"];
             tokensFolder = Path.Combine(targetFolder, tokensFoldername);
             if (!Directory.Exists(tokensFolder))
             {
@@ -302,12 +321,13 @@ namespace Clear3
             }
 
             tokenTextFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenTextFilename);
+            tokenTextIdFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenTextIdFilename);
             tokenLemmaFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenLemmaFilename);
-            tokenIdFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenIdFilename);
+            tokenLemmaIdFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenLemmaIdFilename);
 
             // Parallel Corpus Files
 
-            corporaFoldername = clearSettings["CorporaFoldername"];
+            corporaFoldername = clearSettings["Corpora_Foldername"];
             corporaFolder = Path.Combine(targetFolder, corporaFoldername);
             if (!Directory.Exists(corporaFolder))
             {
@@ -320,16 +340,23 @@ namespace Clear3
             sourceLemmaCatFile = Path.Combine(corporaFolder, translationTestamentPrefix + sourceLemmaCatFilename);
 
             targetTextFile = Path.Combine(corporaFolder, translationTestamentPrefix + targetTextFilename);
+            targetTextIdFile = Path.Combine(corporaFolder, translationTestamentPrefix + targetTextIdFilename);
             targetLemmaFile = Path.Combine(corporaFolder, translationTestamentPrefix + targetLemmaFilename);
-            targetIdFile = Path.Combine(corporaFolder, translationTestamentPrefix + targetIdFilename);
+            targetLemmaIdFile = Path.Combine(corporaFolder, translationTestamentPrefix + targetLemmaIdFilename);
 
             //============================ Output Files Only ============================
 
             jsonOutput = Path.Combine(targetFolder, translationTestamentPrefix + jsonOutputFilename);
+            jsonLemmasOutput = Path.Combine(targetFolder, translationTestamentPrefix + jsonLemmasOutputFilename);
             jsonFile = Path.Combine(targetFolder, translationTestamentPrefix + jsonFilename);
 
             //============================ Input Files Only ============================
             versesFile = Path.Combine(targetFolder, translationTestamentPrefix + versesFilename);
+
+            //============================ Input Files Only from Lexicon ============================
+            lexiconFoldername = clearSettings["Lexicon_Foldername"];
+            lexiconFolder = Path.Combine(targetFolder, lexiconFoldername);
+            lemmaDataFile = Path.Combine(lexiconFolder, translationTestamentPrefix + lemmaDataFilename);
 
             InitializeStateFiles();
         }
@@ -337,13 +364,9 @@ namespace Clear3
         public static void InitializeProcessingSettings()
         {
             // If there is a specific processing configuration file, then use it, otherwise use the generic/default one.
-            processingConfigFile = Path.Combine(translationFolder, processingConfigFilename);
+            processingSettings = Configuration.GetSettings(clearSettings, "Processing_Configuration_Filename", projectFolder);
 
-            if (!File.Exists(processingConfigFile))
-            {
-                processingConfigFile = processingConfigFilename;
-            }
-            processingSettings = Configuration.GetSettings(processingConfigFile);
+            if (lowerCaseMethod == null) lowerCaseMethod = processingSettings["LowerCaseForLemma"];
 
             // Set Processing Parameters
             if (runSpec == null) runSpec = processingSettings["RunSpec"]; // e.g. 1:10;H:5, Machine;FastAlign, Machine;FastAlign:Intersection:7
@@ -357,9 +380,12 @@ namespace Clear3
 
             if (strUseAlignModel == null) strUseAlignModel = processingSettings["UseAlignModel"]; // e.g. "true"
             if (strUseLemmaCatModel == null) strUseLemmaCatModel = processingSettings["UseLemmaCatModel"]; // e.g. "true"
-            if (strUseNoPuncModel == null) strUseNoPuncModel = processingSettings["UseNoPuncModel"]; // e.g. "true
-                                                                                                     //
+            if (strUseNoPuncModel == null) strUseNoPuncModel = processingSettings["UseNoPuncModel"]; // e.g. "
+            if (strUseNormalizedTransModelProbabilities == null) strUseNormalizedTransModelProbabilities = processingSettings["UseNoNormalizedTransModelProbabilities"]; // e.g. "true"
+            if (strUseNormalizedAlignModelProbabilities == null) strUseNormalizedAlignModelProbabilities = processingSettings["UseNoNormalizedAlignModelProbabilities"]; // e.g. "true"
+
             if (strReuseTokenFiles == null) strReuseTokenFiles = processingSettings["ReuseTokenFiles"]; // e.g. "true"
+            if (strReuseLemmaFiles == null) strReuseLemmaFiles = processingSettings["ReuseLemmatizedFiles"]; // e.g. "true"
             if (strReuseParallelCorporaFiles == null) strReuseParallelCorporaFiles = processingSettings["ReuseParallelCorporaFiles"]; // e.g. "true"
             if (strReuseSmtModelFiles == null) strReuseSmtModelFiles = processingSettings["ReuseSmtModelFiles"]; // e.g. "true"
 
@@ -368,7 +394,7 @@ namespace Clear3
 
             // Convert strings parameters to values
 
-            epsilon = Double.Parse(strEpsilon); // Must exceed this to be counted into model, e.g. "0.1"
+            epsilon = double.Parse(strEpsilon); // Must exceed this to be counted into model, e.g. "0.1"
             contentWordsOnlySMT = (strContentWordsOnlySMT == "true"); // e.g. "true" Only use content words for building models
             contentWordsOnlyTC = (strContentWordsOnlyTC == "true"); // e.g. "true" Only use content words for finding terminal candidates
             contentWordsOnly = (strContentWordsOnly == "true"); // e.g. "true" Only align content words
@@ -376,13 +402,20 @@ namespace Clear3
             useAlignModel = (strUseAlignModel == "true"); // e.g. "true"
             useLemmaCatModel = (strUseLemmaCatModel == "true"); // e.g. "true"
             useNoPuncModel = (strUseNoPuncModel == "true"); // e.g. "true"
+            useNormalizedTransModelProbabilities = (strUseNormalizedTransModelProbabilities == "true"); // e.g. "true"
+            useNormalizedAlignModelProbabilities = (strUseNormalizedAlignModelProbabilities == "true"); // e.g. "true"
 
             reuseTokenFiles = (strReuseTokenFiles == "true"); // e.g. "true"
+            reuseLemmaFiles = (strReuseLemmaFiles == "true"); // e.g. "true"
             reuseParallelCorporaFiles = (strReuseParallelCorporaFiles == "true"); // e.g. "true"
             reuseSmtModelFiles = (strReuseSmtModelFiles == "true"); // e.g. "true"
 
-            badLinkMinCount = Int32.Parse(strBadLinkMinCount); // e.g. "3", the minimal count required for treating a link as bad
-            goodLinkMinCount = Int32.Parse(strGoodLinkMinCount); // e.g. "3" the minimal count required for treating a link as bad
+            badLinkMinCount = int.Parse(strBadLinkMinCount); // e.g. "3", the minimal count required for treating a link as bad
+            goodLinkMinCount = int.Parse(strGoodLinkMinCount); // e.g. "3" the minimal count required for treating a link as bad
+
+            string autoType = "_auto.json";
+            jsonOutput = jsonOutput.Replace(".json", autoType); // Want to distinguish these from gold standard alignments
+            jsonLemmasOutput = jsonLemmasOutput.Replace(".json", autoType); // Want to distinguish these from gold standard alignments
 
             string alignmentType = "_all.json";
             if (contentWordsOnly)
@@ -390,6 +423,7 @@ namespace Clear3
                 alignmentType = "_content.json";
             }
             jsonOutput = jsonOutput.Replace(".json", alignmentType);
+            jsonLemmasOutput = jsonLemmasOutput.Replace(".json", alignmentType);
         }
 
         // 2020.07.10 CL: These files define the state of CLEAR and should all be in the targetFolder, and may change during processing.
@@ -399,34 +433,34 @@ namespace Clear3
             // 
             // They are input and output files. You must have them though they can be empty.
             // Has probablities of a manuscript language translated into a target word. Story #1 needs to read in this file after creating it with #6.
-            transModelFilename = clearSettings["TransModelFile"]; // e.g. "transModel.tsv"
+            transModelFilename = clearSettings["Translation_Model_Filename"]; // e.g. "transModel.tsv"
 
             // Input and Output file. If you already have manually checked alignment, it will give statistics. Must have but can be empty.
-            manTransModelFilename = clearSettings["ManTransModelFile"];  // e.g. "manTransModel.tsv"
+            manTransModelFilename = clearSettings["Manual_Translation_Model_Filename"];  // e.g. "manTransModel.tsv"
 
             // Must Have. Input and Output file. Token based alignment data, so for a particular verse and word, what are the statistics for translation. Story #1 needs to read in this file after creating it with #6.
-            alignModelFilename = clearSettings["AlignModelFile"]; // e.g. "alignModel.tsv"
+            alignModelFilename = clearSettings["Alignment_Model_Filename"]; // e.g. "alignModel.tsv"
 
             // Input file. Must create this. Contains word the aligner should ignore. These are because they tend to not align well across languages, such as English aux verbs.
-            stopWordFilename = clearSettings["StopWordFile"]; // e.g. "stopWords.txt"
+            stopWordFilename = clearSettings["Stop_Word_Filename"]; // e.g. "stopWords.txt"
 
             // Output File. Contains links that were manually removed.
-            badLinkFilename = clearSettings["BadLinkFile"]; // e.g. "badLinks.tsv"
+            badLinkFilename = clearSettings["Bad_Links_Filename"]; // e.g. "badLinks.tsv"
 
             // Output File. Contains the links that exist.
-            goodLinkFilename = clearSettings["GoodLinkFile"]; // e.g. "goodLinks.tsv"
+            goodLinkFilename = clearSettings["Good_Links_Filename"]; // e.g. "goodLinks.tsv"
 
             // If empty, it will do 1-to-1 alignment. Otherwise, it shows where groups of verses are mapped to other groups of verses. Can do many-to-1 and 1-to-many. Can do dynamic alignment.
-            groupFilename = clearSettings["GroupFile"]; // e.g. "groups.tsv"
+            groupFilename = clearSettings["Group_Filename"]; // e.g. "groups.tsv"
 
             // 2020.07.10 CL: Made targetFuncWordsFile a global variable to Form1
-            targetFuncWordsFilename = clearSettings["TargetFuncWordsFile"]; // e.g. "targetFuncWords.txt"
+            targetFuncWordsFilename = clearSettings["Target_Function_Words_Filename"]; // e.g. "targetFuncWords.txt"
 
             // 2020.07.10 CL: Why have this specifically in the targetFolder? Shouldn't Strong's Number information be the same for all languages?
-            strongFilename = clearSettings["StrongFile"]; // e.g. "strongs.txt"
+            strongFilename = clearSettings["Strongs_Filename"]; // e.g. "strongs.txt"
 
             // Input file. Must have it. If have done alignment, can bring in for consideration.
-            oldJsonFilename = clearSettings["OldJsonFile"]; // e.g. "oldAlignment.json"
+            oldJsonFilename = clearSettings["Old_Json_Filename"]; // e.g. "oldAlignment.json"
         }
 
         // 2020.10.19 CL: Need to separate out when we set the filenames and when we set the files (with path).
@@ -436,7 +470,7 @@ namespace Clear3
             //============================ CLEAR State Files ============================
             // SMT Model Files
 
-            modelsFoldername = clearSettings["ModelsFoldername"];
+            modelsFoldername = clearSettings["Models_Foldername"];
             modelsFolder = Path.Combine(targetFolder, modelsFoldername);
             if (!Directory.Exists(modelsFolder))
             {
@@ -453,7 +487,7 @@ namespace Clear3
             goodLinkFile = Path.Combine(targetFolder, translationTestamentPrefix + goodLinkFilename);
             targetFuncWordsFile = Path.Combine(targetFolder, translationTestamentPrefix + targetFuncWordsFilename);
             strongFile = Path.Combine(targetFolder, translationTestamentPrefix + strongFilename);
-            oldJson = Path.Combine(targetFolder, translationTestamentPrefix + oldJsonFilename);
+            oldJsonFile = Path.Combine(targetFolder, translationTestamentPrefix + oldJsonFilename);
         }
 
 
@@ -473,7 +507,7 @@ namespace Clear3
             File.Delete(goodLinkFile);
             File.Delete(groupFile);
             File.Delete(strongFile);
-            File.Delete(oldJson);
+            File.Delete(oldJsonFile);
             File.Delete(manTransModelFile);
 
             return ("Deleted State Files.");
@@ -499,39 +533,6 @@ namespace Clear3
             // 2020.07.10 CL: There seem to be some of these that do not change because of processing through CLEAR. They may change based upon analysis by another program.
             // 2021.03.03 CL: Changed some of functions that read in data so if it doesn't exist, it will just return an empty data structure or null.
 
-            /*
-            if (contentWordsOnlySMT)
-            {
-                (string smtTransModelFileCW, string smtAlignModelFileCW) = InitializeSmtModelFiles(true);
-
-                translationModel = importExportService.ImportTranslationModel(smtTransModelFileCW);
-                alignmentModel = importExportService.ImportAlignmentModel(smtAlignModelFileCW);
-                translationModelRest = translationModel;
-                alignmentModelPre = alignmentModel;
-            }
-            else if (contentWordsOnlyTC)
-            {
-                (string smtTransModelFileCW, string smtAlignModelFileCW) = InitializeSmtModelFiles(true);
-
-                translationModel = importExportService.ImportTranslationModel(smtTransModelFileCW);
-                alignmentModel = importExportService.ImportAlignmentModel(smtAlignModelFileCW);
-
-                (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false);
-
-                translationModelRest = importExportService.ImportTranslationModel(smtTransModelFile);
-                alignmentModelPre = importExportService.ImportAlignmentModel(smtAlignModelFile);
-            }
-            else
-            {
-                (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false);
-
-                translationModel = importExportService.ImportTranslationModel(smtTransModelFile);
-                alignmentModel = importExportService.ImportAlignmentModel(smtAlignModelFile);
-                translationModelRest = translationModel;
-                alignmentModelPre = alignmentModel;
-            }
-            */
-
             (List<string> puncs,
              List<string> stopWordsTemp,
              List<string> sourceFunctionWords,
@@ -554,7 +555,7 @@ namespace Clear3
                  badLinkFile,
                  glossFile,
                  groupFile,
-                 oldJson,
+                 oldJsonFile,
                  strongFile);
 
             stopWords = stopWordsTemp;
@@ -570,6 +571,11 @@ namespace Clear3
         }
 
         //
+        // Currently it still uses Tim's ImportTargetVerseCorpusFromLegacy, which assumes a one-to-one relationship between surface text and lemma.
+        // We are now allowing a surface word to have zero or more lemmas (i.e. there is no longer a one-to-one relationship between text and lemma).
+        // We will need to change the data structure to do this all at the same time.
+        // But since we actually want to separate tokenization and lemmatization into two different steps, we will just use the same function to segment the text.
+        // The exporting routine is modified not to write the lemma file since that will be done in the lemmatization step.
         public static string TokenizeVerses()
         {
             Console.WriteLine("Tokenizing Verses");
@@ -592,12 +598,39 @@ namespace Clear3
                         lang,
                         targetCSharpCulture);
 
-                Persistence.ExportTargetVerseCorpus(targetVerseCorpus, tokenTextFile, tokenLemmaFile, tokenIdFile);
+                // NOTE: OneToMany - should not create or write tokenLemmaFile at this time. Should just export the tokenTextFile and tokenIdFile
+                // targetVerseCorpus is read in when building the basic parallel corpora
+                Persistence.ExportTargetVerseCorpus(targetVerseCorpus, tokenTextFile, tokenLemmaFile, tokenTextIdFile);
 
                 ShowTime();
             }
 
             return "Tokenizing Verses: Done.";
+        }
+
+        //
+        //
+        //
+        public static (bool, string) LemmatizeVerses()
+        {
+            Console.WriteLine("Lemmatizing Verses.");
+
+            if (reuseLemmaFiles && File.Exists(tokenTextIdFile) && File.Exists(tokenLemmaFile) && File.Exists(tokenLemmaIdFile))
+            {
+                Console.WriteLine("  Reusing lemmatized files.");
+            }
+            else
+            {
+                Console.WriteLine("  Creating lemmatized files.");
+
+                ShowTime();
+
+                Lemmas.Lemmatize(tokenTextFile, tokenLemmaFile, tokenLemmaIdFile, lang, lowerCaseMethod, targetCSharpCulture, lemmaDataFile);
+
+                ShowTime();
+            }
+
+            return (true, "Lemmatizing Verses: Done.");
         }
 
         //
@@ -622,7 +655,7 @@ namespace Clear3
             {
                 Console.WriteLine("  Creating basic parallel corpus files.");
 
-                if (targetVerseCorpus == null) targetVerseCorpus = Persistence.ImportTargetVerseCorpus(tokenTextFile, tokenLemmaFile, tokenIdFile);
+                if (targetVerseCorpus == null) targetVerseCorpus = Persistence.ImportTargetVerseCorpus(tokenTextFile, tokenLemmaFile, tokenTextIdFile);
                 parallelCorpora = utility.CreateParallelCorpora(targetVerseCorpus, treeService, simpleVersification);
                 Persistence.ExportParallelCorpora(parallelCorpora, sourceTextFile, sourceLemmaFile, sourceIdFile, sourceLemmaCatFile, targetTextFile, targetLemmaFile, targetIdFile);
             }
@@ -1157,29 +1190,30 @@ namespace Clear3
 
         // Variables that are the same as in Clear2
 
-        private static string clearConfigFilename;
+        private static string clearConfigFilename = "Clear.config"; // Default top configuration file
         private static Dictionary<string, string> clearSettings; // Input from .config file
-        private static string processingConfigFilename;
-        private static string processingConfigFile;
-        private static Dictionary<string, string> processingSettings; // Input from .config file
-        private static string runConfigFile;
+        private static string runConfigFilename;
         private static Dictionary<string, string> runSettings; // Input from .config file
-        private static string translationConfigFilename;
-        private static string translationFolder;
-        private static string translationConfigFile;
+        private static string projectFolder;
+        private static Dictionary<string, string> projectSettings;
         private static Dictionary<string, string> translationSettings;
+        private static Dictionary<string, string> processingSettings; // Input from .config file
 
         private static string resourcesFolder; // 2020.07.11 CL: The folder where all the CLEAR Engine resources are kept.
         private static string processingFolder; // 2020.07.11 CL: The folder where all the CLEAR Engine translation projects are kept.
         private static string targetFolder; // the folder where the target language data is kept.  Each different translaton has a different folder.
-        // private static string treeFoldername; // the folder where syntatic trees are kept.
-        // private static string treeFolder; // the folder where syntatic trees are kept.
 
         private static string project; // 2020.09.25 CL: The name of the folder inside the projectsFolder. We may have multiple translations for the same language. This is used to identify the folder used.
         private static string lang; // language of target language
         private static string targetCSharpCulture; // Used in C# routines that consider language and culture, such as .ToLower()
         private static string translation; // 2020.09.25 CL: This is now the name of the translation, sometimes including a numbers to indicate the year of the copyright, e.g. NIV84
-        private static string testament; // 2020.07.11 CL: Which testament we are working on. I think at some point, we should not need to distinguish between them.
+        private static string testament; // 2020.07.11 CL: Which testament we are working on. I think at some point, we should not need to distinguish between them
+        private static string testamentFoldername; // 2021.07.21 CL: Added the ability to use a name for the testament folder other than "OT" and "NT".
+
+        private static string lowerCaseMethod;
+
+        private static string lemmaDataFilename;
+        private static string lemmaDataFile;
 
         private static string runSpec; // 1:10;H:5
         private static double epsilon; // Must exceed this to be counted into model, 0.1
@@ -1193,8 +1227,11 @@ namespace Clear3
         private static bool contentWordsOnlyTC; // Use only content words for creating the statistical translation model: transModel
         private static bool useLemmaCatModel; // whether to use the lemma_cat in creating the SMT models
         private static bool useNoPuncModel; // whether to use the target corpora without punctuations in creating the SMT models
+        private static bool useNormalizedTransModelProbabilities; // whether to use normalized probilities for the translation model from the SMT
+        private static bool useNormalizedAlignModelProbabilities; // whether to use normalized probilities for the alignment model from the SMT
 
         private static bool reuseTokenFiles; // If token files already exist, use them rather than creating them over again.
+        private static bool reuseLemmaFiles; // If token files already exist, use them rather than creating them over again.
         private static bool reuseParallelCorporaFiles; // If parallel corpora files already exist, use them rather than creating them over again.
         private static bool reuseSmtModelFiles; // If SMT model files already exist, use them rather than creating them over again.
 
@@ -1205,8 +1242,11 @@ namespace Clear3
         private static string strContentWordsOnlyTC;
         private static string strUseLemmaCatModel;
         private static string strUseNoPuncModel;
+        private static string strUseNormalizedTransModelProbabilities;
+        private static string strUseNormalizedAlignModelProbabilities;
 
         private static string strReuseTokenFiles;
+        private static string strReuseLemmaFiles;
         private static string strReuseParallelCorporaFiles;
         private static string strReuseSmtModelFiles;
 
@@ -1218,6 +1258,8 @@ namespace Clear3
         private static string corporaFolder;
         private static string modelsFoldername;
         private static string modelsFolder;
+        private static string lexiconFoldername;
+        private static string lexiconFolder;
 
         private static string transModelFilename; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
         private static string transModelFile; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
@@ -1235,14 +1277,14 @@ namespace Clear3
         private static string puncsFilename; // 2020.07.11 CL: The file where the source punctuations kept.
         private static string puncsFile; // 2020.07.11 CL: The file where the source punctuations kept.
 
-        private static string versificationFilenameDefault; // default versification
-        private static string versificationTypeDefault; // default versification type
         private static string versificationFilename; // versification file
         private static string versificationFile; // versification file
         private static string versificationType; // versification type
 
         private static string jsonOutputFilename; // output of aligner in JSON
         private static string jsonOutput; // output of aligner in JSON
+        private static string jsonLemmasOutputFilename; // output of aligner in JSON with target sub-lemmas and surface text
+        private static string jsonLemmasOutput; // output of aligner in JSON with target sub-lemmas and surface text
         private static string jsonFilename; // output of aligner in JSON
         private static string jsonFile; // output of aligner in JSON
 
@@ -1275,14 +1317,16 @@ namespace Clear3
         private static string strongFile;
 
         private static string oldJsonFilename;
-        private static string oldJson;
+        private static string oldJsonFile;
 
         private static string tokenTextFilename;
         private static string tokenTextFile;
+        private static string tokenTextIdFilename;
+        private static string tokenTextIdFile;
         private static string tokenLemmaFilename;
         private static string tokenLemmaFile;
-        private static string tokenIdFilename;
-        private static string tokenIdFile;
+        private static string tokenLemmaIdFilename;
+        private static string tokenLemmaIdFile;
 
         private static string sourceTextFilename;
         private static string sourceTextFile;
@@ -1295,10 +1339,12 @@ namespace Clear3
 
         private static string targetTextFilename;
         private static string targetTextFile;
-        private static string targetIdFilename;
-        private static string targetIdFile;
+        private static string targetTextIdFilename;
+        private static string targetTextIdFile;
         private static string targetLemmaFilename;
         private static string targetLemmaFile;
+        private static string targetLemmaIdFilename;
+        private static string targetLemmaIdFile;
 
         private static string versesFilename; // Input file with verses on separate lines previxed with verseID.
         private static string versesFile; // Input file with verses on separate lines previxed with verseID.
