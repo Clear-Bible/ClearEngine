@@ -75,6 +75,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                         existingLinks,
                         assumptions);
 
+                // Debugging
+                foreach (var candidate in topCandidates2)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+
                 // Add the candidates found to the table of alternatives
                 // for terminals.
                 candidateTable2.Add(sourceID, topCandidates2);
@@ -143,6 +152,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             string sourceID = sourcePoint.SourceID.AsCanonicalString;
             string altID = sourcePoint.AltID;
             string lemma = sourcePoint.Lemma;
+            string category = sourcePoint.Category;
 
             // If there is an existing link for the source word:
             //
@@ -227,7 +237,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .Select(targetPoint =>
                     {
                         bool ok = tryGetManScoreForTargetText(
-                            targetPoint.Lower,
+                            targetPoint.Lemma,
                             out double score);
                         return new { ok, targetPoint, score };
                     })
@@ -249,10 +259,20 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     .ToList();
             }
 
+            // CL: This is where we need to account for useLemmaCatModel
+            // Need to create a lemmaKey that has lemma_cat if useLemmaCatModel and pass lemmaKey to TryGetTranslations()
+
+            string lemmaKey = lemma;
+            if (assumptions.UseLemmaCatModel)
+            {
+                lemmaKey += "_" + category; 
+            }
+
+            //
             // If the estimated translation model has any translations
             // for the source word:
             //
-            if (assumptions.TryGetTranslations(lemma,
+            if (assumptions.TryGetTranslations(lemmaKey,
                 out TryGet<string, double> tryGetScoreForTargetText))
             {
                 // The alternatives are the possibly empty set of target
@@ -262,15 +282,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                 // (as given by the estimated translation model modified
                 // by the estimated alignment).
                 //
-                return 
-                    targetPoints
-                    .Where(tp => !assumptions.IsBadLink(lemma, tp.Lower))
-                    .Where(tp => !assumptions.IsPunctuation(tp.Lower))
-                    .Where(tp => !assumptions.IsStopWord(tp.Lower))
+
+                // Debugging
+                var candidates = targetPoints
+                    .Where(tp => !assumptions.IsBadLink(lemma, tp.Lemma))
+                    .Where(tp => !assumptions.IsPunctuation(tp.Lemma))
+                    .Where(tp => !assumptions.IsStopWord(tp.Lemma))
                     .Select(targetPoint =>
                     {
                         bool ok = tryGetScoreForTargetText(
-                            targetPoint.Lower,
+                            targetPoint.Lemma,
                             out double score);
                         return new { ok, targetPoint, score };
                     })
@@ -293,6 +314,49 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                             x.targetPoint,
                             x.score)))
                     .ToList();
+
+                // Debugging
+                foreach (var candidate in candidates)
+                {
+                    if (double.IsNaN(candidate.LogScore))
+                    {
+                        ;
+                    }
+                }
+                return candidates;
+                /*
+                return 
+                    targetPoints
+                    .Where(tp => !assumptions.IsBadLink(lemma, tp.Lemma))
+                    .Where(tp => !assumptions.IsPunctuation(tp.Lemma))
+                    .Where(tp => !assumptions.IsStopWord(tp.Lemma))
+                    .Select(targetPoint =>
+                    {
+                        bool ok = tryGetScoreForTargetText(
+                            targetPoint.Lemma,
+                            out double score);
+                        return new { ok, targetPoint, score };
+                    })
+                    .Where(x => x.ok)
+                    .Select(x => new
+                    {
+                        x.targetPoint,
+                        score = Math.Log(
+                            getAdjustedScore(
+                                x.score,
+                                x.targetPoint.TargetID.AsCanonicalString))
+                    })
+                    .GroupBy(x => x.score)
+                    .OrderByDescending(group => group.Key)
+                    .Take(1)
+                    .SelectMany(group =>
+                        group
+                        .Select(x => Candidate.NewPoint(
+                            sourcePoint,
+                            x.targetPoint,
+                            x.score)))
+                    .ToList();
+                */
             }
 
             // Otherwise, there are no alternatives.

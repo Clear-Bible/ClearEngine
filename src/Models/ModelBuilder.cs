@@ -29,15 +29,15 @@ namespace Models
 
     public ModelBuilder()
     {
-      this.m_sourceFiles = (List<string>) null;
-      this.m_targetFiles = (List<string>) null;
-      this.m_prealignmentFiles = (List<string>) null;
-      this.m_runList = (List<ModelSpec>) null;
+      this.m_sourceFiles = (List<string>)null;
+      this.m_targetFiles = (List<string>)null;
+      this.m_prealignmentFiles = (List<string>)null;
+      this.m_runList = (List<ModelSpec>)null;
       this.m_symType = SymmetrizationType.None;
       this.m_lowerCase = false;
-      this.m_model = (IAlignmentModel) null;
-      this.m_corpus1Dict = (Dictionary<string, int>) null;
-      this.m_corpus2Dict = (Dictionary<string, int>) null;
+      this.m_model = (IAlignmentModel)null;
+      this.m_corpus1Dict = (Dictionary<string, int>)null;
+      this.m_corpus2Dict = (Dictionary<string, int>)null;
     }
 
     public string SourceFile
@@ -130,32 +130,32 @@ namespace Models
       this.Validate();
       this.m_corpus1Dict = new Dictionary<string, int>();
       this.m_corpus2Dict = new Dictionary<string, int>();
-      CorpusSegmenter<TextFileSegmenter> corpusSegmenter1 = new CorpusSegmenter<TextFileSegmenter>((IEnumerable<string>) this.m_sourceFiles, this.m_corpus1Dict);
-      CorpusSegmenter<TextFileSegmenter> corpusSegmenter2 = new CorpusSegmenter<TextFileSegmenter>((IEnumerable<string>) this.m_targetFiles, this.m_corpus2Dict);
+      CorpusSegmenter<TextFileSegmenter> corpusSegmenter1 = new CorpusSegmenter<TextFileSegmenter>((IEnumerable<string>)this.m_sourceFiles, this.m_corpus1Dict);
+      CorpusSegmenter<TextFileSegmenter> corpusSegmenter2 = new CorpusSegmenter<TextFileSegmenter>((IEnumerable<string>)this.m_targetFiles, this.m_corpus2Dict);
       corpusSegmenter1.LowerCase = this.m_lowerCase;
       corpusSegmenter2.LowerCase = this.m_lowerCase;
       this.m_corpus1SegmentLists = corpusSegmenter1.SegmentLists;
       this.m_corpus2SegmentLists = corpusSegmenter2.SegmentLists;
       if (this.m_prealignmentFiles != null)
-        this.m_corpusAlignmentLists = new CorpusPrealignment((IEnumerable<string>) this.m_prealignmentFiles).AlignmentLists;
+        this.m_corpusAlignmentLists = new CorpusPrealignment((IEnumerable<string>)this.m_prealignmentFiles).AlignmentLists;
       else
-        this.m_corpusAlignmentLists = (List<IEnumerable<Alignment[]>>) null;
+        this.m_corpusAlignmentLists = (List<IEnumerable<Alignment[]>>)null;
       switch (this.m_runList[0].Model)
       {
         case Model.Model1:
-          this.m_model = this.m_symType != SymmetrizationType.None ? (IAlignmentModel) new Symmetrizer((IAlignmentModel) new IBM1(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count), (IAlignmentModel) new IBM1(this.m_corpus2Dict.Count, this.m_corpus1Dict.Count), this.m_symType) : (IAlignmentModel) new IBM1(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count);
+          this.m_model = this.m_symType != SymmetrizationType.None ? (IAlignmentModel)new Symmetrizer((IAlignmentModel)new IBM1(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count), (IAlignmentModel)new IBM1(this.m_corpus2Dict.Count, this.m_corpus1Dict.Count), this.m_symType) : (IAlignmentModel)new IBM1(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count);
           break;
         case Model.Model2:
-          this.m_model = this.m_symType != SymmetrizationType.None ? (IAlignmentModel) new Symmetrizer((IAlignmentModel) new IBM2(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength), (IAlignmentModel) new IBM2(this.m_corpus2Dict.Count, this.m_corpus1Dict.Count, corpusSegmenter2.MaxLength, corpusSegmenter1.MaxLength), this.m_symType) : (IAlignmentModel) new IBM2(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength);
+          this.m_model = this.m_symType != SymmetrizationType.None ? (IAlignmentModel)new Symmetrizer((IAlignmentModel)new IBM2(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength), (IAlignmentModel)new IBM2(this.m_corpus2Dict.Count, this.m_corpus1Dict.Count, corpusSegmenter2.MaxLength, corpusSegmenter1.MaxLength), this.m_symType) : (IAlignmentModel)new IBM2(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength);
           break;
         case Model.Model3:
-          this.m_model = this.m_symType != SymmetrizationType.None ? (IAlignmentModel) new Symmetrizer((IAlignmentModel) new IBM3(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength), (IAlignmentModel) new IBM3(this.m_corpus2Dict.Count, this.m_corpus1Dict.Count, corpusSegmenter2.MaxLength, corpusSegmenter1.MaxLength), this.m_symType) : (IAlignmentModel) new IBM3(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength);
+          this.m_model = this.m_symType != SymmetrizationType.None ? (IAlignmentModel)new Symmetrizer((IAlignmentModel)new IBM3(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength), (IAlignmentModel)new IBM3(this.m_corpus2Dict.Count, this.m_corpus1Dict.Count, corpusSegmenter2.MaxLength, corpusSegmenter1.MaxLength), this.m_symType) : (IAlignmentModel)new IBM3(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength);
           break;
         case Model.HMM:
-          this.m_model = this.m_symType != SymmetrizationType.None ? (IAlignmentModel) new Symmetrizer((IAlignmentModel) new HMM(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength), (IAlignmentModel) new HMM(this.m_corpus2Dict.Count, this.m_corpus1Dict.Count, corpusSegmenter2.MaxLength, corpusSegmenter1.MaxLength), this.m_symType) : (IAlignmentModel) new HMM(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength);
+          this.m_model = this.m_symType != SymmetrizationType.None ? (IAlignmentModel)new Symmetrizer((IAlignmentModel)new HMM(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength), (IAlignmentModel)new HMM(this.m_corpus2Dict.Count, this.m_corpus1Dict.Count, corpusSegmenter2.MaxLength, corpusSegmenter1.MaxLength), this.m_symType) : (IAlignmentModel)new HMM(this.m_corpus1Dict.Count, this.m_corpus2Dict.Count, corpusSegmenter1.MaxLength, corpusSegmenter2.MaxLength);
           break;
         default:
-          this.m_model = (IAlignmentModel) null;
+          this.m_model = (IAlignmentModel)null;
           Debug.Assert(false);
           break;
       }
@@ -176,7 +176,7 @@ namespace Models
                 {
                   if (!enumerator2.MoveNext())
                     throw new Exception("Number of segments in file does not match");
-                  int[] array = this.ConvertAlignmentsToArray(enumerator1.Current, enumerator2.Current, (Alignment[]) null);
+                  int[] array = this.ConvertAlignmentsToArray(enumerator1.Current, enumerator2.Current, (Alignment[])null);
                   if (array == null)
                     throw new Exception("Fixed alignments are out of range of segments");
                   this.m_model.AddSegmentPair(enumerator1.Current, enumerator2.Current, array);
@@ -206,7 +206,7 @@ namespace Models
           Progress progress;
           progress.Phase = this.m_model.Phase;
           progress.MaxDelta = this.m_model.MaxDelta;
-          progress.IterationRatio = ((double) index1 + 1.0) / (double) maxIterations;
+          progress.IterationRatio = ((double)index1 + 1.0) / (double)maxIterations;
           progressBar.Report(progress);
         }
         if (!this.m_model.NeedsMoreTraining)
@@ -237,7 +237,7 @@ namespace Models
     {
       if (this.m_model == null)
         throw new Exception("Not trained yet.");
-      return this.m_corpusAlignmentLists == null ? (IEnumerable<Alignment[]>) null : this.m_corpusAlignmentLists[f];
+      return this.m_corpusAlignmentLists == null ? (IEnumerable<Alignment[]>)null : this.m_corpusAlignmentLists[f];
     }
 
     public List<Alignment> GetAlignments(
@@ -257,7 +257,11 @@ namespace Models
       return this.m_corpus2Dict.Keys;
     }
 
-    public Hashtable GetTranslationTable(double epsilon)
+    // 2020.06.24 CL: Calling this each time creates a new Hashtable in the heap.
+    // It might be better to pass a ref to a Hashtable and let this method just use it.
+    // Also maybe change any method that does a "new" for the return type should be "Create" rather than "Get".
+    /*
+     * public Hashtable GetTranslationTable(double epsilon)
     {
       if (this.m_corpus1Dict == null)
         throw new Exception("You need to call the Train method first");
@@ -284,6 +288,35 @@ namespace Models
       }
       return hashtable1;
     }
+    */
+
+    public Dictionary<string, Dictionary<string, double>> GetTranslationTable(double epsilon)
+    {
+      if (this.m_corpus1Dict == null)
+        throw new Exception("You need to call the Train method first");
+      var table1 = new Dictionary<string, Dictionary<string, double>>();
+      foreach (KeyValuePair<string, int> keyValuePair1 in this.m_corpus1Dict)
+      {
+        var table2 = new Dictionary<string, double>();
+        foreach (KeyValuePair<string, int> keyValuePair2 in this.m_corpus2Dict)
+        {
+          if (this.m_model.T(keyValuePair1.Value, keyValuePair2.Value) > epsilon)
+            table2.Add(keyValuePair2.Key, this.m_model.T(keyValuePair1.Value, keyValuePair2.Value));
+        }
+        table1.Add(keyValuePair1.Key, table2);
+      }
+      if (this.m_model.HasNullSourceWord)
+      {
+        var table2 = new Dictionary<string, double>();
+        foreach (KeyValuePair<string, int> keyValuePair in this.m_corpus2Dict)
+        {
+          if (this.m_model.T_NULL(keyValuePair.Value) > epsilon)
+            table2.Add(keyValuePair.Key, this.m_model.T_NULL(keyValuePair.Value));
+        }
+        table1.Add("<NULL>", table2);
+      }
+      return table1;
+    }
 
     private void Validate()
     {
@@ -293,7 +326,7 @@ namespace Models
       for (int index = 0; index < count1; ++index)
       {
         if (!File.Exists(this.m_sourceFiles[index]))
-          throw new Exception(string.Format("Can't open '{0}'", (object) this.m_sourceFiles[index]));
+          throw new Exception(string.Format("Can't open '{0}'", (object)this.m_sourceFiles[index]));
       }
       if (this.m_targetFiles == null)
         throw new Exception("You need to set the TargetFiles property.");
@@ -301,7 +334,7 @@ namespace Models
       for (int index = 0; index < count2; ++index)
       {
         if (!File.Exists(this.m_targetFiles[index]))
-          throw new Exception(string.Format("Can't open '{0}'", (object) this.m_targetFiles[index]));
+          throw new Exception(string.Format("Can't open '{0}'", (object)this.m_targetFiles[index]));
       }
       if (this.m_sourceFiles.Count != this.m_targetFiles.Count)
         throw new Exception("The number of target files must equal the number of source files.");
@@ -321,7 +354,7 @@ namespace Models
         foreach (Alignment alignment in alignments)
         {
           if (alignment.Target < 0 || alignment.Target >= target.Length || alignment.Source < 0 || alignment.Source > source.Length)
-            return (int[]) null;
+            return (int[])null;
           numArray[alignment.Target] = alignment.Source;
         }
       }

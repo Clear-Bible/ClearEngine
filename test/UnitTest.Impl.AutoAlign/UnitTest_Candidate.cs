@@ -17,7 +17,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
                 Enumerable.Range(0, 8)
                 .Select(n =>
                     new SourcePoint(
-                        $"lemma{n}", null, new SourceID(1, 1, 1, n, 1),
+                        $"text{n}", $"lemma{n}", null, new SourceID(1, 1, 1, n, 1),
                         $"altID{n}", n, n / 8.0, n))
                 .ToArray();
 
@@ -26,7 +26,7 @@ namespace ClearBible.Clear3.UnitTest.Impl.AutoAlign
                 Enumerable.Range(0, 8)
                 .Select(n =>
                     new TargetPoint(
-                        $"text{n}", $"lower{n}", new TargetID(1, 1, 1, n),
+                        $"text{n}", $"lemma{n}", new TargetID(1, 1, 1, n),
                         $"altID{n}", n, n / 8.0))
                 .ToArray();
 

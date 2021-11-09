@@ -29,6 +29,17 @@ namespace ClearBible.Clear3.API
         public LpaLine[] Lines;
     }
 
+    /// <summary>
+    /// Clear2 data model for persisting an alignment that has alignments to lemmas (not surface words) of the translation.
+    /// </summary>
+    /// 
+    /// NOTE: OneToMany
+    /// 
+    public class LegacyLemmaPersistentAlignment
+    {
+        public LpaLemmaLine[] Lines;
+    }
+
 
     /// <summary>
     /// Alignment data for a single zone, consisting of a database of
@@ -46,6 +57,23 @@ namespace ClearBible.Clear3.API
         public List<LpaLink> links;
     }
 
+    /// <summary>
+    /// Alignment data for a single zone, consisting of a database of
+    /// information about the source and translation words, and a collection
+    /// of many-to-many links between source and translation words.
+    /// </summary>
+    ///
+    /// NOTE: OneToMany
+    ///
+    public class LpaLemmaLine
+    {
+        public LpaManuscript manuscript;
+        public LpaLemmaTranslation translation;
+
+        //public int[][][] links;
+        [JsonConverter(typeof(LpaLinkJsonConverter))]
+        public List<LpaLink> links;
+    }
 
     /// <summary>
     /// Information about the manuscript words that occur in
@@ -66,6 +94,18 @@ namespace ClearBible.Clear3.API
     public class LpaTranslation
     {
         public LpaTranslationWord[] words;
+    }
+
+    /// <summary>
+    /// Information about the translated words that occur in
+    /// a zone.
+    /// </summary>
+    ///
+    /// NOTE: OneToMany
+    ///
+    public class LpaLemmaTranslation
+    {
+        public LpaLemmaTranslationWord[] words;
     }
 
 
@@ -147,6 +187,41 @@ namespace ClearBible.Clear3.API
         /// </summary>
         /// 
         public string text;
+    }
+
+    /// <summary>
+    /// Information about a single translation word.
+    /// </summary>
+    ///
+    /// NOTE: OneToMany
+    ///
+    public class LpaLemmaTranslationWord
+    {
+        /// <summary>
+        /// TargetID as a canonical string (which contains only digits) and
+        /// then converted to a long integer.
+        /// </summary>
+        /// 
+        public long id;
+
+        /// <summary>
+        /// Alternate ID of the form, for example, "word-2" to mean the
+        /// second occurence of the surface text "word" within this zone.
+        /// </summary>
+        /// 
+        public string altId;
+
+        /// <summary>
+        /// Text, original surface text.
+        /// </summary>
+        /// 
+        public string text;
+
+        /// <summary>
+        /// Lemma. Depending on the language, it could be or not lowercase.
+        /// </summary>
+        /// 
+        public string lemma;
     }
 
 

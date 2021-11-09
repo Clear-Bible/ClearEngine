@@ -258,7 +258,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
                     // words are the target group words that I am looking for
                     string word = words[wordIndex].Trim();
 
-                    if (targetWord.Lower == word)
+                    if (targetWord.Lemma == word)
                     {
                         match += targetWord.ID + " ";
                         wordIndex++;
@@ -386,6 +386,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
             SourcePoint sNode = new SourcePoint(
                 Lemma: treeNode.Lemma(),
+                Category: treeNode.Category(),
                 Terminal: treeNode,
                 SourceID: treeNode.SourceID(),
                 AltID: "",
