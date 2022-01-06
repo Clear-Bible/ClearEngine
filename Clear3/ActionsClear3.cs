@@ -130,10 +130,6 @@ namespace Clear3
         }
 
         // CL: 2020.08.21 Modified to use a .config (XML) file to store all of the filenames and booleans rather than embedding them in the code.
-        // They can be initialized from the configuration file, and different ones can be used (by manual copying of files) or through a command line option.
-        // Once loaded in at startup, they can be changed by command line options.
-        // This was added to avoid having to change code because you want to use different files.
-        // This was done by using Forms and textBoxes, but only for some of the configuration. Others were embedded in the code.
         private static void ReadConfig(string configFilename)
         {
             clearSettings = Configuration.GetSettings(configFilename);
@@ -150,10 +146,13 @@ namespace Clear3
 
             // Set file information in resourcesFolder
 
-            // treeFoldername = clearSettings["TreeFolder"];
+            // treeFoldername = clearSettings["TreeFolder"]; // Hardcoded in DownloadResource() in ResourceService.cs. Probably should allow it to be in a config file.
             sourceFuncWordsFilename = clearSettings["Source_Function_Words_Filename"];
             puncsFilename = clearSettings["Punctuations_Filename"];
             glossFilename = clearSettings["Gloss_Filename"];
+
+            // sourceFoldername = clearSettings["Source_Foldername"]; // Source text files are created from trees on the fly.
+            // freqPhrasesFilename = clearSettings["Frequent_Phrases_Filename"]; // Not used in ClearEngine3.
 
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
             //
@@ -172,6 +171,11 @@ namespace Clear3
             targetLemmaFilename = clearSettings["Target_Lemma_Filename"];
             targetLemmaIdFilename = clearSettings["Target_Lemma_Id_Filename"];
 
+            // sourceTextFilenameM = clearSettings["Source_Text_Filename_M"]; // Created on the fly from trees.
+            // sourceLemmaFilenameM = clearSettings["Source_Lemma_Filename_M"]; // Created on the fly from trees.
+            // sourceIdFilenameM = clearSettings["Source_Id_Filename_M"]; // Created on the fly from trees.
+            // sourceLemmaCatFilenameM = clearSettings["Source_Lemma_Cat_Filename_M"]; // Created on the fly from trees.
+
             //============================ Output Files Only ============================
             // Files not part of the state, nor used as output/input to pass data between different functions
             // Output file. Has the alignment in .json format, which is more readable than XML format.
@@ -179,8 +183,16 @@ namespace Clear3
             jsonLemmasOutputFilename = clearSettings["Json_Lemmas_Output_Filename"]; // e.g "alignment.json", Should update variable to ...File
             jsonFilename = clearSettings["Json_Filename"]; // e.g "alignment.json", Should merge with jsonOutput
 
+            // Output file. Has the alignment in .json format, which is more readable than XML format. Gateway language alignment. Manuscript to gateway, or gateway to target?
+            // t2gJsonFilename = clearSettings["T2G_Json_Filename"]; // e.g. "gAlignment.json", Not used in ClearEngine3
+
             //============================ Input Files Only ============================
             versesFilename = clearSettings["Verses_Filename"]; // e.g. "Verses.txt"
+
+            // checkedAlignmentsFilename = clearSettings["Checked_Alignments_Filename"]; // e.g. "CheckedAlignments.json"
+            // m_g_jsonFilename = clearSettings["M_G_Json_Filename"]; // e.g "m_g_alignment.json", the CLEAR json where manuscript, gTranslation and gLinks are instantiated but translation and links are still empty
+            // gAlignmentFilename = clearSettings["Gateway_Alignment_Filename"]; // e.g. "gAlignment.json"
+            // auto_m_t_alignmentFilename = clearSettings["Auto_M_T_Alignment_Filename"]; // e.g. "auto_m_t_alignment.json"
 
             //============================ Input Files Only from Lexicon ============================
             lemmaDataFilename = clearSettings["Word_To_Lemmas_Filename"];
@@ -195,11 +207,18 @@ namespace Clear3
         private static void InitializeResourceFiles()
         {
             // Set file information in resourcesFolder
-            // sourceFolder = Path.Combine(resourcesFolder, sourceFoldername); // e.g. "Manuscript",folder with the original language files.
+
             // treeFolder = Path.Combine(resourcesFolder, treeFoldername); // e.g. "Trees", folder with manuscript trees. Fixed. Doesn't change. Input to CLEAR, Andi's own XML format
             sourceFuncWordsFile = Path.Combine(resourcesFolder, sourceFuncWordsFilename); // e.g. "sourceFuncwords.txt"
             puncsFile = Path.Combine(resourcesFolder, puncsFilename); // e.g. "puncs.txt"
             glossFile = Path.Combine(resourcesFolder, glossFilename); // e.g. "Gloss.tsv"
+
+            // sourceFolder = Path.Combine(resourcesFolder, sourceFoldername); // e.g. "Manuscript",folder with the original language files.
+            // freqPhrasesFile = Path.Combine(resourcesFolder, freqPhrasesFilename); // e.g. "freqPhrases.tsv"
+            // sourceTextFileM = Path.Combine(sourceFolder, sourceTextFilenameM);
+            // sourceLemmaFileM = Path.Combine(sourceFolder, sourceLemmaFilenameM);
+            // sourceIdFileM = Path.Combine(sourceFolder, sourceIdFilenameM);
+            // sourceLemmaCatFileM = Path.Combine(sourceFolder, sourceLemmaCatFilenameM);
 
             InitializeResources();
         }
@@ -349,9 +368,14 @@ namespace Clear3
             jsonOutput = Path.Combine(targetFolder, translationTestamentPrefix + jsonOutputFilename);
             jsonLemmasOutput = Path.Combine(targetFolder, translationTestamentPrefix + jsonLemmasOutputFilename);
             jsonFile = Path.Combine(targetFolder, translationTestamentPrefix + jsonFilename);
+            // t2gJsonFile = Path.Combine(targetFolder, translationTestamentPrefix + t2gJsonFilename);
 
             //============================ Input Files Only ============================
             versesFile = Path.Combine(targetFolder, translationTestamentPrefix + versesFilename);
+            // checkedAlignmentsFile = Path.Combine(targetFolder, translationTestamentPrefix + checkedAlignmentsFilename);
+            // m_g_jsonFile = Path.Combine(targetFolder, translationTestamentPrefix + m_g_jsonFilename);
+            // gAlignmentFile = Path.Combine(targetFolder, translationTestamentPrefix + gAlignmentFilename);
+            // auto_m_t_alignmentFile = Path.Combine(targetFolder, translationTestamentPrefix + auto_m_t_alignmentFilename);
 
             //============================ Input Files Only from Lexicon ============================
             lexiconFoldername = clearSettings["Lexicon_Foldername"];
@@ -394,7 +418,7 @@ namespace Clear3
 
             // Convert strings parameters to values
 
-            epsilon = double.Parse(strEpsilon); // Must exceed this to be counted into model, e.g. "0.1"
+            epsilon = Double.Parse(strEpsilon); // Must exceed this to be counted into model, e.g. "0.1"
             contentWordsOnlySMT = (strContentWordsOnlySMT == "true"); // e.g. "true" Only use content words for building models
             contentWordsOnlyTC = (strContentWordsOnlyTC == "true"); // e.g. "true" Only use content words for finding terminal candidates
             contentWordsOnly = (strContentWordsOnly == "true"); // e.g. "true" Only align content words
@@ -461,6 +485,9 @@ namespace Clear3
 
             // Input file. Must have it. If have done alignment, can bring in for consideration.
             oldJsonFilename = clearSettings["Old_Json_Filename"]; // e.g. "oldAlignment.json"
+
+            // Input and Output file. Must have. Translation memory, can be empty. 
+            // tmFilename = clearSettings["Translation_Memory_Filename"]; // e.g. "tm.tsv"
         }
 
         // 2020.10.19 CL: Need to separate out when we set the filenames and when we set the files (with path).
@@ -488,6 +515,8 @@ namespace Clear3
             targetFuncWordsFile = Path.Combine(targetFolder, translationTestamentPrefix + targetFuncWordsFilename);
             strongFile = Path.Combine(targetFolder, translationTestamentPrefix + strongFilename);
             oldJsonFile = Path.Combine(targetFolder, translationTestamentPrefix + oldJsonFilename);
+
+            // tmFile = Path.Combine(targetFolder, translationTestamentPrefix + tmFilename);
         }
 
 
@@ -495,7 +524,6 @@ namespace Clear3
         public static string DeleteStateFiles()
         {
             Console.WriteLine("Deleting State Files");
-
 
             DeleteFilesInFolder(tokensFolder, "*.txt");
             DeleteFilesInFolder(corporaFolder, "*.txt");
@@ -508,7 +536,10 @@ namespace Clear3
             File.Delete(groupFile);
             File.Delete(strongFile);
             File.Delete(oldJsonFile);
+            // File.Delete(t2gJsonFile);
+            // File.Delete(checkedAlignmentsFile);
             File.Delete(manTransModelFile);
+            // File.Delete(tmFile);
 
             return ("Deleted State Files.");
         }
@@ -522,6 +553,8 @@ namespace Clear3
             }
         }
 
+        //
+        //
         //
         public static string InitializeState()
         {

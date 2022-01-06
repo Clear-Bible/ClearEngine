@@ -84,7 +84,7 @@ namespace ClearBible.Clear3.Impl.ResourceService
             // 2021.02.26 CL: Changed to use the same folder as ClearEngine2
             string destinationPath =
                     // Path.Combine(ResourceFolder, "treebank", "Clear3Dev");
-                    Path.Combine(ResourceFolder, "Trees");
+                    Path.Combine(ResourceFolder, "Trees"); // Modified to match Clear2 location, but probably should be read from the config file like in Clear2.
             DirectoryInfo destinationDir = new DirectoryInfo(destinationPath);
 
             // 2021.02.26 CL: Don't delete and recreate each time. Only create if it doesn't already exist.
