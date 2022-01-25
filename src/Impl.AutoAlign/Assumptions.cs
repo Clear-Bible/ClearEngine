@@ -13,13 +13,17 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// <summary>
     /// Standard implementation of IAutoAlignAssumptions, based on
     /// the way things were done in Clear2.
+    /// 2021.05.27 CL: Added _translationModelTC, _useLemmaCatModel, and _alignProbsPre to be consistent with Clear2
     /// </summary>
     /// 
     public class AutoAlignAssumptions : IAutoAlignAssumptions
     {
         private TranslationModel _translationModel;
+        private TranslationModel _translationModelTC;
+        private bool _useLemmaCatModel;
         private TranslationModel _manTransModel;
         private AlignmentModel _alignProbs;
+        private AlignmentModel _alignProbsPre;
         private bool _useAlignModel;
         private List<string> _puncs;
         private List<string> _stopWords;
@@ -42,8 +46,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// 
         public AutoAlignAssumptions(
             TranslationModel translationModel,
+            TranslationModel translationModelTC,
+            bool useLemmaCatModel,
             TranslationModel manTransModel,
             AlignmentModel alignProbs,
+            AlignmentModel alignProbsPre,
             bool useAlignModel,
             List<string> puncs,
             List<string> stopWords,
@@ -59,8 +66,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             int maxPaths)
         {
             _translationModel = translationModel;
+            _translationModelTC = translationModelTC;
+            _useLemmaCatModel = useLemmaCatModel;
             _manTransModel = manTransModel;
             _alignProbs = alignProbs;
+            _alignProbsPre = alignProbsPre;
             _useAlignModel = useAlignModel;
             _puncs = puncs;
             _stopWords = stopWords;
@@ -76,7 +86,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             _maxPaths = maxPaths;
 
             _preAlignment =
-                alignProbs.Dictionary.Keys
+                alignProbsPre.Dictionary.Keys
                 .GroupBy(bareLink => bareLink.SourceID)
                 .Where(group => group.Any())
                 .ToDictionary(
@@ -89,6 +99,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public bool UseAlignModel => _useAlignModel;
+
+
+        public bool UseLemmaCatModel => _useLemmaCatModel;
 
 
         public int MaxPaths => _maxPaths;
@@ -144,13 +157,13 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
 
         public double GetTranslationModelScore(
-            string lemma,
-            string targetTextLower)
+            string sourceLemma,
+            string targetLemma)
         {
-            if (_translationModel.Dictionary.TryGetValue(new Lemma(lemma),
-                out Dictionary<TargetText, Score> translations))
+            if (_translationModel.Dictionary.TryGetValue(new SourceLemma(sourceLemma),
+                out Dictionary<TargetLemma, Score> translations))
             {
-                if (translations.TryGetValue(new TargetText(targetTextLower),
+                if (translations.TryGetValue(new TargetLemma(targetLemma),
                     out Score score))
                 {
                     return score.Double;
@@ -194,12 +207,14 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             _strongs;
 
 
+        // 2021.05.27 CL: Changed to use the translationModelTC to let us use different models to get translations
+        // when getting terminal candidates (TC) and when getting alignments for the rest.
         public bool TryGetTranslations(
             string lemma,
             out TryGet<string, double> tryGetScoreForTargetText)
             =>
             TryGetFromTransModel(
-                _translationModel,
+                _translationModelTC,
                 lemma,
                 out tryGetScoreForTargetText);
 
@@ -220,14 +235,24 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             out TryGet<string, double> tryGetScoreForTargetText)
         {
             if (translationModel.Dictionary.TryGetValue(
-                new Lemma(lemma),
-                out Dictionary<TargetText, Score> translations))
+                new SourceLemma(lemma),
+                out Dictionary<TargetLemma, Score> translations))
             {
+                // Debugging
+                foreach (var entry in translations)
+                {
+                    if (double.IsNaN(entry.Value.Double))
+                    {
+                        ;
+                    }
+                }
+
+
                 tryGetScoreForTargetText =
-                    (string targetText, out double score) =>
+                    (string targetLemma, out double score) =>
                     {
                         if (translations.TryGetValue(
-                            new TargetText(targetText),
+                            new TargetLemma(targetLemma),
                             out Score score2))
                         {
                             score = score2.Double;

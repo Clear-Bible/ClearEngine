@@ -52,7 +52,7 @@ namespace RegressionTest1
             // Prepare for input and output.
 
             // option = 0 for Brief, 1 for Long.
-            int option = 0;
+            int option = 1;
 
             string[] inputFolders = { "InputBrief", "InputLong" };
             string[] outputFolders = { "OutputBrief", "OutputLong" };
@@ -112,11 +112,11 @@ namespace RegressionTest1
                  stopWordsPath: common("stopWords.txt"),
                  sourceFuncWordsPath: common("sourceFuncWords.txt"),
                  targetFuncWordsPath: common("targetFuncWords.txt"),
-                 manTransModelPath: common("manTransModel.txt"),
-                 goodLinksPath: common("goodLinks.txt"),
-                 badLinksPath: common("badLinks.txt"),
-                 glossTablePath: common("Gloss.txt"),
-                 groupsPath: common("groups.txt"),
+                 manTransModelPath: common("manTransModel.tsv"),
+                 goodLinksPath: common("goodLinks.tsv"),
+                 badLinksPath: common("badLinks.tsv"),
+                 glossTablePath: common("Gloss.tsv"),
+                 groupsPath: common("groups.tsv"),
                  oldAlignmentPath: common("oldAlignment.json"),
                  strongsPath: common("strongs.txt"));
 
@@ -133,7 +133,8 @@ namespace RegressionTest1
                     versePath,
                     clearService.DefaultSegmenter,
                     puncs,
-                    lang);
+                    lang,
+                    "en-US");
 
 
             // Import the versification.
@@ -159,7 +160,7 @@ namespace RegressionTest1
             // only the content words for the SMT step to follow.
 
             ParallelCorpora parallelCorporaCW =
-               utility.FilterFunctionWordsFromParallelCorpora(
+               utility.FilterWordsFromParallelCorpora(
                    parallelCorpora,
                    sourceFunctionWords,
                    targetFunctionWords);
@@ -185,8 +186,9 @@ namespace RegressionTest1
                 .Select(zonePair =>
                     new ZoneAlignmentProblem(
                         zonePair.TargetZone,
-                        zonePair.SourceZone.List.First().SourceID.VerseID,
-                        zonePair.SourceZone.List.Last().SourceID.VerseID))
+                        zonePair.SourceZone))
+                        // zonePair.SourceZone.List.First().SourceID.VerseID,
+                        // zonePair.SourceZone.List.Last().SourceID.VerseID))
                 .ToList();
 
 
@@ -202,7 +204,10 @@ namespace RegressionTest1
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
                     transModel2,
+                    transModel2,
+                    false,
                     manTransModel,
+                    alignProbs2,
                     alignProbs2,
                     useAlignModel,
                     puncs,

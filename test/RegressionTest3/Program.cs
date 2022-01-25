@@ -70,11 +70,11 @@ namespace RegressionTest3
                  stopWordsPath: InPath("stopWords.txt"),
                  sourceFuncWordsPath: InPath("sourceFuncWords.txt"),
                  targetFuncWordsPath: InPath("targetFuncWords.txt"),
-                 manTransModelPath: InPath("manTransModel.txt"),
-                 goodLinksPath: InPath("goodLinks.txt"),
-                 badLinksPath: InPath("badLinks.txt"),
-                 glossTablePath: InPath("Gloss.txt"),
-                 groupsPath: InPath("groups.txt"),
+                 manTransModelPath: InPath("manTransModel.tsv"),
+                 goodLinksPath: InPath("goodLinks.tsv"),
+                 badLinksPath: InPath("badLinks.tsv"),
+                 glossTablePath: InPath("Gloss.tsv"),
+                 groupsPath: InPath("groups.tsv"),
                  oldAlignmentPath: InPath("oldAlignment.json"),
                  strongsPath: InPath("strongs.txt"));
 
@@ -106,21 +106,24 @@ namespace RegressionTest3
 
             TranslationModel transModel =
                 importExportService.ImportTranslationModel(
-                    InPath("transModel.txt"));
+                    InPath("transModel.tsv"));
 
             AlignmentModel alignmentModel =
                 importExportService.ImportAlignmentModel(
-                    InPath("alignModel.txt"));
+                    InPath("alignModel.tsv"));
 
 
             // Specify the assumptions to be used during the
             // auto-alignment.
-            
+
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
                     translationModel: transModel,
+                    translationModelTC: transModel,
+                    useLemmaCatModel: false,
                     manTransModel: manTransModel,
                     alignProbs: alignmentModel,
+                    alignProbsPre: alignmentModel,
                     useAlignModel: true,
                     puncs: puncs,
                     stopWords: stopWords,

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 using ClearBible.Clear3.API;
 using ClearBible.Clear3.Service;
@@ -38,39 +39,45 @@ namespace ClearBible.Clear3.SubTasks
             IImportExportService importExportService =
                 Clear30Service.FindOrCreate().ImportExportService;
 
+            // 2021.05.26 CL: Changed to make these files optional. If they don't exist, return empty datastructure.
+            // It is possible to make this part of each importExportService function instead with a bool parameter (as in Clear2) which may be cleaner.
+            // But for now, I don't want to change the Interface so I'll do it here.
 
-            List<string> puncs = importExportService.GetWordList(puncsPath);
+            var puncs = new List<string>();
+            var stopWords = new List<string>();
+            var sourceFuncWords = new List<string>();
+            var targetFuncWords = new List<string>();
+            var manTransModel = new TranslationModel(new Dictionary<SourceLemma, Dictionary<TargetLemma, Score>>());
+            var groups = new GroupTranslationsTable(new Dictionary<SourceLemmasAsText, HashSet<TargetGroup>>());
+            var goodLinks = new Dictionary<string, int>();
+            var badLinks = new Dictionary<string, int>();
+            var glossTable = new Dictionary<string, Gloss>();
+            var oldLinks = new Dictionary<string, Dictionary<string, string>>();
+            var strongs = new Dictionary<string, Dictionary<string, int>>();
 
-            List<string> stopWords = importExportService.GetStopWords(stopWordsPath);
+            if (File.Exists(puncsPath)) puncs = importExportService.GetWordList(puncsPath);
+            if (File.Exists(stopWordsPath)) stopWords = importExportService.GetStopWords(stopWordsPath);
+            if (File.Exists(sourceFuncWordsPath)) sourceFuncWords = importExportService.GetWordList(sourceFuncWordsPath);
+            if (File.Exists(targetFuncWordsPath)) targetFuncWords = importExportService.GetWordList(targetFuncWordsPath);
+            if (File.Exists(manTransModelPath))
+            {
+                var manTransModelOrig = importExportService.GetTranslationModel2(manTransModelPath);
 
-            List<string> sourceFuncWords = importExportService.GetWordList(sourceFuncWordsPath);
-            List<string> targetFuncWords = importExportService.GetWordList(targetFuncWordsPath);
-
-            Dictionary<string, Dictionary<string, Stats>> manTransModelOrig =
-                importExportService.GetTranslationModel2(manTransModelPath);
-           
-            TranslationModel manTransModel =
+                manTransModel =
                 new TranslationModel(
                     manTransModelOrig.ToDictionary(
-                        kvp => new Lemma(kvp.Key),
+                        kvp => new SourceLemma(kvp.Key),
                         kvp => kvp.Value.ToDictionary(
-                            kvp2 => new TargetText(kvp2.Key),
+                            kvp2 => new TargetLemma(kvp2.Key),
                             kvp2 => new Score(kvp2.Value.Prob))));
+            }
 
-            Dictionary<string, int> goodLinks = importExportService.GetXLinks(goodLinksPath);
-            Dictionary<string, int> badLinks = importExportService.GetXLinks(badLinksPath);
-           
-            Dictionary<string, Gloss> glossTable =
-                importExportService.BuildGlossTableFromFile(glossTablePath);
-
-            GroupTranslationsTable groups =
-                importExportService.ImportGroupTranslationsTable(groupsPath);
-
-            Dictionary<string, Dictionary<string, string>> oldLinks =
-                importExportService.GetOldLinks(oldAlignmentPath, groups);
-
-            Dictionary<string, Dictionary<string, int>> strongs =
-                importExportService.BuildStrongTable(strongsPath);
+            if (File.Exists(goodLinksPath)) goodLinks = importExportService.GetXLinks(goodLinksPath);
+            if (File.Exists(badLinksPath)) badLinks = importExportService.GetXLinks(badLinksPath);
+            if (File.Exists(glossTablePath)) glossTable = importExportService.BuildGlossTableFromFile(glossTablePath);
+            if (File.Exists(groupsPath)) groups = importExportService.ImportGroupTranslationsTable(groupsPath);
+            if (File.Exists(oldAlignmentPath)) oldLinks = importExportService.GetOldLinks(oldAlignmentPath, groups);
+            if (File.Exists(strongsPath)) strongs = importExportService.BuildStrongTable(strongsPath);
 
             return new Result(
                 puncs,

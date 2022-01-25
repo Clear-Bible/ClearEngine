@@ -214,7 +214,8 @@ namespace ClearBible.Clear3.API
             string path,
             ISegmenter segmenter,
             List<string> puncs,
-            string lang);
+            string lang,
+            string culture); // 2021.05.26 CL: Added to allow language and region specific lowercasing.
 
         /// <summary>
         /// Obtain a SimpleVersification from the XML versification file
@@ -372,12 +373,14 @@ namespace ClearBible.Clear3.API
         /// </param>
         /// <returns>
         /// Array of the segments in translation order.
+        /// Array of the lemmas in translation order.
         /// </returns>
         /// 
-        string[] GetSegments(
+        (string[], string[]) GetSegments(
             string text,
             List<string> puncs,
-            string lang);
+            string lang,
+            string culture);
     }
 
 
@@ -574,8 +577,11 @@ namespace ClearBible.Clear3.API
         /// 
         IAutoAlignAssumptions MakeStandardAssumptions(
             TranslationModel translationModel,
+            TranslationModel translationModelTC,
+            bool useLemmaCatModel,
             TranslationModel manTransModel,
             AlignmentModel alignProbs,
+            AlignmentModel alignProbsPre,
             bool useAlignModel,
             List<string> puncs,
             List<string> stopWords,
@@ -654,13 +660,13 @@ namespace ClearBible.Clear3.API
 
         /// <summary>
         /// Given a ParallelCorpora, filter the sources and targets
-        /// in its zone pairs to remove the function words, producing
-        /// a new ParallelCorpora that has only the content words.
+        /// in its zone pairs to remove the words in the lists, producing
+        /// a new ParallelCorpora that has only the words not in the list.
         /// </summary>
         /// 
-        public ParallelCorpora FilterFunctionWordsFromParallelCorpora(
+        public ParallelCorpora FilterWordsFromParallelCorpora(
             ParallelCorpora toBeFiltered,
-            List<string> sourceFunctionWords,
-            List<string> targetFunctionWords);
+            List<string> sourceWordsToFilter,
+            List<string> targetWordsToFilter);
     }
 }

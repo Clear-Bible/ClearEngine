@@ -31,3 +31,4 @@ If you are using Visual Studio Community on Windows, the startup folder may be a
 The regression tests may be further configured by editing the source code at the beginning of the tests.
 
 The tests produce output in the form of an alignment.json file.  In the folders where these output files are created, you will also find files with names like alignment.json.cmp2 to which the output may be compared.  You should expect the output to match the comparison file with the highest numbered final digit.
+

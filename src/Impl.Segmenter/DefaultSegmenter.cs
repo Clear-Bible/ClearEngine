@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 using ClearBible.Clear3.API;
 
@@ -15,29 +16,34 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
     /// 
     public class DefaultSegmenter : ISegmenter
     {
-        public string[] GetSegments(
+        public (string[], string[]) GetSegments(
             string text,
             List<string> puncs,
-            string lang)
+            string lang,
+            string culture)
         {
-            string tokens = "", unusedArgument = "";
-            SegPuncs(ref tokens, ref unusedArgument, text.Trim(), puncs, lang);
-            return tokens.Split(" ");
+            var cultureInfo = new CultureInfo(culture);
+            string tokens = "", tokenLowercase = "";
+            SegPuncs(ref tokens, ref tokenLowercase, text.Trim(), puncs, lang, cultureInfo);
+
+            return (tokens.Split(), tokenLowercase.Split());
         }
 
 
-        private void SegPuncs(ref string puncText, ref string puncLowerText, string verseText, List<string> puncs, string lang)
+        private void SegPuncs(ref string puncText, ref string puncLowerText, string verseText, List<string> puncs, string lang, CultureInfo cultureInfo)
         {
-            verseText = verseText.Replace("—", " — ");
-            verseText = verseText.Replace("-", " - ");
-            verseText = verseText.Replace(",“", ", “");
-            verseText = verseText.Replace("  ", " ");
+            // 2020.09.11 CL: Do we need these now that I run verse files through a program to clean up the verses? Will need to check.
+
+            // verseText = verseText.Replace("—", " — ");
+            // verseText = verseText.Replace("-", " - ");
+            // verseText = verseText.Replace(",“", ", “");
+            // verseText = verseText.Replace("  ", " ");
             if (lang == "Gbary")
             {
                 verseText = verseText.Replace("^", "");
             }
             verseText = verseText.Trim();
-            string[] words = verseText.Split(" ".ToCharArray());
+            string[] words = verseText.Split();
 
             for (int i = 0; i < words.Length; i++)
             {
@@ -46,13 +52,13 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
                 string[] subWords = word.Split(punc);
                 if (subWords.Length == 2)
                 {
-                    SepPuncs(ref puncText, ref puncLowerText, subWords[0], puncs, lang);
-                    SepPuncs(ref puncText, ref puncLowerText, punc.ToString(), puncs, lang);
-                    SepPuncs(ref puncText, ref puncLowerText, subWords[1], puncs, lang);
+                    SepPuncs(ref puncText, ref puncLowerText, subWords[0], puncs, lang, cultureInfo);
+                    SepPuncs(ref puncText, ref puncLowerText, punc.ToString(), puncs, lang, cultureInfo);
+                    SepPuncs(ref puncText, ref puncLowerText, subWords[1], puncs, lang, cultureInfo);
                 }
                 else
                 {
-                    SepPuncs(ref puncText, ref puncLowerText, word, puncs, lang);
+                    SepPuncs(ref puncText, ref puncLowerText, word, puncs, lang, cultureInfo);
                 }
             }
         }
@@ -79,7 +85,7 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
         }
 
 
-        private void SepPuncs(ref string puncText, ref string puncLowerText, string word, List<string> puncs, string lang)
+        private void SepPuncs(ref string puncText, ref string puncLowerText, string word, List<string> puncs, string lang, CultureInfo cultureInfo)
         {
             ArrayList postPuncs = new ArrayList();
 
@@ -139,7 +145,10 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
             }
 
             puncText += " " + word;
-            puncLowerText += " " + word.ToLower();
+
+            // 2021.05.26 CL: Modified to use the CultureInfo available in C# to do language/region specific lowercase.
+            // puncLowerText += " " + word.ToLower();
+            puncLowerText += " " + word.ToLower(cultureInfo);
 
             if (postPuncs.Count > 0)
             {

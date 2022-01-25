@@ -27,8 +27,8 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         public string AltID =>
             TargetPoint?.AltID ?? "";
 
-        public string Lower =>
-            TargetPoint?.Lower ?? "";
+        public string Lemma =>
+            TargetPoint?.Lemma ?? "";
 
         public string Text =>
             TargetPoint?.Text ?? "";

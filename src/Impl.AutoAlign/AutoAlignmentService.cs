@@ -68,12 +68,16 @@ namespace ClearBible.Clear3.Impl.AutoAlign
 
         /// <summary>
         /// (Implementation of IAutoAlignmentService.MakeStandardAssumptions.)
+        /// 2021.05.27 CL: Added translationModelTC, useLemmaCatModel, and alignProbsPre to make it consistent with Clear2
         /// </summary>
         /// 
         public IAutoAlignAssumptions MakeStandardAssumptions(
             TranslationModel translationModel,
+            TranslationModel translationModelTC,
+            bool useLemmaCatModel,
             TranslationModel manTransModel,
             AlignmentModel alignProbs,
+            AlignmentModel alignProbsPre,
             bool useAlignModel,
             List<string> puncs,
             List<string> stopWords,
@@ -91,8 +95,11 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // Delegate to the AutoAlignAssumptions class.
             return new AutoAlignAssumptions(
                 translationModel,
+                translationModelTC,
+                useLemmaCatModel,
                 manTransModel,
                 alignProbs,
+                alignProbsPre,
                 useAlignModel,
                 puncs,
                 stopWords,
