@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClearBible.Engine.Translation
+namespace ClearBible.Engine.Corpora
 {
-    public class CorporaAlignments
+    public interface IManuscriptTree
     {
     }
 }
