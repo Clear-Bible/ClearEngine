@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ClearBible.Engine.Translation
 {
-    public class ManuscriptTreeWordAlignmentTrainer : DisposableBase, ITrainer
+    public class ManuscriptWordAlignmentModelTrainer : DisposableBase, ITrainer
     {
         private readonly IManuscriptTree _manuscriptTree;
         private readonly IWordAlignmentModel _smtWordAlignmentModel;
@@ -26,7 +26,7 @@ namespace ClearBible.Engine.Translation
         private ITrainer? _smtTrainer;
         public ManuscriptWordAlignmentModel ManuscriptWordAlignmentModel { get; init; }
 
-        internal ManuscriptTreeWordAlignmentTrainer(
+        internal ManuscriptWordAlignmentModelTrainer(
             ManuscriptWordAlignmentModel manuscriptWordAlignmentModel,
             IWordAlignmentModel smtWordAlignmentModel,
             bool smtWordAligmentModelIsTrained,
@@ -69,17 +69,18 @@ namespace ClearBible.Engine.Translation
         /// <param name="targetPreprocessor"></param>
         /// <param name="maxCorpusCount"></param>
         /// <exception cref="NotImplementedException"></exception>
-        public ManuscriptTreeWordAlignmentTrainer(
+        public ManuscriptWordAlignmentModelTrainer(
             IWordAlignmentModel smtWordAlignmentModel,
             bool smtWordAligmentModelIsTrained,
-            ManuscriptTree manuscriptTree,
+            ManuscriptFileTree manuscriptTree,
             string targetFileName,
             string? prefFileName,
             ManuscriptWordAlignmentConfig config,
             ITokenProcessor? sourcePreprocessor = null,
             ITokenProcessor? targetPreprocessor = null,
             int maxCorpusCount = int.MaxValue)
-            : this(new ManuscriptWordAlignmentModel(),
+            : this(
+                  new ManuscriptWordAlignmentModel(),
                   smtWordAlignmentModel, 
                   smtWordAligmentModelIsTrained, 
                   manuscriptTree, 
@@ -94,17 +95,18 @@ namespace ClearBible.Engine.Translation
             throw new NotImplementedException();
         }
 
-        public ManuscriptTreeWordAlignmentTrainer(
+        public ManuscriptWordAlignmentModelTrainer(
             IWordAlignmentModel smtWordAlignmentModel,
             bool smtWordAligmentModelIsTrained,
-            ManuscriptTree manuscriptTree,
+            ManuscriptFileTree manuscriptTree,
             ParallelTextCorpus parallelTextCorpus,
             string? prefFileName,
             ManuscriptWordAlignmentConfig config,
             ITokenProcessor? sourcePreprocessor = null,
             ITokenProcessor? targetPreprocessor = null,
             int maxCorpusCount = int.MaxValue)
-            : this(new ManuscriptWordAlignmentModel(),
+            : this(
+                  new ManuscriptWordAlignmentModel(),
                   smtWordAlignmentModel,
                   smtWordAligmentModelIsTrained,
                   manuscriptTree,
@@ -122,25 +124,27 @@ namespace ClearBible.Engine.Translation
             _smtTrainer = smtWordAlignmentModel.CreateTrainer(_parallelTextCorpus, _sourcePreprocessor,
                 _targetPreprocessor, _maxCorpusCount);
         }
-        public TrainStats Stats => throw new NotImplementedException();
+        public TrainStats? Stats => _smtTrainer?.Stats;
 
         protected override void DisposeManagedResources()
         {
-            _smtWordAlignmentModel.Dispose();
-            base.DisposeManagedResources();
+             _smtTrainer?.Dispose();
         }
 
         public virtual void Save()
         {
-            // not implemented.
-            //if (!string.IsNullOrEmpty(_prefFileName))
-            
+            ManuscriptWordAlignmentModel.SetModel(null);
+            CheckDisposed();
+
+            _smtTrainer?.Save();
             return;
         }
 
         public Task SaveAsync()
         {
-            Save();
+            CheckDisposed();
+
+            _smtTrainer?.SaveAsync();
             return Task.CompletedTask;
         }
 

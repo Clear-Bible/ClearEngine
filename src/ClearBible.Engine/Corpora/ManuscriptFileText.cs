@@ -9,8 +9,7 @@ namespace ClearBible.Engine.Corpora
 {
     public class ManuscriptFileText : ScriptureText
     {
-        private readonly string _manusciptTreesPath;
-        private readonly string _fileNameBookPrefix;
+        private readonly IManuscriptText _manuscriptCorpus;
 
         private class ManuscriptTokenizer : WhitespaceTokenizer
         {
@@ -19,55 +18,35 @@ namespace ClearBible.Engine.Corpora
                 return c == ' ';
             }
         }
-        private static string ConvertToSILBookAbbreviation(string fileNameBookPrefix)
-		{
-			var hasMapping = Mappings.ManuscriptFileBookToSILBookPrefixes.TryGetValue(fileNameBookPrefix, out var result);
-			if (hasMapping)
-			{
-				return result != null ? result.code : throw new NullReferenceException($"Mapping.ManuscriptFileBookToSILBookPrefixes[{fileNameBookPrefix}] = null");
-			}
-			else
-			{
-				throw new KeyNotFoundException($"Mapping.ManuscriptFileBookToSILBookPrefixes[{fileNameBookPrefix}] doesn't exist.");
-			}
-		}
 		
-		public ManuscriptFileText(string manusciptTreesPath, string fileNameBookPrefix, ScrVers versification)
-			: base(new ManuscriptTokenizer(), ConvertToSILBookAbbreviation(fileNameBookPrefix), versification ?? ScrVers.Original)
-        {
-			_manusciptTreesPath = manusciptTreesPath;
-			_fileNameBookPrefix = fileNameBookPrefix;
-		}
-
-
-
         /// <summary>
-        /// Set to true to get the segments in the document rather than Machine's behavior of trying to partially group them as is required by Engine verse mapping.
-        /// Defaults to false.
+        /// Creates the Text for a manuscript book.
         /// </summary>
-        public bool GetSegmentsReturnsDocSegments { get; set; }
-
-        /// <summary>
-        /// An Engine override which doesn't group segments based on Machine's versification.
-        /// </summary>
-        /// <param name="includeText"></param>
-        /// <param name="basedOn"></param>
-        /// <returns>Segments, which are verse and text, as the are in the USFM document, sorted by verse.</returns>
-        public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText basedOn = null)
+        /// <param name="manuscriptCorpus"></param>
+        /// <param name="book"></param>
+        /// <param name="versification">Defaults to Original</param>
+		public ManuscriptFileText(IManuscriptText manuscriptCorpus, string book, ScrVers versification)
+			: base(new ManuscriptTokenizer(), book, versification ?? ScrVers.Original)
         {
-            if (GetSegmentsReturnsDocSegments)
-            {
-                return GetSegmentsInDocOrder(includeText: includeText);
-            }
-            else
-            {
-                return base.GetSegments(includeText, basedOn);
-            }
+            _manuscriptCorpus = manuscriptCorpus;
         }
 
+        /// <summary>
+        /// Returns verse and text as they are in the document(s).
+        /// </summary>
+        /// <param name="includeText"></param>
+        /// <returns></returns>
         protected override IEnumerable<TextSegment> GetSegmentsInDocOrder(bool includeText = true)
         {
-            return Directory.EnumerateFiles(_manusciptTreesPath, $"{_fileNameBookPrefix}*.xml")
+            return _manuscriptCorpus.GetBookSegments(Id, includeText)
+                .SelectMany(bookSegment => CreateTextSegments(
+                        includeText,
+                        bookSegment.chapter,
+                        bookSegment.verse,
+                        bookSegment.text)
+                    );
+            /*
+            return Directory.EnumerateFiles(_manuscriptTreesPath, $"{_fileNameBookPrefix}*.xml")
                 .SelectMany(fileName =>
                     XElement
                         .Load(fileName)
@@ -79,14 +58,14 @@ namespace ClearBible.Engine.Corpora
                                     .Descendants()
                                     .Where(node => node.FirstNode is XText)
                                     .First()
-                                    ?.Attribute("nodeId")?.Value.Substring(2, 3)
+                                    ?.Attribute("morphId")?.Value.Substring(2, 3)
                                     ?? throw new InvalidDataException($@"Syntax tree {fileName} has a verse whose first leaf node 
                                                                             doesn't have a nodeId attribute. Cannot determine chapter"),
                                 verse
                                     .Descendants()
                                     .Where(node => node.FirstNode is XText)
                                     .First()
-                                    ?.Attribute("nodeId")?.Value.Substring(5, 3)
+                                    ?.Attribute("morphId")?.Value.Substring(5, 3)
                                     ?? throw new InvalidDataException($@"Syntax tree {fileName} has a verse whose first leaf node doesn't 
                                                                              have a nodeId attribute. Cannot determine chapter"),
                                 string.Join(
@@ -99,6 +78,7 @@ namespace ClearBible.Engine.Corpora
                             )
                         )
                 );
+            */
          }
                 
 			/*

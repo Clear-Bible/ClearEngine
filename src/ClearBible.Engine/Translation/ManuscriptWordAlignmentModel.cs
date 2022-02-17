@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,19 +14,67 @@ using SIL.ObjectModel;
 
 namespace ClearBible.Engine.Translation
 {
+    internal class Vocabulary : IWordVocabulary
+    {
+        private readonly Model _model;
+        private readonly bool _isSource;
+
+        public Vocabulary(Model model, bool isSource)
+        {
+            _model = model;
+            _isSource = isSource;
+        }
+        public string this[int index] => throw new NotImplementedException();
+
+        public int Count => throw new NotImplementedException();
+
+        public IEnumerator<string> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int IndexOf(string word)
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal class Model : IDisposable
+    {
+        public static Model CreateModel()
+        {
+            return new Model();
+        }
+        public static Model OpenModel(string prefFileName)
+        {
+            return new Model();
+        }
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class ManuscriptWordAlignmentModel : DisposableBase, IWordAlignmentModel
     {
-        private bool _owned;
-        private string _prefFileName;
+        private string? _prefFileName;
+        private Model? _model;
+        private Vocabulary? _sourceWords;
+        private Vocabulary? _targetWords;
 
         /// <summary>
         /// For untrained smt word alignment model
         /// </summary>
         public ManuscriptWordAlignmentModel()
         {
+            SetModel(new Model());
         }
 
-        protected ManuscriptWordAlignmentModel(string prefFileName, bool createNew = false)
+        public ManuscriptWordAlignmentModel(string prefFileName, bool createNew = false)
         {
             if (createNew || !File.Exists(prefFileName + ".src"))
                 CreateNew(prefFileName);
@@ -55,6 +104,16 @@ namespace ClearBible.Engine.Translation
                 targetPreprocessor,
                 maxCorpusCount);
        }
+        internal void SetModel(Model model)
+        {
+            if (_model != null)
+            {
+                _model.Dispose();
+            }
+            _model = model;
+            _sourceWords = new Vocabulary(model, true);
+            _targetWords = new Vocabulary(model, false);
+        }
         public IWordVocabulary SourceWords => throw new NotImplementedException();
 
         public IWordVocabulary TargetWords => throw new NotImplementedException();
@@ -79,8 +138,11 @@ namespace ClearBible.Engine.Translation
         /// <exception cref="NotImplementedException"></exception>
         public void Load(string prefFileName)
         {
+            if (!File.Exists(prefFileName + ".src"))
+                throw new FileNotFoundException("The word alignment model configuration could not be found.");
+
             _prefFileName = prefFileName;
-            throw new NotImplementedException();
+            SetModel(Model.OpenModel(_prefFileName));
         }
 
         /// <summary>
@@ -102,7 +164,24 @@ namespace ClearBible.Engine.Translation
         public void CreateNew(string prefFileName)
         {
             _prefFileName = prefFileName;
-            throw new NotImplementedException();
+            SetModel(Model.CreateModel());
+        }
+
+        public Task SaveAsync()
+        {
+            CheckDisposed();
+
+            Save();
+            return Task.CompletedTask;
+        }
+
+        public void Save()
+        {
+            CheckDisposed();
+
+            if (!string.IsNullOrEmpty(_prefFileName))
+                ;
+                //IMPL: save the model
         }
 
         /// <summary>
@@ -140,7 +219,7 @@ namespace ClearBible.Engine.Translation
             throw new NotImplementedException();
         }
 
-        private class Trainer : ManuscriptTreeWordAlignmentTrainer
+        private class Trainer : ManuscriptWordAlignmentModelTrainer
         {
             internal Trainer(
                 ManuscriptWordAlignmentModel manuscriptWordAlignmentModel,
@@ -152,7 +231,8 @@ namespace ClearBible.Engine.Translation
                 ITokenProcessor? sourcePreprocessor = null,
                 ITokenProcessor? targetPreprocessor = null,
                 int maxCorpusCount = int.MaxValue)
-                : base(manuscriptWordAlignmentModel,
+                : base(
+                      manuscriptWordAlignmentModel,
                       smtWordAlignmentModel,
                       smtWordAligmentModelIsTrained,
                       manuscriptTree,
@@ -176,6 +256,8 @@ namespace ClearBible.Engine.Translation
             {
                 Dispose();
                 base.Save();
+
+                //
             }
         }
 

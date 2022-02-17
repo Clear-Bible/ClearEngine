@@ -18,37 +18,28 @@ namespace ClearBible.Engine.Corpora
         public EngineUsxFileText(ITokenizer<string, int, string> wordTokenizer, string fileName, ScrVers? versification = null) 
             : base(wordTokenizer, fileName, versification)
         {
-            OverrideGetSegments = false;
         }
-
-        public bool OverrideGetSegments { get; set; }
 
         /// <summary>
         /// An Engine override which doesn't group segments based on Machine's versification.
         /// </summary>
         /// <param name="includeText"></param>
         /// <param name="basedOn"></param>
-        /// <returns>Segments, which are verse and text, as the are in the USX document, sorted by verse.</returns>
+        /// <returns>Segments, which are verse and text, as the are in the USX document.</returns>
         public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText basedOn = null)
         {
-            if (OverrideGetSegments)
-            {
-                /*
-                var segments = GetSegmentsInDocOrder(includeText: true)
-                    .ToList();
-                segments.Sort((x, y) => ((VerseRef)x.SegmentRef).CompareTo((VerseRef)y.SegmentRef));
-                return segments;
-                */
 
-                //Do not sort since sequential TextSegments define ranges.
+            /*
+            var segments = GetSegmentsInDocOrder(includeText: true)
+                .ToList();
+            segments.Sort((x, y) => ((VerseRef)x.SegmentRef).CompareTo((VerseRef)y.SegmentRef));
+            return segments;
+            */
 
-                // SEE NOTE IN EngineUsfmFileText.GetSegments() as to why this override is necessary and its limitations.
-                return GetSegmentsInDocOrder(includeText: includeText);
-            }
-            else
-            {
-                return base.GetSegments(includeText, basedOn);
-            }
+            //Do not sort since sequential TextSegments define ranges.
+
+            // SEE NOTE IN EngineUsfmFileText.GetSegments() as to why this override is necessary and its limitations.
+            return GetSegmentsInDocOrder(includeText: includeText);
         }
     }
 }
