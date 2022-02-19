@@ -5,6 +5,7 @@ using ClearBible.Engine.Translation;
 using SIL.Machine.Corpora;
 using System.Xml.Linq;
 using static ClearBible.Engine.Corpora.IManuscriptText;
+using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -12,18 +13,23 @@ namespace ClearBible.Engine.Corpora
     {
         private readonly string _manuscriptTreesPath;
 
+        /*
         public static string ConvertToSILBookAbbreviation(string fileNameBookPrefix)
         {
-            var hasMapping = Mappings.ManuscriptFileBookToSILBookPrefixes.TryGetValue(fileNameBookPrefix, out var result);
-            if (hasMapping)
+            var bookId = BookIds
+                .Where(bookId => bookId.clearTreeBookAbbrev.Equals(fileNameBookPrefix))
+                .FirstOrDefault();
+
+            if (bookId != null)
             {
-                return result != null ? result.code : throw new NullReferenceException($"Mapping.ManuscriptFileBookToSILBookPrefixes[{fileNameBookPrefix}] = null");
+                return bookId.silCannonBookAbbrev;
             }
             else
             {
                 throw new KeyNotFoundException($"Mapping.ManuscriptFileBookToSILBookPrefixes[{fileNameBookPrefix}] doesn't exist.");
             }
         }
+        */
 
         public ManuscriptFileTree(string manuscriptTreesPath)
         {
@@ -37,12 +43,18 @@ namespace ClearBible.Engine.Corpora
         /// <returns>Returns the books that exist in the syntax trees in three letter SIL abbreviation form.</returns>
         public IEnumerable<string> GetBooks()
         {
-            return Directory.EnumerateFiles(_manuscriptTreesPath, "*.xml")
-                .Select(fileName => ConvertToSILBookAbbreviation(
-                    fileName.Trim().Substring(_manuscriptTreesPath.Length + 1, fileName.Length - _manuscriptTreesPath.Length - 1 - 13)))
+
+            var foo = Directory.EnumerateFiles(_manuscriptTreesPath, "*.xml")
+                .Select(fileName => BookIds
+                    .Where(bookId => bookId.clearTreeBookAbbrev.Equals(fileName
+                        .Trim().Substring(_manuscriptTreesPath.Length + 1, fileName.Length - _manuscriptTreesPath.Length - 1 - 13)))
+                    .FirstOrDefault()?.silCannonBookAbbrev ?? "")
                 //names are  in b[bb]ccc.trees.xml format, and we want the b[bb] part, therefore subtracting
                 // 13 characters and 1 more for the directory separator.
+                .Where(silBookAbbrev => !silBookAbbrev.Trim().Equals(""))
                 .Distinct();
+
+            return foo;
         }
 
         /// <summary>
@@ -100,9 +112,12 @@ namespace ClearBible.Engine.Corpora
         /// <returns></returns>
         public XElement? GetTreeNode(string book, int chapter, List<int> verses)
         {
-            var codes = Mappings.ManuscriptFileBookToSILBookPrefixes
-                .Where(bookToPrefixes => bookToPrefixes.Value.abbr.Equals(book))
-                .Select(bookToPrefixes => bookToPrefixes.Key);
+            var codes = BookIds
+                .Where(BookId => BookId.silCannonBookAbbrev.Equals(book))
+                .Select(bookId => bookId.clearTreeBookAbbrev);
+//            var codes = Mappings.ManuscriptFileBookToSILBookPrefixes
+//               .Where(bookToPrefixes => bookToPrefixes.Value.abbr.Equals(book))
+//                .Select(bookToPrefixes => bookToPrefixes.Key);
 
             if (codes.Count() != 1)
             {

@@ -14,252 +14,101 @@ using SIL.ObjectModel;
 
 namespace ClearBible.Engine.Translation
 {
-    internal class Vocabulary : IWordVocabulary
+    public class ManuscriptWordAlignmentModel :  IWordAlignmentModel, IDisposable
     {
-        private readonly Model _model;
-        private readonly bool _isSource;
+        private IWordAlignmentModel _wordAlignmentModel { get; }
 
-        public Vocabulary(Model model, bool isSource)
-        {
-            _model = model;
-            _isSource = isSource;
-        }
-        public string this[int index] => throw new NotImplementedException();
+        private readonly IManuscriptWordAligner _aligner;
 
-        public int Count => throw new NotImplementedException();
-
-        public IEnumerator<string> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        public int IndexOf(string word)
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    internal class Model : IDisposable
-    {
-        public static Model CreateModel()
-        {
-            return new Model();
-        }
-        public static Model OpenModel(string prefFileName)
-        {
-            return new Model();
-        }
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public class ManuscriptWordAlignmentModel : DisposableBase, IWordAlignmentModel
-    {
-        private string? _prefFileName;
-        private Model? _model;
-        private Vocabulary? _sourceWords;
-        private Vocabulary? _targetWords;
-
+        
         /// <summary>
-        /// For untrained smt word alignment model
+        /// 
         /// </summary>
-        public ManuscriptWordAlignmentModel()
+        /// <param name="aligner"></param>
+        /// <param name="prefFileName">Set to load previously trained and saved model.</param>
+        public ManuscriptWordAlignmentModel(IManuscriptWordAligner aligner, string prefFileName = null)
         {
-            SetModel(new Model());
-        }
+            _aligner = aligner;
+            _wordAlignmentModel = aligner.WordAlignmentModel;
 
-        public ManuscriptWordAlignmentModel(string prefFileName, bool createNew = false)
-        {
-            if (createNew || !File.Exists(prefFileName + ".src"))
-                CreateNew(prefFileName);
-            else
-                Load(prefFileName);
-        }
-
-        public ITrainer CreateTrainer(
-                IWordAlignmentModel smtWordAlignmentModel,
-                bool smtWordAligmentModelIsTrained,
-                IManuscriptTree manuscriptTree,
-                ParallelTextCorpus parallelTextCorpus,
-                ManuscriptWordAlignmentConfig config,
-                ITokenProcessor? sourcePreprocessor = null,
-                ITokenProcessor? targetPreprocessor = null, 
-                int maxCorpusCount = int.MaxValue)
-        {
-            CheckDisposed();
-            return new Trainer(
-                this,
-                smtWordAlignmentModel,
-                smtWordAligmentModelIsTrained,
-                manuscriptTree,
-                parallelTextCorpus,
-                config,
-                sourcePreprocessor,
-                targetPreprocessor,
-                maxCorpusCount);
-       }
-        internal void SetModel(Model model)
-        {
-            if (_model != null)
+            if (!string.IsNullOrEmpty(prefFileName))
             {
-                _model.Dispose();
+                Load(prefFileName);
             }
-            _model = model;
-            _sourceWords = new Vocabulary(model, true);
-            _targetWords = new Vocabulary(model, false);
         }
-        public IWordVocabulary SourceWords => throw new NotImplementedException();
+        public IWordVocabulary SourceWords
+        {
+            get
+            {
+                return _wordAlignmentModel.SourceWords;
+            }
+        }
 
-        public IWordVocabulary TargetWords => throw new NotImplementedException();
+        public IWordVocabulary TargetWords
+        {
+            get
+            {
+                return _wordAlignmentModel.TargetWords;
+            }
+        }
 
         public WordAlignmentMatrix GetBestAlignment(IReadOnlyList<string> sourceSegment, IReadOnlyList<string> targetSegment)
         {
-            throw new NotImplementedException();
+            return _aligner.GetBestAlignment(sourceSegment, targetSegment);
         }
         public IEnumerable<(int TargetWordIndex, double Score)> GetTranslations(int sourceWordIndex, double threshold = 0)
         {
-            throw new NotImplementedException();
+            return _wordAlignmentModel.GetTranslations(sourceWordIndex, threshold);
         }
-        protected override void DisposeManagedResources()
-        {
-            base.DisposeManagedResources();
-        }
-
-        /// <summary>
-        /// Not implemented.
-        /// </summary>
-        /// <param name="prefFileName"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void Load(string prefFileName)
-        {
-            if (!File.Exists(prefFileName + ".src"))
-                throw new FileNotFoundException("The word alignment model configuration could not be found.");
-
-            _prefFileName = prefFileName;
-            SetModel(Model.OpenModel(_prefFileName));
-        }
-
-        /// <summary>
-        /// Not implemented.
-        /// </summary>
-        /// <param name="prefFileName"></param>
-        /// <returns></returns>
-        public Task LoadAsync(string prefFileName)
-        {
-            Load(prefFileName);
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Not implemented
-        /// </summary>
-        /// <param name="prefFileName"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void CreateNew(string prefFileName)
-        {
-            _prefFileName = prefFileName;
-            SetModel(Model.CreateModel());
-        }
-
-        public Task SaveAsync()
-        {
-            CheckDisposed();
-
-            Save();
-            return Task.CompletedTask;
-        }
-
-        public void Save()
-        {
-            CheckDisposed();
-
-            if (!string.IsNullOrEmpty(_prefFileName))
-                ;
-                //IMPL: save the model
-        }
-
-        /// <summary>
-        /// Not implemented. Use other overload instead.
-        /// </summary>
-        /// <param name="corpus"></param>
-        /// <param name="sourcePreprocessor"></param>
-        /// <param name="targetPreprocessor"></param>
-        /// <param name="maxCorpusCount"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
         public ITrainer CreateTrainer(ParallelTextCorpus corpus, ITokenProcessor? sourcePreprocessor = null, ITokenProcessor? targetPreprocessor = null, int maxCorpusCount = int.MaxValue)
         {
-            throw new NotImplementedException();
+            return new ManuscriptWordAlignmentModelTrainer(
+                _aligner,
+                corpus,
+                null,
+                targetPreprocessor,
+                maxCorpusCount
+                );
         }
-        public SIL.ObjectModel.IReadOnlySet<int> SpecialSymbolIndices => throw new NotImplementedException();
+        public SIL.ObjectModel.IReadOnlySet<int> SpecialSymbolIndices => _wordAlignmentModel.SpecialSymbolIndices;
 
         public double GetAlignmentScore(int sourceLen, int prevSourceIndex, int sourceIndex, int targetLen, int prevTargetIndex, int targetIndex)
         {
-            throw new NotImplementedException();
+            return _aligner.GetAlignmentScore(sourceLen, prevSourceIndex, sourceIndex, targetLen, prevTargetIndex, targetIndex);
         }
 
         public IEnumerable<(string TargetWord, double Score)> GetTranslations(string sourceWord, double threshold = 0)
         {
-            throw new NotImplementedException();
+            return _wordAlignmentModel.GetTranslations(sourceWord);
         }
 
         public double GetTranslationScore(string sourceWord, string targetWord)
         {
-            throw new NotImplementedException();
+            return _wordAlignmentModel.GetTranslationScore(sourceWord, targetWord);
         }
 
         public double GetTranslationScore(int sourceWordIndex, int targetWordIndex)
         {
-            throw new NotImplementedException();
+            return _wordAlignmentModel.GetTranslationScore(sourceWordIndex, targetWordIndex);
         }
 
-        private class Trainer : ManuscriptWordAlignmentModelTrainer
+        public void Load(string prefFileName)
         {
-            internal Trainer(
-                ManuscriptWordAlignmentModel manuscriptWordAlignmentModel,
-                IWordAlignmentModel smtWordAlignmentModel,
-                bool smtWordAligmentModelIsTrained,
-                IManuscriptTree manuscriptTree,
-                ParallelTextCorpus parallelTextCorpus,
-                ManuscriptWordAlignmentConfig config,
-                ITokenProcessor? sourcePreprocessor = null,
-                ITokenProcessor? targetPreprocessor = null,
-                int maxCorpusCount = int.MaxValue)
-                : base(
-                      manuscriptWordAlignmentModel,
-                      smtWordAlignmentModel,
-                      smtWordAligmentModelIsTrained,
-                      manuscriptTree,
-                      parallelTextCorpus,
-                      null,
-                      manuscriptWordAlignmentModel._prefFileName,
-                      config, 
-                      sourcePreprocessor, 
-                      targetPreprocessor, 
-                      maxCorpusCount)
-            {
-            }
-
-            /// <summary>
-            /// Disposes SMTWordAlignmentModel similar to machine's design pattern.
-            /// Machine's base class supports saving the model to the filesystem if preffile is set. 
-            /// Ours is instead no-op because not sure yet if we need to save and if so how we would do so
-            /// given we contain a smt aligner.
-            /// </summary>
-            public override void Save()
-            {
-                Dispose();
-                base.Save();
-
-                //
-            }
+            _aligner.Load(prefFileName);
+        }
+        public Task SaveAsync(string prefFileName)
+        {
+            return _aligner.SaveAsync(prefFileName);
         }
 
+        public void Save(string prefFileName)
+        {
+            _aligner.Save(prefFileName);
+        }
+
+        public void Dispose()
+        {
+            _aligner.Dispose();
+        }
     }
 }

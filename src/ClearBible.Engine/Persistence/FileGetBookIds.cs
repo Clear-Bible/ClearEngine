@@ -1,12 +1,15 @@
-﻿using System;
+﻿using ClearBible.Engine.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static ClearBible.Engine.Persistence.FileGetBookIds;
 
-namespace ClearBible.Engine.Corpora
+namespace ClearBible.Engine.Persistence
 {
-    public static class Mappings
+    public static class _Mappings
     {
         public static Dictionary<string, ParatextBook> ManuscriptFileBookToSILBookPrefixes = new()
         {
@@ -80,6 +83,63 @@ namespace ClearBible.Engine.Corpora
 
         public record ParatextBook(string code, string abbr, string shortName, string longName, string id);
     }
+
+
+    public static class FileGetBookIds
+    {
+        public record BookId(string silCannonBookAbbrev, string silCannonBookNum, string clearTreeBookAbbrev, string clearTreeBookNum);
+
+        private static string _fileName = "books.csv";
+        private static bool _fileNameLoaded = false;
+        private static List<BookId> _bookIds = new();
+        public static string Filename
+        {
+            get
+            {
+                return _fileName;
+            }
+            set
+            {
+                if (!_fileName.Equals(value))
+                {
+                    _fileName = value;
+                    _fileNameLoaded = false;
+                }
+                
+            }
+        }
+ 
+        public static List<BookId> BookIds { 
+            get
+            {
+                if (!_fileNameLoaded)
+                {
+                    _bookIds.Clear();
+                    using (var reader = new StreamReader(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + _fileName))
+                    {
+                        string? line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            int commentLocation = line?.IndexOf('#') ?? -1;
+                            if (commentLocation != -1)
+                            {
+                                line = line?.Substring(0, commentLocation) ?? "";
+                            }
+                            var pieces = line?.Split(',') ?? new string[0];
+                            if (pieces.Length >= 4)
+                            {
+                                _bookIds.Add(new BookId(pieces[0], pieces[1], pieces[2], pieces[3]));
+                            }
+                        }
+                    }
+                    _fileNameLoaded = true;
+                }
+                return _bookIds;
+            }
+        }
+    }
 }
+
+
 
 

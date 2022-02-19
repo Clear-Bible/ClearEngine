@@ -13,147 +13,52 @@ namespace ClearBible.Engine.Translation
 {
     public class ManuscriptWordAlignmentModelTrainer : DisposableBase, ITrainer
     {
-        private readonly IManuscriptTree _manuscriptTree;
-        private readonly IWordAlignmentModel _smtWordAlignmentModel;
-        private readonly ParallelTextCorpus? _parallelTextCorpus = null;
-        private readonly string? _targetFileName = null;
+        private ITrainer _smtTrainer;
+        private IManuscriptWordAligner _aligner;
         private readonly string? _prefFileName;
-        private readonly ManuscriptWordAlignmentConfig _config;
-        private readonly ITokenProcessor? _sourcePreprocessor;
-        private readonly ITokenProcessor? _targetPreprocessor;
-        private readonly int _maxCorpusCount;
-
-        private ITrainer? _smtTrainer;
-        public ManuscriptWordAlignmentModel ManuscriptWordAlignmentModel { get; init; }
-
-        internal ManuscriptWordAlignmentModelTrainer(
-            ManuscriptWordAlignmentModel manuscriptWordAlignmentModel,
-            IWordAlignmentModel smtWordAlignmentModel,
-            bool smtWordAligmentModelIsTrained,
-            IManuscriptTree manuscriptTree,
-            ParallelTextCorpus? parallelTextCorpus,
-            string? targetFileName,
-            string? prefFileName,
-            ManuscriptWordAlignmentConfig config,
-            ITokenProcessor? sourcePreprocessor = null,
-            ITokenProcessor? targetPreprocessor = null,
-            int maxCorpusCount = int.MaxValue)
-        {
-            ManuscriptWordAlignmentModel = manuscriptWordAlignmentModel;
-             _smtWordAlignmentModel = smtWordAlignmentModel;
-            _manuscriptTree = manuscriptTree;
-            _parallelTextCorpus = parallelTextCorpus;
-            _targetFileName = targetFileName;
-            _prefFileName = prefFileName;
-            _config = config;
-            _sourcePreprocessor = sourcePreprocessor;
-            _targetPreprocessor = targetPreprocessor;
-            _maxCorpusCount = maxCorpusCount;
-
-            if (!smtWordAligmentModelIsTrained)
-            {
-                createSmtTrainer(smtWordAlignmentModel);
-            }
-        }
-
-        /// <summary>
-        /// Not implemented.
-        /// </summary>
-        /// <param name="smtWordAlignmentModel"></param>
-        /// <param name="smtWordAligmentModelIsTrained"></param>
-        /// <param name="manuscriptTree"></param>
-        /// <param name="targetFileName"></param>
-        /// <param name="prefFileName"></param>
-        /// <param name="config"></param>
-        /// <param name="sourcePreprocessor"></param>
-        /// <param name="targetPreprocessor"></param>
-        /// <param name="maxCorpusCount"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public ManuscriptWordAlignmentModelTrainer(
-            IWordAlignmentModel smtWordAlignmentModel,
-            bool smtWordAligmentModelIsTrained,
-            ManuscriptFileTree manuscriptTree,
-            string targetFileName,
-            string? prefFileName,
-            ManuscriptWordAlignmentConfig config,
-            ITokenProcessor? sourcePreprocessor = null,
-            ITokenProcessor? targetPreprocessor = null,
-            int maxCorpusCount = int.MaxValue)
-            : this(
-                  new ManuscriptWordAlignmentModel(),
-                  smtWordAlignmentModel, 
-                  smtWordAligmentModelIsTrained, 
-                  manuscriptTree, 
-                  null,
-                  targetFileName,
-                  prefFileName,
-                  config, 
-                  sourcePreprocessor, 
-                  targetPreprocessor, 
-                  maxCorpusCount)
-        {
-            throw new NotImplementedException();
-        }
 
         public ManuscriptWordAlignmentModelTrainer(
-            IWordAlignmentModel smtWordAlignmentModel,
-            bool smtWordAligmentModelIsTrained,
-            ManuscriptFileTree manuscriptTree,
+            IManuscriptWordAligner aligner,
             ParallelTextCorpus parallelTextCorpus,
             string? prefFileName,
-            ManuscriptWordAlignmentConfig config,
-            ITokenProcessor? sourcePreprocessor = null,
-            ITokenProcessor? targetPreprocessor = null,
-            int maxCorpusCount = int.MaxValue)
-            : this(
-                  new ManuscriptWordAlignmentModel(),
-                  smtWordAlignmentModel,
-                  smtWordAligmentModelIsTrained,
-                  manuscriptTree,
-                  parallelTextCorpus,
-                  null,
-                  prefFileName,
-                  config,
-                  sourcePreprocessor,
-                  targetPreprocessor,
-                  maxCorpusCount)
+            ITokenProcessor? targetPreprocessor,
+            int maxCorpusCount
+            )
         {
-        }
-        private void createSmtTrainer(IWordAlignmentModel smtWordAlignmentModel)
-        {
-            _smtTrainer = smtWordAlignmentModel.CreateTrainer(_parallelTextCorpus, _sourcePreprocessor,
-                _targetPreprocessor, _maxCorpusCount);
+            _aligner = aligner;
+            _prefFileName = prefFileName;
+            _smtTrainer = _aligner.WordAlignmentModel.CreateTrainer(parallelTextCorpus, null, targetPreprocessor, maxCorpusCount);
         }
         public TrainStats? Stats => _smtTrainer?.Stats;
 
         protected override void DisposeManagedResources()
         {
-             _smtTrainer?.Dispose();
+             _smtTrainer.Dispose();
         }
 
         public virtual void Save()
         {
-            ManuscriptWordAlignmentModel.SetModel(null);
-            CheckDisposed();
+            _smtTrainer.Save();
+            _aligner.Save(_prefFileName);
+            // calling _aligner.Save() so that it can (1) overwrite file that _smtTrainer may create if prefFile is set on trainer
+            // and (2) tell the aligner to save.
 
-            _smtTrainer?.Save();
-            return;
         }
 
         public Task SaveAsync()
         {
-            CheckDisposed();
-
-            _smtTrainer?.SaveAsync();
-            return Task.CompletedTask;
+            _smtTrainer.SaveAsync();
+            return _aligner.SaveAsync(_prefFileName); 
+            // calling _aligner.Save() so that it can (1) overwrite file that _smtTrainer may create if prefFile is set on trainer
+            // and (2) tell the aligner to save.
         }
 
         public void Train(IProgress<ProgressStatus> progress = null, Action checkCanceled = null)
         {
 
             var reporter = new PhasedProgressReporter(progress,
-                new Phase("Training smt model"),
-                new Phase("Refining training alignments with ManuscriptTreeAligner"));
+                new Phase("Training smt model(s)"));
+                //new Phase("Refining training alignments with ManuscriptTreeAligner"));
 
             using (PhaseProgress phaseProgress = reporter.StartNextPhase())
             {
@@ -163,10 +68,10 @@ namespace ClearBible.Engine.Translation
                 }
             }
             checkCanceled?.Invoke();
-            using (PhaseProgress phaseProgress = reporter.StartNextPhase())
-            {
+            //using (PhaseProgress phaseProgress = reporter.StartNextPhase())
+            //{
                 //continue with treealign
-            }
+            //}
         }
     }
 }

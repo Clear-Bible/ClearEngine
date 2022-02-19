@@ -3,7 +3,7 @@ using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Scripture;
 using System.Xml.Linq;
-using static ClearBible.Engine.Corpora.Mappings;
+//using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.Corpora
 {
