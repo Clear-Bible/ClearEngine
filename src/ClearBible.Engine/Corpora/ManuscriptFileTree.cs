@@ -1,9 +1,5 @@
-﻿using ClearBible.Clear3.API;
-using ClearBible.Clear3.SubTasks;
-using ClearBible.Engine.Persistence;
-using ClearBible.Engine.Translation;
-using SIL.Machine.Corpora;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
+
 using static ClearBible.Engine.Corpora.IManuscriptText;
 using static ClearBible.Engine.Persistence.FileGetBookIds;
 

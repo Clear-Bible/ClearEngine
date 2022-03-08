@@ -1,7 +1,8 @@
-﻿using SIL.Machine.Corpora;
+﻿using System.Text;
+
+using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Scripture;
-using System.Text;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -11,9 +12,19 @@ namespace ClearBible.Engine.Corpora
     /// </summary>
     public class EngineUsfmFileText : UsfmFileText
     {
-        public EngineUsfmFileText(ITokenizer<string, int, string> wordTokenizer, UsfmStylesheet stylesheet, Encoding encoding, string fileName, ScrVers? versification = null, bool includeMarkers = false)
+        private readonly IEngineTextConfig _engineTextConfig;
+
+        public EngineUsfmFileText(
+            ITokenizer<string, int, string> wordTokenizer,
+            UsfmStylesheet stylesheet,
+            Encoding encoding,
+            string fileName,
+            ScrVers? versification,
+            bool includeMarkers,
+            IEngineTextConfig engineTextConfig)
             : base(wordTokenizer, stylesheet, encoding, fileName, versification, includeMarkers)
         {
+            _engineTextConfig = engineTextConfig;
         }
 
         /// <summary>
@@ -136,7 +147,20 @@ namespace ClearBible.Engine.Corpora
 
             //Do not sort since sequential TextSegments define ranges.
 
-            return GetSegmentsInDocOrder(includeText: includeText);
+            if (!_engineTextConfig.DoMachineVersification)
+            {
+                return GetSegmentsInDocOrder(includeText: includeText);
+            }
+            return base.GetSegments(includeText, basedOn);
+        }
+        protected override TextSegment CreateTextSegment(bool includeText, string text, object segRef, bool isSentenceStart = true, bool isInRange = false, bool isRangeStart = false)
+        {
+            var textSegments = base.CreateTextSegment(includeText, text, segRef, isSentenceStart, isInRange, isRangeStart);
+            if (_engineTextConfig.TextSegmentProcessor == null)
+            {
+                return textSegments;
+            }
+            return _engineTextConfig.TextSegmentProcessor.Process(textSegments);
         }
     }
 }

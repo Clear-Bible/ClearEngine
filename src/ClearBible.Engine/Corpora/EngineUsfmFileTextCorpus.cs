@@ -1,11 +1,10 @@
-﻿using SIL.Machine.Corpora;
+﻿using System.Text;
+
+using ClearBible.Engine.Tokenization;
+using SIL.Machine.Corpora;
+
 using SIL.Machine.Tokenization;
 using SIL.Scripture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -18,21 +17,32 @@ namespace ClearBible.Engine.Corpora
     /// This override returns custom Engine texts through a new method GetEngineText() which doesn't attempt to 
     /// group segments by versification when Engine wants to replace Machine's versification with its own versification mapping.
     /// </summary>
-    public class EngineUsfmFileTextCorpus : UsfmFileTextCorpus, IEngineCorpus
+    public class EngineUsfmFileTextCorpus : UsfmFileTextCorpus, IEngineCorpus, IEngineTextConfig
     {
-        public EngineUsfmFileTextCorpus(ITokenizer<string, int, string> wordTokenizer, string stylesheetFileName, 
-            Encoding encoding, string projectPath, ScrVers? versification = null, bool includeMarkers = false, string filePattern = "*.SFM")
+        public EngineUsfmFileTextCorpus(
+            ITokenizer<string, int, string> wordTokenizer, 
+            string stylesheetFileName, 
+            Encoding encoding, 
+            string projectPath, 
+            ScrVers? versification = null,
+            ITextSegmentProcessor? textSegmentProcessor = null,
+            bool includeMarkers = false, 
+            string filePattern = "*.SFM")
             : base(wordTokenizer, stylesheetFileName, encoding, projectPath, versification, includeMarkers, filePattern)
         {
+            TextSegmentProcessor = textSegmentProcessor;
+
             var stylesheet = new UsfmStylesheet(stylesheetFileName);
             foreach (string sfmFileName in Directory.EnumerateFiles(projectPath, filePattern))
             {
                 var engineText = new EngineUsfmFileText(wordTokenizer, stylesheet, encoding, sfmFileName, Versification,
-                    includeMarkers);
+                    includeMarkers, this);
                 EngineTextDictionary[engineText.Id] = engineText;
             }
         }
 
+        public ITextSegmentProcessor? TextSegmentProcessor { get; set; }
+        public bool DoMachineVersification { get; set; } = true;
         protected Dictionary<string, IText> EngineTextDictionary { get;} = new Dictionary<string, IText>();
 
         /// <summary>

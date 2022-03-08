@@ -1,14 +1,9 @@
-﻿using ClearBible.Engine.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using static ClearBible.Engine.Persistence.FileGetBookIds;
+﻿using System.Reflection;
+
 
 namespace ClearBible.Engine.Persistence
 {
+    /*
     public static class _Mappings
     {
         public static Dictionary<string, ParatextBook> ManuscriptFileBookToSILBookPrefixes = new()
@@ -83,7 +78,7 @@ namespace ClearBible.Engine.Persistence
 
         public record ParatextBook(string code, string abbr, string shortName, string longName, string id);
     }
-
+    */
 
     public static class FileGetBookIds
     {

@@ -1,11 +1,7 @@
 ﻿using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Scripture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ClearBible.Engine.Corpora
 {
@@ -15,9 +11,16 @@ namespace ClearBible.Engine.Corpora
     /// </summary>
     public class EngineUsxFileText : UsxFileText
     {
-        public EngineUsxFileText(ITokenizer<string, int, string> wordTokenizer, string fileName, ScrVers? versification = null) 
+        private readonly IEngineTextConfig _engineTextConfig;
+
+        public EngineUsxFileText(
+            ITokenizer<string, int, string> wordTokenizer, 
+            string fileName, 
+            ScrVers? versification,
+            IEngineTextConfig engineTextConfig) 
             : base(wordTokenizer, fileName, versification)
         {
+            _engineTextConfig = engineTextConfig;
         }
 
         /// <summary>
@@ -39,7 +42,22 @@ namespace ClearBible.Engine.Corpora
             //Do not sort since sequential TextSegments define ranges.
 
             // SEE NOTE IN EngineUsfmFileText.GetSegments() as to why this override is necessary and its limitations.
-            return GetSegmentsInDocOrder(includeText: includeText);
+
+            if (!_engineTextConfig.DoMachineVersification)
+            {
+                return GetSegmentsInDocOrder(includeText: includeText);
+            }
+            return base.GetSegments(includeText, basedOn);
+        }
+
+        protected override TextSegment CreateTextSegment(bool includeText, string text, object segRef, bool isSentenceStart = true, bool isInRange = false, bool isRangeStart = false)
+        {
+            var textSegments = base.CreateTextSegment(includeText, text, segRef, isSentenceStart, isInRange, isRangeStart);
+            if (_engineTextConfig.TextSegmentProcessor == null)
+            {
+                return textSegments;
+            }
+            return _engineTextConfig.TextSegmentProcessor.Process(textSegments);
         }
     }
 }

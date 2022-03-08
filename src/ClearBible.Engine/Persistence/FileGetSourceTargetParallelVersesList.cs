@@ -1,7 +1,5 @@
-﻿using ClearBible.Clear3.API;
-using ClearBible.Clear3.SubTasks;
-using ClearBible.Engine.Corpora;
-using ClearBible.Engine.Translation;
+﻿using ClearBible.Engine.Corpora;
+
 
 namespace ClearBible.Engine.Persistence
 {

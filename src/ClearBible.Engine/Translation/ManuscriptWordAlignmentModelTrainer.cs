@@ -1,13 +1,7 @@
-﻿using ClearBible.Engine.Corpora;
-using SIL.Machine.Corpora;
+﻿using SIL.Machine.Corpora;
 using SIL.Machine.Translation;
 using SIL.Machine.Utils;
 using SIL.ObjectModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClearBible.Engine.Translation
 {

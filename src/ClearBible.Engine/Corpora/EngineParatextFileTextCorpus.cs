@@ -1,12 +1,10 @@
-﻿using SIL.Machine.Corpora;
-using SIL.Machine.Tokenization;
-using SIL.Scripture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using System.Xml.Linq;
+
+using ClearBible.Engine.Tokenization;
+
+using SIL.Machine.Corpora;
+using SIL.Machine.Tokenization;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -19,11 +17,17 @@ namespace ClearBible.Engine.Corpora
 	/// This override returns custom Engine texts through a new method GetEngineText() which doesn't attempt to 
 	/// group segments by versification when Engine wants to replace Machine's versification with its own versification mapping.
 	/// </summary>
-	public class EngineParatextTextCorpus : ParatextTextCorpus, IEngineCorpus
-    {
-        public EngineParatextTextCorpus(ITokenizer<string, int, string> wordTokenizer, string projectDir, bool includeMarkers = false)
+	public class EngineParatextTextCorpus : ParatextTextCorpus, IEngineCorpus, IEngineTextConfig
+	{
+        public EngineParatextTextCorpus(
+			ITokenizer<string, int, string> wordTokenizer, 
+			string projectDir, 
+			ITextSegmentProcessor? textSegmentProcessor = null,
+			bool includeMarkers = false)
             : base(wordTokenizer, projectDir, includeMarkers)
         {
+			TextSegmentProcessor = textSegmentProcessor;
+
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 			string settingsFileName = Path.Combine(projectDir, "Settings.xml");
 			if (!File.Exists(settingsFileName))
@@ -66,11 +70,14 @@ namespace ClearBible.Engine.Corpora
 			foreach (string sfmFileName in Directory.EnumerateFiles(projectDir, $"{prefix}*{suffix}"))
 			{
 				var engineText = new EngineUsfmFileText(wordTokenizer, stylesheet, encoding, sfmFileName, Versification,
-					includeMarkers);
+					includeMarkers, this);
 				EngineTextDictionary[engineText.Id] = engineText;
 			}
         }
-        protected Dictionary<string, IText> EngineTextDictionary { get;} = new Dictionary<string, IText>();
+
+		public ITextSegmentProcessor? TextSegmentProcessor { get; set; }
+		public bool DoMachineVersification { get; set; } = true;
+		protected Dictionary<string, IText> EngineTextDictionary { get;} = new Dictionary<string, IText>();
 
 		/// <summary>
 		/// Used to obtain Engine USFM texts (upon which are within Paratext projects) which don't attempt to group segments based on Machine versification

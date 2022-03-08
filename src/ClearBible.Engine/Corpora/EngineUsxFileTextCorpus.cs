@@ -1,11 +1,8 @@
-﻿using SIL.Machine.Corpora;
+﻿using ClearBible.Engine.Tokenization;
+
+using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Scripture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -18,18 +15,26 @@ namespace ClearBible.Engine.Corpora
     /// This override returns custom Engine texts through a new method GetEngineText() which doesn't attempt to 
     /// group segments by versification when Engine wants to replace Machine's versification with its own versification mapping.
     /// </summary>
-    public class EngineUsxFileTextCorpus : UsxFileTextCorpus, IEngineCorpus
+    public class EngineUsxFileTextCorpus : UsxFileTextCorpus, IEngineCorpus, IEngineTextConfig
     {
-        public EngineUsxFileTextCorpus(ITokenizer<string, int, string> wordTokenizer, string projectPath, ScrVers versification = null) 
+        public EngineUsxFileTextCorpus(
+            ITokenizer<string, int, string> wordTokenizer, 
+            string projectPath, 
+            ScrVers? versification = null,
+            ITextSegmentProcessor? textSegmentProcessor = null) 
             : base(wordTokenizer, projectPath, versification)
         {
+            TextSegmentProcessor = textSegmentProcessor;
             //Versification = GetVersification(projectPath, versification);
             foreach (string fileName in Directory.EnumerateFiles(projectPath, "*.usx"))
             {
-                var engineText = new EngineUsxFileText(wordTokenizer, fileName, Versification);
+                var engineText = new EngineUsxFileText(wordTokenizer, fileName, Versification, this);
                 EngineTextDictionary[engineText.Id] = engineText;
             }
         }
+
+        public ITextSegmentProcessor? TextSegmentProcessor { get; set; }
+        public bool DoMachineVersification { get; set; } = true;
         protected Dictionary<string, IText> EngineTextDictionary { get;} = new Dictionary<string, IText>();
 
         /// <summary>

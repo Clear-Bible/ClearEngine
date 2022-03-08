@@ -1,25 +1,25 @@
-﻿using SIL.Machine.Corpora;
-using SIL.Scripture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ClearBible.Engine.Tokenization;
+
+using SIL.Machine.Corpora;
+
 
 namespace ClearBible.Engine.Corpora
 {
-    public class EngineManuscriptFileTextCorpus : ManuscriptFileTextCorpus, IEngineCorpus
+    public class EngineManuscriptFileTextCorpus : ManuscriptFileTextCorpus, IEngineCorpus, IEngineTextConfig
     {
         public EngineManuscriptFileTextCorpus(IManuscriptText manuscriptCorpus) : base(manuscriptCorpus)
         {
-           manuscriptCorpus.GetBooks()
+           Books
                 .Select(book =>
                 {
-                    var engineText = new EngineManuscriptFileText(manuscriptCorpus, book, Versification);
+                    var engineText = new EngineManuscriptFileText(manuscriptCorpus, book, Versification, this);
                     EngineTextDictionary[engineText.Id] = engineText;
                     return book;
                 }).ToList();
         }
+
+        public ITextSegmentProcessor? TextSegmentProcessor { get; set; } = null;
+        public bool DoMachineVersification { get; set; } = true;
         protected Dictionary<string, IText> EngineTextDictionary { get; } = new Dictionary<string, IText>();
         public IText GetEngineText(string id)
         {

@@ -1,10 +1,5 @@
 ﻿using SIL.Machine.Corpora;
 using SIL.Scripture;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -12,13 +7,16 @@ namespace ClearBible.Engine.Corpora
     {
         public ManuscriptFileTextCorpus(IManuscriptText manuscriptCorpus) : base(null)
         {
-           manuscriptCorpus.GetBooks()
+            Books = manuscriptCorpus.GetBooks();
+            Books
                 .Select(book =>
                 {
                     AddText(new ManuscriptFileText(manuscriptCorpus, book, Versification));
                     return book;
                 }).ToList();
         }
+
+        protected IEnumerable<string> Books { get; init; }
         public override ScrVers Versification => ScrVers.Original;
     }
 }

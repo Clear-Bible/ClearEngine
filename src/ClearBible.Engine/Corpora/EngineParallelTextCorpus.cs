@@ -123,6 +123,8 @@ namespace ClearBible.Engine.Corpora
 		{
 			if (SourceTargetParallelVersesList != null)
             {
+				((IEngineTextConfig)SourceCorpus).DoMachineVersification = false;
+				((IEngineTextConfig)TargetCorpus).DoMachineVersification = false;
 				IText sourceText = ((IEngineCorpus) SourceCorpus).GetEngineText(id);
 				IText targetText = ((IEngineCorpus) TargetCorpus).GetEngineText(id);
 				ITextAlignmentCollection textAlignmentCollection = TextAlignmentCorpus[id];
@@ -130,6 +132,8 @@ namespace ClearBible.Engine.Corpora
 			}
 			else
             {
+				((IEngineTextConfig)SourceCorpus).DoMachineVersification = true;
+				((IEngineTextConfig)TargetCorpus).DoMachineVersification = true;
 				IText sourceText = SourceCorpus[id];
 				IText targetText = TargetCorpus[id];
 				ITextAlignmentCollection textAlignmentCollection = TextAlignmentCorpus[id];

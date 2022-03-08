@@ -50,6 +50,7 @@ namespace ClearBible.Engine.Corpora
 			{
 				if (sourceTargetParallelVerses != null)
 				{
+					/*
 					var sourceTextSegments = sourceSegments
 						.Where(textSegment => sourceTargetParallelVerses.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)))
 						.SelectMany(textSegment => textSegment.Segment).ToList();
@@ -63,6 +64,17 @@ namespace ClearBible.Engine.Corpora
 					var targetSegmentRefs = targetSegments
 						.Where(textSegment => sourceTargetParallelVerses.targetVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)))
 						.Select(textSegment => textSegment.SegmentRef).ToList();
+					*/
+
+					var parallelVersesSourceSegments = sourceSegments
+						.Where(textSegment => sourceTargetParallelVerses.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)));
+					var parallelVersesTargetSegments = targetSegments
+						.Where(textSegment => sourceTargetParallelVerses.targetVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)));
+					/*
+					var sourceSegmentRefs = sourceSegmentsParallelVerses
+						.Select(textSegment => textSegment.SegmentRef).ToList();
+					var targetSegmentRefs = sourceSegmentsParallelVerses
+						.Select(textSegment => textSegment.SegmentRef).ToList();
 
 					IReadOnlyCollection<AlignedWordPair>? alignedWordPairs = null;
 					if ( (sourceSegmentRefs.Count() == 1) && (TextAlignmentCollection.Alignments.Count() > 0))
@@ -72,21 +84,13 @@ namespace ClearBible.Engine.Corpora
 							.Select(textAlignment => textAlignment.AlignedWordPairs)
 							.FirstOrDefault();
 					}
-
-					yield return new ParallelTextSegment(
+					*/
+					yield return new EngineParallelTextSegment(
 						Id,
-						sourceSegmentRefs,
-						targetSegmentRefs,
-						sourceTextSegments,
-						targetTextSegments,
-						alignedWordPairs: alignedWordPairs,
-						isSourceSentenceStart: false, 
-						isSourceInRange: false, 
-						isSourceRangeStart: false,
-						isTargetSentenceStart: false, 
-						isTargetInRange: false, 
-						isTargetRangeStart: false,
-						isEmpty: false);
+						parallelVersesSourceSegments,
+						parallelVersesTargetSegments,
+						TextAlignmentCollection
+					);
 				}
 			}
 		}
