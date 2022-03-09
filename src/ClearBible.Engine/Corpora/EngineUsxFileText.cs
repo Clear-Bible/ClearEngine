@@ -11,16 +11,16 @@ namespace ClearBible.Engine.Corpora
     /// </summary>
     public class EngineUsxFileText : UsxFileText
     {
-        private readonly IEngineTextConfig _engineTextConfig;
+        private readonly IEngineCorpus _engineCorpus;
 
         public EngineUsxFileText(
             ITokenizer<string, int, string> wordTokenizer, 
             string fileName, 
             ScrVers? versification,
-            IEngineTextConfig engineTextConfig) 
+            IEngineCorpus engineCorpus) 
             : base(wordTokenizer, fileName, versification)
         {
-            _engineTextConfig = engineTextConfig;
+            _engineCorpus = engineCorpus;
         }
 
         /// <summary>
@@ -31,33 +31,39 @@ namespace ClearBible.Engine.Corpora
         /// <returns>Segments, which are verse and text, as the are in the USX document.</returns>
         public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText basedOn = null)
         {
-
-            /*
-            var segments = GetSegmentsInDocOrder(includeText: true)
-                .ToList();
-            segments.Sort((x, y) => ((VerseRef)x.SegmentRef).CompareTo((VerseRef)y.SegmentRef));
-            return segments;
-            */
-
             //Do not sort since sequential TextSegments define ranges.
 
             // SEE NOTE IN EngineUsfmFileText.GetSegments() as to why this override is necessary and its limitations.
 
-            if (!_engineTextConfig.DoMachineVersification)
+            //apply machine versification if configured.
+            IEnumerable<TextSegment> textSegments;
+            if (!_engineCorpus.DoMachineVersification)
             {
-                return GetSegmentsInDocOrder(includeText: includeText);
+                textSegments = GetSegmentsInDocOrder(includeText: includeText);
             }
-            return base.GetSegments(includeText, basedOn);
-        }
+            else
+            {
+                textSegments = base.GetSegments(includeText, basedOn);
+            }
 
-        protected override TextSegment CreateTextSegment(bool includeText, string text, object segRef, bool isSentenceStart = true, bool isInRange = false, bool isRangeStart = false)
-        {
-            var textSegments = base.CreateTextSegment(includeText, text, segRef, isSentenceStart, isInRange, isRangeStart);
-            if (_engineTextConfig.TextSegmentProcessor == null)
+            // return if no processors configured.
+            if (!includeText || _engineCorpus.TextSegmentProcessor == null)
             {
-                return textSegments;
+                //used yield here so the following foreach with yield, which creates an iterator, is possible
+                foreach (var textSegment in textSegments
+                        .Select(textSegment => new TokenIdsTextSegment(textSegment)))
+                {
+                    yield return textSegment;
+                }
             }
-            return _engineTextConfig.TextSegmentProcessor.Process(textSegments);
+            else
+            {
+                // otherwise process the TextSegments.
+                foreach (var textSegment in textSegments)
+                {
+                    yield return _engineCorpus.TextSegmentProcessor.Process(new TokenIdsTextSegment(textSegment));
+                }
+            }
         }
     }
 }

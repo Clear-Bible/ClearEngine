@@ -12,7 +12,7 @@ namespace ClearBible.Engine.Corpora
     /// </summary>
     public class EngineUsfmFileText : UsfmFileText
     {
-        private readonly IEngineTextConfig _engineTextConfig;
+        private readonly IEngineCorpus _engineCorpus;
 
         public EngineUsfmFileText(
             ITokenizer<string, int, string> wordTokenizer,
@@ -21,10 +21,10 @@ namespace ClearBible.Engine.Corpora
             string fileName,
             ScrVers? versification,
             bool includeMarkers,
-            IEngineTextConfig engineTextConfig)
+            IEngineCorpus engineCorpus)
             : base(wordTokenizer, stylesheet, encoding, fileName, versification, includeMarkers)
         {
-            _engineTextConfig = engineTextConfig;
+            _engineCorpus = engineCorpus;
         }
 
         /// <summary>
@@ -35,37 +35,6 @@ namespace ClearBible.Engine.Corpora
         /// <returns>Segments, which are verse and text, as the are in the USFM document.</returns>
         public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText basedOn = null)
         {
-            /* RM: don't implement like Machine. Less efficient than single sort.
-                
-            //Get them the same way as ScriptureText.GetSegments() except do not combine any verses
-            var segList = new List<(VerseRef Ref, TextSegment Segment)>();
-            var prevVerseRef = new VerseRef();
-            bool outOfOrder = false;
-
-            foreach (TextSegment s in GetSegmentsInDocOrder(includeText: true))
-            {
-                TextSegment seg = s;
-                var verseRef = (VerseRef)seg.SegmentRef;
-                segList.Add((verseRef, seg));
-                if (!outOfOrder && verseRef.CompareTo(prevVerseRef) < 0)
-                    outOfOrder = true;
-                prevVerseRef = verseRef;
-            }
-
-            if (outOfOrder)
-                segList.Sort((x, y) => x.Ref.CompareTo(y.Ref));
-
-            return segList.Select(t => t.Segment);
-            */
-
-            /*
-            var segments = GetSegmentsInDocOrder(includeText: true)
-                .ToList();
-            segments.Sort((x, y) => ((VerseRef)x.SegmentRef).CompareTo((VerseRef)y.SegmentRef));
-            return segments;
-            */
-
-
             /*
                 * NOTE:
                 *  TextSegment
@@ -147,20 +116,35 @@ namespace ClearBible.Engine.Corpora
 
             //Do not sort since sequential TextSegments define ranges.
 
-            if (!_engineTextConfig.DoMachineVersification)
+            //apply machine versification if configured.
+            IEnumerable<TextSegment> textSegments;
+            if (!_engineCorpus.DoMachineVersification)
             {
-                return GetSegmentsInDocOrder(includeText: includeText);
+                textSegments = GetSegmentsInDocOrder(includeText: includeText);
             }
-            return base.GetSegments(includeText, basedOn);
-        }
-        protected override TextSegment CreateTextSegment(bool includeText, string text, object segRef, bool isSentenceStart = true, bool isInRange = false, bool isRangeStart = false)
-        {
-            var textSegments = base.CreateTextSegment(includeText, text, segRef, isSentenceStart, isInRange, isRangeStart);
-            if (_engineTextConfig.TextSegmentProcessor == null)
+            else
             {
-                return textSegments;
+                textSegments = base.GetSegments(includeText, basedOn);
             }
-            return _engineTextConfig.TextSegmentProcessor.Process(textSegments);
+
+            // return if no processors configured.
+            if (!includeText || _engineCorpus.TextSegmentProcessor == null)
+            {
+                //used yield here so the following foreach with yield, which creates an iterator, is possible
+                foreach (var textSegment in textSegments
+                        .Select(textSegment => new TokenIdsTextSegment(textSegment)))
+                {
+                    yield return textSegment;
+                }
+            }
+            else
+            {
+                // otherwise process the TextSegments.
+                foreach (var textSegment in textSegments)
+                {
+                    yield return _engineCorpus.TextSegmentProcessor.Process(new TokenIdsTextSegment(textSegment));
+                }
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ using SIL.Machine.Translation;
 using ClearBible.Engine.Translation;
 using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Persistence;
+using ClearBible.Engine.Tokenization;
 
 
 // obtain both source and target corpora.
@@ -72,6 +73,22 @@ var parallelCorpus = new EngineParallelTextCorpus(sourceCorpus, targetCorpus);
         Console.WriteLine($"Source: {sourceVerseText}");
         Console.WriteLine($"Target: {targetVerseText}");
         Console.WriteLine($"Alignment: {alignment}");
+
+
+        if (textSegment != null && textSegment is EngineParallelTextSegment)
+        {
+            var sourceTokenIds = string.Join(" ", ((EngineParallelTextSegment)textSegment)?.SourceTokenIds?
+                .Select(tokenId => tokenId.ToString()) ?? new string[] { "NONE" });
+            Console.WriteLine($"SourceTokenIds: {sourceTokenIds}");
+
+            var targetTokenIds = string.Join(" ", ((EngineParallelTextSegment)textSegment)?.TargetTokenIds?
+                .Select(tokenId => tokenId.ToString()) ?? new string[] {"NONE"});
+            Console.WriteLine($"TargetTokenIds: {targetTokenIds}");
+
+            IEnumerable<(TokenId, TokenId)> sourceTargetTokenIdPairs = ((EngineParallelTextSegment)textSegment).GetAlignedTokenIdPairs(alignment);
+            var alignments = string.Join(" ", sourceTargetTokenIdPairs.Select(t => $"{t.Item1}->{t.Item2}"));
+            Console.WriteLine($"SourceTokenId->TargetTokenId: {alignments}");
+        }
     }
 
     //await SqlLitePersistManuscriptInfoAlignments.Get().SetLocation("connection string")

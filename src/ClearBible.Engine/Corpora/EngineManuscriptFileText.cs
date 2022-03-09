@@ -8,7 +8,7 @@ namespace ClearBible.Engine.Corpora
     public class EngineManuscriptFileText : ManuscriptFileText
     {
         private readonly IManuscriptText _manuscriptCorpus;
-        private readonly IEngineTextConfig _engineTextConfig;
+        private readonly IEngineCorpus _engineCorpus;
 
         /// <summary>
         /// Creates the Text for a manuscript book.
@@ -20,11 +20,11 @@ namespace ClearBible.Engine.Corpora
             IManuscriptText manuscriptCorpus, 
             string book, 
             ScrVers versification,
-            IEngineTextConfig engineTextConfig)
+            IEngineCorpus engineCorpus)
 			: base(manuscriptCorpus, book, versification)
         {
             _manuscriptCorpus = manuscriptCorpus;
-            _engineTextConfig = engineTextConfig;
+            _engineCorpus = engineCorpus;
         }
 
 
@@ -40,21 +40,37 @@ namespace ClearBible.Engine.Corpora
         public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText basedOn = null)
         {
             // SEE NOTE IN EngineUsfmFileText.GetSegments() as to why this override is necessary and its limitations.
-            if (!_engineTextConfig.DoMachineVersification)
-            {
-                return GetSegmentsInDocOrder(includeText: includeText);
-            }
-            return base.GetSegments(includeText, basedOn);
-        }
 
-        protected override TextSegment CreateTextSegment(bool includeText, string text, object segRef, bool isSentenceStart = true, bool isInRange = false, bool isRangeStart = false)
-        {
-            var textSegments = base.CreateTextSegment(includeText, text, segRef, isSentenceStart, isInRange, isRangeStart);
-            if (_engineTextConfig.TextSegmentProcessor == null)
+            //apply machine versification if configured.
+            IEnumerable<TextSegment> textSegments;
+            if (!_engineCorpus.DoMachineVersification)
             {
-                return textSegments;
+                textSegments = GetSegmentsInDocOrder(includeText: includeText);
             }
-            return _engineTextConfig.TextSegmentProcessor.Process(textSegments);
+            else
+            {
+                textSegments = base.GetSegments(includeText, basedOn);
+            }
+
+            // return if no processors configured.
+            if (!includeText || _engineCorpus.TextSegmentProcessor == null)
+            {
+                //used yield here so the following foreach with yield, which creates an iterator, is possible
+                foreach (var textSegment in textSegments
+                        .Select(textSegment => new TokenIdsTextSegment(textSegment)))
+                {
+                    yield return textSegment;
+                }
+            }
+            else
+            {
+                // otherwise process the TextSegments.
+                foreach (var textSegment in textSegments)
+                {
+                    yield return _engineCorpus.TextSegmentProcessor.Process(new TokenIdsTextSegment(textSegment));
+                }
+            }
+
         }
     }
 }

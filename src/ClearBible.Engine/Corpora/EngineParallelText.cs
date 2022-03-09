@@ -50,41 +50,11 @@ namespace ClearBible.Engine.Corpora
 			{
 				if (sourceTargetParallelVerses != null)
 				{
-					/*
-					var sourceTextSegments = sourceSegments
-						.Where(textSegment => sourceTargetParallelVerses.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)))
-						.SelectMany(textSegment => textSegment.Segment).ToList();
-					var targetTextSegments = targetSegments
-						.Where(textSegment => sourceTargetParallelVerses.targetVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)))
-						.SelectMany(textSegment => textSegment.Segment).ToList();
-
-					var sourceSegmentRefs = sourceSegments
-						.Where(textSegment => sourceTargetParallelVerses.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)))
-						.Select(textSegment => textSegment.SegmentRef).ToList();
-					var targetSegmentRefs = targetSegments
-						.Where(textSegment => sourceTargetParallelVerses.targetVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)))
-						.Select(textSegment => textSegment.SegmentRef).ToList();
-					*/
-
 					var parallelVersesSourceSegments = sourceSegments
 						.Where(textSegment => sourceTargetParallelVerses.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)));
 					var parallelVersesTargetSegments = targetSegments
 						.Where(textSegment => sourceTargetParallelVerses.targetVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)));
-					/*
-					var sourceSegmentRefs = sourceSegmentsParallelVerses
-						.Select(textSegment => textSegment.SegmentRef).ToList();
-					var targetSegmentRefs = sourceSegmentsParallelVerses
-						.Select(textSegment => textSegment.SegmentRef).ToList();
 
-					IReadOnlyCollection<AlignedWordPair>? alignedWordPairs = null;
-					if ( (sourceSegmentRefs.Count() == 1) && (TextAlignmentCollection.Alignments.Count() > 0))
-					{
-						alignedWordPairs = TextAlignmentCollection.Alignments
-							.Where(alignment => alignment.SegmentRef.Equals(sourceSegmentRefs.First()))
-							.Select(textAlignment => textAlignment.AlignedWordPairs)
-							.FirstOrDefault();
-					}
-					*/
 					yield return new EngineParallelTextSegment(
 						Id,
 						parallelVersesSourceSegments,

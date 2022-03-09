@@ -7,29 +7,11 @@ using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.Tokenization
 {
-    public record SourceTokenId : TokenId
+    public record TokenId(int BookNum, int ChapterNum, int VerseNum, int WordNum, int SubWordNum)
     {
-        public SourceTokenId(string attr)
+        public override string ToString()
         {
-            BookId? bookId = BookIds.Find(bookId => bookId.clearTreeBookNum.Equals(short.Parse(attr.Substring(0, 2))));
-            if (bookId == null)
-            {
-                throw new InvalidDataException($"The first two characters of attribute value {attr} don't map to a valid Clear tree book number");
-            }
-
-            BookNum = short.Parse(bookId.silCannonBookNum);
-            ChapterNum = short.Parse(attr.Substring(2, 3));
-            VerseNum = short.Parse(attr.Substring(5, 3));
-            WordNum = short.Parse(attr.Substring(8, 3));
-            SubsegmentNum = short.Parse(attr.Substring(11, 1));
+            return $"{BookNum.ToString("000")}{ChapterNum.ToString("000")}{VerseNum.ToString("000")}{WordNum.ToString("000")}{SubWordNum.ToString("000")}";
         }
-    }
-    public record TokenId
-    {
-        public short BookNum { get; init; } = default!;
-        public short ChapterNum { get; init; } = default!;
-        public short VerseNum { get; init; } = default!;
-        public short WordNum { get; init; } = default!;
-        public short SubsegmentNum { get; init; } = default!;
     }
 }

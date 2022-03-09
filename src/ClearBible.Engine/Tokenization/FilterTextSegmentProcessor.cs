@@ -1,4 +1,6 @@
-﻿using SIL.Machine.Corpora;
+﻿using ClearBible.Engine.Corpora;
+using SIL.Machine.Corpora;
+using SIL.Scripture;
 
 namespace ClearBible.Engine.Tokenization
 {
@@ -11,19 +13,25 @@ namespace ClearBible.Engine.Tokenization
             _tokensToFilter = tokensToFilter;
         }
 
-        public TextSegment Process(TextSegment textSegment)
+        public TokenIdsTextSegment Process(TokenIdsTextSegment tokenIdsTextSegment)
         {
-            //List<string> tokens = new List<string>();
-            //List
-            for (int i = 0; i < textSegment.Segment.Count(); i++)
+            List<TokenId> tokenIds = new List<TokenId>();
+            List<string> tokens = new List<string>();
+
+            if (tokenIds.Count() != tokens.Count())
             {
-                var foo = textSegment.Segment[i];
-
+                throw new InvalidDataException($"the number of tokenIds and tokens are different for verse {(VerseRef)tokenIdsTextSegment.SegmentRef}");
             }
-            var segment = textSegment.Segment
-                .Where(s => !_tokensToFilter.Contains(s));
 
-            return textSegment;
+            for (int i = 0; i < tokenIdsTextSegment.Segment.Count(); i++)
+            {
+                if (!_tokensToFilter.Contains(tokenIdsTextSegment.Segment[i]))
+                {
+                    tokenIds.Add(tokenIdsTextSegment.TokenIds[i]);
+                    tokens.Add(tokenIdsTextSegment.Segment[i]);
+                }
+            }
+            return new TokenIdsTextSegment(tokenIdsTextSegment, tokens, tokenIds);
         }
     }
 }

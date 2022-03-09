@@ -82,7 +82,6 @@ namespace ClearBible.Engine.Corpora
 
                 //Versifications as used in machine doesn't support combining verses.
                 sourceTargetParallelVersesList = new();
-				//var foo = GetSegments(includeText: false).ToList();
 
                 _ = GetSegments(includeText: false)
 					.Select(parallelTextSegment =>
@@ -106,8 +105,6 @@ namespace ClearBible.Engine.Corpora
 			else
 			{
 				//for rebuilding map from file: use to VerseRef.VerseRef(int bookNum, int chapterNum, int verseNum, ScrVers versification) constructor.
-				//var sourceVersification = sourceCorpus.Versification;
-				//var targetVersification = sourceCorpus.Versification;
 				SourceTargetParallelVersesList = sourceTargetParallelVersesList;
 			}
 		}
@@ -121,21 +118,20 @@ namespace ClearBible.Engine.Corpora
 
 		protected override ParallelText CreateParallelText(string id)
 		{
+			IText sourceText = SourceCorpus[id];
+			IText targetText = TargetCorpus[id];
+
 			if (SourceTargetParallelVersesList != null)
             {
-				((IEngineTextConfig)SourceCorpus).DoMachineVersification = false;
-				((IEngineTextConfig)TargetCorpus).DoMachineVersification = false;
-				IText sourceText = ((IEngineCorpus) SourceCorpus).GetEngineText(id);
-				IText targetText = ((IEngineCorpus) TargetCorpus).GetEngineText(id);
+				((IEngineCorpus)SourceCorpus).DoMachineVersification = false;
+				((IEngineCorpus)TargetCorpus).DoMachineVersification = false;
 				ITextAlignmentCollection textAlignmentCollection = TextAlignmentCorpus[id];
 				return new EngineParallelText(sourceText, targetText, SourceTargetParallelVersesList, textAlignmentCollection, _segmentRefComparer);
 			}
 			else
             {
-				((IEngineTextConfig)SourceCorpus).DoMachineVersification = true;
-				((IEngineTextConfig)TargetCorpus).DoMachineVersification = true;
-				IText sourceText = SourceCorpus[id];
-				IText targetText = TargetCorpus[id];
+				((IEngineCorpus)SourceCorpus).DoMachineVersification = true;
+				((IEngineCorpus)TargetCorpus).DoMachineVersification = true;
 				ITextAlignmentCollection textAlignmentCollection = TextAlignmentCorpus[id];
 				return new ParallelText(sourceText, targetText, textAlignmentCollection, _segmentRefComparer);
 			}

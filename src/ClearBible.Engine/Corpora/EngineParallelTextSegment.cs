@@ -1,6 +1,7 @@
 ﻿using ClearBible.Engine.Tokenization;
 
 using SIL.Machine.Corpora;
+using SIL.Machine.Translation;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -62,19 +63,30 @@ namespace ClearBible.Engine.Corpora
                   false,
                   false)
         {
-            if (sourceSegments is IEnumerable<EngineTextSegment>)
-            {
-                SourceTokenIds = ((IEnumerable<EngineTextSegment>) sourceSegments)
-                    .SelectMany(engineTextSegment => engineTextSegment.TokenIds).ToList();
-            }
-            if (targetSegments is IEnumerable<EngineTextSegment>)
-            {
-                TargetTokenIds = ((IEnumerable<EngineTextSegment>)targetSegments)
-                    .SelectMany(engineTextSegment => engineTextSegment.TokenIds).ToList();
-            }
+
+            SourceTokenIds = sourceSegments
+                .SelectMany(engineTextSegment => ((TokenIdsTextSegment) engineTextSegment).TokenIds).ToList();
+            TargetTokenIds = targetSegments
+                .SelectMany(engineTextSegment => ((TokenIdsTextSegment) engineTextSegment).TokenIds).ToList();
         }
         public IReadOnlyList<TokenId>? SourceTokenIds { get; }
 
         public IReadOnlyList<TokenId>? TargetTokenIds { get; }
+
+        public IEnumerable<(TokenId, TokenId)> GetAlignedTokenIdPairs(WordAlignmentMatrix alignment)
+        {
+                
+            IReadOnlyCollection<AlignedWordPair>  alignedWordPairs = alignment.GetAlignedWordPairs();
+            foreach (AlignedWordPair alignedWordPair in alignedWordPairs)
+            {
+                var sourceTokenId = SourceTokenIds?[alignedWordPair.SourceIndex];
+                var targetTokenId = TargetTokenIds?[alignedWordPair.TargetIndex];
+
+                if (sourceTokenId != null && targetTokenId != null)
+                {
+                    yield return (sourceTokenId, targetTokenId);
+                }
+            }
+        }
     }
 }
