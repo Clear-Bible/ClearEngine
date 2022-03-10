@@ -12,10 +12,12 @@ namespace ClearBible.Engine.Translation
 			WordAlignmentModel = wordAlignmentModel;
 		}
 
+		/* FIXME: how to persist this model that includes SMT and tree alignment?
 		public ManuscriptTreeWordAlginer(string prefFileName, ManuscriptWordAlignmentConfig config)
 		{
 			Load(prefFileName);
 		}
+		*/
 
 		public WordAlignmentMatrix GetBestAlignment(IReadOnlyList<string> sourceSegment,
 			IReadOnlyList<string> targetSegment)

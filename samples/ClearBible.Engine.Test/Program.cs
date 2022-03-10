@@ -77,11 +77,11 @@ var parallelCorpus = new EngineParallelTextCorpus(sourceCorpus, targetCorpus);
 
         if (textSegment != null && textSegment is EngineParallelTextSegment)
         {
-            var sourceTokenIds = string.Join(" ", ((EngineParallelTextSegment)textSegment)?.SourceTokenIds?
+            var sourceTokenIds = string.Join(" ", ((EngineParallelTextSegment)textSegment).SourceTokenIds?
                 .Select(tokenId => tokenId.ToString()) ?? new string[] { "NONE" });
             Console.WriteLine($"SourceTokenIds: {sourceTokenIds}");
 
-            var targetTokenIds = string.Join(" ", ((EngineParallelTextSegment)textSegment)?.TargetTokenIds?
+            var targetTokenIds = string.Join(" ", ((EngineParallelTextSegment)textSegment).TargetTokenIds?
                 .Select(tokenId => tokenId.ToString()) ?? new string[] {"NONE"});
             Console.WriteLine($"TargetTokenIds: {targetTokenIds}");
 

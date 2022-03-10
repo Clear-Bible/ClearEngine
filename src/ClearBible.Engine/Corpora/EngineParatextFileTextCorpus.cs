@@ -29,7 +29,7 @@ namespace ClearBible.Engine.Corpora
 			TextSegmentProcessor = textSegmentProcessor;
 
 			Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-			string settingsFileName = Path.Combine(projectDir, "Settings.xml");
+			string? settingsFileName = Path.Combine(projectDir, "Settings.xml");
 			if (!File.Exists(settingsFileName))
 				settingsFileName = Directory.EnumerateFiles(projectDir, "*.ssf").FirstOrDefault();
 			if (string.IsNullOrEmpty(settingsFileName))
@@ -38,7 +38,7 @@ namespace ClearBible.Engine.Corpora
 					nameof(projectDir));
 			}
 			var settingsDoc = XDocument.Load(settingsFileName);
-			var encodingStr = (string)settingsDoc.Root.Element("Encoding") ?? "65001";
+			var encodingStr = (string?)settingsDoc.Root?.Element("Encoding") ?? "65001";
 			if (!int.TryParse(encodingStr, out int codePage))
 			{
 				throw new NotImplementedException(
@@ -46,7 +46,7 @@ namespace ClearBible.Engine.Corpora
 			}
 			var encoding = Encoding.GetEncoding(codePage);
 
-			var stylesheetName = (string)settingsDoc.Root.Element("StyleSheet") ?? "usfm.sty";
+			var stylesheetName = (string?)settingsDoc.Root?.Element("StyleSheet") ?? "usfm.sty";
 			string stylesheetFileName = Path.Combine(projectDir, stylesheetName);
 			if (!File.Exists(stylesheetFileName) && stylesheetName != "usfm_sb.sty")
 				stylesheetFileName = Path.Combine(projectDir, "usfm.sty");
@@ -56,13 +56,13 @@ namespace ClearBible.Engine.Corpora
 
 			string prefix = "";
 			string suffix = ".SFM";
-			XElement namingElem = settingsDoc.Root.Element("Naming");
+			XElement? namingElem = settingsDoc.Root?.Element("Naming");
 			if (namingElem != null)
 			{
-				var prePart = (string)namingElem.Attribute("PrePart");
+				var prePart = (string?)namingElem?.Attribute("PrePart");
 				if (!string.IsNullOrEmpty(prePart))
 					prefix = prePart;
-				var postPart = (string)namingElem.Attribute("PostPart");
+				var postPart = (string?)namingElem?.Attribute("PostPart");
 				if (!string.IsNullOrEmpty(postPart))
 					suffix = postPart;
 			}

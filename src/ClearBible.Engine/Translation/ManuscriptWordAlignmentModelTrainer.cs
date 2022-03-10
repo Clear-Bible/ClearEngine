@@ -47,7 +47,7 @@ namespace ClearBible.Engine.Translation
             // and (2) tell the aligner to save.
         }
 
-        public void Train(IProgress<ProgressStatus> progress = null, Action checkCanceled = null)
+        public void Train(IProgress<ProgressStatus>? progress = null, Action? checkCanceled = null)
         {
 
             var reporter = new PhasedProgressReporter(progress,

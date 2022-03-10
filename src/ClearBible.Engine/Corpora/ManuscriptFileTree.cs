@@ -132,11 +132,11 @@ namespace ClearBible.Engine.Corpora
                 trees.SelectMany(t => t.Elements()).ToList();
 
             int totalLength = subTrees
-                .Select(x => Int32.Parse(x.Attribute("Length").Value))
+                .Select(x => Int32.Parse(x.Attribute("Length")?.Value ?? "0"))
                 .Sum();
 
             string newNodeId =
-                subTrees[0].Attribute("nodeId").Value.Substring(0, 11) +
+                subTrees[0].Attribute("nodeId")?.Value.Substring(0, 11) ?? "NODEIDNOTAVAIL" +
                 $"{totalLength:D3}" +
                 "0";
 

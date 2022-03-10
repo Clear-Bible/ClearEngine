@@ -15,7 +15,7 @@ namespace ClearBible.Engine.Translation
         /// </summary>
         /// <param name="aligner"></param>
         /// <param name="prefFileName">Set to load previously trained and saved model.</param>
-        public ManuscriptWordAlignmentModel(IManuscriptWordAligner aligner, string prefFileName = null)
+        public ManuscriptWordAlignmentModel(IManuscriptWordAligner aligner, string? prefFileName = null)
         {
             _aligner = aligner;
             _wordAlignmentModel = aligner.WordAlignmentModel;

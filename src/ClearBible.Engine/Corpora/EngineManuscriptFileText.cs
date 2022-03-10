@@ -37,7 +37,7 @@ namespace ClearBible.Engine.Corpora
         /// <returns>Segments, verse and optionally text, in the book identified by property Id, e.g. '1JN'.
         /// Verses are document verses adjusted by SIL's versification if GetSetmentsReturnsDocSegments is true, 
         /// otherwise verses are as they are in the document.</returns>
-        public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText basedOn = null)
+        public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText? basedOn = null)
         {
             // SEE NOTE IN EngineUsfmFileText.GetSegments() as to why this override is necessary and its limitations.
 

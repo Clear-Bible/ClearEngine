@@ -33,7 +33,7 @@ namespace ClearBible.Engine.Corpora
         /// <param name="includeText"></param>
         /// <param name="basedOn"></param>
         /// <returns>Segments, which are verse and text, as the are in the USFM document.</returns>
-        public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText basedOn = null)
+        public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText? basedOn = null)
         {
             /*
                 * NOTE:
