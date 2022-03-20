@@ -5,13 +5,13 @@ namespace ClearBible.Engine.Corpora
 {
     public class ManuscriptFileTextCorpus : ScriptureTextCorpus
     {
-        public ManuscriptFileTextCorpus(IManuscriptText manuscriptCorpus) : base(null)
+        public ManuscriptFileTextCorpus(IManuscriptText manuscriptText) : base(null)
         {
-            Books = manuscriptCorpus.GetBooks();
+            Books = manuscriptText.GetBooks();
             Books
                 .Select(book =>
                 {
-                    AddText(new ManuscriptFileText(manuscriptCorpus, book, Versification));
+                    AddText(new ManuscriptFileText(manuscriptText, book, Versification));
                     return book;
                 }).ToList();
         }

@@ -1,24 +1,25 @@
-﻿using SIL.Machine.Corpora;
+﻿using ClearBible.Engine.Corpora;
+using SIL.Machine.Corpora;
 using SIL.Machine.Translation;
 
 namespace ClearBible.Engine.Translation
 {
-    public class ManuscriptWordAlignmentModel :  IWordAlignmentModel, IDisposable
+    public class ManuscriptWordAlignmentModel :  IWordAlignmentModel, IManuscriptWordAligner, IDisposable
     {
         private IWordAlignmentModel _wordAlignmentModel { get; }
 
-        private readonly IManuscriptWordAligner _aligner;
+        private readonly IManuscriptTrainableWordAligner _trainableAligner;
 
         
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="aligner"></param>
+        /// <param name="trainableAligner"></param>
         /// <param name="prefFileName">Set to load previously trained and saved model.</param>
-        public ManuscriptWordAlignmentModel(IManuscriptWordAligner aligner, string? prefFileName = null)
+        public ManuscriptWordAlignmentModel(IManuscriptTrainableWordAligner trainableAligner, string? prefFileName = null)
         {
-            _aligner = aligner;
-            _wordAlignmentModel = aligner.WordAlignmentModel;
+            _trainableAligner = trainableAligner;
+            _wordAlignmentModel = trainableAligner.SMTWordAlignmentModel;
 
             if (!string.IsNullOrEmpty(prefFileName))
             {
@@ -41,29 +42,52 @@ namespace ClearBible.Engine.Translation
             }
         }
 
+        /// <summary>
+        /// Used for obtaining best alignment using SMT only.
+        /// </summary>
+        /// <param name="sourceSegment"></param>
+        /// <param name="targetSegment"></param>
+        /// <returns></returns>
         public WordAlignmentMatrix GetBestAlignment(IReadOnlyList<string> sourceSegment, IReadOnlyList<string> targetSegment)
         {
-            return _aligner.GetBestAlignment(sourceSegment, targetSegment);
+            return _trainableAligner.GetBestAlignment(sourceSegment, targetSegment);
         }
+
+        public WordAlignmentMatrix GetBestAlignment(ParallelTextSegment segment, ITokenProcessor? sourcePreprocessor = null, ITokenProcessor? targetPreprocessor = null)
+        {
+            return _trainableAligner.GetBestAlignment(segment, sourcePreprocessor, targetPreprocessor);
+        }
+
         public IEnumerable<(int TargetWordIndex, double Score)> GetTranslations(int sourceWordIndex, double threshold = 0)
         {
             return _wordAlignmentModel.GetTranslations(sourceWordIndex, threshold);
         }
-        public ITrainer CreateTrainer(ParallelTextCorpus corpus, ITokenProcessor? sourcePreprocessor = null, ITokenProcessor? targetPreprocessor = null, int maxCorpusCount = int.MaxValue)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parallelTextCorpus">Corpus SourceCorpus must be an EngineManuscriptFileTextCorpus.</param>
+        /// <param name="sourcePreprocessor">Parameter ignored.</param>
+        /// <param name="targetPreprocessor"></param>
+        /// <param name="maxCorpusCount"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidCastException"></exception>
+        public ITrainer CreateTrainer(ParallelTextCorpus parallelTextCorpus, ITokenProcessor? sourcePreprocessor = null, ITokenProcessor? targetPreprocessor = null, int maxCorpusCount = int.MaxValue)
         {
             return new ManuscriptWordAlignmentModelTrainer(
-                _aligner,
-                corpus,
-                null,
+                _trainableAligner,
+                parallelTextCorpus,
                 targetPreprocessor,
                 maxCorpusCount
                 );
         }
         public SIL.ObjectModel.IReadOnlySet<int> SpecialSymbolIndices => _wordAlignmentModel.SpecialSymbolIndices;
 
+        public IWordAlignmentModel SMTWordAlignmentModel => _trainableAligner.SMTWordAlignmentModel;
+
         public double GetAlignmentScore(int sourceLen, int prevSourceIndex, int sourceIndex, int targetLen, int prevTargetIndex, int targetIndex)
         {
-            return _aligner.GetAlignmentScore(sourceLen, prevSourceIndex, sourceIndex, targetLen, prevTargetIndex, targetIndex);
+            return _trainableAligner.GetAlignmentScore(sourceLen, prevSourceIndex, sourceIndex, targetLen, prevTargetIndex, targetIndex);
         }
 
         public IEnumerable<(string TargetWord, double Score)> GetTranslations(string sourceWord, double threshold = 0)
@@ -83,21 +107,21 @@ namespace ClearBible.Engine.Translation
 
         public void Load(string prefFileName)
         {
-            _aligner.Load(prefFileName);
+            _trainableAligner.Load(prefFileName);
         }
-        public Task SaveAsync(string prefFileName)
+        public Task SaveAsync(string? prefFileName)
         {
-            return _aligner.SaveAsync(prefFileName);
+            return _trainableAligner.SaveAsync();
         }
 
-        public void Save(string prefFileName)
+        public void Save(string? prefFileName)
         {
-            _aligner.Save(prefFileName);
+            _trainableAligner.Save();
         }
 
         public void Dispose()
         {
-            _aligner.Dispose();
+            _trainableAligner.Dispose();
         }
     }
 }

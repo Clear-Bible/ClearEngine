@@ -6,8 +6,16 @@ namespace ClearBible.Engine.Corpora
     /// </summary>
     public interface IManuscriptText
     {
-        public record BookSegment(string chapter, string verse, string text);
         IEnumerable<string> GetBooks();
         IEnumerable<BookSegment> GetBookSegments(string bookAbbreviation, bool includeText);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bookAbbreviation">SIL book abbreviation</param>
+        /// <param name="chapterNum"></param>
+        /// <param name="verseNum"></param>
+        /// <returns></returns>
+        IEnumerable<ManuscriptToken> GetManuscriptTokensForSegment(string bookAbbreviation, int chapterNumber, int verseNumber);
     }
 }

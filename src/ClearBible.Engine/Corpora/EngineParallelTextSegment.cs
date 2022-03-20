@@ -1,5 +1,4 @@
-﻿using ClearBible.Engine.Tokenization;
-
+﻿
 using SIL.Machine.Corpora;
 using SIL.Machine.Translation;
 
@@ -63,24 +62,42 @@ namespace ClearBible.Engine.Corpora
                   false,
                   false)
         {
+            try
+            {
+                //Only set SourceTokens if all the members of sourceSegments can be cast to a TokensTextSegment
+                sourceSegments.Cast<TokensTextSegment>(); //throws an invalidCastException if any of the members can't be cast to type
+                SourceTokens = sourceSegments
+                    ///.Where(textSegment => textSegment is TokensTextSegment)
+                    .SelectMany(textSegment => ((TokensTextSegment)textSegment).Tokens).ToList();
+            }
+            catch (InvalidCastException)
+            {
+            }
 
-            SourceTokenIds = sourceSegments
-                .SelectMany(engineTextSegment => ((TokenIdsTextSegment) engineTextSegment).TokenIds).ToList();
-            TargetTokenIds = targetSegments
-                .SelectMany(engineTextSegment => ((TokenIdsTextSegment) engineTextSegment).TokenIds).ToList();
+            try
+            {
+                //Only set TargetTokens if all the members of sourceSegments can be cast to a TokensTextSegment
+                targetSegments.Cast<TokensTextSegment>(); //throws an invalidCastException if any of the members can't be cast to type
+                TargetTokens = targetSegments
+                    //.Where(textSegment => textSegment is TokensTextSegment)
+                    .SelectMany(textSegment => ((TokensTextSegment)textSegment).Tokens).ToList();
+            }
+            catch (InvalidCastException)
+            {
+            }
         }
-        public IReadOnlyList<TokenId>? SourceTokenIds { get; }
+        public IReadOnlyList<Token>? SourceTokens { get; }
 
-        public IReadOnlyList<TokenId>? TargetTokenIds { get; }
+        public IReadOnlyList<Token>? TargetTokens { get; }
 
-        public IEnumerable<(TokenId, TokenId)> GetAlignedTokenIdPairs(WordAlignmentMatrix alignment)
+        public IEnumerable<(Token, Token)> GetAlignedTokenIdPairs(WordAlignmentMatrix alignment)
         {
                 
             IReadOnlyCollection<AlignedWordPair>  alignedWordPairs = alignment.GetAlignedWordPairs();
             foreach (AlignedWordPair alignedWordPair in alignedWordPairs)
             {
-                var sourceTokenId = SourceTokenIds?[alignedWordPair.SourceIndex];
-                var targetTokenId = TargetTokenIds?[alignedWordPair.TargetIndex];
+                var sourceTokenId = SourceTokens?[alignedWordPair.SourceIndex];
+                var targetTokenId = TargetTokens?[alignedWordPair.TargetIndex];
 
                 if (sourceTokenId != null && targetTokenId != null)
                 {

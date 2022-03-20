@@ -1,8 +1,10 @@
 ﻿using ClearBible.Clear3.API;
 using ClearBible.Clear3.SubTasks;
+using ClearBible.Engine.Persistence;
 using ClearBible.Engine.Translation;
+using ClearBible.Engine.TreeAligner.Translation;
 
-namespace ClearBible.Engine.Persistence
+namespace ClearBible.Engine.TreeAligner.Persistence
 {
     public class FileGetManuscriptTreeAligmentConfig : IPersistGettable<FileGetManuscriptTreeAligmentConfig, ManuscriptWordAlignmentConfig>
     {

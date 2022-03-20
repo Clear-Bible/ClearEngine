@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using ClearBible.Engine.Tokenization;
+using System.Xml.Linq;
 
 using static ClearBible.Engine.Corpora.IManuscriptText;
 using static ClearBible.Engine.Persistence.FileGetBookIds;
@@ -14,6 +15,7 @@ namespace ClearBible.Engine.Corpora
             _manuscriptTreesPath = manuscriptTreesPath;
         }
 
+        #region IManuscriptText
 
         /// <summary>
         /// 
@@ -46,6 +48,36 @@ namespace ClearBible.Engine.Corpora
             string bookAbbreviation, 
             bool includeText = true)
         {
+            return GetBookChapters(bookAbbreviation)
+                .SelectMany(c => _getVerseXElementsForChapter(bookAbbreviation, c)
+                    .Select(verse => new BookSegment
+                        (
+                            verse
+                                .Descendants()
+                                .Where(node => node.FirstNode is XText)
+                                .First()
+                                ?.Attribute("morphId")?.Value.Substring(2, 3)
+                                ?? throw new InvalidDataException($@"Syntax tree for book {bookAbbreviation} chapter {c} has a verse whose first leaf node 
+                                                                        doesn't have a nodeId attribute. Cannot determine chapter number"),
+                            verse
+                                .Descendants()
+                                .Where(node => node.FirstNode is XText)
+                                .First()
+                                ?.Attribute("morphId")?.Value.Substring(5, 3)
+                                ?? throw new InvalidDataException($@"Syntax tree {bookAbbreviation} chapter {c} has a verse whose first leaf node doesn't 
+                                                                            have a nodeId attribute. Cannot determine verse number"),
+                            includeText ?
+                                string.Join(
+                                    " ",
+                                    verse
+                                        .Descendants()
+                                        .Where(node => node.FirstNode is XText)
+                                        .Select(leaf => leaf?
+                                            .Attribute("UnicodeLemma")?.Value.Replace(' ', '~') ?? ""))
+                                : ""
+                        ))
+                    );
+            /*
             return Directory.EnumerateFiles(_manuscriptTreesPath, $"{bookAbbreviation}*.xml")
                 .SelectMany(fileName =>
                     XElement
@@ -79,57 +111,176 @@ namespace ClearBible.Engine.Corpora
                             )
                         )
                 );
+            */
         }
 
+        public IEnumerable<ManuscriptToken> GetManuscriptTokensForSegment(string bookAbbreviation, int chapterNumber, int verseNumber)
+        {
+            IEnumerable<XElement> chapterXElements = _getVerseXElementsForChapter(bookAbbreviation, chapterNumber);
+            return chapterXElements
+                .Where(verse => verse
+                    .Descendants("Node")
+                    .Where(node => node.FirstNode is XText)
+                    .First()
+                     ?.Attribute("morphId")?.Value.Substring(5, 3).Equals(verseNumber.ToString("000")) ?? false)
+                .SelectMany(chapterElement => chapterElement
+                    .Descendants("Node")
+                    .Where(node => node.FirstNode is XText)
+                    .Select(leaf => new ManuscriptToken(leaf.TokenId(), leaf.Surface(), leaf.Strong(), leaf.Category(), leaf.Analysis(), leaf.Lemma())));
+        }
+
+        #endregion
+
+        #region IManuscriptTree
         /// <summary>
         /// 
         /// </summary>
         /// <param name="book">Three character book abbreviation (SIL)</param>
-        /// <param name="chapter"></param>
-        /// <param name="verses"></param>
+        /// <param name="chapterNumber"></param>
+        /// <param name="verseNumbers"></param>
         /// <returns></returns>
-        public XElement? GetTreeNode(string book, int chapter, List<int> verses)
+        /// <exception cref="InvalidDataException"></exception>
+        public XElement? GetVersesXElementsCombined(string book, int chapterNumber, IEnumerable<int> verseNumbers)
         {
-            var codes = BookIds
-                .Where(BookId => BookId.silCannonBookAbbrev.Equals(book))
-                .Select(bookId => bookId.clearTreeBookAbbrev);
-//            var codes = Mappings.ManuscriptFileBookToSILBookPrefixes
-//               .Where(bookToPrefixes => bookToPrefixes.Value.abbr.Equals(book))
-//                .Select(bookToPrefixes => bookToPrefixes.Key);
+            List<XElement> verseXElements = new List<XElement>();
 
-            if (codes.Count() != 1)
+            foreach (int verseNumber in verseNumbers)
             {
-                throw new InvalidDataException("Book not found in ManuscriptFileBookToSILBookPrefixes mapping");
+                var verseXElement = _getVerseXElementsForChapter(book, chapterNumber)
+                    .Where(x =>
+                    {
+                        bool success = int.TryParse(x.Attribute("nodeId")?.Value.Substring(5, 3), out int attrVerseNumber);
+                        if (success)
+                        {
+                            return verseNumber == attrVerseNumber;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    })
+                    .FirstOrDefault();
+
+                if (verseXElement == null)
+                {
+                    throw new InvalidDataException($"Manuscript book {book} chapterNumber {chapterNumber} verse {verseNumber} not found in syntax trees");
+                }
+                else
+                {
+                    verseXElements.Add(verseXElement);
+                }
             }
-
-            var fileName = $"{codes.First()}{chapter.ToString("000")}.trees.xml";
-
-            if (!File.Exists(fileName))
+            if (verseXElements.Count > 0)
             {
-                throw new FileLoadException($"{fileName} doesn't exist.");
+                return CombineVerseXElementsIntoOne(verseXElements);
             }
-
-            var vs = XElement.Load(fileName)
-                .Descendants("Sentence")
-                .Select(s => s.Descendants("Node").First())
-                .ToList();
-
-            return _combineTrees(vs);
-        }
-
-        private XElement? _combineTrees(List<XElement>? trees)
-        {
-            if (trees == null)
+            else if (verseXElements.Count == 1)
+            {
+                return verseXElements[0];
+            }
+            else
             {
                 return null;
             }
-            else if (trees.Count() < 2)
+        }
+
+        #endregion
+
+        #region bookChapters cache from filenames and access method
+
+        /// <summary>
+        /// A cache of chapterNumbers by SIL bookAbreviations.
+        /// </summary>
+        private Dictionary<string,List<int>> _bookChapters = new();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bookAbbreviation">SIL book abbreviation</param>
+        /// <returns></returns>
+        protected IEnumerable<int> GetBookChapters(string bookAbbreviation)
+        {
+            if (!_bookChapters.ContainsKey(bookAbbreviation))
             {
-                return trees.FirstOrDefault(); //should return null if trees is empty.
+                string? clearBookAbbreviation = BookIds
+                    .Where(bookId => bookId.silCannonBookAbbrev.Equals(bookAbbreviation))
+                    .Select(bookId => bookId.clearTreeBookAbbrev)
+                    .FirstOrDefault();
+
+                if (clearBookAbbreviation == null)
+                {
+                    throw new InvalidDataException($"_getBookXElement({bookAbbreviation}) has no mapped clear tree book abbreviation.");
+                }
+
+                _bookChapters.Add(bookAbbreviation, Directory.EnumerateFiles(_manuscriptTreesPath, $"{clearBookAbbreviation}*.xml")
+                    .Select(fileName =>
+                    {
+                        int chapterNumber;
+                        var success = int.TryParse(fileName.Substring(fileName.Length - 13, 3), out chapterNumber);
+                        if (!success)
+                        {
+                            throw new InvalidDataException($"_getBookXElement({bookAbbreviation}) found tree file whose filename couldn't be parsed for a chapter number {fileName}.");
+                        }
+                        return chapterNumber;
+                    }).ToList());
+            }
+            return _bookChapters[bookAbbreviation];
+        }
+
+        #endregion
+
+        #region chapter XElement cache from files and access method.
+
+        /// <summary>
+        /// A cache of loaded verses by chapter.
+        /// 
+        /// key is tuple if (bookAbbreviation (SIL), chapterNumber) and returns an enumerble of verse XElements.
+        /// </summary>
+        private Dictionary<(string, int), IEnumerable<XElement>> _loadedChapters = new Dictionary<(string, int), IEnumerable<XElement>>();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bookAbbreviation">SIL book abbreviation</param>
+        /// <param name="chapterNumber"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidDataException"></exception>
+        /// <exception cref="FileLoadException"></exception>
+        private IEnumerable<XElement> _getVerseXElementsForChapter(string bookAbbreviation, int chapterNumber)
+        {
+            if (!_loadedChapters.ContainsKey((bookAbbreviation, chapterNumber)))
+            {
+
+                var codes = BookIds
+                    .Where(BookId => BookId.silCannonBookAbbrev.Equals(bookAbbreviation))
+                    .Select(bookId => bookId.clearTreeBookAbbrev);
+
+                if (codes.Count() != 1)
+                {
+                    throw new InvalidDataException("Book not found in ManuscriptFileBookToSILBookPrefixes mapping");
+                }
+
+                var fileName = $"{_manuscriptTreesPath}{Path.DirectorySeparatorChar}{codes.First()}{chapterNumber.ToString("000")}.trees.xml";
+
+                if (!File.Exists(fileName))
+                {
+                    throw new FileLoadException($"{fileName} doesn't exist.");
+                }
+                IEnumerable<XElement> verseXElements = XElement.Load(fileName)
+                    .Descendants("Sentence")
+                    .Select(s => s.Descendants("Node").First());
+                _loadedChapters[(bookAbbreviation, chapterNumber)] = verseXElements;
             }
 
+            return _loadedChapters[(bookAbbreviation, chapterNumber)];
+
+
+        }
+        protected XElement CombineVerseXElementsIntoOne(List<XElement> verseXElements)
+        {
+
             List<XElement> subTrees =
-                trees.SelectMany(t => t.Elements()).ToList();
+                verseXElements.SelectMany(t => t.Elements()).ToList();
 
             int totalLength = subTrees
                 .Select(x => Int32.Parse(x.Attribute("Length")?.Value ?? "0"))
@@ -148,7 +299,78 @@ namespace ClearBible.Engine.Corpora
                     new XAttribute("Length", totalLength.ToString()),
                     subTrees);
         }
-
     }
+
+    #endregion
+
+    #region Extensions
+    public static class ManuscriptTreeExtensions
+    {
+        public static TokenId TokenId(this XElement leaf)
+        {
+            string? morphId = leaf.Attribute("morphId")?.Value;
+            if (morphId == null)
+            {
+                throw new InvalidDataException("Unable to extract tokenId from leaf element because element does not have a 'morphId' attribute");
+            }
+            if (morphId.Length != 11)
+            {
+                throw new InvalidDataException("Unable to extract tokenId from leaf element because element's 'morphId' attribute is not length 11");
+            }
+            morphId += "1";
+            string? silBookNum = BookIds
+                .Where(b => b.clearTreeBookNum.Equals(morphId.Substring(0, 2)))
+                .Select(b => b.silCannonBookNum)
+                .FirstOrDefault();
+
+            if (silBookNum == null)
+            {
+                throw new InvalidDataException($"Unable to find sil book number for leaf morphId {morphId} with clear tree book number in first two positions");
+            }
+            int bookSilNumber = int.Parse(silBookNum);
+            int chapterNumber = int.Parse(morphId.Substring(2, 3));
+            int verseNumber = int.Parse(morphId.Substring(5, 3));
+            int wordNumber = int.Parse(morphId.Substring(8, 3));
+            int subWordNumber = int.Parse(morphId.Substring(11, 1));
+            return new TokenId(bookSilNumber, chapterNumber, verseNumber, wordNumber, subWordNumber);
+        }
+        public static string Lemma(this XElement leaf) =>
+            leaf.Attribute("UnicodeLemma")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'UnicodeLemma' attribute");
+
+        public static string Surface(this XElement leaf) =>
+            leaf.Attribute("Unicode")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'Unicode' attribute");
+
+        public static string Strong(this XElement leaf) =>
+            (leaf.Attribute("Language")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'Language' attribute")) +
+            (leaf.Attribute("StrongNumberX")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'StrongNumberX' attribute"));
+
+        public static string English(this XElement leaf) =>
+            leaf.Attribute("English")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'English' attribute");
+
+        public static string Category(this XElement leaf) =>
+            leaf.Attribute("Cat")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'Cat' attribute");
+
+        public static int Start(this XElement leaf)
+        {
+            var attr = leaf.Attribute("Start");
+            if (attr == null)
+            {
+                throw new InvalidDataException("Manuscript leaf element does not contain the 'Start' attribute");
+            }
+
+            bool success = int.TryParse(leaf.Attribute("Start")?.Value, out int startNum);
+            if (success)
+            {
+                return startNum;
+            }
+            else
+            {
+                throw new InvalidDataException("Manuscript leaf element 'Start' attribute not int parseable.");
+            }
+        }
+        public static string Analysis(this XElement leaf) =>
+            leaf.Attribute("Analysis")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'Analysis' attribute");
+    }
+    #endregion
 }
 

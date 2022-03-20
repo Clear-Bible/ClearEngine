@@ -7,12 +7,12 @@ namespace ClearBible.Engine.Corpora
 {
     public class EngineManuscriptFileTextCorpus : ManuscriptFileTextCorpus, IEngineCorpus
     {
-        public EngineManuscriptFileTextCorpus(IManuscriptText manuscriptCorpus) : base(manuscriptCorpus)
+        public EngineManuscriptFileTextCorpus(IManuscriptText manuscriptText) : base(manuscriptText)
         {
            Books
                 .Select(book =>
                 {
-                    AddText(new EngineManuscriptFileText(manuscriptCorpus, book, Versification, this));
+                    AddText(new EngineManuscriptFileText(manuscriptText, book, Versification, this));
                     return book;
                 }).ToList();
         }

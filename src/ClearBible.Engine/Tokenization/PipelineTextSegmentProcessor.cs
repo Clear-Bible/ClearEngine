@@ -17,11 +17,11 @@ namespace ClearBible.Engine.Tokenization
 			_processors = processors.ToArray();
 		}
 
-        public TokenIdsTextSegment Process(TokenIdsTextSegment tokenIdstextSegment)
+        public TokensTextSegment Process(TokensTextSegment tokensTextSegment)
         {
 			foreach (ITextSegmentProcessor processor in _processors)
-				tokenIdstextSegment = processor.Process(tokenIdstextSegment);
-			return tokenIdstextSegment;
+				tokensTextSegment = processor.Process(tokensTextSegment);
+			return tokensTextSegment;
 		}
     }
 }

@@ -7,23 +7,21 @@ namespace ClearBible.Engine.Corpora
 {
     public class EngineManuscriptFileText : ManuscriptFileText
     {
-        private readonly IManuscriptText _manuscriptCorpus;
         private readonly IEngineCorpus _engineCorpus;
 
         /// <summary>
         /// Creates the Text for a manuscript book.
         /// </summary>
-        /// <param name="manuscriptCorpus"></param>
+        /// <param name="manuscriptText"></param>
         /// <param name="book"></param>
         /// <param name="versification">Defaults to Original</param>
         public EngineManuscriptFileText(
-            IManuscriptText manuscriptCorpus, 
-            string book, 
+            IManuscriptText manuscriptText,
+            string book,
             ScrVers versification,
             IEngineCorpus engineCorpus)
-			: base(manuscriptCorpus, book, versification)
+            : base(manuscriptText, book, versification)
         {
-            _manuscriptCorpus = manuscriptCorpus;
             _engineCorpus = engineCorpus;
         }
 
@@ -49,15 +47,15 @@ namespace ClearBible.Engine.Corpora
             }
             else
             {
-                textSegments = base.GetSegments(includeText, basedOn);
+                //textSegments = base.GetSegments(includeText, basedOn);
+                textSegments = _getSegments(includeText, basedOn);
             }
 
             // return if no processors configured.
             if (!includeText || _engineCorpus.TextSegmentProcessor == null)
             {
                 //used yield here so the following foreach with yield, which creates an iterator, is possible
-                foreach (var textSegment in textSegments
-                        .Select(textSegment => new TokenIdsTextSegment(textSegment)))
+                foreach (var textSegment in textSegments)
                 {
                     yield return textSegment;
                 }
@@ -67,10 +65,123 @@ namespace ClearBible.Engine.Corpora
                 // otherwise process the TextSegments.
                 foreach (var textSegment in textSegments)
                 {
-                    yield return _engineCorpus.TextSegmentProcessor.Process(new TokenIdsTextSegment(textSegment));
+                    yield return _engineCorpus.TextSegmentProcessor.Process((TokensTextSegment) textSegment);
                 }
             }
 
+        }
+
+        /*
+        protected override IEnumerable<TextSegment> GetSegmentsInDocOrder(bool includeText = true)
+        {
+            return _manuscriptCorpus.GetManuscriptTokens(Id)
+                .Where(token => token.Use)
+                .SelectMany(token => CreateTextSegments(
+                    includeText,
+                    token.TokenId.ChapterNum,
+                    token.TokenId.VerseNum,
+                    token.Text));
+
+        */
+
+        protected override TextSegment CreateTextSegment(bool includeText, string text, object segRef,
+            bool isSentenceStart = true, bool isInRange = false, bool isRangeStart = false)
+        {
+            text = text.Trim();
+            if (!includeText)
+            {
+                return new TextSegment(Id, segRef, Array.Empty<string>(), isSentenceStart, isInRange, isRangeStart,
+                    isEmpty: text.Length == 0);
+            }
+            IReadOnlyList<string> segment = WordTokenizer.Tokenize(text).ToArray();
+            segment = TokenProcessors.UnescapeSpaces.Process(segment);
+
+            (string bookAbbreviation, int chapterNum, int verseNum) = TokensTextSegment.GetBookChapterVerse(segRef);
+            IReadOnlyList<ManuscriptToken> tokens = _manuscriptText.GetManuscriptTokensForSegment(bookAbbreviation, chapterNum, verseNum).ToList();
+
+            return new TokensTextSegment(
+                Id,
+                segRef,
+                segment,
+                isSentenceStart,
+                isInRange,
+                isRangeStart,
+                segment.Count == 0,
+                tokens);
+        }
+
+        /// <summary>
+        /// Needed as a replacement for SIL.Machine.Corpora.ScriptureText::GetSegments (base) because its implementation generates TextSegments internally
+        /// and we need MachineTokenTextSegments.
+        /// </summary>
+        /// <param name="includeText"></param>
+        /// <param name="basedOn"></param>
+        /// <returns></returns>
+        private IEnumerable<TextSegment> _getSegments(bool includeText = true, IText? basedOn = null)
+        {
+            ScrVers? basedOnVers = null;
+            if (basedOn is ScriptureText scriptureText && Versification != scriptureText.Versification)
+                basedOnVers = scriptureText.Versification;
+            var segList = new List<(VerseRef Ref, TextSegment Segment)>();
+            bool outOfOrder = false;
+            var prevVerseRef = new VerseRef();
+            int rangeStartOffset = -1;
+            foreach (TextSegment s in GetSegmentsInDocOrder(includeText))
+            {
+                TextSegment seg = s;
+                var verseRef = (VerseRef)seg.SegmentRef;
+                if (basedOnVers != null)
+                {
+                    verseRef.ChangeVersification(basedOnVers);
+                    // convert on-to-many versification mapping to a verse range
+                    if (verseRef.Equals(prevVerseRef))
+                    {
+                        var (rangeStartVerseRef, rangeStartSeg) = segList[segList.Count + rangeStartOffset];
+                        bool isRangeStart = false;
+                        if (rangeStartOffset == -1)
+                            isRangeStart = rangeStartSeg.IsInRange ? rangeStartSeg.IsRangeStart : true;
+                        segList[segList.Count + rangeStartOffset] = (rangeStartVerseRef,
+                            TextSegmentFactory(rangeStartSeg, seg, isRangeStart));
+                            //new TextSegment(rangeStartSeg.TextId, rangeStartSeg.SegmentRef,
+                            //    rangeStartSeg.Segment.Concat(seg.Segment).ToArray(), rangeStartSeg.IsSentenceStart,
+                            //    isInRange: true, isRangeStart: isRangeStart,
+                            //    isEmpty: rangeStartSeg.IsEmpty && seg.IsEmpty));
+
+                        seg = CreateEmptyTextSegment(seg.SegmentRef, isInRange: true);
+                        rangeStartOffset--;
+                    }
+                    else
+                    {
+                        rangeStartOffset = -1;
+                    }
+                }
+                segList.Add((verseRef, seg));
+                if (!outOfOrder && verseRef.CompareTo(prevVerseRef) < 0)
+                    outOfOrder = true;
+                prevVerseRef = verseRef;
+            }
+
+            if (outOfOrder)
+                segList.Sort((x, y) => x.Ref.CompareTo(y.Ref));
+
+            return segList.Select(t => t.Segment);
+        }
+
+        protected virtual TextSegment TextSegmentFactory(TextSegment textSegmentStart, TextSegment textSegment, bool isRangeStart)
+        {
+            if (textSegmentStart is not TokensTextSegment || textSegment is not TokensTextSegment)
+            {
+                throw new ApplicationException("BUG: EngineManuscriptFileText._textSegmentFactory received a TextSegment that isn't a TokensTextSegment");
+            }
+            return new TokensTextSegment(
+                textSegmentStart.TextId,
+                textSegmentStart.SegmentRef,
+                textSegmentStart.Segment.Concat(textSegment.Segment).ToArray(),
+                textSegmentStart.IsSentenceStart,
+                isInRange: true,
+                isRangeStart: isRangeStart,
+                isEmpty: textSegmentStart.IsEmpty && textSegment.IsEmpty,
+                ((TokensTextSegment)textSegmentStart).Tokens.Concat(((TokensTextSegment)textSegment).Tokens).ToList().AsReadOnly());
         }
     }
 }

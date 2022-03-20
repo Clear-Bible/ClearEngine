@@ -3,8 +3,6 @@ using SIL.Scripture;
 
 namespace ClearBible.Engine.Corpora
 {
-    //public record SourceTargeVerseRefPair(VerseRef sourceVerseRef, VerseRef targetVerseRef);
-
     #region Versification map data structure
 
 	public record EngineVerseId

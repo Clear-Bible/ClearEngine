@@ -5,6 +5,6 @@ namespace ClearBible.Engine.Tokenization
 {
     public interface ITextSegmentProcessor
     {
-        TokenIdsTextSegment Process(TokenIdsTextSegment tokenIdTextSegment);
+        TokensTextSegment Process(TokensTextSegment tokensTextSegment);
     }
 }

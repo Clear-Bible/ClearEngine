@@ -1,6 +1,6 @@
 ﻿using ClearBible.Clear3.API;
 
-namespace ClearBible.Engine.Translation
+namespace ClearBible.Engine.TreeAligner.Translation
 {
     /// <summary>
     /// 

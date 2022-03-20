@@ -6,32 +6,23 @@ namespace ClearBible.Engine.Tokenization
 {
     public class FilterTextSegmentProcessor : ITextSegmentProcessor
     {
-        private readonly IReadOnlyList<string> _tokensToFilter;
+        private readonly IReadOnlyList<string> _textToFilter;
 
-        public FilterTextSegmentProcessor(IReadOnlyList<string> tokensToFilter)
+        public FilterTextSegmentProcessor(IReadOnlyList<string> textToFilter)
         {
-            _tokensToFilter = tokensToFilter;
+            _textToFilter = textToFilter;
         }
 
-        public TokenIdsTextSegment Process(TokenIdsTextSegment tokenIdsTextSegment)
+        public TokensTextSegment Process(TokensTextSegment tokensTextSegment)
         {
-            List<TokenId> tokenIds = new List<TokenId>();
-            List<string> tokens = new List<string>();
-
-            if (tokenIds.Count() != tokens.Count())
+            for (int i = 0; i < tokensTextSegment.Tokens.Count(); i++)
             {
-                throw new InvalidDataException($"the number of tokenIds and tokens are different for verse {(VerseRef)tokenIdsTextSegment.SegmentRef}");
-            }
-
-            for (int i = 0; i < tokenIdsTextSegment.Segment.Count(); i++)
-            {
-                if (!_tokensToFilter.Contains(tokenIdsTextSegment.Segment[i]))
+                if (!_textToFilter.Contains(tokensTextSegment.Tokens[i].Text))
                 {
-                    tokenIds.Add(tokenIdsTextSegment.TokenIds[i]);
-                    tokens.Add(tokenIdsTextSegment.Segment[i]);
+                    tokensTextSegment.Tokens[i].Use = false;
                 }
             }
-            return new TokenIdsTextSegment(tokenIdsTextSegment, tokens, tokenIds);
+            return tokensTextSegment;
         }
     }
 }

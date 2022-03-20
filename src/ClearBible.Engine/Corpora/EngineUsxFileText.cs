@@ -51,7 +51,7 @@ namespace ClearBible.Engine.Corpora
             {
                 //used yield here so the following foreach with yield, which creates an iterator, is possible
                 foreach (var textSegment in textSegments
-                        .Select(textSegment => new TokenIdsTextSegment(textSegment)))
+                        .Select(textSegment => new TokensTextSegment(textSegment)))
                 {
                     yield return textSegment;
                 }
@@ -61,7 +61,7 @@ namespace ClearBible.Engine.Corpora
                 // otherwise process the TextSegments.
                 foreach (var textSegment in textSegments)
                 {
-                    yield return _engineCorpus.TextSegmentProcessor.Process(new TokenIdsTextSegment(textSegment));
+                    yield return _engineCorpus.TextSegmentProcessor.Process(new TokensTextSegment(textSegment));
                 }
             }
         }

@@ -11,6 +11,12 @@ namespace ClearBible.Engine.Corpora
 	{
 		private readonly IEnumerable<SourceTargetParallelVerses> _sourceTargetParallelVersesList;
 
+		// cache the results so list only needs to be built once.
+		private List<TextSegment>? _sourceSegmentsText = null;
+		private List<TextSegment>? _targetSegmentsText = null;
+		private List<TextSegment>? _sourceSegmentsNoText = null;
+		private List<TextSegment>? _targetSegmentsNoText = null;
+
 		public EngineParallelText(IText sourceText, IText targetText, IEnumerable<SourceTargetParallelVerses> sourceTargetParallelVersesList,
 			ITextAlignmentCollection textAlignmentCollection, IComparer<object>? segmentRefComparer = null)
 			: base(sourceText, targetText, textAlignmentCollection, segmentRefComparer)
@@ -32,8 +38,25 @@ namespace ClearBible.Engine.Corpora
 			// Get the list right from the start so that each foreach iteration's Where clause doesn't have to rebuild it
 			// (within XTexts.GetSegment()) when ToList() is called while supplying
 			// parameters to ParallelTextSegment's ctor.
-			var sourceSegments = SourceText.GetSegments(includeText).ToList(); 
-			var targetSegments = TargetText.GetSegments(includeText).ToList();
+
+			if (includeText && _sourceSegmentsText == null)
+            {
+				_sourceSegmentsText = SourceText.GetSegments(includeText).ToList();
+			}
+			if (includeText && _targetSegmentsText == null)
+			{
+				_targetSegmentsText = TargetText.GetSegments(includeText).ToList();
+			}
+			if (!includeText && _sourceSegmentsText == null)
+			{
+				_sourceSegmentsNoText = SourceText.GetSegments(includeText).ToList();
+			}
+			if (!includeText && _targetSegmentsText == null)
+			{
+				_targetSegmentsText = TargetText.GetSegments(includeText).ToList();
+			}
+			//var sourceSegments = SourceText.GetSegments(includeText).ToList(); 
+			//var targetSegments = TargetText.GetSegments(includeText).ToList();
 
 			//Counting on mappings not crossing Book boundaries, otherwise
 			var filteredSourceTargetParallelVersesList = _sourceTargetParallelVersesList
@@ -50,9 +73,13 @@ namespace ClearBible.Engine.Corpora
 			{
 				if (sourceTargetParallelVerses != null)
 				{
-					var parallelVersesSourceSegments = sourceSegments
+#pragma warning disable CS8604 // Already checked for null
+                    var parallelVersesSourceSegments = (includeText ? _sourceSegmentsText : _sourceSegmentsNoText)
+#pragma warning restore CS8604 // Already checked for null
 						.Where(textSegment => sourceTargetParallelVerses.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)));
-					var parallelVersesTargetSegments = targetSegments
+#pragma warning disable CS8604 // Already checked for null
+					var parallelVersesTargetSegments = (includeText ? _targetSegmentsText : _targetSegmentsNoText)
+#pragma warning restore CS8604 // Already checked for null
 						.Where(textSegment => sourceTargetParallelVerses.targetVerseIds.Contains(new EngineVerseId((VerseRef)textSegment.SegmentRef)));
 
 					yield return new EngineParallelTextSegment(
