@@ -19,7 +19,7 @@ namespace ClearBible.Engine.Translation
         /// <param name="sourcePreprocessor"></param>
         /// <param name="targetPreprocessor"></param>
         /// <returns></returns>
-        WordAlignmentMatrix GetBestAlignment(ParallelTextSegment segment,
+        WordAlignmentMatrix GetBestAlignment(ParallelTextSegment parallelTextSegment,
             ITokenProcessor? sourcePreprocessor, ITokenProcessor? targetPreprocessor);
 
         /// <summary>

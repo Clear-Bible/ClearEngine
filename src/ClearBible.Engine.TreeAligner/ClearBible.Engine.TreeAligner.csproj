@@ -11,11 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClearBible.Engine\ClearBible.Engine.csproj" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Legacy\" />
+    <ProjectReference Include="..\ClearBible.Engine\ClearBible.Engine.csproj" />
   </ItemGroup>
 
 </Project>

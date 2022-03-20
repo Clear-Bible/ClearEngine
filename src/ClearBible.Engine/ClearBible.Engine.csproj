@@ -9,8 +9,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\machine\src\SIL.Machine.Translation.Thot\SIL.Machine.Translation.Thot.csproj" />
     <ProjectReference Include="..\..\..\machine\src\SIL.Machine\SIL.Machine.csproj" />
-    <ProjectReference Include="..\API\Api.csproj" />
-    <ProjectReference Include="..\SubTasks\SubTasks.csproj" />
   </ItemGroup>
 
   <ItemGroup>

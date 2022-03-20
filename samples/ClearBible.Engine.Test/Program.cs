@@ -15,8 +15,8 @@ using ClearBible.Engine.TreeAligner.Translation;
 
 // obtain both source and target corpora.
 
-var manuscriptText = new ManuscriptFileTree("SyntaxTrees");
-var sourceTextCorpus = new EngineManuscriptFileTextCorpus(manuscriptText);
+var manuscriptTree = new ManuscriptFileTree("SyntaxTrees");
+var sourceTextCorpus = new EngineManuscriptFileTextCorpus(manuscriptTree);
 
 var tokenizer = new LatinWordTokenizer();
 //var sourceTextCorpus = new EngineParatextTextCorpus(tokenizer, "data/VBL-PT");
@@ -44,13 +44,19 @@ var parallelTextCorpus = new EngineParallelTextCorpus(sourceTextCorpus, targetTe
         Heuristic = SymmetrizationHeuristic.GrowDiagFinalAnd
     };
 
-    // obtain the manuscript word aligner configuration
-    var manuscriptTreeAlignmentConfig = await FileGetManuscriptTreeAligmentConfig.Get().SetLocation("InputCommon").GetAsync();
-    
+    // set the manuscript tree aligner hyperparameters
+    var manuscriptTreeAlignerParams = await FileGetManuscriptTreeAlignerParams.Get().SetLocation("InputCommon").GetAsync();
+    manuscriptTreeAlignerParams.useAlignModel = true;
+    manuscriptTreeAlignerParams.maxPaths = 1000000;
+    manuscriptTreeAlignerParams.goodLinkMinCount = 3;
+    manuscriptTreeAlignerParams.badLinkMinCount = 3;
+    manuscriptTreeAlignerParams.contentWordsOnly = true;
+
     // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
     IManuscriptTrainableWordAligner manuscriptTrainableWordAligner = new ManuscriptTreeWordAlginer(
         symmetrizedModel,
-        manuscriptTreeAlignmentConfig);
+        manuscriptTreeAlignerParams,
+        manuscriptTree);
 
     // initialize a manuscript word alignment model. At this point it has not yet been trained.
     using var manuscriptModel = new ManuscriptWordAlignmentModel(manuscriptTrainableWordAligner);

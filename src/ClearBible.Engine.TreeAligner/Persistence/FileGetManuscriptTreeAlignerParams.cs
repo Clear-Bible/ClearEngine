@@ -1,26 +1,25 @@
-﻿using ClearBible.Clear3.API;
-using ClearBible.Clear3.SubTasks;
-using ClearBible.Engine.Persistence;
-using ClearBible.Engine.Translation;
+﻿using ClearBible.Engine.Persistence;
 using ClearBible.Engine.TreeAligner.Translation;
+
+using ClearBible.Engine.TreeAligner.Legacy;
 
 namespace ClearBible.Engine.TreeAligner.Persistence
 {
-    public class FileGetManuscriptTreeAligmentConfig : IPersistGettable<FileGetManuscriptTreeAligmentConfig, ManuscriptWordAlignmentConfig>
+    public class FileGetManuscriptTreeAlignerParams : IPersistGettable<FileGetManuscriptTreeAlignerParams, ManuscriptTreeWordAlignerParams>
     {
         public string? PathPrefix { get; private set; }
 
         string AddPathPrefix(string s) => Path.Combine(PathPrefix ?? "", s);
 
-        public FileGetManuscriptTreeAligmentConfig()
+        public FileGetManuscriptTreeAlignerParams()
         {
         }
-        public override IPersistGettable<FileGetManuscriptTreeAligmentConfig, ManuscriptWordAlignmentConfig> SetLocation(string location)
+        public override IPersistGettable<FileGetManuscriptTreeAlignerParams, ManuscriptTreeWordAlignerParams> SetLocation(string location)
         {
             PathPrefix = location;
             return this;
         }
-        public override async Task<ManuscriptWordAlignmentConfig> GetAsync()
+        public override async Task<ManuscriptTreeWordAlignerParams> GetAsync()
         {
             (List<string> puncs,
              List<string> stopWords,
@@ -47,18 +46,18 @@ namespace ClearBible.Engine.TreeAligner.Persistence
              oldAlignmentPath: AddPathPrefix("oldAlignment.json"),
              strongsPath: AddPathPrefix("strongs.txt"));
 
-            return await Task.Run(() => new ManuscriptWordAlignmentConfig(
-                puncs,
-                stopWords,
-                sourceFunctionWords,
-                targetFunctionWords,
-                manTransModel,
+            return await Task.Run(() => new ManuscriptTreeWordAlignerParams(
+                strongs,
+                glossTable,
+                oldLinks,
                 goodLinks,
                 badLinks,
-                glossTable,
-                groups,
-                oldLinks,
-                strongs
+                sourceFunctionWords,
+                targetFunctionWords,
+                stopWords,
+                puncs,
+                manTransModel,
+                groups
             ));
         }
     }

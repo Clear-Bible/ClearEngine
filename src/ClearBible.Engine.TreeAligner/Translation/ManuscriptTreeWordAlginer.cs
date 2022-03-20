@@ -1,4 +1,9 @@
-﻿using ClearBible.Engine.Translation;
+﻿using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Translation;
+using ClearBible.Engine.TreeAligner.Adapter;
+
+using ClearBible.Engine.TreeAligner.Legacy;
+
 using SIL.Machine.Corpora;
 using SIL.Machine.Translation;
 using SIL.Machine.Utils;
@@ -7,18 +12,21 @@ namespace ClearBible.Engine.TreeAligner.Translation
 {
 	public class ManuscriptTreeWordAlginer : IManuscriptWordAligner, IManuscriptTrainableWordAligner
 	{
-        private ManuscriptWordAlignmentConfig? _manuscriptWordAlignmentConfig;
+        private ManuscriptTreeWordAlignerParams _hyperParameters;
 
         private string? _prefFileName;
+        private readonly IManuscriptTree _manuscriptTree;
+
         public IWordAlignmentModel SMTWordAlignmentModel { get; }
 
         public TrainStats Stats => throw new NotImplementedException();
 
-        public ManuscriptTreeWordAlginer(IWordAlignmentModel wordAlignmentModel, ManuscriptWordAlignmentConfig manuscriptWordAlignmentConfig, string? prefFileName = null)
+        public ManuscriptTreeWordAlginer(IWordAlignmentModel wordAlignmentModel, ManuscriptTreeWordAlignerParams hyperParameters, IManuscriptTree manuscriptTree, string? prefFileName = null)
 		{
 			SMTWordAlignmentModel = wordAlignmentModel;
-			Load(prefFileName);
-			Configure(manuscriptWordAlignmentConfig);
+            _manuscriptTree = manuscriptTree;
+            Load(prefFileName);
+			Configure(hyperParameters);
 		}
 
 		public WordAlignmentMatrix GetBestAlignment(IReadOnlyList<string> sourceSegment,
@@ -33,9 +41,9 @@ namespace ClearBible.Engine.TreeAligner.Translation
 		/// Congfigures aligner
 		/// </summary>
 		/// <param name="config"></param>
-		public void Configure(ManuscriptWordAlignmentConfig manuscriptWordAlignmentConfig)
+		public void Configure(ManuscriptTreeWordAlignerParams hyperParameters)
         {
-			_manuscriptWordAlignmentConfig = manuscriptWordAlignmentConfig;
+			_hyperParameters = hyperParameters;
         }
         public double GetAlignmentScore(int sourceLen, int prevSourceIndex, int sourceIndex, int targetLen, int prevTargetIndex, int targetIndex)
         {
@@ -53,9 +61,12 @@ namespace ClearBible.Engine.TreeAligner.Translation
         {
 
         }
-		public WordAlignmentMatrix GetBestAlignment(ParallelTextSegment segment, ITokenProcessor? sourcePreprocessor = null, ITokenProcessor? targetPreprocessor = null)
+		public WordAlignmentMatrix GetBestAlignment(ParallelTextSegment parallelTextSegment, ITokenProcessor? sourcePreprocessor = null, ITokenProcessor? targetPreprocessor = null)
         {
-            throw new NotImplementedException();
+			//FIXME!
+			var result = ZoneAlignmentAdapter.AlignZone(parallelTextSegment, _manuscriptTree, new AutoAlignAssumptions(_hyperParameters, null, null, null, null));
+
+			throw new NotImplementedException();
         }
 		/// <summary>
 		/// Load generated collections of Translations And Alignments
