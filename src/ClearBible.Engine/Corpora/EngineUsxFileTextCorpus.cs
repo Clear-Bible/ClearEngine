@@ -21,7 +21,7 @@ namespace ClearBible.Engine.Corpora
             ITokenizer<string, int, string> wordTokenizer, 
             string projectPath, 
             ScrVers? versification = null,
-            ITextSegmentProcessor? textSegmentProcessor = null) 
+            BaseTextSegmentProcessor? textSegmentProcessor = null) 
             : base(wordTokenizer, projectPath, versification)
         {
             TextSegmentProcessor = textSegmentProcessor;
@@ -30,10 +30,14 @@ namespace ClearBible.Engine.Corpora
             {
                 AddText(new EngineUsxFileText(wordTokenizer, fileName, Versification, this));
             }
-
         }
 
-        public ITextSegmentProcessor? TextSegmentProcessor { get; set; }
+        public BaseTextSegmentProcessor? TextSegmentProcessor { get; set; }
         public bool DoMachineVersification { get; set; } = true;
+
+        public void Train(ParallelTextCorpus parallelTextCorpus, ITextCorpus textCorpus)
+        {
+            TextSegmentProcessor?.Train(parallelTextCorpus, textCorpus);
+        }
     }
 }

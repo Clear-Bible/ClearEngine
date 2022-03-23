@@ -17,7 +17,12 @@ namespace ClearBible.Engine.Corpora
                 }).ToList();
         }
 
-        public ITextSegmentProcessor? TextSegmentProcessor { get; set; } = null;
+        public BaseTextSegmentProcessor? TextSegmentProcessor { get; set; } = null;
         public bool DoMachineVersification { get; set; } = true;
+
+        public void Train(ParallelTextCorpus parallelTextCorpus, ITextCorpus textCorpus)
+        {
+            TextSegmentProcessor?.Train(parallelTextCorpus, textCorpus);
+        }
     }
 }

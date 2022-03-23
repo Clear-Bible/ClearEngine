@@ -5,9 +5,10 @@ using SIL.Scripture;
 
 namespace ClearBible.Engine.Corpora
 {
-    public class EngineManuscriptFileText : ManuscriptFileText
+    public class EngineManuscriptFileText : ManuscriptFileText, IEngineText
     {
         private readonly IEngineCorpus _engineCorpus;
+        public bool _leaveTextRaw = false;
 
         /// <summary>
         /// Creates the Text for a manuscript book.
@@ -40,35 +41,32 @@ namespace ClearBible.Engine.Corpora
             // SEE NOTE IN EngineUsfmFileText.GetSegments() as to why this override is necessary and its limitations.
 
             //apply machine versification if configured.
-            IEnumerable<TextSegment> textSegments;
-            if (!_engineCorpus.DoMachineVersification)
+            try
             {
-                textSegments = GetSegmentsInDocOrder(includeText: includeText);
-            }
-            else
-            {
-                //textSegments = base.GetSegments(includeText, basedOn);
-                textSegments = _getSegments(includeText, basedOn);
-            }
-
-            // return if no processors configured.
-            if (!includeText || _engineCorpus.TextSegmentProcessor == null)
-            {
-                //used yield here so the following foreach with yield, which creates an iterator, is possible
-                foreach (var textSegment in textSegments)
+                IEnumerable<TextSegment> segments;
+                if (!_engineCorpus.DoMachineVersification)
                 {
-                    yield return textSegment;
+                    segments = GetSegmentsInDocOrder(includeText: includeText);
                 }
-            }
-            else
-            {
-                // otherwise process the TextSegments.
-                foreach (var textSegment in textSegments)
+                else
                 {
-                    yield return _engineCorpus.TextSegmentProcessor.Process((TokensTextSegment) textSegment);
+                    //textSegments = base.GetSegments(includeText, basedOn);
+                    segments = _getSegments(includeText, basedOn);
                 }
-            }
 
+                segments = segments
+                    .Select(ts => _engineCorpus.TextSegmentProcessor?.Process(((TokensTextSegment) ts)) ?? (TokensTextSegment) ts);
+
+                if (_leaveTextRaw)
+                {
+                    segments.ToList(); //make sure to evaluate enumeration before setting ToggleTextRaw from true to false;
+                }
+                return segments;
+            }
+            finally
+            {
+                _leaveTextRaw = false;
+            }
         }
 
         /*
@@ -93,7 +91,17 @@ namespace ClearBible.Engine.Corpora
                 return new TextSegment(Id, segRef, Array.Empty<string>(), isSentenceStart, isInRange, isRangeStart,
                     isEmpty: text.Length == 0);
             }
-            IReadOnlyList<string> segment = WordTokenizer.Tokenize(text).ToArray();
+
+            IReadOnlyList<string> segment;
+            if (_leaveTextRaw)
+            {
+                segment = new List<string>() { text };
+            }
+            else
+            {
+                segment = WordTokenizer.Tokenize(text).ToArray();
+            }
+
             segment = TokenProcessors.UnescapeSpaces.Process(segment);
 
             (string bookAbbreviation, int chapterNum, int verseNum) = TokensTextSegment.GetBookChapterVerse(segRef);
@@ -182,6 +190,23 @@ namespace ClearBible.Engine.Corpora
                 isRangeStart: isRangeStart,
                 isEmpty: textSegmentStart.IsEmpty && textSegment.IsEmpty,
                 ((TokensTextSegment)textSegmentStart).Tokens.Concat(((TokensTextSegment)textSegment).Tokens).ToList().AsReadOnly());
+        }
+        public bool LeaveTextRaw
+        {
+            get
+            {
+                return _leaveTextRaw;
+            }
+        }
+
+        /// <summary>
+        /// Should never be called while iterating GetSegments()
+        /// </summary>
+        public bool ToggleLeaveTextRawOn()
+        {
+            bool prev = _leaveTextRaw;
+            _leaveTextRaw = true;
+            return prev;
         }
     }
 }

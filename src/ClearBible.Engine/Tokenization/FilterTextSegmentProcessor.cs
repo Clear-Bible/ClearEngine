@@ -4,7 +4,7 @@ using SIL.Scripture;
 
 namespace ClearBible.Engine.Tokenization
 {
-    public class FilterTextSegmentProcessor : ITextSegmentProcessor
+    public class FilterTextSegmentProcessor : BaseTextSegmentProcessor
     {
         private readonly IReadOnlyList<string> _textToFilter;
 
@@ -12,8 +12,7 @@ namespace ClearBible.Engine.Tokenization
         {
             _textToFilter = textToFilter;
         }
-
-        public TokensTextSegment Process(TokensTextSegment tokensTextSegment)
+        public override TokensTextSegment Process(TokensTextSegment tokensTextSegment)
         {
             for (int i = 0; i < tokensTextSegment.Tokens.Count(); i++)
             {

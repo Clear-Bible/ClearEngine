@@ -22,7 +22,7 @@ namespace ClearBible.Engine.Corpora
         public EngineParatextTextCorpus(
 			ITokenizer<string, int, string> wordTokenizer, 
 			string projectDir, 
-			ITextSegmentProcessor? textSegmentProcessor = null,
+			BaseTextSegmentProcessor? textSegmentProcessor = null,
 			bool includeMarkers = false)
             : base(wordTokenizer, projectDir, includeMarkers)
         {
@@ -75,7 +75,17 @@ namespace ClearBible.Engine.Corpora
 			}
 		}
 
-		public ITextSegmentProcessor? TextSegmentProcessor { get; set; }
+		public BaseTextSegmentProcessor? TextSegmentProcessor { get; set; }
 		public bool DoMachineVersification { get; set; } = true;
-    }
+
+        public void Train(EngineParallelTextCorpus engineParallelTextCorpus)
+        {
+            throw new NotImplementedException();
+        }
+
+		public void Train(ParallelTextCorpus parallelTextCorpus, ITextCorpus textCorpus)
+		{
+			TextSegmentProcessor?.Train(parallelTextCorpus, textCorpus);
+		}
+	}
 }

@@ -105,6 +105,8 @@ namespace ClearBible.Engine.Corpora
 				//for rebuilding map from file: use to VerseRef.VerseRef(int bookNum, int chapterNum, int verseNum, ScrVers versification) constructor.
 				SourceTargetParallelVersesList = sourceTargetParallelVersesList;
 			}
+			sourceCorpus.Train(this, sourceCorpus);
+			targetCorpus.Train(this, targetCorpus);
 		}
         public List<SourceTargetParallelVerses> SourceTargetParallelVersesList { get; set; }
 

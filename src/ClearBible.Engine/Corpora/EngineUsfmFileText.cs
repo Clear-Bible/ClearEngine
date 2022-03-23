@@ -10,9 +10,10 @@ namespace ClearBible.Engine.Corpora
     /// An Engine USFM text override that returns segments, each of which is a verse id and text, from its GetSegments() override. which aren't
 	/// grouped my Machine versification so Engine can apply its own versification mapping.
     /// </summary>
-    public class EngineUsfmFileText : UsfmFileText
+    public class EngineUsfmFileText : UsfmFileText, IEngineText
     {
         private readonly IEngineCorpus _engineCorpus;
+        public bool _leaveTextRaw = false;
 
         public EngineUsfmFileText(
             ITokenizer<string, int, string> wordTokenizer,
@@ -25,6 +26,39 @@ namespace ClearBible.Engine.Corpora
             : base(wordTokenizer, stylesheet, encoding, fileName, versification, includeMarkers)
         {
             _engineCorpus = engineCorpus;
+        }
+
+        public bool LeaveTextRaw
+        {
+            get
+            {
+                return _leaveTextRaw;
+            }
+        }
+
+        /// <summary>
+        /// Should never be called while iterating GetSegments()
+        /// </summary>
+        public bool ToggleLeaveTextRawOn()
+        {
+            bool prev = _leaveTextRaw;
+            _leaveTextRaw = true;
+            return prev;
+        }
+
+        protected override TextSegment CreateTextSegment(bool includeText, string text, object segRef,
+            bool isSentenceStart = true, bool isInRange = false, bool isRangeStart = false)
+        {
+            if (_leaveTextRaw)
+            {
+                text = text.Trim();
+                List<string> segment = new List<string>() { text };
+                return new TextSegment(Id, segRef, segment, isSentenceStart, isInRange, isRangeStart, segment.Count == 0);
+            }
+            else
+            {
+                return base.CreateTextSegment(includeText, text, segRef, isSentenceStart, isInRange, isRangeStart);
+            }
         }
 
         /// <summary>
@@ -115,35 +149,31 @@ namespace ClearBible.Engine.Corpora
                 */
 
             //Do not sort since sequential TextSegments define ranges.
+            try
+            {
+                IEnumerable<TextSegment> segments;
 
-            //apply machine versification if configured.
-            IEnumerable<TextSegment> textSegments;
-            if (!_engineCorpus.DoMachineVersification)
-            {
-                textSegments = GetSegmentsInDocOrder(includeText: includeText);
-            }
-            else
-            {
-                textSegments = base.GetSegments(includeText, basedOn);
-            }
+                if (!_engineCorpus.DoMachineVersification)
+                {
+                    segments = GetSegmentsInDocOrder(includeText: includeText);
+                }
+                else
+                {
+                    segments = base.GetSegments(includeText, basedOn);
+                }
 
-            // return if no processors configured.
-            if (!includeText || _engineCorpus.TextSegmentProcessor == null)
-            {
-                //used yield here so the following foreach with yield, which creates an iterator, is possible
-                foreach (var textSegment in textSegments
-                        .Select(textSegment => new TokensTextSegment(textSegment)))
+                segments = segments
+                    .Select(ts => _engineCorpus.TextSegmentProcessor?.Process(new TokensTextSegment(ts)) ?? new TokensTextSegment(ts));
+
+                if (_leaveTextRaw)
                 {
-                    yield return textSegment;
+                    segments.ToList(); //make sure to evaluate enumeration before setting ToggleTextRaw from true to false;
                 }
+                return segments;
             }
-            else
+            finally
             {
-                // otherwise process the TextSegments.
-                foreach (var textSegment in textSegments)
-                {
-                    yield return _engineCorpus.TextSegmentProcessor.Process(new TokensTextSegment(textSegment));
-                }
+                _leaveTextRaw = false;
             }
         }
     }

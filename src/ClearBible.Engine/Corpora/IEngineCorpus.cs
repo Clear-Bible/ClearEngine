@@ -8,8 +8,16 @@ namespace ClearBible.Engine.Corpora
     {
         bool DoMachineVersification { get; set; }
 
-        ITextSegmentProcessor? TextSegmentProcessor { get; set; }
+        BaseTextSegmentProcessor? TextSegmentProcessor { get; set; }
 
         ScrVers Versification { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parallelTextCorpus"></param>
+        /// <param name="forTarget">if true this processor applies to target, else source.</param>
+        /// <exception cref="InvalidCastException"></exception>
+        void Train(ParallelTextCorpus parallelTextCorpus, ITextCorpus textCorpus);
     }
 }

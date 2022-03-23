@@ -25,7 +25,7 @@ namespace ClearBible.Engine.Corpora
             Encoding encoding, 
             string projectPath, 
             ScrVers? versification = null,
-            ITextSegmentProcessor? textSegmentProcessor = null,
+            BaseTextSegmentProcessor? textSegmentProcessor = null,
             bool includeMarkers = false, 
             string filePattern = "*.SFM")
             : base(wordTokenizer, stylesheetFileName, encoding, projectPath, versification, includeMarkers, filePattern)
@@ -41,7 +41,12 @@ namespace ClearBible.Engine.Corpora
             }
         }
 
-        public ITextSegmentProcessor? TextSegmentProcessor { get; set; }
+        public BaseTextSegmentProcessor? TextSegmentProcessor { get; set; }
         public bool DoMachineVersification { get; set; } = true;
+
+        public void Train(ParallelTextCorpus parallelTextCorpus, ITextCorpus textCorpus)
+        {
+            TextSegmentProcessor?.Train(parallelTextCorpus, textCorpus);
+        }
     }
 }

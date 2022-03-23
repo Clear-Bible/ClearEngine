@@ -9,9 +9,11 @@ namespace ClearBible.Engine.Corpora
     /// An Engine USX text override that returns segments, each of which is a verse id and text, from its GetSegments() override which aren't
     /// grouped my Machine versification so Engine can apply its own versification mapping.
     /// </summary>
-    public class EngineUsxFileText : UsxFileText
+    public class EngineUsxFileText : UsxFileText, IEngineText
     {
         private readonly IEngineCorpus _engineCorpus;
+
+        public bool _leaveTextRaw = false;
 
         public EngineUsxFileText(
             ITokenizer<string, int, string> wordTokenizer, 
@@ -22,6 +24,35 @@ namespace ClearBible.Engine.Corpora
         {
             _engineCorpus = engineCorpus;
         }
+        public bool LeaveTextRaw { get
+            {
+                return _leaveTextRaw;
+            }
+        }
+
+        /// <summary>
+        /// Should never be called while iterating GetSegments()
+        /// </summary>
+        public bool ToggleLeaveTextRawOn()
+        {
+            bool prev = _leaveTextRaw;
+            _leaveTextRaw = true;
+            return prev;
+        }
+        protected override TextSegment CreateTextSegment(bool includeText, string text, object segRef,
+            bool isSentenceStart = true, bool isInRange = false, bool isRangeStart = false)
+        {
+            if (_leaveTextRaw)
+            {
+                text = text.Trim();
+                List<string> segment = new List<string>() { text };
+                return new TextSegment(Id, segRef, segment, isSentenceStart, isInRange, isRangeStart, segment.Count == 0);
+            }
+            else
+            {
+                return base.CreateTextSegment(includeText, text, segRef, isSentenceStart, isInRange, isRangeStart);
+            }
+        }
 
         /// <summary>
         /// An Engine override which doesn't group segments based on Machine's versification.
@@ -31,38 +62,32 @@ namespace ClearBible.Engine.Corpora
         /// <returns>Segments, which are verse and text, as the are in the USX document.</returns>
         public override IEnumerable<TextSegment> GetSegments(bool includeText = true, IText? basedOn = null)
         {
-            //Do not sort since sequential TextSegments define ranges.
-
             // SEE NOTE IN EngineUsfmFileText.GetSegments() as to why this override is necessary and its limitations.
+            try
+            {
+                IEnumerable<TextSegment> segments;
 
-            //apply machine versification if configured.
-            IEnumerable<TextSegment> textSegments;
-            if (!_engineCorpus.DoMachineVersification)
-            {
-                textSegments = GetSegmentsInDocOrder(includeText: includeText);
-            }
-            else
-            {
-                textSegments = base.GetSegments(includeText, basedOn);
-            }
+                if (!_engineCorpus.DoMachineVersification)
+                {
+                    segments = GetSegmentsInDocOrder(includeText: includeText);
+                }
+                else
+                {
+                    segments = base.GetSegments(includeText, basedOn);
+                }
 
-            // return if no processors configured.
-            if (!includeText || _engineCorpus.TextSegmentProcessor == null)
-            {
-                //used yield here so the following foreach with yield, which creates an iterator, is possible
-                foreach (var textSegment in textSegments
-                        .Select(textSegment => new TokensTextSegment(textSegment)))
+                segments = segments
+                    .Select(ts => _engineCorpus.TextSegmentProcessor?.Process(new TokensTextSegment(ts)) ?? new TokensTextSegment(ts));
+
+                if (_leaveTextRaw)
                 {
-                    yield return textSegment;
+                    segments.ToList(); //make sure to evaluate enumeration before setting ToggleTextRaw from true to false;
                 }
+                return segments;
             }
-            else
+            finally
             {
-                // otherwise process the TextSegments.
-                foreach (var textSegment in textSegments)
-                {
-                    yield return _engineCorpus.TextSegmentProcessor.Process(new TokensTextSegment(textSegment));
-                }
+                _leaveTextRaw = false;
             }
         }
     }
