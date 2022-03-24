@@ -53,9 +53,9 @@ namespace ClearBible.Engine.Translation
             return _trainableAligner.GetBestAlignment(sourceSegment, targetSegment);
         }
 
-        public WordAlignmentMatrix GetBestAlignment(ParallelTextSegment segment, ITokenProcessor? sourcePreprocessor = null, ITokenProcessor? targetPreprocessor = null)
+        public WordAlignmentMatrix GetBestAlignment(ParallelTextRow row)
         {
-            return _trainableAligner.GetBestAlignment(segment, sourcePreprocessor, targetPreprocessor);
+            return _trainableAligner.GetBestAlignment(row);
         }
 
         public IEnumerable<(int TargetWordIndex, double Score)> GetTranslations(int sourceWordIndex, double threshold = 0)
@@ -72,13 +72,11 @@ namespace ClearBible.Engine.Translation
         /// <param name="maxCorpusCount"></param>
         /// <returns></returns>
         /// <exception cref="InvalidCastException"></exception>
-        public ITrainer CreateTrainer(ParallelTextCorpus parallelTextCorpus, ITokenProcessor? sourcePreprocessor = null, ITokenProcessor? targetPreprocessor = null, int maxCorpusCount = int.MaxValue)
+        public ITrainer CreateTrainer(IEnumerable<ParallelTextRow> parallelTextRows)
         {
             return new ManuscriptWordAlignmentModelTrainer(
                 _trainableAligner,
-                parallelTextCorpus,
-                targetPreprocessor,
-                maxCorpusCount
+                parallelTextRows
                 );
         }
         public SIL.ObjectModel.IReadOnlySet<int> SpecialSymbolIndices => _wordAlignmentModel.SpecialSymbolIndices;

@@ -13,42 +13,42 @@ namespace ClearBible.Engine.TreeAligner.Adapter
     internal class ZoneAlignmentAdapter
     {
 
-        internal static IEnumerable<(SourcePoint, (TargetPoint, double))> AlignZone(ParallelTextSegment parallelTextSegment, IManuscriptTree manuscriptTree, IAutoAlignAssumptions config)
+        internal static IEnumerable<(SourcePoint, (TargetPoint, double))> AlignZone(ParallelTextRow parallelTextRow, IManuscriptTree manuscriptTree, IAutoAlignAssumptions config)
         {
             try
             {
-                parallelTextSegment.SourceSegmentRefs.Cast<VerseRef>();
+                parallelTextRow.SourceRefs.Cast<VerseRef>();
             }
             catch (InvalidCastException)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextSegment with a source segment that includes refs that are not VerseRefs");
+                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes refs that are not VerseRefs");
             }
 
-            var books = parallelTextSegment.SourceSegmentRefs
+            var books = parallelTextRow.SourceRefs
                 .Select(r => ((VerseRef)r).Book)
                 .Distinct();
             if (books.Count() > 1)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextSegment with a source segment that includes ref to more than one book");
+                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref to more than one book");
             }
             if (books.Count() == 0)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextSegment with a source segment that includes ref without a book");
+                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref without a book");
             }
 
-            var chapterNumbers = parallelTextSegment.SourceSegmentRefs
+            var chapterNumbers = parallelTextRow.SourceRefs
                 .Select(r => ((VerseRef)r).ChapterNum)
                 .Distinct();
             if (chapterNumbers.Count() > 1)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextSegment with a source segment that includes ref to more than one chapterNum");
+                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref to more than one chapterNum");
             }
             if (chapterNumbers.Count() == 0)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextSegment with a source segment that includes ref without a chapterNum");
+                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref without a chapterNum");
             }
 
-            var verseNumbers = parallelTextSegment.SourceSegmentRefs
+            var verseNumbers = parallelTextRow.SourceRefs
                 .Select(r => ((VerseRef)r).VerseNum)
                 .Distinct();
 
@@ -96,13 +96,13 @@ namespace ClearBible.Engine.TreeAligner.Adapter
         }
         */
 
-            if (parallelTextSegment.TargetSegment is not TokensTextSegment)
+            if (parallelTextRow.TargetSegment is not TokensTextRow)
             {
-                throw new InvalidDataException("parallelTextSegment supplied is not a TokensTextSegment, which is required for extracting target points.");
+                throw new InvalidDataException("ParallelTextRow supplied is not a TokensTextSegment, which is required for extracting target points.");
             }
 
             //FIXME: CHECK THIS!
-            IEnumerable<Target> targets = ((TokensTextSegment)parallelTextSegment.TargetSegment).Tokens
+            IEnumerable<Target> targets = ((TokensTextRow)parallelTextRow.TargetSegment).Tokens
                 .Select(t => new Target(new TargetText(t.Text), new TargetLemma(t.Text), new TargetID(t.TokenId.ToString())));
 
             List<MonoLink> monoLinks = ZoneAlignment.GetMonoLinks(

@@ -10,35 +10,33 @@ namespace ClearBible.Engine.Translation
     {
         private ITrainer _smtTrainer;
         private IManuscriptTrainableWordAligner _trainableAligner;
-        private ParallelTextCorpus _parallelTextCorpus;
+        private IEnumerable<ParallelTextRow> _parallelTextRows;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="trainableAligner"></param>
-        /// <param name="parallelTextCorpus">parallelTextCorpus SourceCorpus must be an EngineManuscriptFileTextCorpus</param>
-        /// <param name="targetPreprocessor"></param>
-        /// <param name="maxCorpusCount"></param>
+        /// <param name="parallelTextRows"></param>
         /// <exception cref="ManuscriptWordAlignmentException"></exception>
         public ManuscriptWordAlignmentModelTrainer(
             IManuscriptTrainableWordAligner trainableAligner,
-            ParallelTextCorpus parallelTextCorpus,
-            ITokenProcessor? targetPreprocessor,
-            int maxCorpusCount
+            IEnumerable<ParallelTextRow> parallelTextRows
             )
         {
             // this ensures the aligner Trainer gets both (1) a sourceCorpus which is a EngineManuscriptFileTextCorpus,
             // which ensures TextSegments are TokenTextSegments with ManuscriptTokens in them,
             // (2) targetCorpus TextSegments are TokenTextSegments with TokenIds in them.
-            if ( (parallelTextCorpus.SourceCorpus is not EngineManuscriptFileTextCorpus) || (parallelTextCorpus.TargetCorpus is not IEngineCorpus))
-            {
-                throw new ManuscriptWordAlignmentException(@"Trainer must be supplied a parallelTextCorpus with SourceCorpus of EngineManuscriptFileTextCorpus
-                    and TargetCorpus of IEngineCorpus.");
-            }
+            //FIXME - what checks here?
+
+            //if ( (parallelTextCorpus.SourceCorpus is not _EngineManuscriptFileTextCorpus) || (parallelTextCorpus.TargetCorpus is not IEngineCorpus))
+            //{
+            //    throw new ManuscriptWordAlignmentException(@"Trainer must be supplied a parallelTextCorpus with SourceCorpus of EngineManuscriptFileTextCorpus
+            //        and TargetCorpus of IEngineCorpus.");
+            //}
 
             _trainableAligner = trainableAligner;
-            _parallelTextCorpus = parallelTextCorpus;
-            _smtTrainer = _trainableAligner.SMTWordAlignmentModel.CreateTrainer(_parallelTextCorpus, null, targetPreprocessor, maxCorpusCount);
+            _parallelTextRows = parallelTextRows;
+            _smtTrainer = _trainableAligner.SMTWordAlignmentModel.CreateTrainer(_parallelTextRows);
         }
         public TrainStats? Stats => _smtTrainer?.Stats;
 
@@ -76,7 +74,7 @@ namespace ClearBible.Engine.Translation
             checkCanceled?.Invoke();
             using (PhaseProgress phaseProgress = reporter.StartNextPhase())
             {
-                _trainableAligner.Train(_parallelTextCorpus, phaseProgress, checkCanceled);
+                _trainableAligner.Train(_parallelTextRows, phaseProgress, checkCanceled);
             }
         }
     }

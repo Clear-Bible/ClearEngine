@@ -61,10 +61,10 @@ namespace ClearBible.Engine.TreeAligner.Translation
         {
 
         }
-		public WordAlignmentMatrix GetBestAlignment(ParallelTextSegment parallelTextSegment, ITokenProcessor? sourcePreprocessor = null, ITokenProcessor? targetPreprocessor = null)
+		public WordAlignmentMatrix GetBestAlignment(ParallelTextRow parallelTextRow)
         {
 			//FIXME!
-			var result = ZoneAlignmentAdapter.AlignZone(parallelTextSegment, _manuscriptTree, new AutoAlignAssumptions(_hyperParameters, null, null, null, null));
+			var result = ZoneAlignmentAdapter.AlignZone(parallelTextRow, _manuscriptTree, new AutoAlignAssumptions(_hyperParameters, null, null, null, null));
 
 			throw new NotImplementedException();
         }
@@ -94,7 +94,7 @@ namespace ClearBible.Engine.TreeAligner.Translation
 		/// <param name="progress"></param>
 		/// <param name="checkCanceled"></param>
 		/// <exception cref="NotImplementedException"></exception>
-        public void Train(ParallelTextCorpus parallelTextCorpus, IProgress<ProgressStatus>? progress = null, Action? checkCanceled = null)
+        public void Train(IEnumerable<ParallelTextRow> parallelTextRows, IProgress<ProgressStatus>? progress = null, Action? checkCanceled = null)
         {
             //Implement
         }

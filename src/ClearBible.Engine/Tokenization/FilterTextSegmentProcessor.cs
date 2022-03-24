@@ -12,16 +12,16 @@ namespace ClearBible.Engine.Tokenization
         {
             _textToFilter = textToFilter;
         }
-        public override TokensTextSegment Process(TokensTextSegment tokensTextSegment)
+        public override TokensTextRow Process(TokensTextRow tokensTextRow)
         {
-            for (int i = 0; i < tokensTextSegment.Tokens.Count(); i++)
+            for (int i = 0; i < tokensTextRow.Tokens.Count(); i++)
             {
-                if (!_textToFilter.Contains(tokensTextSegment.Tokens[i].Text))
+                if (!_textToFilter.Contains(tokensTextRow.Tokens[i].Text))
                 {
-                    tokensTextSegment.Tokens[i].Use = false;
+                    tokensTextRow.Tokens[i].Use = false;
                 }
             }
-            return tokensTextSegment;
+            return tokensTextRow;
         }
     }
 }

@@ -15,12 +15,26 @@ using ClearBible.Engine.TreeAligner.Translation;
 
 // obtain both source and target corpora.
 
-var manuscriptTree = new ManuscriptFileTree("SyntaxTrees");
-var sourceTextCorpus = new EngineManuscriptFileTextCorpus(manuscriptTree);
-
 var tokenizer = new LatinWordTokenizer();
+
+var manuscriptTree = new ManuscriptFileTree("SyntaxTrees");
+var sourceTextCorpus = new ManuscriptFileTextCorpus(manuscriptTree)
+    .Select(textRow =>
+    {
+        textRow.Segment = tokenizer.Tokenize(textRow.Segment[0]).ToList();
+        return textRow;
+    })
+    .Select(textRow => new TokensTextRow(textRow));
+
+
 //var sourceTextCorpus = new EngineParatextTextCorpus(tokenizer, "data/VBL-PT");
-var targetTextCorpus = new EngineParatextTextCorpus(tokenizer, "data/WEB-PT");
+var targetTextCorpus = new ParatextTextCorpus("data/WEB-PT")
+    .Select(textRow =>
+    {
+        textRow.Segment = tokenizer.Tokenize(textRow.Segment[0]).ToList();
+        return textRow;
+    })
+    .Select(textRow => new TokensTextRow(textRow));
 
 // formulate a parallel corpus based on versification. If Engine versification (sourceTargetParallelVersesList parameter) not provided,
 // build it using SIL Scripture / Machine versification.
@@ -60,7 +74,7 @@ var parallelTextCorpus = new EngineParallelTextCorpus(sourceTextCorpus, targetTe
 
     // initialize a manuscript word alignment model. At this point it has not yet been trained.
     using var manuscriptModel = new ManuscriptWordAlignmentModel(manuscriptTrainableWordAligner);
-    using var manuscriptTrainer = manuscriptModel.CreateTrainer(parallelTextCorpus, targetPreprocessor: TokenProcessors.Lowercase);
+    using var manuscriptTrainer = manuscriptModel.CreateTrainer(parallelTextCorpus);
 
     // train the source->target and target->source models within the symmetrized word alignment model.
     // NOTE: this only needs to be done if they aren't trained already, otherwise this step can be skipped.
@@ -69,31 +83,31 @@ var parallelTextCorpus = new EngineParallelTextCorpus(sourceTextCorpus, targetTe
     manuscriptTrainer.Save();
 
     // now iterate through the best alignments in the model.
-    foreach (ParallelTextSegment textSegment in parallelTextCorpus.GetSegments().Take(5))
+    foreach (ParallelTextRow textRow in parallelTextCorpus.Take(5))
     {
-        var alignment = manuscriptModel.GetBestAlignment(TokenProcessors.Lowercase.Process(textSegment.SourceSegment),
-            TokenProcessors.Lowercase.Process(textSegment.TargetSegment));
+        var alignment = manuscriptModel.GetBestAlignment(textRow.SourceSegment,
+            textRow.TargetSegment);
 
-        var verseRefStr = textSegment.SegmentRef.ToString();
-        var sourceVerseText = string.Join(" ", textSegment.SourceSegment);
-        var targetVerseText = string.Join(" ", textSegment.TargetSegment);
+        var verseRefStr = textRow.Ref.ToString();
+        var sourceVerseText = string.Join(" ", textRow.SourceSegment);
+        var targetVerseText = string.Join(" ", textRow.TargetSegment);
         Console.WriteLine(verseRefStr);
         Console.WriteLine($"Source: {sourceVerseText}");
         Console.WriteLine($"Target: {targetVerseText}");
         Console.WriteLine($"Alignment: {alignment}");
 
 
-        if (textSegment != null && textSegment is EngineParallelTextSegment)
+        if (textRow != null && textRow is EngineParallelTextRow)
         {
-            var sourceTokenIds = string.Join(" ", ((EngineParallelTextSegment)textSegment).SourceTokens?
+            var sourceTokenIds = string.Join(" ", ((EngineParallelTextRow)textRow).SourceTokens?
                 .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
             Console.WriteLine($"SourceTokenIds: {sourceTokenIds}");
 
-            var targetTokenIds = string.Join(" ", ((EngineParallelTextSegment)textSegment).TargetTokens?
+            var targetTokenIds = string.Join(" ", ((EngineParallelTextRow)textRow).TargetTokens?
                 .Select(token => token.TokenId.ToString()) ?? new string[] {"NONE"});
             Console.WriteLine($"TargetTokenIds: {targetTokenIds}");
 
-            IEnumerable<(Token, Token)> sourceTargetTokenIdPairs = ((EngineParallelTextSegment)textSegment).GetAlignedTokenIdPairs(alignment);
+            IEnumerable<(Token, Token)> sourceTargetTokenIdPairs = ((EngineParallelTextRow)textRow).GetAlignedTokenIdPairs(alignment);
             var alignments = string.Join(" ", sourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"));
             Console.WriteLine($"SourceTokenId->TargetTokenId: {alignments}");
         }

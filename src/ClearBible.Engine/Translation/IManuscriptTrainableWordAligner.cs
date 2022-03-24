@@ -10,7 +10,7 @@ namespace ClearBible.Engine.Translation
 {
     public interface IManuscriptTrainableWordAligner : IManuscriptWordAligner
     {
-        void Train(ParallelTextCorpus parallelCorpus, IProgress<ProgressStatus>? progress, Action? checkCanceled);
+        void Train(IEnumerable<ParallelTextRow> parallelTextRows, IProgress<ProgressStatus>? progress, Action? checkCanceled);
         Task SaveAsync();
         void Save();
     }

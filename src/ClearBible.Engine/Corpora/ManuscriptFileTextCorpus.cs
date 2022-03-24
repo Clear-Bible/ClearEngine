@@ -5,7 +5,7 @@ namespace ClearBible.Engine.Corpora
 {
     public class ManuscriptFileTextCorpus : ScriptureTextCorpus
     {
-        public ManuscriptFileTextCorpus(IManuscriptText manuscriptText) : base(null)
+        public ManuscriptFileTextCorpus(IManuscriptText manuscriptText)
         {
             Books = manuscriptText.GetBooks();
             Books

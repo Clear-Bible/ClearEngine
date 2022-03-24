@@ -33,7 +33,7 @@ namespace ClearBible.Engine.Corpora
     public record SourceTargetParallelVerses(IEnumerable<EngineVerseId> sourceVerseIds, IEnumerable<EngineVerseId> targetVerseIds);
 	public static class Extensions
 	{
-		public static List<SourceTargetParallelVerses> Validate(this List<SourceTargetParallelVerses> list, IEngineCorpus sourceCorpus, IEngineCorpus targetCorpus)
+		public static List<SourceTargetParallelVerses> Validate(this List<SourceTargetParallelVerses> list, IEnumerable<TextRow> sourceCorpus, IEnumerable<TextRow> targetCorpus)
 		{
 			//FIXME:validate that entries in each enumerable in SourceTargetParallelVerses are from the same book and chapter.
 			//FIXME: Validate that entries in each enumerable have accompanying entries that together comprise a file verse grouping, e.g. "Fee fi fo" is for verses 1-3.
@@ -66,12 +66,12 @@ namespace ClearBible.Engine.Corpora
 		/// <param name="segmentRefComparer">The comparer used to find parallel source and target segments. Defaults to null,
 		/// which uses machine's VerseRef comparer.</param>
 		public EngineParallelTextCorpus(
-			IEngineCorpus sourceCorpus,
-			IEngineCorpus targetCorpus,
+			IEnumerable<TextRow> sourceCorpus,
+			IEnumerable<TextRow> targetCorpus,
 			List<SourceTargetParallelVerses>? sourceTargetParallelVersesList = null,
-			ITextAlignmentCorpus? textAlignmentCorpus = null,
+			IEnumerable<AlignmentRow>? alignmentCorpus = null,
 			IComparer<object>? segmentRefComparer = null)
-			: base(sourceCorpus, targetCorpus, textAlignmentCorpus, segmentRefComparer = null)
+			: base(sourceCorpus, targetCorpus, alignmentCorpus, segmentRefComparer = null)
 		{
 			// If sourceTargetParallelVerses is null, use Machine/sil/scripture versification to create it.
 			if (sourceTargetParallelVersesList == null)
@@ -81,15 +81,15 @@ namespace ClearBible.Engine.Corpora
                 //Versifications as used in machine doesn't support combining verses.
                 sourceTargetParallelVersesList = new();
 
-                _ = GetSegments(includeText: false)
-					.Select(parallelTextSegment =>
+                _ = this
+					.Select(parallelTextRow =>
 						{
 							var sourceTargetParallelVerses = new SourceTargetParallelVerses
 							(
 								// assume SegmentRef is VerseRef since corpora are ScriptureTextCorpus.
-								parallelTextSegment.SourceSegmentRefs
+								parallelTextRow.SourceRefs
 									.Select(sourceSegmentRef => new EngineVerseId((VerseRef)sourceSegmentRef)),
-								parallelTextSegment.TargetSegmentRefs
+								parallelTextRow.TargetRefs
 									.Select(targetSegmentRef => new EngineVerseId((VerseRef)targetSegmentRef))
 
 							);
@@ -105,35 +105,84 @@ namespace ClearBible.Engine.Corpora
 				//for rebuilding map from file: use to VerseRef.VerseRef(int bookNum, int chapterNum, int verseNum, ScrVers versification) constructor.
 				SourceTargetParallelVersesList = sourceTargetParallelVersesList;
 			}
-			sourceCorpus.Train(this, sourceCorpus);
-			targetCorpus.Train(this, targetCorpus);
 		}
         public List<SourceTargetParallelVerses> SourceTargetParallelVersesList { get; set; }
 
 
-		public override ParallelTextCorpus Invert()
-		{
-			return new EngineParallelTextCorpus((IEngineCorpus) TargetCorpus, (IEngineCorpus) SourceCorpus, SourceTargetParallelVersesList, TextAlignmentCorpus.Invert());
-		}
+		private List<TextRow>? _sourceTextRows = null;
+		private List<TextRow>? _targetTextRows = null;
 
-		protected override ParallelText CreateParallelText(string id)
+		protected override IEnumerable<ParallelTextRow> GetRows()
 		{
-			IText sourceText = SourceCorpus[id];
-			IText targetText = TargetCorpus[id];
-
-			if (SourceTargetParallelVersesList != null)
-            {
-				((IEngineCorpus)SourceCorpus).DoMachineVersification = false;
-				((IEngineCorpus)TargetCorpus).DoMachineVersification = false;
-				ITextAlignmentCollection textAlignmentCollection = TextAlignmentCorpus[id];
-				return new EngineParallelText(sourceText, targetText, SourceTargetParallelVersesList, textAlignmentCollection, _segmentRefComparer);
+			if (SourceTargetParallelVersesList == null)
+			{
+				var enumerator = base.GetRows().GetEnumerator();
+				bool succeeded = enumerator.MoveNext();
+				yield return enumerator.Current;
 			}
 			else
-            {
-				((IEngineCorpus)SourceCorpus).DoMachineVersification = true;
-				((IEngineCorpus)TargetCorpus).DoMachineVersification = true;
-				ITextAlignmentCollection textAlignmentCollection = TextAlignmentCorpus[id];
-				return new ParallelText(sourceText, targetText, textAlignmentCollection, _segmentRefComparer);
+			{
+				//ScriptureText.GetSegments is an IEnumerable based on an underlying list (ScriptureText.GetRows())
+				// Get the list right from the start so that each foreach iteration's Where clause doesn't have to rebuild it
+				// (within XTexts.GetSegment()) when ToList() is called while supplying
+				// parameters to ParallelTextSegment's ctor.
+
+				if (_sourceTextRows == null)
+				{
+					_sourceTextRows = SourceCorpus.ToList();
+				}
+				if (_targetTextRows == null)
+				{
+					_targetTextRows = TargetCorpus.ToList();
+				}
+
+				/* Not by ParallelText anymore
+				//Counting on mappings not crossing Book boundaries
+				var filteredSourceTargetParallelVersesList = SourceTargetParallelVersesList
+					.Where(s => s.sourceVerseIds
+						.Select(v => v.Book)
+						.Contains(SourceText.Id))
+					.Where(s => s.targetVerseIds
+						.Select(v => v.Book)
+						.Contains(TargetText.Id));
+				*/
+
+				//Believe it may be desirable to have ParallelTextSegments in order of sourceTargetParallelVerses, e.g. for Dashboard display?
+				foreach (var sourceTargetParallelVerses in SourceTargetParallelVersesList)
+				{
+					if (sourceTargetParallelVerses != null)
+					{
+#pragma warning disable CS8604 // Already checked for null
+						var sourceTextRows = (_sourceTextRows)
+#pragma warning restore CS8604 // Already checked for null
+						.Where(textRow => sourceTargetParallelVerses.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textRow.Ref)));
+#pragma warning disable CS8604 // Already checked for null
+						var targetTextRows = (_targetTextRows)
+#pragma warning restore CS8604 // Already checked for null
+						.Where(textRow => sourceTargetParallelVerses.targetVerseIds.Contains(new EngineVerseId((VerseRef)textRow.Ref)));
+
+						var sourceTextIds = sourceTextRows
+							.Select(textRole => textRole.TextId)
+							.Distinct();
+						var targetTextIds = targetTextRows
+							.Select(textRole => textRole.TextId)
+							.Distinct();
+
+						if (sourceTextIds?.Count() != 1 || targetTextIds?.Count() != 1)
+                        {
+							throw new InvalidDataException(@$"Versified verses are from different books.  source: {string.Join(" ", sourceTextIds ?? new string[] {"EMPTY" })} 
+								target: {string.Join(" ", targetTextIds ?? new string[] { "EMPTY" })}");
+                        }
+
+						yield return new EngineParallelTextRow(
+							sourceTextIds.FirstOrDefault() ?? targetTextIds.FirstOrDefault() ?? "",
+							sourceTextRows,
+							targetTextRows,
+							AlignmentCorpus
+						);
+
+					}
+				}
 			}
 		}
 	}

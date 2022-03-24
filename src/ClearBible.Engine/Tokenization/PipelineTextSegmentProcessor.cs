@@ -16,17 +16,17 @@ namespace ClearBible.Engine.Tokenization
 		{
 			_processors = processors.ToArray();
 		}
-        public override TokensTextSegment Process(TokensTextSegment tokensTextSegment)
+        public override TokensTextRow Process(TokensTextRow tokensTextRow)
         {
 			foreach (BaseTextSegmentProcessor processor in _processors)
-				tokensTextSegment = processor.Process(tokensTextSegment);
-			return tokensTextSegment;
+				tokensTextRow = processor.Process(tokensTextRow);
+			return tokensTextRow;
 		}
-        public override void Train(ParallelTextCorpus parallelTextCorpus, ITextCorpus textCorpus)
+        public override void Train(IEnumerable<ParallelTextRow> parallelTextRows, IEnumerable<TextRow> textRows)
         {
 			foreach (BaseTextSegmentProcessor processor in _processors)
             {
-				processor.Train(parallelTextCorpus, textCorpus);
+				processor.Train(parallelTextRows, textRows);
 			}
 		}
 	}

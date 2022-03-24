@@ -5,6 +5,7 @@ namespace ClearBible.Engine.Tokenization
 {
     public abstract class BaseTextSegmentProcessor
     {
+        /*
         protected static IEnumerable<ParallelTextSegment> GetParallelTextSegmentsWithTextRaw(ParallelTextCorpus parallelTextCorpus)
         {
             if ((parallelTextCorpus.SourceCorpus is not IEngineCorpus) || (parallelTextCorpus.TargetCorpus is not IEngineCorpus))
@@ -13,10 +14,10 @@ namespace ClearBible.Engine.Tokenization
             }
 
             parallelTextCorpus.SourceCorpus.Texts
-                .Cast<IEngineText>()
+                .Cast<_IEngineText>()
                 .Select(et => et.ToggleLeaveTextRawOn());
             parallelTextCorpus.TargetCorpus.Texts
-                .Cast<IEngineText>()
+                .Cast<_IEngineText>()
                 .Select(et => et.ToggleLeaveTextRawOn());
             return parallelTextCorpus.Segments.ToList();
         }
@@ -29,11 +30,11 @@ namespace ClearBible.Engine.Tokenization
             }
 
             textCorpus.Texts
-                .Cast<IEngineText>()
+                .Cast<_IEngineText>()
                 .Select(et => et.ToggleLeaveTextRawOn());
             return textCorpus.GetSegments(true);
         }
-
+        */
 
         /// <summary>
         /// 
@@ -41,10 +42,10 @@ namespace ClearBible.Engine.Tokenization
         /// <param name="parallelTextCorpus"></param>
         /// <param name="forTarget">if true this processor applies to target, else source.</param>
         /// <exception cref="InvalidCastException"></exception>
-        public virtual void Train(ParallelTextCorpus parallelTextCorpus, ITextCorpus textCorpus)
+        public virtual void Train(IEnumerable<ParallelTextRow> parallelTextRows, IEnumerable<TextRow> textRows)
         {
             //no op
         }
-        public abstract TokensTextSegment Process(TokensTextSegment tokensTextSegment);
+        public abstract TokensTextRow Process(TokensTextRow tokensTextRow);
     }
 }

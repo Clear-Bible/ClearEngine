@@ -10,6 +10,7 @@ namespace ClearBible.Engine.Corpora
     {
         protected readonly IManuscriptText _manuscriptText;
 
+        /*
         private class ManuscriptTokenizer : WhitespaceTokenizer
         {
             protected override bool IsWhitespace(char c)
@@ -17,7 +18,7 @@ namespace ClearBible.Engine.Corpora
                 return c == ' ';
             }
         }
-		
+		*/
         /// <summary>
         /// Creates the Text for a manuscript book.
         /// </summary>
@@ -25,7 +26,7 @@ namespace ClearBible.Engine.Corpora
         /// <param name="book"></param>
         /// <param name="versification">Defaults to Original</param>
 		public ManuscriptFileText(IManuscriptText manuscriptText, string book, ScrVers versification)
-			: base(new ManuscriptTokenizer(), book, versification ?? ScrVers.Original)
+			: base(book, versification ?? ScrVers.Original)
         {
             _manuscriptText = manuscriptText;
         }
@@ -35,15 +36,14 @@ namespace ClearBible.Engine.Corpora
         /// </summary>
         /// <param name="includeText"></param>
         /// <returns></returns>
-        protected override IEnumerable<TextSegment> GetSegmentsInDocOrder(bool includeText = true)
+        protected override IEnumerable<TextRow> GetVersesInDocOrder()
         {
-            return _manuscriptText.GetBookSegments(Id, includeText)
-                .SelectMany(bookSegment => CreateTextSegments(
-                        includeText,
+            return _manuscriptText.GetBookSegments(Id, true)
+                .SelectMany(bookSegment => CreateRows(
                         bookSegment.chapter,
                         bookSegment.verse,
                         bookSegment.text)
                     );
-         }
-	}
+        }
+    }
 }

@@ -4,7 +4,7 @@ using SIL.Scripture;
 
 namespace ClearBible.Engine.Corpora
 {
-    public class TokensTextSegment : TextSegment
+    public class TokensTextRow : TextRow
     {
         /// <summary>
         /// 
@@ -18,7 +18,7 @@ namespace ClearBible.Engine.Corpora
                 ((VerseRef)segmentRef).ChapterNum,
                 ((VerseRef)segmentRef).VerseNum);
         }
-        public TokensTextSegment(
+        public TokensTextRow(
             string textId, 
             object segmentRef, 
             IReadOnlyList<string> segment, 
@@ -27,26 +27,27 @@ namespace ClearBible.Engine.Corpora
             bool isRangeStart, 
             bool isEmpty,
             IReadOnlyList<Token> tokens)
-            : base(textId,
-                  segmentRef,
-                  segment,
-                  isSentenceStart,
-                  isInRange,
-                  isRangeStart,
-                  isEmpty)
+            : base(textId,segmentRef)
         {
+            base.Segment = segment;
+            IsSentenceStart = isSentenceStart;
+            IsInRange = isInRange;
+            IsRangeStart = isRangeStart;
+            IsEmpty = isEmpty;
+
             Tokens = tokens;
         }
-        public TokensTextSegment(TextSegment textSegment)
-            : base(textSegment.TextId, 
-                  textSegment.SegmentRef, 
-                  textSegment.Segment, 
-                  textSegment.IsSentenceStart, 
-                  textSegment.IsInRange, 
-                  textSegment.IsRangeStart, 
-                  textSegment.IsEmpty)
+        public TokensTextRow(TextRow textRow)
+            : base(textRow.TextId, 
+                  textRow.Ref)
         {
-            (string bookAbbreviation, int chapterNumber, int verseNumber) = GetBookChapterVerse(SegmentRef);
+            base.Segment = textRow.Segment;
+            IsSentenceStart = textRow.IsSentenceStart;
+            IsInRange = textRow.IsInRange;
+            IsRangeStart = textRow.IsRangeStart;
+            IsEmpty = textRow.IsEmpty;
+
+            (string bookAbbreviation, int chapterNumber, int verseNumber) = GetBookChapterVerse(Ref);
 
             Tokens = base.Segment
                 .Select((stringToken, index) => new Token(new TokenId(bookAbbreviation, chapterNumber, verseNumber, index + 1, 1), stringToken))

@@ -212,7 +212,7 @@ namespace ClearBible.Engine.Corpora
                     throw new InvalidDataException($"_getBookXElement({bookAbbreviation}) has no mapped clear tree book abbreviation.");
                 }
 
-                _bookChapters.Add(bookAbbreviation, Directory.EnumerateFiles(_manuscriptTreesPath, $"{clearBookAbbreviation}*.xml")
+                _bookChapters.Add(bookAbbreviation, Directory.EnumerateFiles(_manuscriptTreesPath, $"{clearBookAbbreviation}???.trees.xml")
                     .Select(fileName =>
                     {
                         int chapterNumber;
@@ -269,7 +269,8 @@ namespace ClearBible.Engine.Corpora
                 IEnumerable<XElement> verseXElements = XElement.Load(fileName)
                     .Descendants("Sentence")
                     .Select(s => s.Descendants("Node").First());
-                _loadedChapters[(bookAbbreviation, chapterNumber)] = verseXElements;
+                //FIXME: _loadedChapters[(bookAbbreviation, chapterNumber)] = verseXElements;
+                return verseXElements;
             }
 
             return _loadedChapters[(bookAbbreviation, chapterNumber)];

@@ -19,8 +19,7 @@ namespace ClearBible.Engine.Translation
         /// <param name="sourcePreprocessor"></param>
         /// <param name="targetPreprocessor"></param>
         /// <returns></returns>
-        WordAlignmentMatrix GetBestAlignment(ParallelTextSegment parallelTextSegment,
-            ITokenProcessor? sourcePreprocessor, ITokenProcessor? targetPreprocessor);
+        WordAlignmentMatrix GetBestAlignment(ParallelTextRow parallelTextRow);
 
         /// <summary>
         /// Load previously saved generated collections of Translations And Alignments
