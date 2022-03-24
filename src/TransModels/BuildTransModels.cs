@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Collections;
+using System.Threading.Tasks;
 using System.Globalization;
+using System.Diagnostics;
 
 using Models;
 using SIL.Machine.Corpora;
@@ -28,41 +28,63 @@ namespace TransModels
             string runSpec, // specification for the number of iterations to run for the IBM model and the HMM model (e.g. 1:10;H:5 -- IBM model 10 iterations and HMM model 5 iterations)
             double epsilon, // threhold for a translation pair to be kept in translation model (e.g. 0.1 -- only pairs whole probability is greater than or equal to 0.1 are kept)
             string transModelFile, // name of the file containing the translation model
-            string alignModelFile // name of the file containing the translation model
+            string alignModelFile, // name of the file containing the translation model
+            string python // path to the python executable file
             )
         {
-            // Check if using Machine models
-            if (runSpec.StartsWith("HMM;"))
+            string smtModel;
+            var iterations = 5;
+            double threshold = epsilon;
+            var heuristicStr = "Intersection";
+            (smtModel, iterations, threshold, heuristicStr) = GetRunSpecs(runSpec, iterations, threshold, heuristicStr);
+
+            
+            if (smtModel == "HMM")
             {
+                // The original models and the Machine and GIZA models have different parameter settings.
+                // Below is an attempt to at least try and to allow some adjustment to the original HMM model so it can be similar where it can be to these other models.
+                // Originally runSpec was "HMM;1:10;H:5" so IBM1 had an iteration of 10 and HMM had an iteration of 5.
+                // Needed to change runSpec format outside of here since it is now used as part of the filename for models and it is best to have filenames that do not have ":" (or ";").
+                // 2021.06.24 CL: Changed format of runSpec to <model>-<iterations>-<epsilon>-<heuristic>
+                var specParts = runSpec.Split('-');
+
+                // It isn't perfect, but the original HMM model takes different parameters then the other models.
+                // Originally runSpec was "HMM;1:10;H:5" so IBM1 had an iteration of 10 and HMM had an iteration of 5.
+                // Before, I didn't allow any changes to HMM via the command line or setting processing parameters.
+                // I will just allow changing the number of iterations for HMM using the iteration setting.
+                // I also didn't want to play around with the format of setting iterations for the original models.
+
+
+                var runSpecification = string.Format("1:10;H:{0}", iterations);
+                var heuristic = GetHeuristicType(heuristicStr);
+
                 ModelBuilder modelBuilder = new ModelBuilder();
 
                 // Setting these are required before training
                 modelBuilder.SourceFile = sourceLemmaFile;
                 modelBuilder.TargetFile = targetLemmaFile;
-                modelBuilder.RunSpecification = runSpec.Substring(runSpec.IndexOf(';') + 1);
-
-                // If you don't specify, you get no symmetry. Heuristics avaliable are "Diag", "Max",  "Min", "None", "Null"
-                modelBuilder.Symmetrization = SymmetrizationType.Min;
+                modelBuilder.RunSpecification = runSpecification;
+                modelBuilder.Symmetrization = heuristic;
 
                 using (ConsoleProgressBar progressBar = new ConsoleProgressBar(Console.Out))
                 {
                     modelBuilder.Train(progressBar);
                 }
 
-                var transModel = modelBuilder.GetTranslationTable(epsilon);
+                var transModel = modelBuilder.GetTranslationTable(threshold);
                 WriteTransModel(transModel, transModelFile);
 
                 var corporaAlignments = GetCorporaAlignments(modelBuilder);
                 var alignModel = GetAlignmentModel(corporaAlignments, sourceIdFile, targetIdFile);
                 WriteAlignModel(alignModel, alignModelFile);
             }
-            else if (runSpec.StartsWith("IBM4;"))
+            else if (smtModel == "FastAlign")
             {
-                BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
+                BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile, python);
             }
             else
             {
-                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile);
+                BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile, python);
             }
         }
 
@@ -92,7 +114,7 @@ namespace TransModels
             return corporaAlignments;
         }
 
-        public static SortedDictionary<string, double> GetAlignmentModel(
+        public static Dictionary<string, double> GetAlignmentModel(
             IReadOnlyCollection<IReadOnlyCollection<AlignedWordPair>> corporaAlignments,
             string sourceIdFile,
             string targetIdFile)
@@ -101,7 +123,7 @@ namespace TransModels
             string[] sourceIdList = File.ReadAllLines(sourceIdFile);
             string[] targetIdList = File.ReadAllLines(targetIdFile);
 
-            var alignModel = new SortedDictionary<string, double>();
+            var alignModel = new Dictionary<string, double>();
 
             int i = 0;
             foreach (var alignments in corporaAlignments)
@@ -141,20 +163,33 @@ namespace TransModels
             return alignModel;
         }
 
-        //
-        public static void WriteAlignModel(SortedDictionary<string, double> table, string file)
+        // Take an unordered dictionary, sort it, and then write the sorted version to the file.
+        public static void WriteAlignModel(Dictionary<string, double> table, string file)
         {
             StreamWriter sw = new StreamWriter(file, false, Encoding.UTF8);
 
-            IDictionaryEnumerator tableEnum = table.GetEnumerator();
+            // Stopwatch stopwatch = Stopwatch.StartNew();
 
-            while (tableEnum.MoveNext())
+            // Took 156/162/170 msec for Malayalam NT
+            /*
+            var keyList = table.Keys.ToList();
+            keyList.Sort();
+            foreach (var key in keyList)
             {
-                string pair = (string)tableEnum.Key;
-                double prob = (double)tableEnum.Value;
-                sw.WriteLine(string.Format(CultureInfo.InvariantCulture, "{0}\t{1}", pair, prob));
+                sw.WriteLine("{0}\t{1}", key, table[key]);
+            }
+            */
+
+            // Took 165/163/134 msec for Malayalam NT
+            
+            foreach (var item in table.OrderBy(i => i.Key))
+            {
+                sw.WriteLine("{0}\t{1}", item.Key, item.Value);
             }
 
+            // stopwatch.Stop();
+            // Console.WriteLine("WriteAlignModel() took {0} msec", stopwatch.ElapsedMilliseconds);
+            
             sw.Close();
         }
 
@@ -270,6 +305,64 @@ namespace TransModels
 
             return transModel;
         }
+
+        // 
+        public static (string, int, double, string) GetRunSpecs(string runSpec, int defaultIteration, double defaultThreshold, string defaultHeursitic)
+        {
+            int iterations = defaultIteration;
+            double threshold = defaultThreshold;
+            string heuristic = defaultHeursitic;
+
+            var parts = runSpec.Split('-');
+            var model = parts[0];
+
+            if ((parts.Length > 1) && (parts[1] != ""))
+            {
+                iterations = int.Parse(parts[1]);
+            }
+            if ((parts.Length > 2) && (parts[2] != ""))
+            {
+                threshold = double.Parse(parts[2]);
+            }
+            if ((parts.Length > 3) && (parts[3] != ""))
+            {
+                heuristic = parts[3];
+            }
+
+            return (model, iterations, threshold, heuristic);
+        }
+
+        // Original heuristic was "Min" (same as Intersection). If you don't specify, you get no symmetry. Heuristics avaliable are "Diag", "Max",  "Min", "None", "Null"
+        // Again, these are different from the Machine and GIZA models.
+        private static SymmetrizationType GetHeuristicType(string heuristicStr)
+        {
+            var heuristic = SymmetrizationType.Min;
+            switch (heuristicStr)
+            {
+                case "Intersection": // Same as original "Min"
+                    heuristic = SymmetrizationType.Min;
+                    break;
+
+                case "Union": // Not worth trying?
+                    heuristic = SymmetrizationType.Max;
+                    break;
+
+                case "GrowDiag":
+                    heuristic = SymmetrizationType.Diag;
+                    break;
+
+                case "Ouch":
+                case "Grow":
+                case "GrowDiagFinal":
+                case "GrowDiagFinalAnd":
+                default:
+                    Console.WriteLine("Warning in BuildTransModel: Heuristic {0} does not exist. Using Intersection.", heuristicStr);
+                    break;
+            }
+
+            return heuristic;
+        }
+
     }
 
     public class AlignmentWordPair

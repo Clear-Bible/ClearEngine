@@ -100,6 +100,8 @@ namespace ClearBible.Clear3.Impl.SMTService
                 }
             }
 
+            // Need to eventually pass this in as a parameter
+            string python = "C:\\Program Files\\Python310\\python.exe";
 
             // Train the model and write out the translation model
             // and alignment model.
@@ -111,7 +113,8 @@ namespace ClearBible.Clear3.Impl.SMTService
                     runSpec,
                     epsilon,
                     tempTransModelPath,
-                    tempAlignModelPath);
+                    tempAlignModelPath,
+                    python);
 
 
             // Import the translation model and alignment model from the

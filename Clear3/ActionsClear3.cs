@@ -134,6 +134,8 @@ namespace Clear3
         {
             clearSettings = Configuration.GetSettings(configFilename);
 
+            python = clearSettings["Python"];
+
             resourcesFolder = clearSettings["ResourcesFolder"]; // e.g. 
             processingFolder = clearSettings["ProcessingFolder"]; // e.g. 
 
@@ -1223,6 +1225,7 @@ namespace Clear3
 
         // Variables that are the same as in Clear2
 
+        private static string python = "python.exe"; // The path to the Python program. Default is that it is in the Clear folder with this name.
         private static string clearConfigFilename = "Clear.config"; // Default top configuration file
         private static Dictionary<string, string> clearSettings; // Input from .config file
         private static string runConfigFilename;
