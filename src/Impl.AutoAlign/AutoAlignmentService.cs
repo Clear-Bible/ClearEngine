@@ -69,6 +69,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         /// <summary>
         /// (Implementation of IAutoAlignmentService.MakeStandardAssumptions.)
         /// 2021.05.27 CL: Added translationModelTC, useLemmaCatModel, and alignProbsPre to make it consistent with Clear2
+        /// 2022.03.24 CL: Changed puncs, stopWords, sourceFuncWords, targetFuncWords to HashSet<string> from List<string>
         /// </summary>
         /// 
         public IAutoAlignAssumptions MakeStandardAssumptions(
@@ -79,15 +80,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlignmentModel alignProbs,
             AlignmentModel alignProbsPre,
             bool useAlignModel,
-            List<string> puncs,
-            List<string> stopWords,
+            HashSet<string> puncs,
+            HashSet<string> stopWords,
             Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
             Dictionary<string, Dictionary<string, string>> oldLinks,
-            List<string> sourceFuncWords,
-            List<string> targetFuncWords,
+            HashSet<string> sourceFuncWords,
+            HashSet<string> targetFuncWords,
             bool contentWordsOnly,
             Dictionary<string, Dictionary<string, int>> strongs,
             int maxPaths)

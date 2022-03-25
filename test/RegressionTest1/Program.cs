@@ -94,11 +94,13 @@ namespace RegressionTest1
             // stop words, function words, manual translation model,
             // good and bad links, old alignment, glossary table,
             // and Strongs data.
+            //
+            // 2022.03.24 CL: Changed puncs, stopWords, sourceFunctionWords, targetFunctionWords to HashSet<string> from List<string>
 
-            (List<string> puncs,
-             List<string> stopWords,
-             List<string> sourceFunctionWords,
-             List<string> targetFunctionWords,
+            (HashSet<string> puncs,
+             HashSet<string> stopWords,
+             HashSet<string> sourceFunctionWords,
+             HashSet<string> targetFunctionWords,
              TranslationModel manTransModel,
              Dictionary<string, int> goodLinks,
              Dictionary<string, int> badLinks,

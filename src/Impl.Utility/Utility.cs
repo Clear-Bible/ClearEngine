@@ -81,12 +81,14 @@ namespace ClearBible.Clear3.Impl.Utility
 
         /// <summary>
         /// (Implementation of IUtility.FilterWordsFromParallelCorpora)
+        ///
+        /// 2022.03.24 CL: changed sourceWordsToFilter and targetWordsToFilter to HashSet<string> from List<string>
         /// </summary>
         /// 
         public ParallelCorpora FilterWordsFromParallelCorpora(
             ParallelCorpora toBeFiltered,
-            List<string> sourceWordsToFilter,
-            List<string> targetWordsToFilter)
+            HashSet<string> sourceWordsToFilter,
+            HashSet<string> targetWordsToFilter)
         {
             return
                 new ParallelCorpora(

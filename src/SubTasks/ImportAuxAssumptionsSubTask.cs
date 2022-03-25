@@ -10,11 +10,12 @@ namespace ClearBible.Clear3.SubTasks
 {
     public class ImportAuxAssumptionsSubTask
     {
+        // 2022.03.24 CL: Changed Puncs, StopWords, SourceFunctionWords, TargetWords to HashSet<string> from List<string>
         public record Result(
-            List<string> Puncs,
-            List<string> Stopwords,
-            List<string> SourceFunctionWords,
-            List<string> TargetFunctionWords,
+            HashSet<string> Puncs,
+            HashSet<string> Stopwords,
+            HashSet<string> SourceFunctionWords,
+            HashSet<string> TargetFunctionWords,
             TranslationModel ManTransModel,
             Dictionary<string, int> GoodLinks,
             Dictionary<string, int> BadLinks,
@@ -42,11 +43,13 @@ namespace ClearBible.Clear3.SubTasks
             // 2021.05.26 CL: Changed to make these files optional. If they don't exist, return empty datastructure.
             // It is possible to make this part of each importExportService function instead with a bool parameter (as in Clear2) which may be cleaner.
             // But for now, I don't want to change the Interface so I'll do it here.
+            //
+            // 2022.03.24 CL: Changed puncs, stopWords, sourceFuncWords, targetFuncWords to HashSet<string> from List<string>
 
-            var puncs = new List<string>();
-            var stopWords = new List<string>();
-            var sourceFuncWords = new List<string>();
-            var targetFuncWords = new List<string>();
+            var puncs = new HashSet<string>();
+            var stopWords = new HashSet<string>();
+            var sourceFuncWords = new HashSet<string>();
+            var targetFuncWords = new HashSet<string>();
             var manTransModel = new TranslationModel(new Dictionary<SourceLemma, Dictionary<TargetLemma, Score>>());
             var groups = new GroupTranslationsTable(new Dictionary<SourceLemmasAsText, HashSet<TargetGroup>>());
             var goodLinks = new Dictionary<string, int>();

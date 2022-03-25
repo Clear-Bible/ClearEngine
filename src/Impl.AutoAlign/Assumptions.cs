@@ -14,6 +14,7 @@ namespace ClearBible.Clear3.Impl.AutoAlign
     /// Standard implementation of IAutoAlignAssumptions, based on
     /// the way things were done in Clear2.
     /// 2021.05.27 CL: Added _translationModelTC, _useLemmaCatModel, and _alignProbsPre to be consistent with Clear2
+    /// 2022.03.24 CL: Changed puncs, stopWords, sourceFuncWords, targetFuncWords from List<string> to HashSet<string>
     /// </summary>
     /// 
     public class AutoAlignAssumptions : IAutoAlignAssumptions
@@ -25,15 +26,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
         private AlignmentModel _alignProbs;
         private AlignmentModel _alignProbsPre;
         private bool _useAlignModel;
-        private List<string> _puncs;
-        private List<string> _stopWords;
+        private HashSet<string> _puncs;
+        private HashSet<string> _stopWords;
         private Dictionary<string, int> _goodLinks;
         private int _goodLinkMinCount;
         private Dictionary<string, int> _badLinks;
         private int _badLinkMinCount;
         private Dictionary<string, Dictionary<string, string>> _oldLinks;
-        private List<string> _sourceFuncWords;
-        private List<string> _targetFuncWords;
+        private HashSet<string> _sourceFuncWords;
+        private HashSet<string> _targetFuncWords;
         private bool _contentWordsOnly;
         private Dictionary<string, Dictionary<string, int>> _strongs;
         private int _maxPaths;
@@ -52,15 +53,15 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             AlignmentModel alignProbs,
             AlignmentModel alignProbsPre,
             bool useAlignModel,
-            List<string> puncs,
-            List<string> stopWords,
+            HashSet<string> puncs,
+            HashSet<string> stopWords,
             Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
             Dictionary<string, Dictionary<string, string>> oldLinks,
-            List<string> sourceFuncWords,
-            List<string> targetFuncWords,
+            HashSet<string> sourceFuncWords,
+            HashSet<string> targetFuncWords,
             bool contentWordsOnly,
             Dictionary<string, Dictionary<string, int>> strongs,
             int maxPaths)

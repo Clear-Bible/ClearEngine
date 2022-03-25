@@ -208,12 +208,14 @@ namespace ClearBible.Clear3.API
         /// verses in the Clear2 format.  Import includes segmentation,
         /// which in turn requires specification of the punctuation strings
         /// and the language for use by the segmenter.
+        ///
+        /// 2022.03.24 CL: Changed puncs to HashSet
         /// </summary>
         /// 
         TargetVerseCorpus ImportTargetVerseCorpusFromLegacy(
             string path,
             ISegmenter segmenter,
-            List<string> puncs,
+            HashSet<string> puncs,
             string lang,
             string culture); // 2021.05.26 CL: Added to allow language and region specific lowercasing.
 
@@ -267,16 +269,20 @@ namespace ClearBible.Clear3.API
         /// <summary>
         /// Obtain a list of strings from a file that contains one string
         /// per line.
+        ///
+        /// 2022.03.24 CL: Changed from List<string> to HashSet<string>
         /// </summary>
         /// 
-        List<string> GetWordList(string file);
+        HashSet<string> GetWordList(string file);
 
         /// <summary>
         /// Get the list of stop words from a file that contains one stop word
         /// per line.
+        ///
+        /// 2022.03.24 CL: Changed from List<string> to HashSet<string>
         /// </summary>
         /// 
-        List<string> GetStopWords(string file);
+        HashSet<string> GetStopWords(string file);
 
         /// <summary>
         /// Import the information from a file in the Clear2 "manTransModel"
@@ -375,10 +381,12 @@ namespace ClearBible.Clear3.API
         /// Array of the segments in translation order.
         /// Array of the lemmas in translation order.
         /// </returns>
+        ///
+        /// 2022.03.24 CL: Changed puncs to HashSet<string> from List<string>
         /// 
         (string[], string[]) GetSegments(
             string text,
-            List<string> puncs,
+            HashSet<string> puncs,
             string lang,
             string culture);
     }
@@ -574,7 +582,9 @@ namespace ClearBible.Clear3.API
         /// An IAutoAlignAssumptions object that the auto-aligner uses in
         /// various ways to influence its behavior.
         /// </returns>
-        /// 
+        ///
+        /// 2022.03.24 CL: Changed puncs, stopWords, sourceFuncWords,
+        /// targetFuncWords to HashSet<string> from List<string>
         IAutoAlignAssumptions MakeStandardAssumptions(
             TranslationModel translationModel,
             TranslationModel translationModelTC,
@@ -583,15 +593,15 @@ namespace ClearBible.Clear3.API
             AlignmentModel alignProbs,
             AlignmentModel alignProbsPre,
             bool useAlignModel,
-            List<string> puncs,
-            List<string> stopWords,
+            HashSet<string> puncs,
+            HashSet<string> stopWords,
             Dictionary<string, int> goodLinks,
             int goodLinkMinCount,
             Dictionary<string, int> badLinks,
             int badLinkMinCount,
             Dictionary<string, Dictionary<string, string>> oldLinks,
-            List<string> sourceFuncWords,
-            List<string> targetFuncWords,
+            HashSet<string> sourceFuncWords,
+            HashSet<string> targetFuncWords,
             bool contentWordsOnly,
             Dictionary<string, Dictionary<string, int>> strongs,
             int maxPaths);
@@ -622,6 +632,12 @@ namespace ClearBible.Clear3.API
         /// </param>
         /// 
         LpaLine GetLpaLine(
+            ZoneMultiAlignment zoneMultiAlignment,
+            Dictionary<string, Gloss> glossTable,
+            Dictionary<string, int> primaryPositions);
+
+        // 2022.03.24 CL: Added getting the LpaLemmaLine
+        LpaLemmaLine GetLpaLemmaLine(
             ZoneMultiAlignment zoneMultiAlignment,
             Dictionary<string, Gloss> glossTable,
             Dictionary<string, int> primaryPositions);
@@ -662,11 +678,13 @@ namespace ClearBible.Clear3.API
         /// Given a ParallelCorpora, filter the sources and targets
         /// in its zone pairs to remove the words in the lists, producing
         /// a new ParallelCorpora that has only the words not in the list.
+        ///
+        /// 2022.03.24 CL: Changed sourceWordsToFilter and targetWordsToFilter to HashSet<string> from List<string>
         /// </summary>
         /// 
         public ParallelCorpora FilterWordsFromParallelCorpora(
             ParallelCorpora toBeFiltered,
-            List<string> sourceWordsToFilter,
-            List<string> targetWordsToFilter);
+            HashSet<string> sourceWordsToFilter,
+            HashSet<string> targetWordsToFilter);
     }
 }

@@ -13,7 +13,6 @@
     <PackageReference Include="SIL.Machine.Translation.Thot" Version="2.4.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\API\Api.csproj" />
     <ProjectReference Include="..\src\Clear3Service\Clear3Service.csproj" />
     <ProjectReference Include="..\src\SubTasks\SubTasks.csproj" />
     <ProjectReference Include="..\src\Lemmatizer\Lemmatizer.csproj" />

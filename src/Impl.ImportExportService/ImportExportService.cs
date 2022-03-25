@@ -23,13 +23,15 @@ namespace ClearBible.Clear3.Impl.ImportExportService
     // We now want to have a separate lemmatization process that may have a one-to-many word-to-lemma.
     // Therefore we need either a different TargetVerseCorpora datastructure that has two separate lists for text and lemma
     // or to different data structures. The TargetVerseCorpus which is abou the text, and another one for the lemmas.
+    //
+    // 2022.03.24 CL: Changed puncs to HashSet
     // 
     public class ImportExportService : IImportExportService
     {
         public TargetVerseCorpus ImportTargetVerseCorpusFromLegacy(
             string path,
             ISegmenter segmenter,
-            List<string> puncs,
+            HashSet<string> puncs,
             string lang,
             string culture)
         {
@@ -247,9 +249,10 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         }
 
 
-        public List<string> GetWordList(string file)
+        // 2022.03.24 CL: Changed from List<string> to HashSet<string>
+        public HashSet<string> GetWordList(string file)
         {
-            List<string> wordList = new List<string>();
+            HashSet<string> wordList = new HashSet<string>();
 
             string[] lines = File.ReadAllLines(file);
             foreach (string line in lines)
@@ -261,9 +264,10 @@ namespace ClearBible.Clear3.Impl.ImportExportService
         }
 
 
-        public List<string> GetStopWords(string file)
+        // 2022.03.24 CL: Changed from List<string> to HashSet<string>
+        public HashSet<string> GetStopWords(string file)
         {
-            List<string> wordList = new List<string>();
+            HashSet<string> wordList = new HashSet<string>();
 
             using (StreamReader sr = new StreamReader(file, Encoding.UTF8))
             {

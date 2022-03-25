@@ -12,7 +12,7 @@ namespace Clear3
         CreateParallelCorpus, // Create Parallel Files
         BuildModels, // Build Translation Model with these files and specs
         AutoAlign,
-        IncrementalUpdate,
+        IncrementalUpdate, // Update manTransModel, translationModel (TM), groups, and goodLinks with alignments.json
         GlobalUpdate, // Rebuild the model with these 3 files:
         AlignG2TviaM2G, // Align to the gateway translation，using (1) target translation, (2) alignment between manuscript and gateway
         AlignM2TviaM2G, // Create manuscript-to-target alignment through gateway-to-target alignment
@@ -50,6 +50,8 @@ namespace Clear3
         SetReuseSmtModelFiles,
 
         SetLowerCaseMethod,
+
+        SetUseMorphology,
     }
 
     static class Program
@@ -244,6 +246,7 @@ namespace Clear3
                 case Options.SetReuseLemmaFiles:
                 case Options.SetReuseParallelCorporaFiles:
                 case Options.SetReuseSmtModelFiles:
+                case Options.SetUseMorphology:
                     if ((param == "true") || (param == "false"))
                     {
                         good = true;
@@ -497,6 +500,9 @@ namespace Clear3
             Console.WriteLine("\t-nap <bool>, --use-normalized-alignmodel-probabilities=<bool>");
             Console.WriteLine("\t\tSets the useNormalizedAlignModelProbabilities boolean to <bool>, which can only be true or false");
 
+            Console.WriteLine("\t-um <bool>, --use-morphology=<bool>");
+            Console.WriteLine("\t\tSets the useMorphology boolean to <bool>, which can only be true or false");
+
             Console.WriteLine("\t-rt <bool>, --reuse-tokenized-files=<bool>");
             Console.WriteLine("\t\tSets the reuseTokenizedFiles boolean to <bool>, which can only be true or false");
             Console.WriteLine("\t-rl <bool>, --reuse-lemmatized-files=<bool>");
@@ -596,6 +602,8 @@ namespace Clear3
                 { "-ntp", Options.SetUseNormalizedTransModelProbabilities }, { "--use-normalized-transmodel-probabilities", Options.SetUseNormalizedTransModelProbabilities },
                 { "-nap", Options.SetUseNormalizedAlignModelProbabilities }, { "--use-normalized-alignmodel-probabilities", Options.SetUseNormalizedAlignModelProbabilities },
 
+                { "-um", Options.SetUseMorphology }, { "--use-morphology", Options.SetUseMorphology },
+
                 { "-rt", Options.SetReuseTokenFiles }, { "--reuse-tokenized-files", Options.SetReuseTokenFiles },
                 { "-rl", Options.SetReuseLemmaFiles }, { "--reuse-lemmatized-files", Options.SetReuseLemmaFiles },
                 { "-rc", Options.SetReuseParallelCorporaFiles }, { "--reuse-parallel-corpora-files", Options.SetReuseParallelCorporaFiles },
@@ -623,6 +631,8 @@ namespace Clear3
                 { Options.SetUseNoPuncModel, "useNoPuncModel" },
                 { Options.SetUseNormalizedTransModelProbabilities, "useNormalizedTransModelProbabilities" },
                 { Options.SetUseNormalizedAlignModelProbabilities, "useNormalizedAlignModelProbabilities" },
+
+                { Options.SetUseMorphology, "useMorphology" },
 
                 { Options.SetReuseTokenFiles, "reuseTokenFiles" },
                 { Options.SetReuseLemmaFiles, "reuseLemmaFiles" },
@@ -653,6 +663,8 @@ namespace Clear3
                 { Options.SetUseNoPuncModel, ActionsClear3.SetUseNoPuncModel },
                 { Options.SetUseNormalizedTransModelProbabilities, ActionsClear3.SetUseNormalizedTransModelProbabilities },
                 { Options.SetUseNormalizedAlignModelProbabilities, ActionsClear3.SetUseNormalizedAlignModelProbabilities },
+
+                { Options.SetUseMorphology, ActionsClear3.SetUseMorphology },
 
                 { Options.SetReuseTokenFiles, ActionsClear3.SetReuseTokenFiles },
                 { Options.SetReuseLemmaFiles, ActionsClear3.SetReuseLemmFiles },

@@ -52,11 +52,11 @@ namespace RegressionTest3
             // good and bad links, old alignment, glossary table,
             // and Strongs data.
 
-
-            (List<string> puncs,
-             List<string> stopWords,
-             List<string> sourceFunctionWords,
-             List<string> targetFunctionWords,
+            // 2022.03.24 CL: Changed puncs, stopWords, sourceFunctionWords, targetFunctionWords to HashSet<string> from List<string>
+            (HashSet<string> puncs,
+             HashSet<string> stopWords,
+             HashSet<string> sourceFunctionWords,
+             HashSet<string> targetFunctionWords,
              TranslationModel manTransModel,
              Dictionary<string, int> goodLinks,
              Dictionary<string, int> badLinks,

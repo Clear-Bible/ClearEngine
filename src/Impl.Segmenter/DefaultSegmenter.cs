@@ -13,12 +13,14 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
     /// Implementation of ISegmenter.  The code here was taken from Clear2
     /// with very little change.
     /// </summary>
+    ///
+    /// 2022.03.24 CL: Changed puncs to HashSet<string> from List<string>
     /// 
     public class DefaultSegmenter : ISegmenter
     {
         public (string[], string[]) GetSegments(
             string text,
-            List<string> puncs,
+            HashSet<string> puncs,
             string lang,
             string culture)
         {
@@ -30,7 +32,8 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
         }
 
 
-        private void SegPuncs(ref string puncText, ref string puncLowerText, string verseText, List<string> puncs, string lang, CultureInfo cultureInfo)
+        // 2022.03.24 CL: Changed puncs to HashSet<string> from List<string>
+        private void SegPuncs(ref string puncText, ref string puncLowerText, string verseText, HashSet<string> puncs, string lang, CultureInfo cultureInfo)
         {
             // 2020.09.11 CL: Do we need these now that I run verse files through a program to clean up the verses? Will need to check.
 
@@ -63,8 +66,8 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
             }
         }
 
-
-        private char FindPunc(string word, List<string> puncs)
+        // 2022.03.24 CL: Changed puncs to HashSet<string> from List<string>
+        private char FindPunc(string word, HashSet<string> puncs)
         {
             Regex r = new Regex("[0-9]+.+[0-9]+");
             Match m = r.Match(word);
@@ -84,8 +87,8 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
             return (char)0;
         }
 
-
-        private void SepPuncs(ref string puncText, ref string puncLowerText, string word, List<string> puncs, string lang, CultureInfo cultureInfo)
+        // 2022.03.24 CL: Changed puncs to HashSet<string> from List<string>
+        private void SepPuncs(ref string puncText, ref string puncLowerText, string word, HashSet<string> puncs, string lang, CultureInfo cultureInfo)
         {
             ArrayList postPuncs = new ArrayList();
 
@@ -164,8 +167,8 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
             puncLowerText = puncLowerText.Trim();
         }
 
-
-        private bool StartsWithPunc(string word, List<string> puncs)
+        // 2022.03.24 CL: Changed puncs to HashSet<string> from List<string>
+        private bool StartsWithPunc(string word, HashSet<string> puncs)
         {
             string firstChar = word.Substring(0, 1);
             if (puncs.Contains(firstChar))
@@ -178,8 +181,8 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
             }
         }
 
-
-        private bool StartsWithPunc2(string word, List<string> puncs)
+        // 2022.03.24 CL: Changed puncs to HashSet<string> from List<string>
+        private bool StartsWithPunc2(string word, HashSet<string> puncs)
         {
             if (word.Length > 1)
             {
@@ -203,8 +206,8 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
             return word.Substring(0, word.IndexOf(apostraphe) + 1);
         }
 
-
-        private bool EndsWithPunc(string word, List<string> puncs)
+        // 2022.03.24 CL: Changed puncs to HashSet<string> from List<string>
+        private bool EndsWithPunc(string word, HashSet<string> puncs)
         {
             string lastChar = word.Substring(word.Length - 1);
             if (puncs.Contains(lastChar))
@@ -217,8 +220,8 @@ namespace ClearBible.Clear3.Impl.DefaultSegmenter
             }
         }
 
-
-        private bool EndsWithPunc2(string word, List<string> puncs)
+        // 2022.03.24 CL: Changed puncs to HashSet<string> from List<string>
+        private bool EndsWithPunc2(string word, HashSet<string> puncs)
         {
             if (word.Length > 1)
             {
