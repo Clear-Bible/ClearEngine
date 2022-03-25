@@ -30,7 +30,6 @@ namespace Clear3
 
         SetContentWordsOnly,
         SetUseAlignModel,
-        SetRunSpec,
         SetEpsilon,
         SetSmtModel,
         SetSmtHeuristic,
@@ -182,16 +181,6 @@ namespace Clear3
                     else
                     {
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported lowercase selection", optionStr, param));
-                    }
-                    break;
-                case Options.SetRunSpec:
-                    if (param.StartsWith("HMM-") || param.StartsWith("IBM1-") || param.StartsWith("IBM2-") || param.StartsWith("IBM3-") || param.StartsWith("IBM4-") || param.StartsWith("FastAlign-"))
-                    {
-                        good = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should start with 'HMM-', 'IBM1-', 'IBM2-', 'IBM3-', 'IBM4-', or 'FastAlign-'", optionStr, param));
                     }
                     break;
                 case Options.SetEpsilon:
@@ -481,8 +470,6 @@ namespace Clear3
             Console.WriteLine("\t\tSets number of iterations for SMT model to <int>, e.g. 7");
             Console.WriteLine("\t-m <model>, --model=<model>");
             Console.WriteLine("\t\tSets the SMT model to <model>, which can only be IBM1, IBM2, IBM3, IBM4, HMM, FastAlign");
-            Console.WriteLine("\t-r <runspec>, --runspec=<runspec>");
-            Console.WriteLine("\t\tSets the runSpec to <runspec>, e.g. 1:10;H:5 or Machine;FastAlign:Inter");
 
             Console.WriteLine("\t-smt <bool>, --smt-content-words-only=<bool>");
             Console.WriteLine("\t\tSets the contentWordsOnlySMT boolean to <bool>, which can only be true or false");
@@ -587,7 +574,6 @@ namespace Clear3
 
                 { "-c", Options.SetContentWordsOnly }, { "--content-words-only", Options.SetContentWordsOnly },
                 { "-a", Options.SetUseAlignModel }, { "--use-align-model", Options.SetUseAlignModel },
-                { "-r", Options.SetRunSpec }, { "--runspec", Options.SetRunSpec },
                 { "-e", Options.SetEpsilon }, { "--epsilon", Options.SetEpsilon },
                 { "-m", Options.SetSmtModel }, { "--model", Options.SetSmtModel },
                 { "-h", Options.SetSmtHeuristic }, { "--hueristic", Options.SetSmtHeuristic },
@@ -617,7 +603,6 @@ namespace Clear3
 
                 { Options.SetContentWordsOnly, "contentWordsOnly" },
                 { Options.SetUseAlignModel, "useAlignModel" },
-                { Options.SetRunSpec, "runSpec" },
                 { Options.SetEpsilon, "epsilon" },
                 { Options.SetSmtModel, "smtModel" },
                 { Options.SetSmtHeuristic, "smtHeuristic" },
@@ -649,7 +634,6 @@ namespace Clear3
 
                 { Options.SetContentWordsOnly, ActionsClear3.SetContentWordsOnly },
                 { Options.SetUseAlignModel, ActionsClear3.SetUseAlignModel },
-                { Options.SetRunSpec, ActionsClear3.SetRunSpec },
                 { Options.SetEpsilon, ActionsClear3.SetEpsilon },
                 { Options.SetSmtModel, ActionsClear3.SetSmtModel },
                 { Options.SetSmtHeuristic, ActionsClear3.SetSmtHeuristic },

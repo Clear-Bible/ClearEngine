@@ -17,13 +17,14 @@ namespace TransModels
 {
     public class BuildModelsMachine
     {
+        // 2022.03.25 CL: Removed passing in epsilon since it is part of runSpec now: <model>-<iteration>-<epsilon>-<heursitic>
+        // Epsilon is the same a threshold
         public static void BuildMachineModels(
             string sourceLemmaFile, // source text in verse per line format
             string targetLemmaFile, // target text in verse per line format
             string sourceIdFile, // source text in verse per line format, with ID for each word
             string targetIdFile, // target text in verse per line format, with ID for each word
             string runSpec, // specification for the number of iterations to run for the IBM model and the HMM model (e.g. 1:10;H:5 -- IBM model 10 iterations and HMM model 5 iterations)
-            double epsilon, // threhold for a translation pair to be kept in translation model (e.g. 0.1 -- only pairs whole probability is greater than or equal to 0.1 are kept)
             string transModelFile, // this method updates it
             string alignModelFile  // this method updates it
             )
@@ -33,22 +34,13 @@ namespace TransModels
             var targetCorpus = new TextFileTextCorpus(wordTokenizer, targetLemmaFile); // In SIL.Machine.Corpora
             var parallelCorpus = new ParallelTextCorpus(sourceCorpus, targetCorpus); // In SIL.Machine.Corpora
 
-            // Current runspec for Machine is:
-            // <model>:<heuristic>:<iterations>
-            // Probably need to do some error checking
-            string[] parts = runSpec.Split(';');
-            var smtModel = parts[0];
-            // Default
-            string heuristic = "Intersection";
-            int iterations = 4;
-            if ((parts.Length > 1) && (parts[1] != ""))
-            {
-                heuristic = parts[1];
-            }
-            if ((parts.Length > 2) && (parts[2] != ""))
-            {
-                iterations = int.Parse(parts[2]);
-            }
+            // There are many other places where we set the default for these four values so it should be the case that
+            // runspec is set to at least the default, so setting defaults here again is probably not necessary.
+            string smtModel = "FastAlign";
+            var iterations = 5;
+            double threshold = 0.1;
+            var heuristic = "Intersection";
+            (smtModel, iterations, threshold, heuristic) = BuildTransModels.GetRunSpecs(runSpec, smtModel, iterations, threshold, heuristic);
 
             using (IWordAlignmentModel model = CreateModel(smtModel, heuristic, iterations))  // In SIL.Machine.Translation
             {
@@ -59,7 +51,7 @@ namespace TransModels
                     trainer.Save();
                 }
 
-                var transTable = model.GetTranslationTable(epsilon);
+                var transTable = model.GetTranslationTable(threshold);
                 BuildTransModels.WriteTransModel(transTable, transModelFile);
 
                 var corporaAlignments = GetCorporaAlignments(sourceLemmaFile, targetLemmaFile, model);

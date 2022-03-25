@@ -1,12 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
 
 using ClearBible.Clear3.API;
-using ClearBible.Clear3.Service;
-using ClearBible.Clear3.SubTasks;
-
-using TransModels;
 
 namespace Clear3
 {
@@ -27,12 +22,17 @@ namespace Clear3
             string targetLemmaFile,
             string targetLemmaIdFile,
             string runSpec,
-            double epsilon,
             string transModelFile,
             string alignModelFile,
             string python,
             IClear30ServiceAPI clearService)
         {
+            string modelType = string.Format("(All Words, {0})", runSpec);
+            if (useContentWordsOnly)
+            {
+                modelType = string.Format("(Content Words Only, {0})", runSpec);
+            }
+
             (var transModel, var alignModel) = BuildOrReuseBaseModels(
                 reuseSmtModelFiles,
                 useContentWordsOnly,
@@ -45,19 +45,14 @@ namespace Clear3
                 targetLemmaFile,
                 targetLemmaIdFile,
                 runSpec,
-                epsilon,
                 transModelFile,
                 alignModelFile,
-                python,
+                modelType,
+                python,           
                 clearService);
 
-            string modelType = "(All Words)";
-            if (useContentWordsOnly)
-            {
-                modelType = "(Content Words Only)";
-            }
 
-            (string smtTransModelFileNorm, string smtAlignModelFileNorm) = InitializeSmtModelFiles(true, useContentWordsOnly, useNoPuncModel, useLemmaCatModel, runSpec, epsilon, transModelFile, alignModelFile);
+            (string smtTransModelFileNorm, string smtAlignModelFileNorm) = InitializeSmtModelFiles(true, useContentWordsOnly, useNoPuncModel, useLemmaCatModel, runSpec, transModelFile, alignModelFile);
 
 
             if (useNormalizedTransModelProbabilities)
@@ -86,19 +81,13 @@ namespace Clear3
             string targetLemmaFile,
             string targetLemmaIdFile,
             string runSpec,
-            double epsilon,
             string transModelFile,
             string alignModelFile,
+            string modelType,
             string python,
             IClear30ServiceAPI clearService)
         {
-            string modelType = "(All Words)";
-            if (useContentWordsOnly)
-            {
-                modelType = "(Content Words Only)";
-            }
-
-            (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false, useContentWordsOnly, useNoPuncModel, useLemmaCatModel, runSpec, epsilon, transModelFile, alignModelFile);
+            (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false, useContentWordsOnly, useNoPuncModel, useLemmaCatModel, runSpec, transModelFile, alignModelFile);
 
             if (reuseSmtModelFiles && File.Exists(smtTransModelFile) && File.Exists(smtAlignModelFile))
             {
@@ -112,9 +101,8 @@ namespace Clear3
 
                 ShowTime();
 
-                // BuildTransModels.BuildModels(smtSourceLemmaFile, smtTargetLemmaFile, smtSourceIdFile, smtTargetIdFile, runSpec, epsilon, smtTransModelFile, smtAlignModelFile, python);
                 ParallelCorpora smtParallelCorpora = Persistence.ImportParallelCorpus(smtSourceTextFile, smtSourceLemmaFile, smtSourceIdFile, smtTargetTextFile, smtTargetLemmaFile, smtTargetIdFile);
-                (var smtTranslationModel, var smtAlignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec, epsilon);
+                (var smtTranslationModel, var smtAlignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec);
             
                 ShowTime();
 
@@ -123,9 +111,6 @@ namespace Clear3
 
                 ShowTime();
             }
-
-            // var transModel = BuildTransModels.ReadTransModel(smtTransModelFile, true);
-            // var alignModel = BuildTransModels.ReadAlignModel(smtAlignModelFile, true);
 
             var translationModel = Persistence.ImportTranslationModel(smtTransModelFile);
             var alignmentModel = Persistence.ImportAlignmentModel(smtAlignModelFile);
@@ -152,7 +137,6 @@ namespace Clear3
                 ShowTime();
             }
 
-            // var transModelNormalized = BuildTransModels.ReadTransModel(smtTransModelFileNorm, true);
             var transModelNormalized = Persistence.ImportTranslationModel(smtTransModelFileNorm);
 
             return transModelNormalized;
@@ -177,7 +161,6 @@ namespace Clear3
                 ShowTime();
             }
 
-            // var alignModelNormalized = BuildTransModels.ReadAlignModel(smtAlignModelFileNorm, true);
             var alignModelNormalized = Persistence.ImportAlignmentModel(smtAlignModelFileNorm);
 
             return alignModelNormalized;
@@ -275,7 +258,6 @@ namespace Clear3
             bool useNoPuncModel,
             bool useLemmaCatModel,
             string runSpec,
-            double epsilon,
             string transModelFile,
             string alignModelFile)
         {

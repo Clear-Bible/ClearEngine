@@ -422,6 +422,9 @@ namespace ClearBible.Clear3.API
         /// wrapped code by creating temporary files in a temporary
         /// working directory.  This entry point deletes the temporary working
         /// directory after use.
+        ///
+        /// 2022.03.25 CL: Changed to not use epsilon since it is now encoded in runSpec.
+        /// Also, runSpec has changed to <model>-<iterations>-<threshold>-<heuristic>
         /// </remarks>
         ///
         // FIXME: Add parameters
@@ -432,8 +435,7 @@ namespace ClearBible.Clear3.API
         //  
         (TranslationModel, AlignmentModel) DefaultSMT(
             ParallelCorpora parallelCorpora,
-            string runSpec = "1:10;H:5",
-            double epsilon = 0.1);
+            string runSpec = "FastAlign-5-0.1-Intersection");
     }
 
 

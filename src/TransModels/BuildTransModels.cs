@@ -20,23 +20,26 @@ namespace TransModels
     public class BuildTransModels
     {
         // Given parallel files, build both the translation model and alignment model
+        // 2022.03.25 CL: Removed passing in epsilon since it is part of runSpec now: <model>-<iteration>-<epsilon>-<heursitic>
+        // Epsilon is the same a threshold
         public static void BuildModels(
             string sourceLemmaFile, // source text in verse per line format
             string targetLemmaFile, // target text in verse per line format
             string sourceIdFile, // source text in verse per line format, with ID for each word
             string targetIdFile, // target text in verse per line format, with ID for each word
-            string runSpec, // specification for the number of iterations to run for the IBM model and the HMM model (e.g. 1:10;H:5 -- IBM model 10 iterations and HMM model 5 iterations)
-            double epsilon, // threhold for a translation pair to be kept in translation model (e.g. 0.1 -- only pairs whole probability is greater than or equal to 0.1 are kept)
+            string runSpec, // specification <model>-<iterations>-<epsilon>-<heuristic>
             string transModelFile, // name of the file containing the translation model
             string alignModelFile, // name of the file containing the translation model
             string python // path to the python executable file
             )
         {
-            string smtModel;
+            // There are many other places where we set the default for these four values so it should be the case that
+            // runspec is set to at least the default, so setting defaults here again is probably not necessary.
+            string smtModel = "HMM";
             var iterations = 5;
-            double threshold = epsilon;
+            double threshold = 0.1;
             var heuristicStr = "Intersection";
-            (smtModel, iterations, threshold, heuristicStr) = GetRunSpecs(runSpec, iterations, threshold, heuristicStr);
+            (smtModel, iterations, threshold, heuristicStr) = GetRunSpecs(runSpec, smtModel, iterations, threshold, heuristicStr);
 
             
             if (smtModel == "HMM")
@@ -78,13 +81,13 @@ namespace TransModels
                 var alignModel = GetAlignmentModel(corporaAlignments, sourceIdFile, targetIdFile);
                 WriteAlignModel(alignModel, alignModelFile);
             }
-            else if (smtModel == "FastAlign")
+            else if (smtModel == "IBM4")
             {
-                BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile, python);
+                BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, transModelFile, alignModelFile, python);
             }
             else
             {
-                BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, epsilon, transModelFile, alignModelFile, python);
+                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, transModelFile, alignModelFile);
             }
         }
 
@@ -307,15 +310,18 @@ namespace TransModels
         }
 
         // 
-        public static (string, int, double, string) GetRunSpecs(string runSpec, int defaultIteration, double defaultThreshold, string defaultHeursitic)
+        public static (string, int, double, string) GetRunSpecs(string runSpec, string defaultModel, int defaultIteration, double defaultThreshold, string defaultHeursitic)
         {
+            string model = defaultModel;
             int iterations = defaultIteration;
             double threshold = defaultThreshold;
             string heuristic = defaultHeursitic;
 
             var parts = runSpec.Split('-');
-            var model = parts[0];
-
+            if (parts[0] != "")
+            {
+                model = parts[0];
+            }
             if ((parts.Length > 1) && (parts[1] != ""))
             {
                 iterations = int.Parse(parts[1]);

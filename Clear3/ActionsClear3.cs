@@ -39,11 +39,6 @@ namespace Clear3
             strUseAlignModel = arg;
         }
 
-        public static void SetRunSpec(string arg)
-        {
-            runSpec = arg;
-        }
-
         public static void SetEpsilon(string arg)
         {
             strEpsilon = arg;
@@ -141,8 +136,8 @@ namespace Clear3
 
             python = clearSettings["Python"];
 
-            resourcesFolder = clearSettings["ResourcesFolder"]; // e.g. 
-            processingFolder = clearSettings["ProcessingFolder"]; // e.g. 
+            resourcesFolder = clearSettings["Resources_Foldername"]; // e.g. 
+            processingFolder = clearSettings["Processing_Foldername"]; // e.g. 
 
             runConfigFilename = clearSettings["Run_Configuration_Filename"];
             runSettings = Configuration.GetSettings(runConfigFilename);
@@ -404,7 +399,6 @@ namespace Clear3
             if (lowerCaseMethod == null) lowerCaseMethod = processingSettings["LowerCaseForLemma"];
 
             // Set Processing Parameters
-            if (runSpec == null) runSpec = processingSettings["RunSpec"]; // e.g. 1:10;H:5, Machine;FastAlign, Machine;FastAlign:Intersection:7
             if (strEpsilon == null) strEpsilon = processingSettings["Epsilon"]; // Must exceed this to be counted into model, e.g. "0.1"
             if (smtModel == null) smtModel = processingSettings["SmtModel"];
             if (smtHeuristic == null) smtHeuristic = processingSettings["SmtHeuristic"];
@@ -416,10 +410,10 @@ namespace Clear3
             if (strUseAlignModel == null) strUseAlignModel = processingSettings["UseAlignModel"]; // e.g. "true"
             if (strUseLemmaCatModel == null) strUseLemmaCatModel = processingSettings["UseLemmaCatModel"]; // e.g. "true"
             if (strUseNoPuncModel == null) strUseNoPuncModel = processingSettings["UseNoPuncModel"]; // e.g. "
-            if (strUseNormalizedTransModelProbabilities == null) strUseNormalizedTransModelProbabilities = processingSettings["UseNoNormalizedTransModelProbabilities"]; // e.g. "true"
-            if (strUseNormalizedAlignModelProbabilities == null) strUseNormalizedAlignModelProbabilities = processingSettings["UseNoNormalizedAlignModelProbabilities"]; // e.g. "true"
+            if (strUseNormalizedTransModelProbabilities == null) strUseNormalizedTransModelProbabilities = processingSettings["UseNormalizedTransModelProbabilities"]; // e.g. "true"
+            if (strUseNormalizedAlignModelProbabilities == null) strUseNormalizedAlignModelProbabilities = processingSettings["UseNormalizedAlignModelProbabilities"]; // e.g. "true"
 
-            if (strReuseTokenFiles == null) strReuseTokenFiles = processingSettings["ReuseTokenFiles"]; // e.g. "true"
+            if (strReuseTokenFiles == null) strReuseTokenFiles = processingSettings["ReuseTokenizedFiles"]; // e.g. "true"
             if (strReuseLemmaFiles == null) strReuseLemmaFiles = processingSettings["ReuseLemmatizedFiles"]; // e.g. "true"
             if (strReuseParallelCorporaFiles == null) strReuseParallelCorporaFiles = processingSettings["ReuseParallelCorporaFiles"]; // e.g. "true"
             if (strReuseSmtModelFiles == null) strReuseSmtModelFiles = processingSettings["ReuseSmtModelFiles"]; // e.g. "true"
@@ -739,20 +733,21 @@ namespace Clear3
         //
         public static (bool, string) BuildModels()
         {
-            Console.WriteLine("Building Models");
 
-            string returnMessage = string.Empty;
+            Console.WriteLine("Building Models");
 
             // Create a new runSpec if thotModel is specified, otherwise, use exisiting runSpec set by command line or processing.config.
             // 2021.06.23 CL: Need to change the format of runSpec since we will use this as part of model filenames and ":" is not allowed in a filename.
+            // 2022.03.25 CL: Removed using runSpec externally. Only use it internally as an easy way to pass all SMT model parameters
+            // and to use as a way to label files so we know what was used to create them.
 
-            if ((runSpec == "") && (smtModel != ""))
+            if (smtModel != "")
             {
                 runSpec = string.Format("{0}-{1}-{2}-{3}", smtModel, smtIterations, epsilon, smtHeuristic);
             }
             else
             {
-                return (false, "ERROR in BuildModels: No runSpec or smtMOdel specified");
+                return (false, "ERROR in BuildModels: No smtModel specified");
             }
 
             // Train a statistical translation model using the parallel corpora producing an estimated translation model and estimated alignment.
@@ -768,7 +763,7 @@ namespace Clear3
                 // Build content only words for TC alignment
                 (translationModel, alignmentModel) = BuildModelTools.BuildOrReuseModels(reuseSmtModelFiles, true, useNoPuncModel, useLemmaCatModel, useNormalizedTransModelProbabilities, useNormalizedAlignModelProbabilities,
                                                 sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetLemmaIdFile,
-                                                runSpec, epsilon, transModelFile, alignModelFile, python, clearService);
+                                                runSpec, transModelFile, alignModelFile, python, clearService);
 
                 // SMT take priority over TC. Probably should not use two booleans but a enum.
                 if (contentWordsOnlySMT)
@@ -787,7 +782,7 @@ namespace Clear3
                 // Build all words for aligning the rest
                 (translationModelRest, alignmentModelRest) = BuildModelTools.BuildOrReuseModels(reuseSmtModelFiles, false, useNoPuncModel, useLemmaCatModel, useNormalizedTransModelProbabilities, useNormalizedAlignModelProbabilities,
                                                         sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetLemmaIdFile,
-                                                        runSpec, epsilon, transModelFile, alignModelFile, python, clearService);
+                                                        runSpec, transModelFile, alignModelFile, python, clearService);
 
                 alignmentModelPre = alignmentModelRest;
 
@@ -798,259 +793,14 @@ namespace Clear3
                 }
             }
 
-            /*
-            // Train a statistical translation model using the parallel corpora producing an estimated translation model and estimated alignment.
-            // There are three possible scenarios for how to use parallel corpus with all words or content only words.
-            // Within the SMTService.DefaultSMT, it writes and reads from the file, so any double differences is already done.
-            // No need to read them in again.
-            if (contentWordsOnlySMT)
-            {
-                (string smtTransModelFileCW, string smtAlignModelFileCW) = InitializeSmtModelFiles(true);
-
-                if (reuseSmtModelFiles &&
-                    File.Exists(smtTransModelFileCW) && File.Exists(smtAlignModelFileCW))
-                {
-                    Console.WriteLine("  Reusing (Content Word Only) SMT Model Files.");
-                    returnMessage = "Building Models: Done.";
-
-                    ShowTime();
-
-                    translationModel = Persistence.ImportTranslationModel(smtTransModelFileCW);
-                    alignmentModel = Persistence.ImportAlignmentModel(smtAlignModelFileCW);
-
-                    ShowTime();
-                }
-                else
-                {
-                    Console.WriteLine("  Building Models (Content Words Only).");
-                    returnMessage = string.Format("Built Models: {0}  {1}", smtTransModelFileCW, smtAlignModelFileCW);
-
-                    ShowTime();
-
-                    ParallelCorpora smtParallelCorporaCW = InitializeParallelCorpora(true);
-                    (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorporaCW, runSpec, epsilon);
-
-                    ShowTime();
-
-                    Persistence.ExportTranslationModel(translationModel, smtTransModelFileCW);
-                    Persistence.ExportAlignmentModel(alignmentModel, smtAlignModelFileCW);
-
-                    ShowTime();
-                }
-
-                translationModelRest = translationModel;
-                alignmentModelPre = alignmentModel;
-
-                return (true, returnMessage);
-            }
-            else if (contentWordsOnlyTC)
-            {
-                (string smtTransModelFileCW, string smtAlignModelFileCW) = InitializeSmtModelFiles(true);
-
-                if (reuseSmtModelFiles &&
-                    File.Exists(smtTransModelFileCW) && File.Exists(smtAlignModelFileCW))
-                {
-                    Console.WriteLine("  Reusing (Content Word Only) SMT Model Files for Finding Terminal Candidates.");
-
-                    ShowTime();
-
-                    translationModel = Persistence.ImportTranslationModel(smtTransModelFileCW);
-                    alignmentModel = Persistence.ImportAlignmentModel(smtAlignModelFileCW);
-
-                    ShowTime();
-                }
-                else
-                {
-                    Console.WriteLine("  Building Models (Content Words Only) for Finding Terminal Candidates.");
-                    returnMessage += string.Format(" {0} {1}", smtTransModelFileCW, smtAlignModelFileCW);
-
-                    ShowTime();
-
-                    ParallelCorpora smtParallelCorporaCW = InitializeParallelCorpora(true);
-                    (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorporaCW, runSpec, epsilon);
-
-                    ShowTime();
-
-                    Persistence.ExportTranslationModel(translationModel, smtTransModelFileCW);
-                    Persistence.ExportAlignmentModel(alignmentModel, smtAlignModelFileCW);
-
-                    ShowTime();
-                }
-
-                (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false);
-
-                if (reuseSmtModelFiles &&
-                    File.Exists(smtTransModelFile) && File.Exists(smtAlignModelFile))
-                {
-                    Console.WriteLine("  Reusing (All Words) SMT Model Files for Aligning the Rest.");
-
-                    ShowTime();
-
-                    translationModelRest = Persistence.ImportTranslationModel(smtTransModelFile);
-                    alignmentModelPre = Persistence.ImportAlignmentModel(smtAlignModelFile);
-
-                    ShowTime();
-                }
-                else
-                {
-                    Console.WriteLine("  Building Models (All Words) for Aligning the Rest.");
-                    returnMessage += string.Format(" {0} {1}", smtTransModelFile, smtAlignModelFile);
-
-                    ShowTime();
-
-                    ParallelCorpora smtParallelCorpora = InitializeParallelCorpora(false);
-                    (translationModelRest, alignmentModelPre) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec, epsilon);
-
-                    ShowTime();
-
-                    Persistence.ExportTranslationModel(translationModelRest, smtTransModelFile);
-                    Persistence.ExportAlignmentModel(alignmentModelPre, smtAlignModelFile);
-
-                    ShowTime();
-                }
-
-                if (returnMessage == string.Empty)
-                {
-                    returnMessage = "Building Models: Done.";
-                }
-                else
-                {
-                    returnMessage = "Built Models:" + returnMessage;
-                }
-
-                return returnMessage;
-            }
-            else
-            {
-                (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false);
-
-                if (reuseSmtModelFiles &&
-                    File.Exists(smtTransModelFile) && File.Exists(smtAlignModelFile))
-                {
-                    Console.WriteLine("  Reusing (All Words) SMT Model Files.");
-                    returnMessage = "Building Models: Done.";
-
-                    ShowTime();
-
-                    translationModel = Persistence.ImportTranslationModel(smtTransModelFile);
-                    alignmentModel = Persistence.ImportAlignmentModel(smtAlignModelFile);
-
-                    ShowTime();
-                }
-                else
-                {
-                    Console.WriteLine("  Building Models (All Words).");
-                    returnMessage += string.Format("Built Models: {0} {1}", smtTransModelFile, smtAlignModelFile);
-
-                    ParallelCorpora smtParallelCorpora = InitializeParallelCorpora(false);
-                    (translationModel, alignmentModel) = clearService.SMTService.DefaultSMT(smtParallelCorpora, runSpec, epsilon);
-
-                    ShowTime();
-
-                    Persistence.ExportTranslationModel(translationModel, smtTransModelFile);
-                    Persistence.ExportAlignmentModel(alignmentModel, smtAlignModelFile);
-
-                    ShowTime();
-                }
-                    
-                translationModelRest = translationModel;
-                alignmentModelPre = alignmentModel;
-
-                return returnMessage;
-               
-            }
-            */
-
             return (true, "Building Models: Done");
 
         }
 
-        /*
-        // returns the two sets (all words and content words only) parallel corpora based upon different settings for building models
-        private static ParallelCorpora InitializeParallelCorpora(bool useContentWordsOnly)
-        {
-            (string smtSourceTextFile, string smtSourceLemmaFile, string smtSourceIdFile, string smtTargetTextFile, string smtTargetLemmaFile, string smtTargetIdFile) = InitializeParallelCorporaFilesForSMT(useContentWordsOnly);
-
-            ParallelCorpora smtParallelCorpora = Persistence.ImportParallelCorpus(smtSourceTextFile, smtSourceLemmaFile, smtSourceIdFile, smtTargetTextFile, smtTargetLemmaFile, smtTargetIdFile);
-
-            return smtParallelCorpora;
-        }
-
-        // returns the two sets (all words and content words only) files based upon different settings for building models
-        private static (string, string, string, string, string, string) InitializeParallelCorporaFilesForSMT(bool useContentWordsOnly)
-        {
-            string suffix = CreateCorporaSuffix(useLemmaCatModel, useNoPuncModel, useContentWordsOnly);
-            string filteredSuffix = CreateCorporaFilteredSuffix(useNoPuncModel, useContentWordsOnly);
-
-            string smtSourceTextFile = sourceTextFile.Replace(".source", suffix + ".source");
-            string smtSourceLemmaFile = sourceLemmaFile.Replace(".source", suffix + ".source");
-            string smtSourceIdFile = sourceIdFile.Replace(".source", filteredSuffix + ".source");
-
-            string smtTargetTextFile = targetTextFile.Replace(".target", filteredSuffix + ".target");
-            string smtTargetLemmaFile = targetLemmaFile.Replace(".target", filteredSuffix + ".target");
-            string smtTargetIdFile = targetLemmaIdFile.Replace(".target", filteredSuffix + ".target");
-
-            return (smtSourceTextFile, smtSourceLemmaFile, smtSourceIdFile, smtTargetTextFile, smtTargetLemmaFile, smtTargetIdFile);
-        }
-
-        // returns the two sets (all words and content words only) files based upon different settings for building models
-        // produce sourceLemma, sourceId, sourceText, sourceLemmaCat, targetLemma, targetId, targetText files
-        private static (string, string, string, string, string, string, string) InitializeCreateParallelCorporaFiles(bool useNoPunc, bool useContentWordsOnly)
-        {
-            string filteredSuffix = CreateCorporaFilteredSuffix(useNoPunc, useContentWordsOnly);
-
-            // Default parallel corpus files
-
-            string corporaSourceLemmaFile = sourceLemmaFile.Replace(".source", filteredSuffix + ".source");
-            string corporaSourceIdFile = sourceIdFile.Replace(".source", filteredSuffix + ".source");
-            string corporaSourceTextFile = sourceTextFile.Replace(".source", filteredSuffix + ".source");
-            string corporaSourceLemmaCatFile = sourceLemmaCatFile.Replace(".source", filteredSuffix + ".source");
-
-            string corporaTargetLemmaFile = targetLemmaFile.Replace(".target", filteredSuffix + ".target");
-            string corporaTargetIdFile = targetLemmaIdFile.Replace(".target", filteredSuffix + ".target");
-            string corporaTargetTextFile = targetTextFile.Replace(".target", filteredSuffix + ".target");
-
-            return (
-                corporaSourceLemmaFile, corporaSourceIdFile, corporaSourceTextFile, corporaSourceLemmaCatFile,
-                corporaTargetLemmaFile, corporaTargetIdFile, corporaTargetTextFile
-                );
-        }
 
         //
-        private static (string, string) InitializeSmtModelFiles(bool useContentWordsOnly)
-        {
-            string suffix = CreateCorporaSuffix(useLemmaCatModel, useNoPuncModel, useContentWordsOnly);
-            string modelSuffix = string.Format(".{0}.lemma{1}", smtModel.ToLower(), suffix);
-
-            string smtTransModelFile = transModelFile.Replace(".tsv", modelSuffix + ".tsv");
-            string smtAlignModelFile = alignModelFile.Replace(".tsv", modelSuffix + ".tsv");
-
-            return (smtTransModelFile, smtAlignModelFile);
-        }
-
-        private static string CreateCorporaSuffix(bool useLemmaCat, bool useNoPunc, bool useContentWordsOnly)
-        {
-            string suffix = string.Empty;
-
-            if (useLemmaCat) suffix += ".cat";
-            if (useNoPunc) suffix += ".nopunc";
-            if (useContentWordsOnly) suffix += ".cw";
-
-            return suffix;
-        }
-
-        private static string CreateCorporaFilteredSuffix(bool useNoPunc, bool useContentWordsOnly)
-        {
-            string suffix = string.Empty;
-
-            if (useNoPunc) suffix += ".nopunc";
-            if (useContentWordsOnly) suffix += ".cw";
-
-            return suffix;
-        }
-        */
-
-        // Was Do_Button1()
+        //
+        //
         public static (bool, string) AutoAlign()
         {
             // Use the parallel corpora (with both the function words and

@@ -22,12 +22,14 @@ namespace ClearBible.Clear3.Impl.SMTService
         /// Implementation of ISMTService.DefaultSMT.
         /// The code here wraps the statistical machine translation
         /// functions from Clear2, which have not otherwise been touched.
+        ///
+        /// 2022.03.25 CL: Changed to not use epsilon since it is now encoded in runSpec.
+        /// Also, runSpec has changed to <model>-<iterations>-<threshold>-<heuristic>
         /// </summary>
         /// 
         public (TranslationModel, AlignmentModel) DefaultSMT(
             ParallelCorpora parallelCorpora,
-            string runSpec = "1:10;H:5",
-            double epsilon = 0.1)
+            string runSpec = "FastAlign-5-0.1-Intersection")
         {
             // Create a temporary work folder.
 
@@ -111,7 +113,6 @@ namespace ClearBible.Clear3.Impl.SMTService
                     tempSourceIdPath,
                     tempTargetIdPath,
                     runSpec,
-                    epsilon,
                     tempTransModelPath,
                     tempAlignModelPath,
                     python);
