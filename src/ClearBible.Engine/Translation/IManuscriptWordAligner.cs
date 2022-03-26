@@ -6,9 +6,7 @@ namespace ClearBible.Engine.Translation
 {
     public  interface IManuscriptWordAligner : IWordAligner, IDisposable
     {
-        IWordAlignmentModel SMTWordAlignmentModel { get; }
-
-        double GetAlignmentScore(int sourceLen, int prevSourceIndex, int sourceIndex, int targetLen,
+       double GetAlignmentScore(int sourceLen, int prevSourceIndex, int sourceIndex, int targetLen,
             int prevTargetIndex, int targetIndex);
 
 

@@ -330,7 +330,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
     public class Gloss
     {
-        public string Gloss1;
-        public string Gloss2;
+        public string? Gloss1;
+        public string? Gloss2;
     }
 }

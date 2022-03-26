@@ -8,7 +8,7 @@ namespace ClearBible.Engine.Translation
 {
     public class ManuscriptWordAlignmentModelTrainer : DisposableBase, ITrainer
     {
-        private ITrainer _smtTrainer;
+        private IEnumerable<ITrainer> _smtTrainers;
         private IManuscriptTrainableWordAligner _trainableAligner;
         private IEnumerable<ParallelTextRow> _parallelTextRows;
 
@@ -36,46 +36,90 @@ namespace ClearBible.Engine.Translation
 
             _trainableAligner = trainableAligner;
             _parallelTextRows = parallelTextRows;
-            _smtTrainer = _trainableAligner.SMTWordAlignmentModel.CreateTrainer(_parallelTextRows);
+            _smtTrainers = _trainableAligner.SmtModels
+                .Select(m => m.SmtWordAlignmentModel.CreateTrainer(_parallelTextRows));
         }
-        public TrainStats? Stats => _smtTrainer?.Stats;
+        public TrainStats? Stats
+        { get
+            {
+                int trainedSegCount = _smtTrainers
+                                        .Select(t => t.Stats.TrainedSegmentCount)
+                                        .Sum();
+                var stats = new TrainStats()
+                {
+                    TrainedSegmentCount = trainedSegCount
+                };
+
+                _smtTrainers
+                    .Select(t => stats.Metrics
+                        .Concat(t.Stats.Metrics)
+                        .ToLookup(kvp => kvp.Key, kvp => kvp.Value)
+                        .ToDictionary(group => group.Key, group => group.Select(d => d).Sum()));
+                return stats;
+            } 
+        }
 
         protected override void DisposeManagedResources()
         {
-             _smtTrainer.Dispose();
+             _smtTrainers
+                .Select(t =>
+                {
+                    t.Dispose();
+                    return t;
+                });
         }
 
         public virtual void Save()
         {
-            _smtTrainer.Save();
-            _trainableAligner.Save();
+            _smtTrainers
+               .Select(t =>
+               {
+                   t.Save();
+                   return t;
+               }); _trainableAligner.Save();
         }
 
         public Task SaveAsync()
         {
-            _smtTrainer.SaveAsync();
+            _smtTrainers
+               .Select(t =>
+               {
+                   t.SaveAsync();
+                   return t;
+               });
             return _trainableAligner.SaveAsync(); 
         }
 
         public void Train(IProgress<ProgressStatus>? progress = null, Action? checkCanceled = null)
         {
 
-            var reporter = new PhasedProgressReporter(progress,
-                new Phase("Training smt model(s)"),
-                new Phase("Building collections of translations and alignments"));
-
-            using (PhaseProgress phaseProgress = reporter.StartNextPhase())
+            List<Phase> phases = new List<Phase>();
+            int count = 0;
+            foreach (var _ in _smtTrainers)
             {
-                if (_smtTrainer != null)
-                {
-                    _smtTrainer.Train(phaseProgress, checkCanceled);
-                }
+                phases.Add(new Phase($"Training smt {count}"));
+                count++;
             }
-            checkCanceled?.Invoke();
+            phases.Add(new Phase("Building collections of translations and alignments"));
+            var reporter = new PhasedProgressReporter(progress, phases.ToArray());
+
+            foreach (var smtTrainer in _smtTrainers)
+            {
+                using (PhaseProgress phaseProgress = reporter.StartNextPhase())
+                {
+                    if (_smtTrainers != null)
+                    {
+                        smtTrainer.Train(phaseProgress, checkCanceled);
+                    }
+                }
+                checkCanceled?.Invoke();
+            }
+
             using (PhaseProgress phaseProgress = reporter.StartNextPhase())
             {
                 _trainableAligner.Train(_parallelTextRows, phaseProgress, checkCanceled);
             }
+
         }
     }
 }

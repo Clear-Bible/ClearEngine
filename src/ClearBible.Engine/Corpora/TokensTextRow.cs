@@ -19,7 +19,6 @@ namespace ClearBible.Engine.Corpora
                 ((VerseRef)segmentRef).VerseNum);
         }
         public TokensTextRow(
-            string textId, 
             object segmentRef, 
             IReadOnlyList<string> segment, 
             bool isSentenceStart,
@@ -27,7 +26,7 @@ namespace ClearBible.Engine.Corpora
             bool isRangeStart, 
             bool isEmpty,
             IReadOnlyList<Token> tokens)
-            : base(textId,segmentRef)
+            : base(segmentRef)
         {
             base.Segment = segment;
             IsSentenceStart = isSentenceStart;
@@ -38,8 +37,7 @@ namespace ClearBible.Engine.Corpora
             Tokens = tokens;
         }
         public TokensTextRow(TextRow textRow)
-            : base(textRow.TextId, 
-                  textRow.Ref)
+            : base(textRow.Ref)
         {
             base.Segment = textRow.Segment;
             IsSentenceStart = textRow.IsSentenceStart;

@@ -6,8 +6,6 @@ namespace ClearBible.Engine.Translation
 {
     public class ManuscriptWordAlignmentModel :  IWordAlignmentModel, IManuscriptWordAligner, IDisposable
     {
-        private IWordAlignmentModel _wordAlignmentModel { get; }
-
         private readonly IManuscriptTrainableWordAligner _trainableAligner;
 
         
@@ -19,7 +17,6 @@ namespace ClearBible.Engine.Translation
         public ManuscriptWordAlignmentModel(IManuscriptTrainableWordAligner trainableAligner, string? prefFileName = null)
         {
             _trainableAligner = trainableAligner;
-            _wordAlignmentModel = trainableAligner.SMTWordAlignmentModel;
 
             if (!string.IsNullOrEmpty(prefFileName))
             {
@@ -30,7 +27,7 @@ namespace ClearBible.Engine.Translation
         {
             get
             {
-                return _wordAlignmentModel.SourceWords;
+                return _trainableAligner.SmtModels[_trainableAligner.IndexPrimarySmtModel].SmtWordAlignmentModel.SourceWords;
             }
         }
 
@@ -38,7 +35,7 @@ namespace ClearBible.Engine.Translation
         {
             get
             {
-                return _wordAlignmentModel.TargetWords;
+                return _trainableAligner.SmtModels[_trainableAligner.IndexPrimarySmtModel].SmtWordAlignmentModel.TargetWords;
             }
         }
 
@@ -60,7 +57,7 @@ namespace ClearBible.Engine.Translation
 
         public IEnumerable<(int TargetWordIndex, double Score)> GetTranslations(int sourceWordIndex, double threshold = 0)
         {
-            return _wordAlignmentModel.GetTranslations(sourceWordIndex, threshold);
+            return _trainableAligner.SmtModels[_trainableAligner.IndexPrimarySmtModel].SmtWordAlignmentModel.GetTranslations(sourceWordIndex, threshold);
         }
 
         /// <summary>
@@ -79,9 +76,8 @@ namespace ClearBible.Engine.Translation
                 parallelTextRows
                 );
         }
-        public SIL.ObjectModel.IReadOnlySet<int> SpecialSymbolIndices => _wordAlignmentModel.SpecialSymbolIndices;
-
-        public IWordAlignmentModel SMTWordAlignmentModel => _trainableAligner.SMTWordAlignmentModel;
+        public SIL.ObjectModel.IReadOnlySet<int> SpecialSymbolIndices =>
+            _trainableAligner.SmtModels[_trainableAligner.IndexPrimarySmtModel].SmtWordAlignmentModel.SpecialSymbolIndices;
 
         public double GetAlignmentScore(int sourceLen, int prevSourceIndex, int sourceIndex, int targetLen, int prevTargetIndex, int targetIndex)
         {
@@ -90,17 +86,17 @@ namespace ClearBible.Engine.Translation
 
         public IEnumerable<(string TargetWord, double Score)> GetTranslations(string sourceWord, double threshold = 0)
         {
-            return _wordAlignmentModel.GetTranslations(sourceWord);
+            return _trainableAligner.SmtModels[_trainableAligner.IndexPrimarySmtModel].SmtWordAlignmentModel.GetTranslations(sourceWord);
         }
 
         public double GetTranslationScore(string sourceWord, string targetWord)
         {
-            return _wordAlignmentModel.GetTranslationScore(sourceWord, targetWord);
+            return _trainableAligner.SmtModels[_trainableAligner.IndexPrimarySmtModel].SmtWordAlignmentModel.GetTranslationScore(sourceWord, targetWord);
         }
 
         public double GetTranslationScore(int sourceWordIndex, int targetWordIndex)
         {
-            return _wordAlignmentModel.GetTranslationScore(sourceWordIndex, targetWordIndex);
+            return _trainableAligner.SmtModels[_trainableAligner.IndexPrimarySmtModel].SmtWordAlignmentModel.GetTranslationScore(sourceWordIndex, targetWordIndex);
         }
 
         public void Load(string prefFileName)

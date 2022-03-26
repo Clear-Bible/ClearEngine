@@ -40,6 +40,37 @@ namespace ClearBible.Engine.Corpora
         {
         }
 
+        public static int SubstringToInt(string tokenString, int start, int count)
+        {
+            string substring;
+            try
+            {
+                substring = tokenString.Substring(start, count);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                throw new InvalidDataException($"TokenString {tokenString} can't extract substring at position {start} count {count}.");
+            }
+
+            if (int.TryParse(substring, out int result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new InvalidDataException($"TokenString {tokenString} can't parse int at position {start} count {count}.");
+            }
+        }
+        public TokenId(string tokenIdString)
+            : this(
+                  SubstringToInt(tokenIdString,0,3),
+                  SubstringToInt(tokenIdString,3,3),
+                  SubstringToInt(tokenIdString, 6,3),
+                  SubstringToInt(tokenIdString, 9,3),
+                  SubstringToInt(tokenIdString, 12,3))
+        {
+        }
+
         public override string ToString()
         {
             return $"{BookNum.ToString("000")}{ChapterNum.ToString("000")}{VerseNum.ToString("000")}{WordNum.ToString("000")}{SubWordNum.ToString("000")}";

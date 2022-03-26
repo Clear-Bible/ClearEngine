@@ -1,4 +1,5 @@
 ﻿using SIL.Machine.Corpora;
+using SIL.Machine.Translation;
 using SIL.Machine.Utils;
 using System;
 using System.Collections.Generic;
@@ -8,8 +9,20 @@ using System.Threading.Tasks;
 
 namespace ClearBible.Engine.Translation
 {
-    public interface IManuscriptTrainableWordAligner : IManuscriptWordAligner
+	public class SmtModel
+	{
+		public SmtModel(IWordAlignmentModel smtWordAlignmentModel)
+		{
+			SmtWordAlignmentModel = smtWordAlignmentModel;
+		}
+		public IWordAlignmentModel SmtWordAlignmentModel { get; }
+		public Dictionary<string, Dictionary<string, double>>? TranslationModel { get; set; }
+		public List<IReadOnlyCollection<EngineAlignedWordPair>> AlignmentModel { get; } = new();
+	}
+	public interface IManuscriptTrainableWordAligner : IManuscriptWordAligner
     {
+		int IndexPrimarySmtModel { get; }
+		List<SmtModel> SmtModels { get; }
         void Train(IEnumerable<ParallelTextRow> parallelTextRows, IProgress<ProgressStatus>? progress, Action? checkCanceled);
         Task SaveAsync();
         void Save();

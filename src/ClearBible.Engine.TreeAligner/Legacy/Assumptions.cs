@@ -1,10 +1,17 @@
-﻿using ClearBible.Engine.TreeAligner.Translation;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+
 
 namespace ClearBible.Engine.TreeAligner.Legacy
 {
     //-2
     //using ClearBible.Clear3.API;
     //using ClearBible.Clear3.Impl.Miscellaneous;
+    //+1
+    using ClearBible.Engine.TreeAligner.Legacy;
 
     /// <summary>
     /// Standard implementation of IAutoAlignAssumptions, based on
@@ -36,43 +43,6 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
         private Dictionary<string, string> _preAlignment;
 
-        public AutoAlignAssumptions(
-            ManuscriptTreeWordAlignerParams manuscriptTreeWordAlignerParams,
-            TranslationModel translationModel,
-            TranslationModel translationModelTC,
-            AlignmentModel alignProbs,
-            AlignmentModel alignProbsPre
-            )
-        {
-            _translationModel = translationModel;
-            _translationModelTC = translationModelTC;
-            _useLemmaCatModel = manuscriptTreeWordAlignerParams.useLemmaCatModel;
-            _manTransModel = manuscriptTreeWordAlignerParams.manTransModel;
-            _alignProbs = alignProbs;
-            _alignProbsPre = alignProbsPre;
-            _useAlignModel = manuscriptTreeWordAlignerParams.useAlignModel;
-            _puncs = manuscriptTreeWordAlignerParams.puncs;
-            _stopWords = manuscriptTreeWordAlignerParams.stopWords;
-            _goodLinks = manuscriptTreeWordAlignerParams.goodLinks;
-            _goodLinkMinCount = manuscriptTreeWordAlignerParams.goodLinkMinCount;
-            _badLinks = manuscriptTreeWordAlignerParams.badLinks;
-            _badLinkMinCount = manuscriptTreeWordAlignerParams.badLinkMinCount;
-            _oldLinks = manuscriptTreeWordAlignerParams.oldLinks;
-            _sourceFuncWords = manuscriptTreeWordAlignerParams.sourceFunctionWords;
-            _targetFuncWords = manuscriptTreeWordAlignerParams.targetFunctionWords;
-            _contentWordsOnly = manuscriptTreeWordAlignerParams.contentWordsOnly;
-            _strongs = manuscriptTreeWordAlignerParams.strongs;
-            _maxPaths = manuscriptTreeWordAlignerParams.maxPaths;
-
-            _preAlignment =
-                alignProbsPre.Dictionary.Keys
-                .GroupBy(bareLink => bareLink.SourceID)
-                .Where(group => group.Any())
-                .ToDictionary(
-                    group => group.Key.AsCanonicalString,
-                    group => group.First().TargetID.AsCanonicalString);
-        }
-        /* //-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -126,7 +96,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                     group => group.Key.AsCanonicalString,
                     group => group.First().TargetID.AsCanonicalString);
         }
-        */
+
 
         public bool ContentWordsOnly => _contentWordsOnly;
 
@@ -305,108 +275,5 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                 return false;
             }
         }
-
-
-        //+ all the following for reference
-
-        /// <summary>
-        /// <para>
-        /// Create assumptions for the tree-based auto-aligner
-        /// based on certain standard inputs, after the manner of Clear2.
-        /// </para>
-        /// <para>
-        /// Note that you can also create your own assumptions by
-        /// supplying a custom object that implements the
-        /// IAutoAlignAssumptions interface.
-        /// </para>
-        /// </summary>
-        /// <param name="translationModel">
-        /// An estimated TranslationModel such as one obtained from training
-        /// a statistical translation model with a ParallelCorpora that is to
-        /// be aligned.
-        /// </param>
-        /// <param name="manTransModel">
-        /// A confirmed TranslationModel such as one obtained by analyzing
-        /// a database of manual alignments.
-        /// </param>
-        /// <param name="alignProbs">
-        /// An estimated AlignmentModel such as one obtained from training
-        /// a statistical translation model with a ParallelCorpora that is to
-        /// be aligned.
-        /// </param>
-        /// <param name="useAlignModel">
-        /// True if the estimated AlignmentModel should influence the
-        /// probabilities of the possible target words identified for each
-        /// source segment.
-        /// </param>
-        /// <param name="puncs">
-        /// A set of target texts that are to be considered as punctuation.
-        /// </param>
-        /// <param name="stopWords">
-        /// A set of source lemmas and lowercased target texts that should
-        /// not participate in linking.
-        /// </param>
-        /// <param name="goodLinks">
-        /// A dictionary mapping strings of the form xxx#yyy (where xxx is
-        /// a lemma and yyy is a lower-cased target text) to a count,
-        /// representing that the association between the lemma and the
-        /// target text has been found to be good for the count number of
-        /// times.
-        /// </param>
-        /// <param name="goodLinkMinCount">
-        /// The count threshold at which the auto-aligner algorithm will
-        /// allow a good link to influence the auto alignment.
-        /// </param>
-        /// <param name="badLinks">
-        /// A dictionary mapping strings of the form xxx#yyy (where xxx is
-        /// a lemma and yyy is a lower-cased target text) to a count,
-        /// representing that the association between the lemma and the
-        /// target text has been found to be good for the count number of
-        /// times.
-        /// </param>
-        /// <param name="badLinkMinCount">
-        /// The count threshold at which the auto-aligner algorithm will
-        /// allow a bad link to influence the auto alignment.
-        /// </param>
-        /// <param name="oldLinks">
-        /// A database of old links, organized by verse, and using alternate
-        /// IDs to identify the sources and targets.  (Alternate IDs have the
-        /// form, for example, of "λόγος-2" to mean the second occurence of
-        /// the lemma "λόγος" within the verse, or "word-2" to mean the
-        /// second occurrence of the lowercased target text "word"
-        /// within the verse.)  The auto-aligner gives preference to these
-        /// old links when it is identifying possible choices of target word
-        /// for a source word.  The use of alternate IDs is intended to help
-        /// in case the translation of the verse has changed since the old
-        /// links were identified.
-        /// </param>
-        /// <param name="sourceFuncWords">
-        /// Those lemmas that are to be considered function words rather than
-        /// content words.
-        /// </param>
-        /// <param name="targetFuncWords">
-        /// Those lowercased target texts that are to be considered function
-        /// words rather than content words.
-        /// </param>
-        /// <param name="contentWordsOnly">
-        /// True if the auto-aligner should consider content words only.
-        /// </param>
-        /// <param name="strongs">
-        /// A database of Strong's information, consisting of a dictionary
-        /// mapping a Strong number to a dictionary whose keys are the set
-        /// of target texts that are possible definitions of the word.
-        /// The auto-aligner gives preference to a Strong's definition when
-        /// one is available.
-        /// </param>
-        /// <param name="maxPaths">
-        /// The maximum number of alternatives that the auto-aligner should
-        /// permit during its generation of alternatives using tree traversal.
-        /// </param>
-        /// <returns>
-        /// An IAutoAlignAssumptions object that the auto-aligner uses in
-        /// various ways to influence its behavior.
-        /// </returns>
-        /// 
-
     }
 }
