@@ -8,15 +8,15 @@ namespace ClearBible.Engine.Corpora
     {
         private static IReadOnlyList<object> GetSourceSegmentRefs(IEnumerable<TextRow> sourceTextRows, IEnumerable<TextRow> targetTextRows, IEnumerable<AlignmentRow> alignmentRows)
         {
-            var sourceRow = sourceTextRows
-                .SelectMany(textSegment => textSegment.Segment).ToList();
-            var targetRow = targetTextRows
-                .SelectMany(textSegment => textSegment.Segment).ToList();
+            var sourceSegment = sourceTextRows
+                .SelectMany(textRow => textRow.Segment).ToList();
+            var targetSegment = targetTextRows
+                .SelectMany(textRow => textRow.Segment).ToList();
 
             var sourceRefs = sourceTextRows
-                .Select(textSegment => textSegment.Ref).ToList();
+                .Select(textRow => textRow.Ref).ToList();
             var targetRefs = targetTextRows
-                .Select(textSegment => textSegment.Ref).ToList();
+                .Select(textRow => textRow.Ref).ToList();
 
             //FIXME: is this right?
             IReadOnlyCollection<AlignedWordPair>? alignedWordPairs = null;
@@ -28,24 +28,12 @@ namespace ClearBible.Engine.Corpora
                     .FirstOrDefault();
             }
 
-            /*
-
-            IReadOnlyCollection<AlignedWordPair>? alignedWordPairs = null;
-            if ((sourceRefs.Count() == 1) && (textAlignmentCollection.Alignments.Count() > 0))
-            {
-                alignedWordPairs = textAlignmentCollection.Alignments
-                    .Where(alignment => alignment.SegmentRef.Equals(sourceRefs.First()))
-                    .Select(textAlignment => textAlignment.AlignedWordPairs)
-                    .FirstOrDefault();
-            }
-            */
-
             //since C# doesn't support tuple splatting yet.
             //return (sourceSegmentRefs.AsReadOnly(), targetSegmentRefs.AsReadOnly(), sourceTextSegments.AsReadOnly(), targetTextSegments.AsReadOnly(), alignedWordPairs);
 
             _TargetSegmentRefs = targetRefs.AsReadOnly();
-            _SourceTextSegment = sourceRow.AsReadOnly();
-            _TargetTextSegment = targetRow.AsReadOnly();
+            _SourceTextSegment = sourceSegment.AsReadOnly();
+            _TargetTextSegment = targetSegment.AsReadOnly();
             _AlignedWordPairs = alignedWordPairs;
 
             return sourceRefs.AsReadOnly();
@@ -56,13 +44,12 @@ namespace ClearBible.Engine.Corpora
         private static IReadOnlyCollection<AlignedWordPair>? _AlignedWordPairs = new List<AlignedWordPair>();
 
         public EngineParallelTextRow(
-            string textId,
+            //string textId,
             IEnumerable<TextRow> sourceTextRows,
             IEnumerable<TextRow> targetTextRows,
-            IEnumerable<AlignmentRow> alignmentRows
+            IAlignmentCorpus alignmentRows
             )
             : base(
-                  textId, //the following because C# doesn't support tuple splatting yet.
                   GetSourceSegmentRefs(sourceTextRows, targetTextRows, alignmentRows),
                   _TargetSegmentRefs)
         {
@@ -94,6 +81,24 @@ namespace ClearBible.Engine.Corpora
             {
             }
         }
+
+        public EngineParallelTextRow(ParallelTextRow parallelTextRow, 
+            IEnumerable<TextRow> sourceTextRows,
+            IEnumerable<TextRow> targetTextRows)
+            : base(parallelTextRow.SourceRefs, parallelTextRow.TargetRefs)
+        {
+            SourceSegment = parallelTextRow.SourceSegment;
+            TargetSegment = parallelTextRow.TargetSegment;
+            AlignedWordPairs = parallelTextRow.AlignedWordPairs;
+            IsSourceSentenceStart = parallelTextRow.IsSourceSentenceStart;
+            IsSourceInRange = parallelTextRow.IsSourceInRange;
+            IsSourceRangeStart = parallelTextRow.IsSourceRangeStart;
+            IsTargetSentenceStart = parallelTextRow.IsTargetSentenceStart;
+            IsTargetInRange = parallelTextRow.IsTargetInRange;
+            IsTargetRangeStart = parallelTextRow.IsTargetRangeStart;
+            IsEmpty = parallelTextRow.IsEmpty;
+        }
+
         public IReadOnlyList<Token>? SourceTokens { get; }
 
         public IReadOnlyList<Token>? TargetTokens { get; }

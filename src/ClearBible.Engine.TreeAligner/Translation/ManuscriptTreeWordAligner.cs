@@ -10,7 +10,7 @@ using SIL.Machine.Utils;
 
 namespace ClearBible.Engine.TreeAligner.Translation
 {
-	public class ManuscriptTreeWordAlginer : IManuscriptWordAligner, IManuscriptTrainableWordAligner
+	public class ManuscriptTreeWordAligner : IManuscriptWordAligner, IManuscriptTrainableWordAligner
 	{
         public ManuscriptTreeWordAlignerParams HyperParameters { get; set; } 
 
@@ -18,7 +18,7 @@ namespace ClearBible.Engine.TreeAligner.Translation
         private readonly IManuscriptTree _manuscriptTree;
 
 		public List<SmtModel> SmtModels { get; }
-		public double Epsilon { get; set; }
+		public double Epsilon { get; set; } = 0.1;
         public int IndexPrimarySmtModel { get; }
 
 		/// <summary>
@@ -29,7 +29,7 @@ namespace ClearBible.Engine.TreeAligner.Translation
 		/// <param name="hyperParameters"></param>
 		/// <param name="manuscriptTree"></param>
 		/// <param name="prefFileName"></param>
-        public ManuscriptTreeWordAlginer(IEnumerable<IWordAlignmentModel> smtModels, int indexPrmarySmtModel, ManuscriptTreeWordAlignerParams hyperParameters, IManuscriptTree manuscriptTree, string? prefFileName = null)
+        public ManuscriptTreeWordAligner(IEnumerable<IWordAlignmentModel> smtModels, int indexPrmarySmtModel, ManuscriptTreeWordAlignerParams hyperParameters, IManuscriptTree manuscriptTree, string? prefFileName = null)
 		{
 			SmtModels = smtModels
 				.Select(m => new SmtModel(m)).ToList();
@@ -63,12 +63,23 @@ namespace ClearBible.Engine.TreeAligner.Translation
 				?? throw new InvalidDataException("Not configured with one or more smt models.");
 		}
 
-		public WordAlignmentMatrix GetBestAlignment(ParallelTextRow parallelTextRow)
+		public IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(ParallelTextRow parallelTextRow)
         {
-			//FIXME!
-			var result = ZoneAlignmentAdapter.AlignZone(parallelTextRow, _manuscriptTree, HyperParameters, SmtModels, IndexPrimarySmtModel);
+			IEnumerable <(SourcePoint, TargetPoint, double)> alignments = ZoneAlignmentAdapter.AlignZone(parallelTextRow, _manuscriptTree, HyperParameters, SmtModels, IndexPrimarySmtModel);
+			//PointsTokensAlignedWordPair((SourcePoint, (TargetPoint, double)) alignment, EngineParallelTextRow engineParallelTextRow)
 
-			throw new NotImplementedException();
+			if (parallelTextRow is EngineParallelTextRow)
+			{ 
+				return alignments
+						.Select(a => new PointsTokensAlignedWordPair(a.Item1, a.Item2, a.Item3, (EngineParallelTextRow)parallelTextRow))
+						.ToList();
+			}
+			else
+            {
+				return alignments
+						.Select(a => new AlignedWordPair(a.Item1.SourcePosition, a.Item2.Position) {AlignmentScore = a.Item3} )
+						.ToList();
+			}
         }
 		/// <summary>
 		/// Load generated collections of Translations And Alignments
@@ -100,10 +111,9 @@ namespace ClearBible.Engine.TreeAligner.Translation
 		/// <param name="progress"></param>
 		/// <param name="checkCanceled"></param>
 		/// <exception cref="NotImplementedException"></exception>
-        public void Train(IEnumerable<ParallelTextRow> parallelTextRows, IProgress<ProgressStatus>? progress = null, Action? checkCanceled = null)
+        public void Train(IEnumerable<EngineParallelTextRow> engineParallelTextRows, IProgress<ProgressStatus>? progress = null, Action? checkCanceled = null)
         {
 			List<Phase> phases = new List<Phase>();
-			phases.Add(new Phase("Checking that ParallelTextRows are EngineParallelTextRows"));
 			int count = 0;
 			foreach (var _ in SmtModels)
             {
@@ -113,19 +123,6 @@ namespace ClearBible.Engine.TreeAligner.Translation
 			}
 			var reporter = new PhasedProgressReporter(progress, phases.ToArray());
 
-			IEnumerable<EngineParallelTextRow> engineParallelTextRows;
-			using (PhaseProgress phaseProgress = reporter.StartNextPhase())
-			{
-				try
-				{
-					engineParallelTextRows = parallelTextRows.Cast<EngineParallelTextRow>();
-				}
-				catch (InvalidCastException)
-				{
-					throw new InvalidCastException("train was not supplied with ParallelTextRows that are EngineParallelTextRows");
-				}
-			}
-
 			count = 0;
 			foreach (var smtModel in SmtModels)
 			{
@@ -134,7 +131,7 @@ namespace ClearBible.Engine.TreeAligner.Translation
 					smtModel.TranslationModel?.Clear();
 					smtModel.TranslationModel = smtModel.SmtWordAlignmentModel.GetTranslationTable(Epsilon);
 				}
-
+				checkCanceled?.Invoke();
 				using (PhaseProgress phaseProgress = reporter.StartNextPhase())
 				{
 					smtModel.AlignmentModel.Clear();

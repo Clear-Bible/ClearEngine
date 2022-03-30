@@ -288,7 +288,7 @@ namespace ClearBible.Engine.Corpora
                 .Sum();
 
             string newNodeId =
-                subTrees[0].Attribute("nodeId")?.Value.Substring(0, 11) ?? "NODEIDNOTAVAIL" +
+                (subTrees[0].Attribute("nodeId")?.Value.Substring(0, 11) ?? throw new InvalidDataException("Node doesn't have nodeId attribute")) +
                 $"{totalLength:D3}" +
                 "0";
 

@@ -50,11 +50,10 @@ namespace ClearBible.Engine.Translation
             return _trainableAligner.GetBestAlignment(sourceSegment, targetSegment);
         }
 
-        public WordAlignmentMatrix GetBestAlignment(ParallelTextRow row)
+        public IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(ParallelTextRow parallelTextRow)
         {
-            return _trainableAligner.GetBestAlignment(row);
+            return _trainableAligner.GetBestAlignmentAlignedWordPairs(parallelTextRow);
         }
-
         public IEnumerable<(int TargetWordIndex, double Score)> GetTranslations(int sourceWordIndex, double threshold = 0)
         {
             return _trainableAligner.SmtModels[_trainableAligner.IndexPrimarySmtModel].SmtWordAlignmentModel.GetTranslations(sourceWordIndex, threshold);
@@ -71,10 +70,18 @@ namespace ClearBible.Engine.Translation
         /// <exception cref="InvalidCastException"></exception>
         public ITrainer CreateTrainer(IEnumerable<ParallelTextRow> parallelTextRows)
         {
-            return new ManuscriptWordAlignmentModelTrainer(
-                _trainableAligner,
-                parallelTextRows
-                );
+
+            try
+            {
+                return new ManuscriptWordAlignmentModelTrainer(
+                    _trainableAligner,
+                    parallelTextRows.Cast<EngineParallelTextRow>()
+                    );
+            }
+            catch (InvalidCastException)
+            {
+                throw new InvalidDataException("Trainer requires an IEnumerable<EngineParallelTextRow>, usually implemented from EngineParallelTextCorpus");
+            }
         }
         public SIL.ObjectModel.IReadOnlySet<int> SpecialSymbolIndices =>
             _trainableAligner.SmtModels[_trainableAligner.IndexPrimarySmtModel].SmtWordAlignmentModel.SpecialSymbolIndices;

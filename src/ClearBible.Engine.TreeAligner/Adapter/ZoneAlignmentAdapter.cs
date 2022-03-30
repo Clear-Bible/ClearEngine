@@ -56,7 +56,7 @@ namespace ClearBible.Engine.TreeAligner.Adapter
 
             return new TargetID($"{clearBookNumString}{tokenId.ChapterNum.ToString("000")}{tokenId.VerseNum.ToString("000")}{tokenId.WordNum.ToString("000")}");
         }
-        internal static AlignmentModel ToAlignmentModel(List<IReadOnlyCollection<EngineAlignedWordPair>>? alignMod)
+        internal static AlignmentModel ToAlignmentModel(List<IReadOnlyCollection<TokensAlignedWordPair>>? alignMod)
         {    
             if (alignMod == null)
             {
@@ -75,7 +75,7 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                      .ToDictionary(x => x.Key, x => x.Value)
                );
         }
-        internal static IEnumerable<(SourcePoint, (TargetPoint, double))> AlignZone(
+        internal static IEnumerable<(SourcePoint, TargetPoint, double)> AlignZone(
             ParallelTextRow parallelTextRow, 
             IManuscriptTree manuscriptTree, 
             ManuscriptTreeWordAlignerParams hyperParameters, 
@@ -88,6 +88,10 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 throw new InvalidDataException("more than two smt's provided to AlignZone");
             if (smtModels.Count == 2)
                 smtTcIndex = indexPrimarySmtModel == 0 ? 1 : 0;
+            if (smtModels.Count == 1)
+            {
+                smtTcIndex = 0;
+            }
 
             var assumptions = new AutoAlignAssumptions(
                 ToTranslationModel(smtModels[indexPrimarySmtModel].TranslationModel),
@@ -154,51 +158,19 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 throw new InvalidDataException(@$"TreeAligner.Adapters.AlignZone got a versesXElementCombined that is null for 
                     book {books.First()} chapter {chapterNumbers.First()} verses {string.Join(" ", verseNumbers)}");
             }
-            /*
-            public record Target(
-    TargetText TargetText,
-    TargetLemma TargetLemma,
-    TargetID TargetID);
 
-                public readonly struct TargetID
-        {
-            public int Book => int.Parse(_tag.Substring(0, 2));
-            public int Chapter => int.Parse(_tag.Substring(2, 3));
-            public int Verse => int.Parse(_tag.Substring(5, 3));
-            public int Word => int.Parse(_tag.Substring(8, 3));
-
-            public ChapterID ChapterID => new ChapterID(_tag.Substring(0, 5));
-            public VerseID VerseID => new VerseID(_tag.Substring(0, 8));
-
-            private readonly string _tag;
-
-            public TargetID(string tag) { _tag = tag; }
-
-            public TargetID(
-                int book, int chapter, int verse, int word)
+            if (parallelTextRow is not EngineParallelTextRow)
             {
-                _tag = $"{book:D2}{chapter:D3}{verse:D3}{word:D3}";
-            }
-
-            public TargetID(
-                VerseID verseID,
-                int word)
-            {
-                _tag = $"{verseID.AsCanonicalString}{word:D3}";
-            }
-
-            public string AsCanonicalString => _tag;
-        }
-        */
-
-            if (parallelTextRow.TargetSegment is not TokensTextRow)
-            {
-                throw new InvalidDataException("ParallelTextRow supplied is not a TokensTextSegment, which is required for extracting target points.");
+                throw new InvalidDataException("ParallelTextRow supplied is not a EngineParallelTextRow, which is required for extracting target points.");
             }
 
             //FIXME: CHECK THIS!
-            IEnumerable<Target> targets = ((TokensTextRow)parallelTextRow.TargetSegment).Tokens
-                .Select(t => new Target(new TargetText(t.Text), new TargetLemma(t.Text), new TargetID(t.TokenId.ToString())));
+            IEnumerable<Target>? targets = ((EngineParallelTextRow)parallelTextRow).TargetTokens
+                ?.Select(t => new Target(new TargetText(t.Text), new TargetLemma(t.Text), new TargetID(t.TokenId.ToTokenIdCanonicalString()))) ?? null;
+            if (targets == null)
+            {
+                throw new InvalidDataException("ParallelTextRow targets must be transformed to a TargetTextRow (.Transform(textRow => new TokensTextRow(textRow))) ");
+            }
 
             List<MonoLink> monoLinks = ZoneAlignment.GetMonoLinks(
                 versesXElementCombined,
@@ -206,7 +178,8 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 ZoneAlignment.GetTargetPoints(targets.ToList()),
                 assumptions);
 
-            throw new NotImplementedException();
+            return monoLinks
+                .Select(m => (m.SourcePoint, m.TargetBond.TargetPoint, m.TargetBond.Score));
         }
     }
 }

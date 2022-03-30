@@ -11,10 +11,10 @@ namespace ClearBible.Engine.Translation
 {
     public static class EngineTranslationExtensions
     {
-        public static IReadOnlyCollection<EngineAlignedWordPair> GetAlignedWordPairs(this WordAlignmentMatrix wordAlignmentMatrix, IWordAlignmentModel model, EngineParallelTextRow engineParallelTextRow)
+        public static IReadOnlyCollection<TokensAlignedWordPair> GetAlignedWordPairs(this WordAlignmentMatrix wordAlignmentMatrix, IWordAlignmentModel model, EngineParallelTextRow engineParallelTextRow)
         {
             return wordAlignmentMatrix.GetAlignedWordPairs(model, engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment)
-                .Select(a => new EngineAlignedWordPair(a, engineParallelTextRow))
+                .Select(a => new TokensAlignedWordPair(a, engineParallelTextRow))
                 .ToList();
         }
     }
