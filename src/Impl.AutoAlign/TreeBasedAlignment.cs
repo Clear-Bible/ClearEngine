@@ -344,8 +344,9 @@ namespace ClearBible.Clear3.Impl.AutoAlign
             // to the same target point.  (If all the possibilities have
             // conflicts, use the first possibility.)
             //
-            // FIXME: 2021.06.07 CL: Got an index out of bounds on NRT NT using IBM1
-            // The childCandidateList has two items in our list/
+            // FIXME: 2021.06.07 CL: Got an index out of bounds on NRT NT using
+            // the Machine SIL Thot implemenation of IBM1.
+            // The childCandidateList has two items in our list.
             // The first inner List has one Candidate, the second inner List has zero candidates.
             // CreatePaths returns allCandidates as an empty List.
             List<Candidate> candidates =

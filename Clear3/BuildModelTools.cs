@@ -24,7 +24,6 @@ namespace Clear3
             string runSpec,
             string transModelFile,
             string alignModelFile,
-            string python,
             IClear30ServiceAPI clearService)
         {
             string modelType = string.Format("(All Words, {0})", runSpec);
@@ -47,8 +46,7 @@ namespace Clear3
                 runSpec,
                 transModelFile,
                 alignModelFile,
-                modelType,
-                python,           
+                modelType,        
                 clearService);
 
 
@@ -84,7 +82,6 @@ namespace Clear3
             string transModelFile,
             string alignModelFile,
             string modelType,
-            string python,
             IClear30ServiceAPI clearService)
         {
             (string smtTransModelFile, string smtAlignModelFile) = InitializeSmtModelFiles(false, useContentWordsOnly, useNoPuncModel, useLemmaCatModel, runSpec, transModelFile, alignModelFile);

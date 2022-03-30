@@ -30,10 +30,12 @@ namespace Clear3
 
         SetContentWordsOnly,
         SetUseAlignModel,
-        SetEpsilon,
+
+        SetSmtImplementation,
         SetSmtModel,
-        SetSmtHeuristic,
         SetSmtIterations,
+        SetSmtEpsilon,
+        SetSmtHeuristic,       
 
         SetContentWordsOnlySMT,
         SetContentWordsOnlyTC,
@@ -183,14 +185,14 @@ namespace Clear3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported lowercase selection", optionStr, param));
                     }
                     break;
-                case Options.SetEpsilon:
-                    if (double.TryParse(param, out double epsilon))
+                case Options.SetSmtImplementation:
+                    if ((param == "Original") || (param == "Machine") || (param == "Giza"))
                     {
                         good = true;
                     }
                     else
                     {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be a number", optionStr, param));
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported model", optionStr, param));
                     }
                     break;
                 case Options.SetSmtModel:
@@ -203,16 +205,6 @@ namespace Clear3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported model", optionStr, param));
                     }
                     break;
-                case Options.SetSmtHeuristic:
-                    if ((param == "Intersection") || (param == "Union") || (param == "Grow") || (param == "GrowDiag") || (param == "GrowDiagFinal") || (param == "GrowDiagFinalAnd") || (param == "Och"))
-                    {
-                        good = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported hueristic", optionStr, param));
-                    }
-                    break;
                 case Options.SetSmtIterations:
                     if (int.TryParse(param, out int iterations))
                     {
@@ -221,6 +213,27 @@ namespace Clear3
                     else
                     {
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be an integer", optionStr, param));
+                    }
+                    break;
+                case Options.SetSmtEpsilon:
+                    if (double.TryParse(param, out double epsilon))
+                    {
+                        good = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be a number", optionStr, param));
+                    }
+                    break;
+
+                case Options.SetSmtHeuristic:
+                    if ((param == "Intersection") || (param == "Union") || (param == "Grow") || (param == "GrowDiag") || (param == "GrowDiagFinal") || (param == "GrowDiagFinalAnd") || (param == "Och"))
+                    {
+                        good = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported hueristic", optionStr, param));
                     }
                     break;
                 case Options.SetContentWordsOnly:
@@ -462,14 +475,17 @@ namespace Clear3
             Console.WriteLine("\t\tSets the contentWordsOnly boolean to <bool>, which can only be true or false");
             Console.WriteLine("\t-a <bool>, --use-align-model=<bool>");
             Console.WriteLine("\t\tSets the useAlignModel boolean to <bool>, which can only be true or false");
+
+            Console.WriteLine("\t-im <implementation>, --implementation=<implementation>");
+            Console.WriteLine("\t\tSets the implementation of the SMT model to <implementation>, which can only be Original, Machine, Giza");
+            Console.WriteLine("\t-m <model>, --model=<model>");
+            Console.WriteLine("\t\tSets the SMT model to <model>, which can only be IBM1, IBM2, IBM3, IBM4, HMM, FastAlign");
+            Console.WriteLine("\t-i <int>, --iterations=<int>");
+            Console.WriteLine("\t\tSets number of iterations for SMT model to <int>, e.g. 7");
             Console.WriteLine("\t-e <double>, --epsilon=<double>");
             Console.WriteLine("\t\tSets epsilon (threshold) to <double>, e.g. 0.1");
             Console.WriteLine("\t-h <heuristic>, --heuristic=<heuristic>");
             Console.WriteLine("\t\tSets the SMT model heursitic to <heursitic>, e.g. Intersection");
-            Console.WriteLine("\t-i <int>, --iterations=<int>");
-            Console.WriteLine("\t\tSets number of iterations for SMT model to <int>, e.g. 7");
-            Console.WriteLine("\t-m <model>, --model=<model>");
-            Console.WriteLine("\t\tSets the SMT model to <model>, which can only be IBM1, IBM2, IBM3, IBM4, HMM, FastAlign");
 
             Console.WriteLine("\t-smt <bool>, --smt-content-words-only=<bool>");
             Console.WriteLine("\t\tSets the contentWordsOnlySMT boolean to <bool>, which can only be true or false");
@@ -574,11 +590,13 @@ namespace Clear3
 
                 { "-c", Options.SetContentWordsOnly }, { "--content-words-only", Options.SetContentWordsOnly },
                 { "-a", Options.SetUseAlignModel }, { "--use-align-model", Options.SetUseAlignModel },
-                { "-e", Options.SetEpsilon }, { "--epsilon", Options.SetEpsilon },
-                { "-m", Options.SetSmtModel }, { "--model", Options.SetSmtModel },
-                { "-h", Options.SetSmtHeuristic }, { "--hueristic", Options.SetSmtHeuristic },
-                { "-i", Options.SetSmtIterations }, { "--iterations", Options.SetSmtIterations },
 
+                { "-im", Options.SetSmtImplementation }, { "--implementation", Options.SetSmtImplementation },
+                { "-m", Options.SetSmtModel }, { "--model", Options.SetSmtModel },
+                { "-i", Options.SetSmtIterations }, { "--iterations", Options.SetSmtIterations },
+                { "-e", Options.SetSmtEpsilon }, { "--epsilon", Options.SetSmtEpsilon },
+                { "-h", Options.SetSmtHeuristic }, { "--hueristic", Options.SetSmtHeuristic },
+                
                 { "-smt", Options.SetContentWordsOnlySMT }, { "--smt-content-words-only", Options.SetContentWordsOnlySMT },
                 { "-tc", Options.SetContentWordsOnlyTC }, { "--tc-content-words-only", Options.SetContentWordsOnlyTC },
 
@@ -603,10 +621,12 @@ namespace Clear3
 
                 { Options.SetContentWordsOnly, "contentWordsOnly" },
                 { Options.SetUseAlignModel, "useAlignModel" },
-                { Options.SetEpsilon, "epsilon" },
+
+                { Options.SetSmtImplementation, "smtImplementation" },
                 { Options.SetSmtModel, "smtModel" },
-                { Options.SetSmtHeuristic, "smtHeuristic" },
                 { Options.SetSmtIterations, "smtIterations" },
+                { Options.SetSmtEpsilon, "smtEpsilon" },
+                { Options.SetSmtHeuristic, "smtHeuristic" },
 
                 { Options.SetContentWordsOnlySMT, "contentWordsOnlySMT" },
                 { Options.SetContentWordsOnlyTC, "contentWordsOnlyTC" },
@@ -634,10 +654,12 @@ namespace Clear3
 
                 { Options.SetContentWordsOnly, ActionsClear3.SetContentWordsOnly },
                 { Options.SetUseAlignModel, ActionsClear3.SetUseAlignModel },
-                { Options.SetEpsilon, ActionsClear3.SetEpsilon },
+
+                { Options.SetSmtImplementation, ActionsClear3.SetSmtImplementation },
                 { Options.SetSmtModel, ActionsClear3.SetSmtModel },
-                { Options.SetSmtHeuristic, ActionsClear3.SetSmtHeuristic },
                 { Options.SetSmtIterations, ActionsClear3.SetSmtIterations },
+                { Options.SetSmtEpsilon, ActionsClear3.SetSmtEpsilon },
+                { Options.SetSmtHeuristic, ActionsClear3.SetSmtHeuristic },
 
                 { Options.SetContentWordsOnlySMT, ActionsClear3.SetContentWordsOnlySMT },
                 { Options.SetContentWordsOnlyTC, ActionsClear3.SetContentWordsOnlyTC },

@@ -17,14 +17,14 @@ namespace TransModels
 {
     public class BuildModelsMachine
     {
-        // 2022.03.25 CL: Removed passing in epsilon since it is part of runSpec now: <model>-<iteration>-<epsilon>-<heursitic>
-        // Epsilon is the same a threshold
+        // 2022.03.25 CL: Removed passing in epsilon since it is part of runSpec now: <model>-<iteration>-<epsilon>-<heursitic
+        // // Epsilon is the same a threshold
         public static void BuildMachineModels(
             string sourceLemmaFile, // source text in verse per line format
             string targetLemmaFile, // target text in verse per line format
             string sourceIdFile, // source text in verse per line format, with ID for each word
             string targetIdFile, // target text in verse per line format, with ID for each word
-            string runSpec, // specification for the number of iterations to run for the IBM model and the HMM model (e.g. 1:10;H:5 -- IBM model 10 iterations and HMM model 5 iterations)
+            string runSpec, // specification <model>-<iterations>-<epsilon>-<heuristic>
             string transModelFile, // this method updates it
             string alignModelFile  // this method updates it
             )
@@ -34,13 +34,7 @@ namespace TransModels
             var targetCorpus = new TextFileTextCorpus(wordTokenizer, targetLemmaFile); // In SIL.Machine.Corpora
             var parallelCorpus = new ParallelTextCorpus(sourceCorpus, targetCorpus); // In SIL.Machine.Corpora
 
-            // There are many other places where we set the default for these four values so it should be the case that
-            // runspec is set to at least the default, so setting defaults here again is probably not necessary.
-            string smtModel = "FastAlign";
-            var iterations = 5;
-            double threshold = 0.1;
-            var heuristic = "Intersection";
-            (smtModel, iterations, threshold, heuristic) = BuildTransModels.GetRunSpecs(runSpec, smtModel, iterations, threshold, heuristic);
+            (var smtModel, var iterations, var threshold, var heuristic) = BuildTransModels.GetRunSpecs(runSpec);
 
             using (IWordAlignmentModel model = CreateModel(smtModel, heuristic, iterations))  // In SIL.Machine.Translation
             {
@@ -150,11 +144,11 @@ namespace TransModels
                 else
                 {
                     corporaAlignments.Add(emptyAlignments);
-                }    
+                }
             }
 
             return corporaAlignments;
         }
-    }  
+    }
 }
 

@@ -1,0 +1,14 @@
+{
+  "profiles": {
+    "Clear3": {
+      "commandName": "Project",
+      "commandLineArgs": "-p Test-Series-NRT -t NT -m IBM1 DoStart",
+      "workingDirectory": "G:\\CLEAR_2_DEV"
+    },
+    "Test-Series-NRT": {
+      "commandName": "Project",
+      "commandLineArgs": "-p Test-Series-NRT -t NT -m HMM DoStart",
+      "workingDirectory": "G:\\CLEAR_2_DEV"
+    }
+  }
+}

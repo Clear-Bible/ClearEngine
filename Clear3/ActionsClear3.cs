@@ -39,9 +39,9 @@ namespace Clear3
             strUseAlignModel = arg;
         }
 
-        public static void SetEpsilon(string arg)
+        public static void SetSmtImplementation(string arg)
         {
-            strEpsilon = arg;
+            smtImplementation = arg;
         }
 
         public static void SetSmtModel(string arg)
@@ -49,14 +49,19 @@ namespace Clear3
             smtModel = arg;
         }
 
-        public static void SetSmtHeuristic(string arg)
-        {
-            smtHeuristic = arg;
-        }
-
         public static void SetSmtIterations(string arg)
         {
             smtIterations = arg;
+        }
+
+        public static void SetSmtEpsilon(string arg)
+        {
+            smtEpsilon = arg;
+        }
+
+        public static void SetSmtHeuristic(string arg)
+        {
+            smtHeuristic = arg;
         }
 
         public static void SetContentWordsOnlySMT(string arg)
@@ -133,8 +138,6 @@ namespace Clear3
         private static void ReadConfig(string configFilename)
         {
             clearSettings = Configuration.GetSettings(configFilename);
-
-            python = clearSettings["Python"];
 
             resourcesFolder = clearSettings["Resources_Foldername"]; // e.g. 
             processingFolder = clearSettings["Processing_Foldername"]; // e.g. 
@@ -399,10 +402,12 @@ namespace Clear3
             if (lowerCaseMethod == null) lowerCaseMethod = processingSettings["LowerCaseForLemma"];
 
             // Set Processing Parameters
-            if (strEpsilon == null) strEpsilon = processingSettings["Epsilon"]; // Must exceed this to be counted into model, e.g. "0.1"
+            if (smtImplementation == null) smtImplementation = processingSettings["SmtImplementation"];
             if (smtModel == null) smtModel = processingSettings["SmtModel"];
-            if (smtHeuristic == null) smtHeuristic = processingSettings["SmtHeuristic"];
             if (smtIterations == null) smtIterations = processingSettings["SmtIterations"];
+            if (smtEpsilon == null) smtEpsilon = processingSettings["SmtEpsilon"]; // Must exceed this to be counted into model, e.g. "0.1"
+            if (smtHeuristic == null) smtHeuristic = processingSettings["SmtHeuristic"];
+            
             if (strContentWordsOnlySMT == null) strContentWordsOnlySMT = processingSettings["ContentWordsOnlySMT"]; // e.g. "true" Only use content words for building models
             if (strContentWordsOnlyTC == null) strContentWordsOnlyTC = processingSettings["ContentWordsOnlyTC"]; // e.g. "true" Only use content words for building models
             if (strContentWordsOnly == null) strContentWordsOnly = processingSettings["ContentWordsOnly"]; // e.g. "true" Only align content words
@@ -423,7 +428,6 @@ namespace Clear3
 
             // Convert strings parameters to values
 
-            epsilon = Double.Parse(strEpsilon); // Must exceed this to be counted into model, e.g. "0.1"
             contentWordsOnlySMT = (strContentWordsOnlySMT == "true"); // e.g. "true" Only use content words for building models
             contentWordsOnlyTC = (strContentWordsOnlyTC == "true"); // e.g. "true" Only use content words for finding terminal candidates
             contentWordsOnly = (strContentWordsOnly == "true"); // e.g. "true" Only align content words
@@ -743,7 +747,7 @@ namespace Clear3
 
             if (smtModel != "")
             {
-                runSpec = string.Format("{0}-{1}-{2}-{3}", smtModel, smtIterations, epsilon, smtHeuristic);
+                runSpec = string.Format("{0}-{1}-{2}-{3}-{4}", smtImplementation, smtModel, smtIterations, smtEpsilon, smtHeuristic);
             }
             else
             {
@@ -763,7 +767,7 @@ namespace Clear3
                 // Build content only words for TC alignment
                 (translationModel, alignmentModel) = BuildModelTools.BuildOrReuseModels(reuseSmtModelFiles, true, useNoPuncModel, useLemmaCatModel, useNormalizedTransModelProbabilities, useNormalizedAlignModelProbabilities,
                                                 sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetLemmaIdFile,
-                                                runSpec, transModelFile, alignModelFile, python, clearService);
+                                                runSpec, transModelFile, alignModelFile, clearService);
 
                 // SMT take priority over TC. Probably should not use two booleans but a enum.
                 if (contentWordsOnlySMT)
@@ -782,7 +786,7 @@ namespace Clear3
                 // Build all words for aligning the rest
                 (translationModelRest, alignmentModelRest) = BuildModelTools.BuildOrReuseModels(reuseSmtModelFiles, false, useNoPuncModel, useLemmaCatModel, useNormalizedTransModelProbabilities, useNormalizedAlignModelProbabilities,
                                                         sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetLemmaIdFile,
-                                                        runSpec, transModelFile, alignModelFile, python, clearService);
+                                                        runSpec, transModelFile, alignModelFile, clearService);
 
                 alignmentModelPre = alignmentModelRest;
 
@@ -1087,11 +1091,12 @@ namespace Clear3
         private static string lemmaDataFilename;
         private static string lemmaDataFile;
 
-        private static string runSpec; // 1:10;H:5
-        private static double epsilon; // Must exceed this to be counted into model, 0.1
-        private static string smtModel; // For SIL auto aligner interations
-        private static string smtHeuristic; // For SIL auto aligner interations
-        private static string smtIterations; // For SIL auto aligner interations
+        private static string runSpec; // <implementation>-<model>-<iterations>-<epsilon>-<heuristic>
+        private static string smtImplementation; // The implementation of the SMT model we want to use
+        private static string smtModel; // The SMT model we want to use
+        private static string smtIterations; // The number of interations we want to use
+        private static string smtEpsilon; // Must exceed this (threshold) to be included in the translation model, 0.1
+        private static string smtHeuristic; // The heuristic used for alignments
 
         private static bool useAlignModel; // whether to use the alignment model
         private static bool contentWordsOnly; // whether to align content words
@@ -1109,7 +1114,6 @@ namespace Clear3
         private static bool reuseParallelCorporaFiles; // If parallel corpora files already exist, use them rather than creating them over again.
         private static bool reuseSmtModelFiles; // If SMT model files already exist, use them rather than creating them over again.
 
-        private static string strEpsilon;
         private static string strUseAlignModel;
         private static string strContentWordsOnly;
         private static string strContentWordsOnlySMT;

@@ -9,43 +9,24 @@ namespace TransModels
 {
     public class BuildModelsGiza
     {
-        // 2022.03.25 CL: Removed passing in epsilon since it is part of runSpec now: <model>-<iteration>-<epsilon>-<heursitic>
-        // Epsilon is the same a threshold
+        // 2022.03.25 CL: Removed passing in epsilon since it is part of runSpec now: <model>-<iteration>-<epsilon>-<heursitic
+        // // Epsilon is the same a threshold
         public static void BuildGizaModels(
             string sourceLemmaFile, // source text in verse per line format
             string targetLemmaFile, // target text in verse per line format
             string sourceIdFile, // source text in verse per line format, with ID for each word
             string targetIdFile, // target text in verse per line format, with ID for each word
-            string runSpec, // specification for the number of iterations to run for the IBM model and the HMM model (e.g. 1:10;H:5 -- IBM model 10 iterations and HMM model 5 iterations)
+            string runSpec, // specification <model>-<iterations>-<epsilon>-<heuristic>
             string transModelFile, // name of the file containing the translation model
-            string alignModelFile, // name of the file containing the translation model)
-            string python
+            string alignModelFile // name of the file containing the translation model)
             )
         {
-            // There are many other places where we set the default for these four values so it should be the case that
-            // runspec is set to at least the default, so setting defaults here again is probably not necessary.
-            string smtModel = "IBM4";
-            var iterations = 5;
-            double threshold = 0.1;
-            var heuristic = "Intersection";
-            (smtModel, iterations, threshold, heuristic) = BuildTransModels.GetRunSpecs(runSpec, smtModel, iterations, threshold, heuristic);
+            (var smtModel, var iterations, var threshold, var heuristic) = BuildTransModels.GetRunSpecs(runSpec);
 
             string alignmentsFile = alignModelFile.Replace(".tsv", "_pharaoh+probabilities.txt");
 
-            // Have the model write the transModel to a "complete" file since we will then use epsilon to create the real transModel file that we want.
-            // Once the model can accept an epsilon parameter, we won't have to do this ourselves.
-            // string transModelCompleteFile = transModelFile.Replace(".tsv", "_complete.tsv");
+            CreateGizaModels(sourceLemmaFile, targetLemmaFile, alignmentsFile, transModelFile, threshold, smtModel, iterations, heuristic);
 
-            // Create models using Giza++ through Damien's Python script which writes output to alignmentsFile and transModelCompleteFile     
-            // CreateGizaModels(sourceLemmaFile, targetLemmaFile, alignmentsFile, transModelCompleteFile, modelOption, heuristicOption);
-
-            CreateGizaModels(sourceLemmaFile, targetLemmaFile, alignmentsFile, transModelFile, threshold, smtModel, iterations, heuristic, python);
-
-            // Filter out entries below epsilon
-            // var transTable = GetTranslationTableFromFile(transModelCompleteFile, epsilon);
-            // BuildTransModels.WriteTransModel(transTable, transModelFile);
-
-            // Write alginModel file from pharoah alignments file by first converting to the data structure used by the SIL Thot library, then into our data structure.
             var corporaAlignments = GetCorporaAlignmentsFromPharaoh(alignmentsFile);
             var alignModel = BuildTransModels.GetAlignmentModel(corporaAlignments, sourceIdFile, targetIdFile);
             BuildTransModels.WriteAlignModel(alignModel, alignModelFile);
@@ -79,8 +60,7 @@ namespace TransModels
             double threshold,
             string smtModel,
             int iterations,
-            string heuristic,
-            string python
+            string heuristic
             )
         {
             string modelOption = GetGizaModelOption(smtModel);
@@ -90,6 +70,10 @@ namespace TransModels
 
             // Need to run python3 in the giza-py folder which has all of the scripts
             Directory.SetCurrentDirectory("giza-py");
+            // Need to get the path to the python executable, which should be the first line of the file "python_path.txt" inside "giza-py" folder.
+            string pythonPathFile = "python_path.txt";
+            var lines = File.ReadAllLines(pythonPathFile);
+            var python = lines[0];
 
             // File paths are from the top Clear folder.
             // Need to run python3 in the giza-py folder which has all of the scripts and so we need to change the path of these files for the python scripts
@@ -105,8 +89,6 @@ namespace TransModels
 
             // For my Windows installation of Python
             // string python = "C:\\Program Files\\Python310\\python.exe";
-
-            // The python string is now passed in as a parameter and is set using the Clear.config file.
 
             string arguments = string.Format("giza.py --source {0} --target {1} --alignments {2} --include-probs --lexicon {3} {4} {5} {6} {7}", sourceLemmaFileFromGizaFolder, targetLemmaFileFromGizaFolder, alignmentsFileFromGizaFolder, transModelFileFromGizaFolder, thresholdOption, modelOption, iterationOption, heuristicOption);
 
@@ -124,7 +106,7 @@ namespace TransModels
                 // It would be nice not to have to specify the whole path since it is different on different machines.
                 // The path is in the $PATH variable so I'm not sure why it doesn't work without the full path.
                 // We may eventually need to put the path to python3 in a config file, or can change this once it is in SIL.Thot library.
-                startInfo.FileName =python;
+                startInfo.FileName = python;
                 startInfo.Arguments = arguments;
                 Process process = Process.Start(startInfo);
                 process.WaitForExit();
@@ -323,57 +305,5 @@ namespace TransModels
 
             return corporaAlignments;
         }
-
-        // Normally the SMT can do this and maybe in the future IBM-4 will be able to do this, but for now, we must do it ourselves.
-        // Damien modified it so now I can specify a threshold. No longer used.
-        /*
-        private static Dictionary<string, Dictionary<string, double>> GetTranslationTableFromFile(string transModelFile, double epsilon)
-        {
-            var transModel = new Dictionary<string, Dictionary<string, double>>();
-            string[] transModelLines = File.ReadAllLines(transModelFile);
-
-            foreach (var transModelLine in transModelLines)
-            {
-                var parts = transModelLine.Split('\t');
-
-                if (parts.Length == 3)
-                {
-                    var sourceLemma = parts[0];
-                    var targetLemma = parts[1];
-                    double probability = double.Parse(parts[2]);
-
-                    if (probability >= epsilon)
-                    {
-                        if (transModel.ContainsKey(sourceLemma))
-                        {
-                            var targetLemmas = transModel[sourceLemma];
-
-                            if (!targetLemmas.ContainsKey(targetLemma))
-                            {
-                                targetLemmas.Add(targetLemma, probability);
-                            }
-                            else
-                            {
-                                Console.WriteLine("BuildGizaModels.GetTranslationTableFromFile - Duplicate translation pari {0}  {1}", sourceLemma, targetLemma);
-                            }
-                        }
-                        else
-                        {
-                            var targetLemmas = new Dictionary<string, double>();
-                            targetLemmas.Add(targetLemma, probability);
-                            transModel.Add(sourceLemma, targetLemmas);
-                        }
-                    }
-                }
-                else
-                {
-                    // Shound never happen
-                    Console.WriteLine("BuildGizaModels.GetTranslationTableFromFile - Error in transModel file: {0}", transModelLine);
-                }
-            }
-
-            return transModel;
-        }
-        */
     }
 }

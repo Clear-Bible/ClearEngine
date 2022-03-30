@@ -19,79 +19,41 @@ namespace TransModels
 {
     public class BuildTransModels
     {
-        // Given parallel files, build both the translation model and alignment model
-        // 2022.03.25 CL: Removed passing in epsilon since it is part of runSpec now: <model>-<iteration>-<epsilon>-<heursitic>
-        // Epsilon is the same a threshold
+        // Given parallel files, build both the translation model and alignment
+        // 2022.03.25 CL: Removed passing in epsilon since it is part of runSpec now: <implementation>-<model>-<iteration>-<epsilon>-<heursitic
+        // // Epsilon is the same a threshold
+
         public static void BuildModels(
             string sourceLemmaFile, // source text in verse per line format
             string targetLemmaFile, // target text in verse per line format
             string sourceIdFile, // source text in verse per line format, with ID for each word
             string targetIdFile, // target text in verse per line format, with ID for each word
-            string runSpec, // specification <model>-<iterations>-<epsilon>-<heuristic>
+            string runSpec, // specification <implementation>-<model>-<iterations>-<epsilon>-<heuristic>
             string transModelFile, // name of the file containing the translation model
-            string alignModelFile, // name of the file containing the translation model
-            string python // path to the python executable file
+            string alignModelFile // name of the file containing the translation model
             )
         {
-            // There are many other places where we set the default for these four values so it should be the case that
-            // runspec is set to at least the default, so setting defaults here again is probably not necessary.
-            string smtModel = "HMM";
-            var iterations = 5;
-            double threshold = 0.1;
-            var heuristicStr = "Intersection";
-            (smtModel, iterations, threshold, heuristicStr) = GetRunSpecs(runSpec, smtModel, iterations, threshold, heuristicStr);
+            (var implementation, var modelRunSpec) = GetImplementation(runSpec);
 
-            
-            if (smtModel == "HMM")
+            switch (implementation)
             {
-                // The original models and the Machine and GIZA models have different parameter settings.
-                // Below is an attempt to at least try and to allow some adjustment to the original HMM model so it can be similar where it can be to these other models.
-                // Originally runSpec was "HMM;1:10;H:5" so IBM1 had an iteration of 10 and HMM had an iteration of 5.
-                // Needed to change runSpec format outside of here since it is now used as part of the filename for models and it is best to have filenames that do not have ":" (or ";").
-                // 2021.06.24 CL: Changed format of runSpec to <model>-<iterations>-<epsilon>-<heuristic>
-                var specParts = runSpec.Split('-');
-
-                // It isn't perfect, but the original HMM model takes different parameters then the other models.
-                // Originally runSpec was "HMM;1:10;H:5" so IBM1 had an iteration of 10 and HMM had an iteration of 5.
-                // Before, I didn't allow any changes to HMM via the command line or setting processing parameters.
-                // I will just allow changing the number of iterations for HMM using the iteration setting.
-                // I also didn't want to play around with the format of setting iterations for the original models.
-
-
-                var runSpecification = string.Format("1:10;H:{0}", iterations);
-                var heuristic = GetHeuristicType(heuristicStr);
-
-                ModelBuilder modelBuilder = new ModelBuilder();
-
-                // Setting these are required before training
-                modelBuilder.SourceFile = sourceLemmaFile;
-                modelBuilder.TargetFile = targetLemmaFile;
-                modelBuilder.RunSpecification = runSpecification;
-                modelBuilder.Symmetrization = heuristic;
-
-                using (ConsoleProgressBar progressBar = new ConsoleProgressBar(Console.Out))
-                {
-                    modelBuilder.Train(progressBar);
-                }
-
-                var transModel = modelBuilder.GetTranslationTable(threshold);
-                WriteTransModel(transModel, transModelFile);
-
-                var corporaAlignments = GetCorporaAlignments(modelBuilder);
-                var alignModel = GetAlignmentModel(corporaAlignments, sourceIdFile, targetIdFile);
-                WriteAlignModel(alignModel, alignModelFile);
-            }
-            else if (smtModel == "IBM4")
-            {
-                BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, transModelFile, alignModelFile, python);
-            }
-            else
-            {
-                BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, runSpec, transModelFile, alignModelFile);
+                case "Original":
+                    BuildModelsOriginal.BuildOriginalModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, modelRunSpec, transModelFile, alignModelFile);
+                    break;
+                case "Machine":
+                    BuildModelsMachine.BuildMachineModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, modelRunSpec, transModelFile, alignModelFile);
+                    break;
+                case "Giza":
+                    BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, modelRunSpec, transModelFile, alignModelFile);
+                    break;
+                default:
+                    Console.WriteLine("  Implementation {0} not supported", implementation);
+                    break;
             }
         }
 
-        private static IReadOnlyCollection<IReadOnlyCollection<AlignedWordPair>> GetCorporaAlignments(
+        // 
+        public static IReadOnlyCollection<IReadOnlyCollection<AlignedWordPair>> GetCorporaAlignments(
             ModelBuilder modelBuilder)
         {
             var corporaAlignments = new List<IReadOnlyCollection<AlignedWordPair>>();
@@ -184,7 +146,7 @@ namespace TransModels
             */
 
             // Took 165/163/134 msec for Malayalam NT
-            
+
             foreach (var item in table.OrderBy(i => i.Key))
             {
                 sw.WriteLine("{0}\t{1}", item.Key, item.Value);
@@ -192,7 +154,7 @@ namespace TransModels
 
             // stopwatch.Stop();
             // Console.WriteLine("WriteAlignModel() took {0} msec", stopwatch.ElapsedMilliseconds);
-            
+
             sw.Close();
         }
 
@@ -309,13 +271,24 @@ namespace TransModels
             return transModel;
         }
 
-        // 
-        public static (string, int, double, string) GetRunSpecs(string runSpec, string defaultModel, int defaultIteration, double defaultThreshold, string defaultHeursitic)
+        //
+        public static (string, string) GetImplementation(string runSpec)
         {
-            string model = defaultModel;
-            int iterations = defaultIteration;
-            double threshold = defaultThreshold;
-            string heuristic = defaultHeursitic;
+            var implementation = runSpec.Substring(0, runSpec.IndexOf('-'));
+            var restRunSpec = runSpec.Substring(runSpec.IndexOf('-') + 1);
+
+            return (implementation, restRunSpec);
+        }
+
+        // 
+        public static (string, int, double, string) GetRunSpecs(string runSpec)
+        {
+            // We have guaranteed that the runSpec should be correct elsewhere, also with defaults
+            // so setting defaults here is probably not necessary
+            string model = "HMM";
+            int iterations = 5;
+            double threshold = 0.1;
+            string heuristic = "Intersection";
 
             var parts = runSpec.Split('-');
             if (parts[0] != "")
@@ -337,38 +310,6 @@ namespace TransModels
 
             return (model, iterations, threshold, heuristic);
         }
-
-        // Original heuristic was "Min" (same as Intersection). If you don't specify, you get no symmetry. Heuristics avaliable are "Diag", "Max",  "Min", "None", "Null"
-        // Again, these are different from the Machine and GIZA models.
-        private static SymmetrizationType GetHeuristicType(string heuristicStr)
-        {
-            var heuristic = SymmetrizationType.Min;
-            switch (heuristicStr)
-            {
-                case "Intersection": // Same as original "Min"
-                    heuristic = SymmetrizationType.Min;
-                    break;
-
-                case "Union": // Not worth trying?
-                    heuristic = SymmetrizationType.Max;
-                    break;
-
-                case "GrowDiag":
-                    heuristic = SymmetrizationType.Diag;
-                    break;
-
-                case "Ouch":
-                case "Grow":
-                case "GrowDiagFinal":
-                case "GrowDiagFinalAnd":
-                default:
-                    Console.WriteLine("Warning in BuildTransModel: Heuristic {0} does not exist. Using Intersection.", heuristicStr);
-                    break;
-            }
-
-            return heuristic;
-        }
-
     }
 
     public class AlignmentWordPair
