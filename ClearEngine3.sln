@@ -41,9 +41,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clear3", "Clear3\Clear3.csproj", "{0836AC3E-E506-4270-AB28-2E70096352BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clear3", "Clear3\Clear3.csproj", "{0836AC3E-E506-4270-AB28-2E70096352BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lemmatizer", "src\Lemmatizer\Lemmatizer.csproj", "{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lemmatizer", "Lemmatizer\Lemmatizer.csproj", "{301E95E6-60AF-40A7-8DB5-9E17F2003A54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -271,18 +271,18 @@ Global
 		{0836AC3E-E506-4270-AB28-2E70096352BE}.Release|x64.Build.0 = Release|Any CPU
 		{0836AC3E-E506-4270-AB28-2E70096352BE}.Release|x86.ActiveCfg = Release|Any CPU
 		{0836AC3E-E506-4270-AB28-2E70096352BE}.Release|x86.Build.0 = Release|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Debug|x64.Build.0 = Debug|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Debug|x86.Build.0 = Debug|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Release|x64.ActiveCfg = Release|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Release|x64.Build.0 = Release|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Release|x86.ActiveCfg = Release|Any CPU
-		{B582CD01-1F8A-409E-87DD-E11AC7BB71B3}.Release|x86.Build.0 = Release|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Debug|x64.Build.0 = Debug|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Debug|x86.Build.0 = Debug|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Release|x64.ActiveCfg = Release|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Release|x64.Build.0 = Release|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Release|x86.ActiveCfg = Release|Any CPU
+		{301E95E6-60AF-40A7-8DB5-9E17F2003A54}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

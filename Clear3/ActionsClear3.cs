@@ -374,8 +374,8 @@ namespace Clear3
 
             //============================ Output Files Only ============================
 
-            jsonOutput = Path.Combine(targetFolder, translationTestamentPrefix + jsonOutputFilename);
-            jsonLemmasOutput = Path.Combine(targetFolder, translationTestamentPrefix + jsonLemmasOutputFilename);
+            jsonOutputBase = Path.Combine(targetFolder, translationTestamentPrefix + jsonOutputFilename);
+            jsonLemmasOutputBase = Path.Combine(targetFolder, translationTestamentPrefix + jsonLemmasOutputFilename);
             jsonFile = Path.Combine(targetFolder, translationTestamentPrefix + jsonFilename);
             // t2gJsonFile = Path.Combine(targetFolder, translationTestamentPrefix + t2gJsonFilename);
 
@@ -448,17 +448,23 @@ namespace Clear3
             badLinkMinCount = int.Parse(strBadLinkMinCount); // e.g. "3", the minimal count required for treating a link as bad
             goodLinkMinCount = int.Parse(strGoodLinkMinCount); // e.g. "3" the minimal count required for treating a link as bad
 
+            runSpec = string.Format("{0}-{1}-{2}-{3}-{4}", smtImplementation, smtModel, smtIterations, smtEpsilon, smtHeuristic);
+
             string autoType = "_auto.json";
-            jsonOutput = jsonOutput.Replace(".json", autoType); // Want to distinguish these from gold standard alignments
-            jsonLemmasOutput = jsonLemmasOutput.Replace(".json", autoType); // Want to distinguish these from gold standard alignments
+            jsonOutputBase = jsonOutputBase.Replace(".json", autoType); // Want to distinguish these from gold standard alignments
+            jsonLemmasOutputBase = jsonLemmasOutputBase.Replace(".json", autoType); // Want to distinguish these from gold standard alignments
 
             string alignmentType = "_all.json";
             if (contentWordsOnly)
             {
                 alignmentType = "_content.json";
             }
-            jsonOutput = jsonOutput.Replace(".json", alignmentType);
-            jsonLemmasOutput = jsonLemmasOutput.Replace(".json", alignmentType);
+            jsonOutputBase = jsonOutputBase.Replace(".json", alignmentType);
+            jsonLemmasOutputBase = jsonLemmasOutputBase.Replace(".json", alignmentType);
+
+
+            jsonOutput = jsonOutputBase.Replace(".alignments", string.Format(".alignments_{0}", runSpec));
+            jsonLemmasOutput = jsonLemmasOutputBase.Replace(".lemmas", string.Format(".lemmas_{0}", runSpec));
         }
 
         // 2020.07.10 CL: These files define the state of CLEAR and should all be in the targetFolder, and may change during processing.
@@ -740,20 +746,6 @@ namespace Clear3
 
             Console.WriteLine("Building Models");
 
-            // Create a new runSpec if thotModel is specified, otherwise, use exisiting runSpec set by command line or processing.config.
-            // 2021.06.23 CL: Need to change the format of runSpec since we will use this as part of model filenames and ":" is not allowed in a filename.
-            // 2022.03.25 CL: Removed using runSpec externally. Only use it internally as an easy way to pass all SMT model parameters
-            // and to use as a way to label files so we know what was used to create them.
-
-            if (smtModel != "")
-            {
-                runSpec = string.Format("{0}-{1}-{2}-{3}-{4}", smtImplementation, smtModel, smtIterations, smtEpsilon, smtHeuristic);
-            }
-            else
-            {
-                return (false, "ERROR in BuildModels: No smtModel specified");
-            }
-
             // Train a statistical translation model using the parallel corpora producing an estimated translation model and estimated alignment.
             // There are three possible scenarios for how to use parallel corpus with all words or content only words.
             // In CE2 it converts alignmentModelRest to alignmentModelPre.
@@ -798,7 +790,6 @@ namespace Clear3
             }
 
             return (true, "Building Models: Done");
-
         }
 
 
@@ -1162,8 +1153,10 @@ namespace Clear3
         private static string versificationType; // versification type
 
         private static string jsonOutputFilename; // output of aligner in JSON
+        private static string jsonOutputBase; // base file output of aligner in JSON
         private static string jsonOutput; // output of aligner in JSON
         private static string jsonLemmasOutputFilename; // output of aligner in JSON with target sub-lemmas and surface text
+        private static string jsonLemmasOutputBase; // base file output of aligner in JSON with target sub-lemmas and surface text
         private static string jsonLemmasOutput; // output of aligner in JSON with target sub-lemmas and surface text
         private static string jsonFilename; // output of aligner in JSON
         private static string jsonFile; // output of aligner in JSON

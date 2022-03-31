@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.810.6
+VisualStudioVersion = 16.0.808.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Clear3", "Clear3.csproj", "{D4E83058-2236-44EA-9AEB-8F1079C20E96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clear3", "Clear3\Clear3.csproj", "{3CE7FF8C-359C-4A7F-93FD-C8CFA837E3C9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lemmatizer", "Lemmatizer\Lemmatizer.csproj", "{DD51D968-E6F0-4E97-BF56-D44BCCCABC4D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +13,19 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D4E83058-2236-44EA-9AEB-8F1079C20E96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D4E83058-2236-44EA-9AEB-8F1079C20E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D4E83058-2236-44EA-9AEB-8F1079C20E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D4E83058-2236-44EA-9AEB-8F1079C20E96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CE7FF8C-359C-4A7F-93FD-C8CFA837E3C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CE7FF8C-359C-4A7F-93FD-C8CFA837E3C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CE7FF8C-359C-4A7F-93FD-C8CFA837E3C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CE7FF8C-359C-4A7F-93FD-C8CFA837E3C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD51D968-E6F0-4E97-BF56-D44BCCCABC4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD51D968-E6F0-4E97-BF56-D44BCCCABC4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD51D968-E6F0-4E97-BF56-D44BCCCABC4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD51D968-E6F0-4E97-BF56-D44BCCCABC4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D0C6BF0D-C8F9-4DD4-9AE7-12634BB18F36}
+		SolutionGuid = {007F1587-346E-4125-A98C-0A62BC448B84}
 	EndGlobalSection
 EndGlobal

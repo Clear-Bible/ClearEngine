@@ -21,7 +21,7 @@ namespace TransModels
     {
         // Given parallel files, build both the translation model and alignment
         // 2022.03.25 CL: Removed passing in epsilon since it is part of runSpec now: <implementation>-<model>-<iteration>-<epsilon>-<heursitic
-        // // Epsilon is the same a threshold
+        // Epsilon is the same a threshold
 
         public static void BuildModels(
             string sourceLemmaFile, // source text in verse per line format
@@ -47,7 +47,7 @@ namespace TransModels
                     BuildModelsGiza.BuildGizaModels(sourceLemmaFile, targetLemmaFile, sourceIdFile, targetIdFile, modelRunSpec, transModelFile, alignModelFile);
                     break;
                 default:
-                    Console.WriteLine("  Implementation {0} not supported", implementation);
+                    Console.WriteLine("  Implementation {0} not supported. Original, Machine, and Giza are supported.", implementation);
                     break;
             }
         }
