@@ -142,5 +142,19 @@ namespace ClearBible.Engine.Corpora
                 }
             }
         }
+
+        public IEnumerable<(Token, Token)> GetAlignedTokenIdPairs(IReadOnlyCollection<AlignedWordPair> alignedWordPairs)
+        {
+            foreach (AlignedWordPair alignedWordPair in alignedWordPairs)
+            {
+                var sourceTokenId = SourceTokens?[alignedWordPair.SourceIndex];
+                var targetTokenId = TargetTokens?[alignedWordPair.TargetIndex];
+
+                if (sourceTokenId != null && targetTokenId != null)
+                {
+                    yield return (sourceTokenId, targetTokenId);
+                }
+            }
+        }
     }
 }

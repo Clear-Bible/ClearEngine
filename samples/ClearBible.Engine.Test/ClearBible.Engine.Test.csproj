@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\machine\src\SIL.Machine.Translation.Thot\SIL.Machine.Translation.Thot.csproj" />
     <ProjectReference Include="..\..\..\machine\src\SIL.Machine\SIL.Machine.csproj" />
+    <ProjectReference Include="..\..\src\ClearBible.Engine.Dashboard\ClearBible.Engine.Dashboard.csproj" />
     <ProjectReference Include="..\..\src\ClearBible.Engine.TreeAligner\ClearBible.Engine.TreeAligner.csproj" />
     <ProjectReference Include="..\..\src\ClearBible.Engine\ClearBible.Engine.csproj" />
   </ItemGroup>

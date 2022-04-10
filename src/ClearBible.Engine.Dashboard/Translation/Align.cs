@@ -14,13 +14,14 @@ namespace ClearBible.Engine.Dashboard.Translation
 {
     public static class Align
     {
-        public static async void SymmetrizedFastAlignThenTreeAlign(
-            string connection, 
-            int parallelCorpusId, 
+        public static async Task<ManuscriptWordAlignmentModel> BuildManuscriptWordAlignmentModel(
+            ParallelTextCorpus parallelTextCorpus,
+            IWordAlignmentModel smtTrainedWordAlignmentModel,
+            IProgress<ProgressStatus>? progress = null,
             string syntaxTreesPath = "SyntaxTrees",
-            string fileGetManuscriptTreeAlignerParamsLocation = "InputCommon",
-            IProgress<ProgressStatus>? progress = null) //e.g. new DelegateProgress(status => Console.WriteLine($"Training Fastalign model: {status.PercentCompleted:P}"))
+            string fileGetManuscriptTreeAlignerParamsLocation = "InputCommon") //e.g. new DelegateProgress(status => Console.WriteLine($"Training Fastalign model: {status.PercentCompleted:P}"))
         {
+            // sane settings for some hyperparameters. Will look into how much these need to be tuned by Dashboard power user.
             const bool UseAlignModel = true;
             const int MaxPaths = 1000000;
             const int GoodLinkMinCount = 3;
@@ -29,30 +30,6 @@ namespace ClearBible.Engine.Dashboard.Translation
 
 
             var manuscriptTree = new ManuscriptFileTree(syntaxTreesPath);
-
-            var sourceCorpus = new FromDbTextCorpus(connection, parallelCorpusId, true);
-
-            var targetCorpus = new FromDbTextCorpus(connection, parallelCorpusId, false);
-
-            var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, DbVerseMapping.FromDb(connection, parallelCorpusId));
-
-            FunctionWordTextRowProcessor.Train(parallelTextCorpus);
-
-            parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-                .Transform<FunctionWordTextRowProcessor>();
-
-            using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
-            using var trgSrcModel = new ThotFastAlignWordAlignmentModel();
-
-            using var symmetrizedModel = new SymmetrizedWordAlignmentModel(srcTrgModel, trgSrcModel)
-            {
-                Heuristic = SymmetrizationHeuristic.GrowDiagFinalAnd
-            };
-
-            //train model
-            using var trainer = symmetrizedModel.CreateTrainer(parallelTextCorpus.Lowercase());
-            trainer.Train(progress);
-            await trainer.SaveAsync();
 
             // set the manuscript tree aligner hyperparameters
             var manuscriptTreeAlignerParams = await FileGetManuscriptTreeAlignerParams.Get().SetLocation(fileGetManuscriptTreeAlignerParamsLocation).GetAsync();
@@ -64,75 +41,92 @@ namespace ClearBible.Engine.Dashboard.Translation
 
             // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
             IManuscriptTrainableWordAligner manuscriptTrainableWordAligner = new ManuscriptTreeWordAligner(
-                new List<IWordAlignmentModel>() { symmetrizedModel },
+                new List<IWordAlignmentModel>() { smtTrainedWordAlignmentModel },
                 0,
                 manuscriptTreeAlignerParams,
                 manuscriptTree);
 
             // initialize a manuscript word alignment model. At this point it has not yet been trained.
-            using var manuscriptModel = new ManuscriptWordAlignmentModel(manuscriptTrainableWordAligner);
+            var manuscriptModel = new ManuscriptWordAlignmentModel(manuscriptTrainableWordAligner);
             using var manuscriptTrainer = manuscriptModel.CreateTrainer(parallelTextCorpus);
 
             // Trains the manuscriptmodel using the pre-trained SMT model(s)
             manuscriptTrainer.Train(progress);
             manuscriptTrainer.Save();
 
-            // now iterate through the best alignments in the model.
-            foreach (EngineParallelTextRow textRow in parallelTextCorpus)
-            {
-
-                //FIXME: put alignments in DB
-                var alignment = symmetrizedModel.GetBestAlignment(textRow.SourceSegment,
-                    textRow.TargetSegment);
-                Console.WriteLine($"Alignment    : {alignment}");  //source-target ordinal positions
-
-                IEnumerable<(Token, Token)> sourceTargetTokenIdPairs = textRow.GetAlignedTokenIdPairs(alignment);
-                var alignments = string.Join(" ", sourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"));
-                Console.WriteLine($"SourceTokenId->TargetTokenId: {alignments}"); //source-target ids.
-                //TokenId.ToStriong() ->  $"{BookNum.ToString("000")}{ChapterNum.ToString("000")}{VerseNum.ToString("000")}{WordNum.ToString("000")}{SubWordNum.ToString("000")}"
-
-            }
+            return manuscriptModel;
         }
 
-        public static async void SymmetrizedFastAlign(string connection, int parallelCorpusId)
+        public static async Task<IWordAlignmentModel> BuildSymmetrizedFastAlignAlignmentModel(
+            ParallelTextCorpus parallelTextCorpus,
+            IProgress<ProgressStatus>? progress = null,
+            SymmetrizationHeuristic symmetrizationHeuristic = SymmetrizationHeuristic.GrowDiagFinalAnd)
+        {
+            var srcTrgModel = new ThotFastAlignWordAlignmentModel();
+            var trgSrcModel = new ThotFastAlignWordAlignmentModel();
+
+            var symmetrizedModel = new SymmetrizedWordAlignmentModel(srcTrgModel, trgSrcModel)
+            {
+                Heuristic = symmetrizationHeuristic
+            };
+
+            using var trainer = symmetrizedModel.CreateTrainer(parallelTextCorpus.Lowercase());
+            trainer.Train(progress);
+            await trainer.SaveAsync();
+
+            return symmetrizedModel;
+        }
+        public static EngineParallelTextCorpus GetEngineParallelCorpusFromDb(string connection, int parallelCorpusId)
         {
             var sourceCorpus = new FromDbTextCorpus(connection, parallelCorpusId, true);
 
             var targetCorpus = new FromDbTextCorpus(connection, parallelCorpusId, false);
 
-            var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, DbVerseMapping.FromDb(connection, parallelCorpusId));
+            EngineParallelTextCorpus engineParallelTextCorpus = (EngineParallelTextCorpus) sourceCorpus.EngineAlignRows(targetCorpus, DbVerseMapping.FromDb(connection, parallelCorpusId));
 
-            FunctionWordTextRowProcessor.Train(parallelTextCorpus);
+            FunctionWordTextRowProcessor.Train(engineParallelTextCorpus);
 
-            parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
+            engineParallelTextCorpus.SourceCorpus = engineParallelTextCorpus.SourceCorpus
                 .Transform<FunctionWordTextRowProcessor>();
 
-            using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
-            using var trgSrcModel = new ThotFastAlignWordAlignmentModel();
+            return engineParallelTextCorpus;
+        }
+        public static void WordAlignmentsToDb(IWordAlignmentModel smtWordAlignmentModel, EngineParallelTextCorpus engineParallelTextCorpus)
+        {
 
-            using var symmetrizedModel = new SymmetrizedWordAlignmentModel(srcTrgModel, trgSrcModel)
+            //iterate through the best alignments in the model.
+            foreach (EngineParallelTextRow engineParallelTextRow in engineParallelTextCorpus)
             {
-                Heuristic = SymmetrizationHeuristic.GrowDiagFinalAnd
-            };
- 
-            using var trainer = symmetrizedModel.CreateTrainer(parallelTextCorpus.Lowercase());
-            trainer.Train();
-            await trainer.SaveAsync();
+                var ordinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
 
-            // now iterate through the best alignments in the model.
-            foreach (EngineParallelTextRow textRow in parallelTextCorpus)
+                //FIXME: put sourceTargetTokenIdPairs in DB
+                IEnumerable<(Token, Token)> sourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(ordinalAlignments);
+
+
+                //For testing, can remove the following
+                Console.WriteLine($"Ordinal Alignments    : {ordinalAlignments}");
+
+                var tokenIdAlignments = string.Join(" ", sourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"));
+                Console.WriteLine($"TokenId Alignments: {tokenIdAlignments}");
+
+                //NOTE: TokenId.ToString() ->  $"{BookNum.ToString("000")}{ChapterNum.ToString("000")}{VerseNum.ToString("000")}{WordNum.ToString("000")}{SubWordNum.ToString("000")}"
+            }
+        }
+
+        public static void ManuscriptWordAlignmentsToDb(ManuscriptWordAlignmentModel manuscriptWordAlignmentModel, EngineParallelTextCorpus engineParallelTextCorpus)
+        {
+            // iterate through the best alignments in the model.
+            foreach (EngineParallelTextRow engineParallelTextRow in engineParallelTextCorpus)
             {
+                var ordinalAlignedWordPairs = manuscriptWordAlignmentModel.GetBestAlignmentAlignedWordPairs(engineParallelTextRow);
 
-                //FIXME: put alignments in DB
-                var alignment = symmetrizedModel.GetBestAlignment(textRow.SourceSegment,
-                    textRow.TargetSegment);
-                Console.WriteLine($"Alignment    : {alignment}");  //source-target ordinal positions
+                //FIXME: put alignedWordPairs in DB
+                IEnumerable<(Token, Token)> sourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(ordinalAlignedWordPairs);
 
-                IEnumerable<(Token, Token)> sourceTargetTokenIdPairs = textRow.GetAlignedTokenIdPairs(alignment);
-                var alignments = string.Join(" ", sourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"));
-                Console.WriteLine($"SourceTokenId->TargetTokenId: {alignments}"); //source-target ids.
-                //TokenId.ToStriong() ->  $"{BookNum.ToString("000")}{ChapterNum.ToString("000")}{VerseNum.ToString("000")}{WordNum.ToString("000")}{SubWordNum.ToString("000")}"
+                var tokenIdAlignments = string.Join(" ", sourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"));
+                Console.WriteLine($"TokenId Alignments: {tokenIdAlignments}");
 
+                //NOTE: TokenId.ToString() ->  $"{BookNum.ToString("000")}{ChapterNum.ToString("000")}{VerseNum.ToString("000")}{WordNum.ToString("000")}{SubWordNum.ToString("000")}"
             }
         }
     }
