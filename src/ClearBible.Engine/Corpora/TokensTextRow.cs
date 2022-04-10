@@ -52,6 +52,21 @@ namespace ClearBible.Engine.Corpora
                 .ToList();
         }
 
+        public TokensTextRow(TextRow textRow, IReadOnlyList<Token> tokens)
+            : base(textRow.Ref)
+        {
+            base.Segment = textRow.Segment;
+            IsSentenceStart = textRow.IsSentenceStart;
+            IsInRange = textRow.IsInRange;
+            IsRangeStart = textRow.IsRangeStart;
+            IsEmpty = textRow.IsEmpty;
+
+            if (Segment.Count() > 0)
+            {
+                Tokens = tokens;
+            }
+        }
+
         public override IReadOnlyList<string> Segment
         {
             get

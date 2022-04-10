@@ -97,6 +97,30 @@ namespace ClearBible.Engine.Corpora
             IsTargetInRange = parallelTextRow.IsTargetInRange;
             IsTargetRangeStart = parallelTextRow.IsTargetRangeStart;
             IsEmpty = parallelTextRow.IsEmpty;
+
+            try
+            {
+                //Only set SourceTokens if all the members of sourceSegments can be cast to a TokensTextSegment
+                sourceTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
+                SourceTokens = sourceTextRows
+                    ///.Where(textSegment => textSegment is TokensTextSegment)
+                    .SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
+            }
+            catch (InvalidCastException)
+            {
+            }
+
+            try
+            {
+                //Only set TargetTokens if all the members of sourceSegments can be cast to a TokensTextSegment
+                targetTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
+                TargetTokens = targetTextRows
+                    //.Where(textSegment => textSegment is TokensTextSegment)
+                    .SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
+            }
+            catch (InvalidCastException)
+            {
+            }
         }
 
         public IReadOnlyList<Token>? SourceTokens { get; }
