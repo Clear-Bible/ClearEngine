@@ -6,7 +6,7 @@ using SIL.Scripture;
 
 namespace ClearBible.Engine.Dashboard.Corpora
 {
-    public static class From
+    public static class FromDb
    {
         public static EngineParallelTextCorpus GetEngineParallelCorpusFromDb(string connection, int parallelCorpusId)
         {
