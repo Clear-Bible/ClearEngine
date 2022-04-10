@@ -76,21 +76,6 @@ namespace ClearBible.Engine.Dashboard.Translation
 
             return symmetrizedModel;
         }
-        public static EngineParallelTextCorpus GetEngineParallelCorpusFromDb(string connection, int parallelCorpusId)
-        {
-            var sourceCorpus = new FromDbTextCorpus(connection, parallelCorpusId, true);
-
-            var targetCorpus = new FromDbTextCorpus(connection, parallelCorpusId, false);
-
-            EngineParallelTextCorpus engineParallelTextCorpus = (EngineParallelTextCorpus) sourceCorpus.EngineAlignRows(targetCorpus, DbVerseMapping.FromDb(connection, parallelCorpusId));
-
-            FunctionWordTextRowProcessor.Train(engineParallelTextCorpus);
-
-            engineParallelTextCorpus.SourceCorpus = engineParallelTextCorpus.SourceCorpus
-                .Transform<FunctionWordTextRowProcessor>();
-
-            return engineParallelTextCorpus;
-        }
         public static void WordAlignmentsToDb(IWordAlignmentModel smtWordAlignmentModel, EngineParallelTextCorpus engineParallelTextCorpus)
         {
 
