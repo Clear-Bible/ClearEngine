@@ -9,22 +9,22 @@ namespace ClearBible.Engine.Dashboard.Corpora
         /// 
         /// </summary>
         /// <param name="connection">connection string to db</param>
-        /// <param name="corpusId">primary key of Corpus dbentity</param>
+        /// <param name="parallelCorpusId">primary key of the parallel corpus entity</param>
         /// <param name-"isSource">if true, get source corpora, else target</param>
-        public FromDbTextCorpus(string connection, int corpusId, bool isSource)
+        public FromDbTextCorpus(string connection, int parallelCorpusId, bool isSource)
         {
-            // corpusId is corpusTableName primary key for corpus.
+            // parallelCorpusId is the primary key for the parallel corpus entity.
 
             //FIXME: get versification int for corpus from DB (missing in Corpus Entity?)
             int scrVersType = (int)ScrVersType.RussianOrthodox;
             Versification = new ScrVers((ScrVersType)scrVersType);
 
             //FIXME: get unique books (ids) for corpus
-            var ids = new List<string>(); //ids are books in three character SIL format.
+            var bookIds = new List<string>(); //ids are books in three character SIL format.
 
-            foreach (var id in ids)
+            foreach (var bookId in bookIds)
             { 
-                AddText(new FromDbText(connection, corpusId, id, isSource, Versification));
+                AddText(new FromDbText(connection, parallelCorpusId, bookId, isSource, Versification));
             }
         }
         public override ScrVers Versification { get; }

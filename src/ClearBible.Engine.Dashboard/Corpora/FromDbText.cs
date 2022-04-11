@@ -10,12 +10,12 @@ namespace ClearBible.Engine.Dashboard.Corpora
         /// 
         /// </summary>
         /// <param name="connection">connection string to db</param>
-        /// <param name="corpusId">primary key of Corpus db entity</param>
-        /// <param name="id">book in three character SIL format</param>
+        /// <param name="parallelCorpusId">primary key of Corpus db entity</param>
+        /// <param name="bookId">book in three character SIL format</param>
         /// <param name-"isSource">if true, get source corpora, else target</param>
         /// <param name="versification"></param>
-        public FromDbText(string connection, int corpusId, string id, bool isSource, ScrVers versification)
-            : base(id, versification)
+        public FromDbText(string connection, int parallelCorpusId, string bookId, bool isSource, ScrVers versification)
+            : base(bookId, versification)
         {
         }
         protected override IEnumerable<TextRow> GetVersesInDocOrder()

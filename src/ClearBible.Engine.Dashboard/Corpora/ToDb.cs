@@ -65,8 +65,8 @@ namespace ClearBible.Engine.Dashboard.Corpora
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="T">StringTokenizer to apply to Paratext source corpus</typeparam>
-        /// <typeparam name="U">StringTokenizer to apply to Paratext target corpus</typeparam>
+        /// <typeparam name="TSourceStringTokenizer">StringTokenizer to apply to Paratext source corpus</typeparam>
+        /// <typeparam name="TTargetStringTokenizer">StringTokenizer to apply to Paratext target corpus</typeparam>
         /// <param name="sourceParatextTextCorpusPath"></param>
         /// <param name="targetParatextTextCorpusPath"></param>
         /// <param name="connection">connection string to db</param>
@@ -76,21 +76,21 @@ namespace ClearBible.Engine.Dashboard.Corpora
         /// or with values to use as versification.
         /// </param>
         /// <exception cref="InvalidDataException"></exception>
-        public static void ParatextParatextParallelCorporaToDb<T,U>(
+        public static void ParatextParatextParallelCorporaToDb<TSourceStringTokenizer,TTargetStringTokenizer>(
             string sourceParatextTextCorpusPath,
             string targetParatextTextCorpusPath,
             string connection,
             int parallelCorpusId,
             List<EngineVerseMapping>? engineVerseMappingList = null)
-            where T : StringTokenizer, new()
-            where U : StringTokenizer, new()
+            where TSourceStringTokenizer : StringTokenizer, new()
+            where TTargetStringTokenizer : StringTokenizer, new()
         {
             var sourceCorpus = new ParatextTextCorpus(sourceParatextTextCorpusPath)
-                .Tokenize<T>()
+                .Tokenize<TSourceStringTokenizer>()
                 .Transform<IntoTokensTextRowProcessor>();
 
             var targetCorpus = new ParatextTextCorpus(targetParatextTextCorpusPath)
-                .Tokenize<U>()
+                .Tokenize<TTargetStringTokenizer>()
                 .Transform<IntoTokensTextRowProcessor>();
 
             var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, engineVerseMappingList);
@@ -100,15 +100,15 @@ namespace ClearBible.Engine.Dashboard.Corpora
                 //FIXME: put these into db instead of writing to console.
 
                 //verse
-                var verseRef = (VerseRef)textRow.Ref;
+                //var verseRef = (VerseRef)textRow.Ref;
 
                 //source 
-                var sourceVerseText = string.Join(" ", textRow.SourceSegment);
+                //var sourceVerseText = string.Join(" ", textRow.SourceSegment);
                 var sourceTokenIds = string.Join(" ", textRow.SourceTokens?
                     .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataException());
                 Console.WriteLine($"SourceTokenIds: {sourceTokenIds}");
                 
-                var targetVerseText = string.Join(" ", textRow.TargetSegment);
+                //var targetVerseText = string.Join(" ", textRow.TargetSegment);
                 var targetTokenIds = string.Join(" ", textRow.TargetTokens?
                     .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataException());
                 Console.WriteLine($"TargetTokenIds: {targetTokenIds}");
