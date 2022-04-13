@@ -10,7 +10,7 @@ namespace ClearBible.Engine.Dashboard.Corpora
         /// </summary>
         /// <param name="connection">connection string to db</param>
         /// <param name="parallelCorpusId">primary key of the parallel corpus entity</param>
-        /// <param name-"isSource">if true, get source corpora, else target</param>
+        /// <param name="isSource">if true, get source corpora, else target</param>
         public FromDbTextCorpus(string connection, int parallelCorpusId, bool isSource)
         {
             // parallelCorpusId is the primary key for the parallel corpus entity.
