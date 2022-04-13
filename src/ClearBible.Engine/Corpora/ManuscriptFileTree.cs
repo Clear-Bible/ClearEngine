@@ -260,7 +260,8 @@ namespace ClearBible.Engine.Corpora
                     throw new InvalidDataException("Book not found in ManuscriptFileBookToSILBookPrefixes mapping");
                 }
 
-                var fileName = $"{_manuscriptTreesPath}{Path.DirectorySeparatorChar}{codes.First()}{chapterNumber.ToString("000")}.trees.xml";
+                var path = Path.GetFullPath(_manuscriptTreesPath);
+                var fileName = Path.Combine(path, $"{codes.First()}{chapterNumber.ToString("000")}.trees.xml");
 
                 if (!File.Exists(fileName))
                 {
