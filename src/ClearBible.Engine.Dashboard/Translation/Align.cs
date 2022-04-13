@@ -52,7 +52,7 @@ namespace ClearBible.Engine.Dashboard.Translation
 
             // Trains the manuscriptmodel using the pre-trained SMT model(s)
             manuscriptTrainer.Train(progress);
-            manuscriptTrainer.Save();
+            await manuscriptTrainer.SaveAsync();
 
             return manuscriptModel;
         }
