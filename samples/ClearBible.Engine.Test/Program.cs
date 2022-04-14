@@ -65,11 +65,11 @@ parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
 
         //display smt alignments ordinally and by tokenIds
         Console.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
-        Console.WriteLine($"SMT Alignemnt        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
+        Console.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
 
         //display manuscript alignments ordinally and by tokenIds
         Console.WriteLine($"Manuscript Alignment : { string.Join(" ", manuscriptOrdinalAlignedWordPairs.Select(a => a.ToString()))}");
-        Console.WriteLine($"Manuscript Alignemnt : {string.Join(" ", manuscriptSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
+        Console.WriteLine($"Manuscript Alignment : {string.Join(" ", manuscriptSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
     }
 
     //await SqlLitePersistManuscriptInfoAlignments.Get().SetLocation("connection string")
