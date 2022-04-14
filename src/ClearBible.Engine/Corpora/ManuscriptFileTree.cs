@@ -126,7 +126,7 @@ namespace ClearBible.Engine.Corpora
                 .SelectMany(chapterElement => chapterElement
                     .Descendants("Node")
                     .Where(node => node.FirstNode is XText)
-                    .Select(leaf => new ManuscriptToken(leaf.TokenId(), leaf.Surface(), leaf.Strong(), leaf.Category(), leaf.Analysis(), leaf.Lemma())));
+                    .Select(leaf => new ManuscriptToken(leaf.TokenId(), leaf.Surface(), leaf.Strong(), leaf.Category(), /*leaf.Analysis(),*/ leaf.Lemma())));
         }
 
         #endregion
