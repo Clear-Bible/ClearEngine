@@ -101,9 +101,6 @@ namespace Clear.Engine.Dashboard.Tests
                     output_.WriteLine(
                         $"Manuscript Alignment : {string.Join(" ", manuscriptSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
                 }
-
-                //await SqlLitePersistManuscriptInfoAlignments.Get().SetLocation("connection string")
-                //    .PutAsync(new ManuscriptInfoAlignments(manuscriptModel, manuscriptTree));
             }
         }
     }
