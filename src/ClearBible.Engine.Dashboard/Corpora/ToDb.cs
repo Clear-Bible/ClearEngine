@@ -30,9 +30,7 @@ namespace ClearBible.Engine.Dashboard.Corpora
             where T : StringTokenizer, new() 
         {
             var manuscriptTree = new ManuscriptFileTree(syntaxTreesPath);
-            var sourceCorpus = new ManuscriptFileTextCorpus(manuscriptTree)
-                .Tokenize<LatinWordTokenizer>()
-                .Transform<IntoTokensTextRowProcessor>();
+            var sourceCorpus = new ManuscriptFileTextCorpus(manuscriptTree);
 
             var targetCorpus = new ParatextTextCorpus(targetParatextTextCorpusPath)
                 .Tokenize<T>()
