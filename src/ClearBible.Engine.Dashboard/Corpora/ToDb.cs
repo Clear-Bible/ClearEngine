@@ -44,7 +44,7 @@ namespace ClearBible.Engine.Dashboard.Corpora
             {
                 // (for 1-3, look in next method comments)
                 // 4. iterate sourcetokens, inserting into Token with appropriate VerseId, CorpusId. 
-                //   NOTE: for manuscript, (once done), see if textRow is ManuscriptTokensTextRow and if so Insert extra data into Adornment
+                //   NOTE: for manuscript, sourceTokens should now be ManuscriptTokens, which inculde the extra data to INSERT into Adornment
 
 
 
