@@ -38,12 +38,13 @@ namespace ClearBible.Engine.Corpora
         /// <returns></returns>
         protected override IEnumerable<TextRow> GetVersesInDocOrder()
         {
-            return _manuscriptText.GetBookSegments(Id, true)
-                .SelectMany(bookSegment => CreateRows(
-                        bookSegment.chapter,
-                        bookSegment.verse,
-                        bookSegment.text)
-                    );
+            return _manuscriptText.GetTokensTextRowInfos(Id)
+                .SelectMany(tokenTextRowInfo => CreateRows(
+                        tokenTextRowInfo.chapter,
+                        tokenTextRowInfo.verse,
+                        "", // text parameter is overridden by TokensTextRow and is therefore not needed here.
+                        tokenTextRowInfo.isSentenceStart)
+                    .Select(textRow => new TokensTextRow(textRow, tokenTextRowInfo.manuscriptTokens.ToList())));
         }
     }
 }

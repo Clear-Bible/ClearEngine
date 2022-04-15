@@ -18,6 +18,8 @@ namespace ClearBible.Engine.Corpora
                 ((VerseRef)segmentRef).ChapterNum,
                 ((VerseRef)segmentRef).VerseNum);
         }
+
+        /*FIXME: not used. Remove?
         public TokensTextRow(
             object segmentRef, 
             IReadOnlyList<string> segment, 
@@ -34,8 +36,16 @@ namespace ClearBible.Engine.Corpora
             IsRangeStart = isRangeStart;
             IsEmpty = isEmpty;
 
-            Tokens = tokens;
+            if (Segment.Count() == tokens.Count())
+            {
+                Tokens = tokens;
+            }
+            else
+            {
+                throw new InvalidDataException($"textRow ref {(VerseRef)Ref} tokens count don't match segment count");
+            }
         }
+        */
         public TokensTextRow(TextRow textRow)
             : base(textRow.Ref)
         {
@@ -61,10 +71,7 @@ namespace ClearBible.Engine.Corpora
             IsRangeStart = textRow.IsRangeStart;
             IsEmpty = textRow.IsEmpty;
 
-            if (Segment.Count() > 0)
-            {
-                Tokens = tokens;
-            }
+            Tokens = tokens;
         }
 
         public override IReadOnlyList<string> Segment

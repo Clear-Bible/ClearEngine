@@ -30,9 +30,7 @@ namespace Clear.Engine.Dashboard.Tests
             var corpusProjectPath = "..\\..\\..\\..\\..\\Samples\\data\\WEB-PT";
 
             var manuscriptTree = new ManuscriptFileTree(syntaxTreePath);
-            var sourceCorpus = new ManuscriptFileTextCorpus(manuscriptTree)
-                .Tokenize<LatinWordTokenizer>()
-                .Transform<IntoTokensTextRowProcessor>();
+            var sourceCorpus = new ManuscriptFileTextCorpus(manuscriptTree);
 
             var targetCorpus = new ParatextTextCorpus(corpusProjectPath)
                 .Tokenize<LatinWordTokenizer>()
@@ -49,13 +47,13 @@ namespace Clear.Engine.Dashboard.Tests
                 using var smtWordAlignmentModel = await Align.BuildSymmetrizedFastAlignAlignmentModel(
                     parallelTextCorpus,
                     new DelegateProgress(status =>
-                        Console.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")));
+                        output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")));
 
                 using var manuscriptWordAlignmentModel = await Align.BuildManuscriptWordAlignmentModel(
                     parallelTextCorpus,
                     smtWordAlignmentModel,
                     new DelegateProgress(status =>
-                        Console.WriteLine($"Training manuscript tree align model: {status.PercentCompleted:P}")),
+                        output_.WriteLine($"Training manuscript tree align model: {status.PercentCompleted:P}")),
                         syntaxTreePath);
 
                 // now best alignments for first 5 verses.

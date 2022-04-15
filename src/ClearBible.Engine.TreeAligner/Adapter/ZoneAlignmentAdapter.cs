@@ -35,26 +35,26 @@ namespace ClearBible.Engine.TreeAligner.Adapter
             if (tokenId == null)
                 throw new InvalidDataException("SourceToken in EngineAlignedWordPair is null");
 
-            var bookId = BookIds.Where(b => int.Parse(b.silCannonBookNum) == tokenId.BookNum).FirstOrDefault();
+            var bookId = BookIds.Where(b => int.Parse(b.silCannonBookNum) == tokenId.BookNumber).FirstOrDefault();
             if (bookId == null)
-                throw new InvalidDataException($"SourceToken's tokenId book number {tokenId.BookNum} is not in BookIds");
+                throw new InvalidDataException($"SourceToken's tokenId book number {tokenId.BookNumber} is not in BookIds");
 
             string clearBookNumString = int.Parse(bookId.clearTreeBookNum).ToString("00");
 
-            return new SourceID($"{clearBookNumString}{tokenId.ChapterNum.ToString("000")}{tokenId.VerseNum.ToString("000")}{tokenId.WordNum.ToString("000")}{tokenId.SubWordNum.ToString("0")}");
+            return new SourceID($"{clearBookNumString}{tokenId.ChapterNumber.ToString("000")}{tokenId.VerseNumber.ToString("000")}{tokenId.WordNumber.ToString("000")}{tokenId.SubWordNumber.ToString("0")}");
         }
         internal static TargetID TokenIdStringToLegacyTargetId(TokenId? tokenId)
         {//{book:D2}{chapter:D3}{verse:D3}{word:D3}
             if (tokenId == null)
                 throw new InvalidDataException("TargetToken in EngineAlignedWordPair is null");
 
-            var bookId = BookIds.Where(b => int.Parse(b.silCannonBookNum) == tokenId.BookNum).FirstOrDefault();
+            var bookId = BookIds.Where(b => int.Parse(b.silCannonBookNum) == tokenId.BookNumber).FirstOrDefault();
             if (bookId == null)
-                throw new InvalidDataException($"SourceToken's tokenId book number {tokenId.BookNum} is not in BookIds");
+                throw new InvalidDataException($"SourceToken's tokenId book number {tokenId.BookNumber} is not in BookIds");
 
             string clearBookNumString = int.Parse(bookId.clearTreeBookNum).ToString("00");
 
-            return new TargetID($"{clearBookNumString}{tokenId.ChapterNum.ToString("000")}{tokenId.VerseNum.ToString("000")}{tokenId.WordNum.ToString("000")}");
+            return new TargetID($"{clearBookNumString}{tokenId.ChapterNumber.ToString("000")}{tokenId.VerseNumber.ToString("000")}{tokenId.WordNumber.ToString("000")}");
         }
         internal static AlignmentModel ToAlignmentModel(List<IReadOnlyCollection<TokensAlignedWordPair>>? alignMod)
         {    

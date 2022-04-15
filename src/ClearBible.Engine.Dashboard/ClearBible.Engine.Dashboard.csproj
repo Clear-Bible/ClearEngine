@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\ClearDashboard\src\ClearDashboard.DAL\ClearDashboard.DAL.csproj" />
     <ProjectReference Include="..\..\..\machine\src\SIL.Machine\SIL.Machine.csproj" />
     <ProjectReference Include="..\ClearBible.Engine.TreeAligner\ClearBible.Engine.TreeAligner.csproj" />
     <ProjectReference Include="..\ClearBible.Engine\ClearBible.Engine.csproj" />

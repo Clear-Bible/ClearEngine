@@ -20,11 +20,11 @@ namespace ClearBible.Engine.Dashboard.Corpora
         }
         protected override IEnumerable<TextRow> GetVersesInDocOrder()
         {
-            //FIXME: get rows from DB, a tuple of chapter, verse, text, isSentenceStart, where chapter and verse are short.ToString().
-            var rows = new List<(string chapter, string verse, string text, IEnumerable<Token> tokens, bool isSentenceStart)>();
+            //FIXME: get rows from DB, a tuple of chapter, verse, isSentenceStart, where chapter and verse are short.ToString().
+            var rows = new List<(string chapter, string verse,  IEnumerable<Token> tokens, bool isSentenceStart)>();
 
             return rows
-                .SelectMany(r => CreateRows(r.chapter, r.verse, r.text, r.isSentenceStart)
+                .SelectMany(r => CreateRows(r.chapter, r.verse, "", r.isSentenceStart) // text parameter is overridden by TokensTextRow and is therefore not needed here.
                     .Select(tr => new TokensTextRow(tr, r.tokens.ToList()))); //MUST return TokensTextRow. 
         }
     }

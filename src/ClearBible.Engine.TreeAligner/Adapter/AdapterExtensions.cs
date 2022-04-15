@@ -11,7 +11,7 @@ namespace ClearBible.Engine.TreeAligner.Adapter
     {
         public static string ToTokenIdCanonicalString(this TokenId tokenId)
         {
-            return $"{tokenId.BookNum:00}{tokenId.ChapterNum:000}{tokenId.VerseNum:000}{tokenId.WordNum:000}";
+            return $"{tokenId.BookNumber:00}{tokenId.ChapterNumber:000}{tokenId.VerseNumber:000}{tokenId.WordNumber:000}";
         }
     }
 }
