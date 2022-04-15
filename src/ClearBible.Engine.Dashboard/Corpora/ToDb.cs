@@ -42,20 +42,19 @@ namespace ClearBible.Engine.Dashboard.Corpora
 
             foreach (EngineParallelTextRow textRow in parallelTextCorpus)
             {
-                //FIXME: put these into db instead of writing to console.
+                // (for 1-3, look in next method comments)
+                // 4. iterate sourcetokens, inserting into Token with appropriate VerseId, CorpusId. 
+                //   NOTE: for manuscript, sourceTokens should now be ManuscriptTokens, which inculde the extra data to INSERT into Adornment
 
-                //verse
-                var verseRef = (VerseRef) textRow.Ref;
+
 
                 // tokenId.ToString() -> $"{BookNum.ToString("000")}{ChapterNum.ToString("000")}{VerseNum.ToString("000")}{WordNum.ToString("000")}{SubWordNum.ToString("000")}"
                 //source
-                var sourceVerseText = string.Join(" ", textRow.SourceSegment);
                 var sourceTokenIds = string.Join(" ", textRow.SourceTokens?
                     .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataException());
                 Console.WriteLine($"SourceTokenIds: {sourceTokenIds}");
                 
                 //target
-                var targetVerseText = string.Join(" ", textRow.TargetSegment);
                 var targetTokenIds = string.Join(" ", textRow.TargetTokens?
                     .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataException());
                 Console.WriteLine($"TargetTokenIds: {targetTokenIds}");
@@ -95,15 +94,20 @@ namespace ClearBible.Engine.Dashboard.Corpora
 
             var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, engineVerseMappingList);
 
+            // PREREQUISITE: create ParallelCorpus per green line, which includes Corpus, getting back ParallelCorpusId and CorpaIds
             foreach (EngineParallelTextRow textRow in parallelTextCorpus)
             {
-                //FIXME: put these into db instead of writing to console.
-
-                //verse
-                //var verseRef = (VerseRef)textRow.Ref;
-
-                //source 
-                //var sourceVerseText = string.Join(" ", textRow.SourceSegment);
+                // 1. INSERT into ParallelVerseLink, providing ParallelCorpusId and getting a ParallelVerseLink.Id
+                // 2. * look in sourcetokens and find unique verseNumbers. INSERT those found into Verse and get VerseIds.
+                // 3. Foreach VerseId, INSERT  into VerseLink providing VerseId and ParallelVerseLink.Id.
+                // 4. iterate sourcetokens, inserting into Token with appropriate VerseId, CorpusId
+                //
+                /* 
+                 * 
+                var verseNums = textRow.SourceTokens
+                    .GroupBy(t => t.TokenId.VerseNum)
+                    .SelectMany(g => g.Select(t => t.TokenId.VerseNum));
+                */
                 var sourceTokenIds = string.Join(" ", textRow.SourceTokens?
                     .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataException());
                 Console.WriteLine($"SourceTokenIds: {sourceTokenIds}");

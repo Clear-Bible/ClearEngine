@@ -30,9 +30,7 @@ namespace Clear.Engine.Dashboard.Tests
             var corpusProjectPath = "..\\..\\..\\..\\..\\Samples\\data\\WEB-PT";
 
             var manuscriptTree = new ManuscriptFileTree(syntaxTreePath);
-            var sourceCorpus = new ManuscriptFileTextCorpus(manuscriptTree)
-                .Tokenize<LatinWordTokenizer>()
-                .Transform<IntoTokensTextRowProcessor>();
+            var sourceCorpus = new ManuscriptFileTextCorpus(manuscriptTree);
 
             var targetCorpus = new ParatextTextCorpus(corpusProjectPath)
                 .Tokenize<LatinWordTokenizer>()

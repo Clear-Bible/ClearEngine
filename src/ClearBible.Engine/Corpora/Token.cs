@@ -1,6 +1,4 @@
-﻿
-
-using static ClearBible.Engine.Persistence.FileGetBookIds;
+﻿using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -21,22 +19,22 @@ namespace ClearBible.Engine.Corpora
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="BookNum">SIL book number</param>
-    /// <param name="ChapterNum"></param>
-    /// <param name="VerseNum"></param>
-    /// <param name="WordNum"></param>
-    /// <param name="SubWordNum"></param>
-    public record TokenId(int BookNum, int ChapterNum, int VerseNum, int WordNum, int SubWordNum)
+    /// <param name="BookNumber">SIL book abbreviation</param>
+    /// <param name="ChapterNumber"></param>
+    /// <param name="VerseNumber"></param>
+    /// <param name="WordNumber"></param>
+    /// <param name="SubWordNumber"></param>
+    public record TokenId(int BookNumber, int ChapterNumber, int VerseNumber, int WordNumber, int SubWordNumber)
     {
-        public TokenId(string bookAbbreviation, int chapterNum, int verseNum, int wordNum, int subWordNum)
+        public TokenId(string bookAbbreviation, int chapterNumber, int verseNumber, int wordNumber, int subWordNumber)
             : this(int.Parse(BookIds
                   .Where(b => b.silCannonBookAbbrev.Equals(bookAbbreviation))
                   .Select(b => b.silCannonBookNum)
                   .FirstOrDefault() ?? throw new InvalidDataException($"TokenId ctor bookAbbreviation parameter cannot be mapped to a sil book number")), 
-                  chapterNum, 
-                  verseNum, 
-                  wordNum, 
-                  subWordNum)
+                  chapterNumber, 
+                  verseNumber, 
+                  wordNumber, 
+                  subWordNumber)
         {
         }
 
@@ -73,7 +71,7 @@ namespace ClearBible.Engine.Corpora
 
         public override string ToString()
         {
-            return $"{BookNum.ToString("000")}{ChapterNum.ToString("000")}{VerseNum.ToString("000")}{WordNum.ToString("000")}{SubWordNum.ToString("000")}";
+            return $"{BookNumber.ToString("000")}{ChapterNumber.ToString("000")}{VerseNumber.ToString("000")}{WordNumber.ToString("000")}{SubWordNumber.ToString("000")}";
         }
     }
 }

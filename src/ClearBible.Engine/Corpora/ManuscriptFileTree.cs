@@ -6,6 +6,7 @@ using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.Corpora
 {
+
     public class ManuscriptFileTree : IManuscriptText, IManuscriptTree
     {
         private readonly string _manuscriptTreesPath;
@@ -44,37 +45,41 @@ namespace ClearBible.Engine.Corpora
         /// <param name="includeText"></param>
         /// <returns></returns>
         /// <exception cref="InvalidDataException"></exception>
-        public IEnumerable<BookSegment> GetBookSegments(
-            string bookAbbreviation, 
-            bool includeText = true)
+        public IEnumerable<(string chapter, string verse, IEnumerable<ManuscriptToken> manuscriptTokens, bool isSentenceStart)> GetTokensTextRowInfos(string bookAbbreviation)
         {
             return GetBookChapters(bookAbbreviation)
                 .SelectMany(c => _getVerseXElementsForChapter(bookAbbreviation, c)
-                    .Select(verse => new BookSegment
+                    .Select(verse =>
                         (
-                            verse
+                            chapter: verse
                                 .Descendants()
                                 .Where(node => node.FirstNode is XText)
                                 .First()
-                                ?.Attribute("morphId")?.Value.Substring(2, 3)
-                                ?? throw new InvalidDataException($@"Syntax tree for book {bookAbbreviation} chapter {c} has a verse whose first leaf node 
-                                                                        doesn't have a nodeId attribute. Cannot determine chapter number"),
-                            verse
+                                ?.Chapter()
+                                ?? throw new InvalidDataException($"Syntax tree for book {bookAbbreviation} chapter {c} doesn't have a first textNode"),
+                            verse: verse
                                 .Descendants()
                                 .Where(node => node.FirstNode is XText)
                                 .First()
-                                ?.Attribute("morphId")?.Value.Substring(5, 3)
-                                ?? throw new InvalidDataException($@"Syntax tree {bookAbbreviation} chapter {c} has a verse whose first leaf node doesn't 
-                                                                            have a nodeId attribute. Cannot determine verse number"),
-                            includeText ?
-                                string.Join(
+                                ?.Verse()
+                                ?? throw new InvalidDataException($"Syntax tree {bookAbbreviation} chapter {c} doesn't have a first textNode"),
+                            /*FIXME: remove? text: string.Join(
                                     " ",
                                     verse
                                         .Descendants()
                                         .Where(node => node.FirstNode is XText)
-                                        .Select(leaf => leaf?
-                                            .Attribute("UnicodeLemma")?.Value.Replace(' ', '~') ?? ""))
-                                : ""
+                                        .Select(textNode => textNode.Lemma().Replace(' ', '~'))),*/
+                            tokens: verse
+                                .Descendants()
+                                .Where(node => node.FirstNode is XText)
+                                .Select((leaf, index) => new ManuscriptToken(
+                                    leaf.TokenId(),
+                                    leaf.Surface(),
+                                    leaf.Strong(),
+                                    leaf.Category(),
+                                    leaf.Lemma()
+                                    )),
+                            isSentenceStart: true
                         ))
                     );
             /*
@@ -122,11 +127,11 @@ namespace ClearBible.Engine.Corpora
                     .Descendants("Node")
                     .Where(node => node.FirstNode is XText)
                     .First()
-                     ?.Attribute("morphId")?.Value.Substring(5, 3).Equals(verseNumber.ToString("000")) ?? false)
+                     ?.Verse().Equals(verseNumber.ToString("000")) ?? false)
                 .SelectMany(chapterElement => chapterElement
                     .Descendants("Node")
                     .Where(node => node.FirstNode is XText)
-                    .Select(leaf => new ManuscriptToken(leaf.TokenId(), leaf.Surface(), leaf.Strong(), leaf.Category(), leaf.Analysis(), leaf.Lemma())));
+                    .Select(textNode => new ManuscriptToken(textNode.TokenId(), textNode.Surface(), textNode.Strong(), textNode.Category(), /*leaf.Analysis(),*/ textNode.Lemma())));
         }
 
         #endregion
@@ -305,74 +310,5 @@ namespace ClearBible.Engine.Corpora
 
     #endregion
 
-    #region Extensions
-    public static class ManuscriptTreeExtensions
-    {
-        public static TokenId TokenId(this XElement leaf)
-        {
-            string? morphId = leaf.Attribute("morphId")?.Value;
-            if (morphId == null)
-            {
-                throw new InvalidDataException("Unable to extract tokenId from leaf element because element does not have a 'morphId' attribute");
-            }
-            if (morphId.Length != 11)
-            {
-                throw new InvalidDataException("Unable to extract tokenId from leaf element because element's 'morphId' attribute is not length 11");
-            }
-            morphId += "1";
-            string? silBookNum = BookIds
-                .Where(b => b.clearTreeBookNum.Equals(morphId.Substring(0, 2)))
-                .Select(b => b.silCannonBookNum)
-                .FirstOrDefault();
-
-            if (silBookNum == null)
-            {
-                throw new InvalidDataException($"Unable to find sil book number for leaf morphId {morphId} with clear tree book number in first two positions");
-            }
-            int bookSilNumber = int.Parse(silBookNum);
-            int chapterNumber = int.Parse(morphId.Substring(2, 3));
-            int verseNumber = int.Parse(morphId.Substring(5, 3));
-            int wordNumber = int.Parse(morphId.Substring(8, 3));
-            int subWordNumber = int.Parse(morphId.Substring(11, 1));
-            return new TokenId(bookSilNumber, chapterNumber, verseNumber, wordNumber, subWordNumber);
-        }
-        public static string Lemma(this XElement leaf) =>
-            leaf.Attribute("UnicodeLemma")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'UnicodeLemma' attribute");
-
-        public static string Surface(this XElement leaf) =>
-            leaf.Attribute("Unicode")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'Unicode' attribute");
-
-        public static string Strong(this XElement leaf) =>
-            (leaf.Attribute("Language")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'Language' attribute")) +
-            (leaf.Attribute("StrongNumberX")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'StrongNumberX' attribute"));
-
-        public static string English(this XElement leaf) =>
-            leaf.Attribute("English")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'English' attribute");
-
-        public static string Category(this XElement leaf) =>
-            leaf.Attribute("Cat")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'Cat' attribute");
-
-        public static int Start(this XElement leaf)
-        {
-            var attr = leaf.Attribute("Start");
-            if (attr == null)
-            {
-                throw new InvalidDataException("Manuscript leaf element does not contain the 'Start' attribute");
-            }
-
-            bool success = int.TryParse(leaf.Attribute("Start")?.Value, out int startNum);
-            if (success)
-            {
-                return startNum;
-            }
-            else
-            {
-                throw new InvalidDataException("Manuscript leaf element 'Start' attribute not int parseable.");
-            }
-        }
-        public static string Analysis(this XElement leaf) =>
-            leaf.Attribute("Analysis")?.Value ?? throw new InvalidDataException("Manuscript leaf element does not contain the 'Analysis' attribute");
-    }
-    #endregion
 }
 

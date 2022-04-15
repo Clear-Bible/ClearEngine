@@ -7,7 +7,7 @@ namespace ClearBible.Engine.Corpora
     public interface IManuscriptText
     {
         IEnumerable<string> GetBooks();
-        IEnumerable<BookSegment> GetBookSegments(string bookAbbreviation, bool includeText);
+        IEnumerable<(string chapter, string verse, IEnumerable<ManuscriptToken> manuscriptTokens, bool isSentenceStart)> GetTokensTextRowInfos(string bookAbbreviation);
 
         /// <summary>
         /// 
