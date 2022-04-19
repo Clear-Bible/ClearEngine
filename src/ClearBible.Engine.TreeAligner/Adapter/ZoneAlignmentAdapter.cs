@@ -29,33 +29,6 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 .ToDictionary(x => x.Key, x => x.Value)
             );
         }
-
-        internal static SourceID TokenIdToLegacySourceId(TokenId? tokenId)
-        {
-            if (tokenId == null)
-                throw new InvalidDataException("SourceToken in EngineAlignedWordPair is null");
-
-            var bookId = BookIds.Where(b => int.Parse(b.silCannonBookNum) == tokenId.BookNumber).FirstOrDefault();
-            if (bookId == null)
-                throw new InvalidDataException($"SourceToken's tokenId book number {tokenId.BookNumber} is not in BookIds");
-
-            string clearBookNumString = int.Parse(bookId.clearTreeBookNum).ToString("00");
-
-            return new SourceID($"{clearBookNumString}{tokenId.ChapterNumber.ToString("000")}{tokenId.VerseNumber.ToString("000")}{tokenId.WordNumber.ToString("000")}{tokenId.SubWordNumber.ToString("0")}");
-        }
-        internal static TargetID TokenIdStringToLegacyTargetId(TokenId? tokenId)
-        {//{book:D2}{chapter:D3}{verse:D3}{word:D3}
-            if (tokenId == null)
-                throw new InvalidDataException("TargetToken in EngineAlignedWordPair is null");
-
-            var bookId = BookIds.Where(b => int.Parse(b.silCannonBookNum) == tokenId.BookNumber).FirstOrDefault();
-            if (bookId == null)
-                throw new InvalidDataException($"SourceToken's tokenId book number {tokenId.BookNumber} is not in BookIds");
-
-            string clearBookNumString = int.Parse(bookId.clearTreeBookNum).ToString("00");
-
-            return new TargetID($"{clearBookNumString}{tokenId.ChapterNumber.ToString("000")}{tokenId.VerseNumber.ToString("000")}{tokenId.WordNumber.ToString("000")}");
-        }
         internal static AlignmentModel ToAlignmentModel(List<IReadOnlyCollection<TokensAlignedWordPair>>? alignMod)
         {    
             if (alignMod == null)
@@ -68,14 +41,14 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 .SelectMany(c => c
                     .Select(p => KeyValuePair.Create(
                         new BareLink(
-                            TokenIdToLegacySourceId(p.SourceToken?.TokenId),
-                            TokenIdStringToLegacyTargetId(p.TargetToken?.TokenId)),
+                            p.SourceToken?.TokenId.ToSourceId() ?? throw new InvalidDataException("Can't create AlignmentModel: sourceToken is null"),
+                            p.TargetToken?.TokenId.ToTargetId() ?? throw new InvalidDataException("Can't create AlignmentModel: targetToken is null")),
                         new Score(p.AlignmentScore)))
                      )
                      .ToDictionary(x => x.Key, x => x.Value)
                );
         }
-        internal static IEnumerable<(SourcePoint, TargetPoint, double)> AlignZone(
+        internal static IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> AlignZone(
             ParallelTextRow parallelTextRow, 
             IManuscriptTree manuscriptTree, 
             ManuscriptTreeWordAlignerParams hyperParameters, 
@@ -166,7 +139,7 @@ namespace ClearBible.Engine.TreeAligner.Adapter
 
             //FIXME: CHECK THIS!
             IEnumerable<Target>? targets = ((EngineParallelTextRow)parallelTextRow).TargetTokens
-                ?.Select(t => new Target(new TargetText(t.Text), new TargetLemma(t.Text), new TargetID(t.TokenId.ToTokenIdCanonicalString()))) ?? null;
+                ?.Select(t => new Target(new TargetText(t.Text), new TargetLemma(t.Text), t.TokenId.ToTargetId())) ?? null;
             if (targets == null)
             {
                 throw new InvalidDataException("ParallelTextRow targets must be transformed to a TargetTextRow (.Transform(textRow => new TokensTextRow(textRow))) ");
@@ -179,7 +152,10 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 assumptions);
 
             return monoLinks
-                .Select(m => (m.SourcePoint, m.TargetBond.TargetPoint, m.TargetBond.Score));
+                .OrderBy(ml => ml.SourcePoint.SourceID.AsCanonicalString)
+                .Select(ml => (ml.SourcePoint.SourceID.ToTokenId(), 
+                    ml.TargetBond.TargetPoint.TargetID.ToTokenId(), 
+                    ml.TargetBond.Score));
         }
     }
 }

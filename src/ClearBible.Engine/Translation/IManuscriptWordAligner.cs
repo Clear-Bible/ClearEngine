@@ -1,4 +1,5 @@
-﻿using SIL.Machine.Corpora;
+﻿using ClearBible.Engine.Corpora;
+using SIL.Machine.Corpora;
 using SIL.Machine.Translation;
 using SIL.Machine.Utils;
 
@@ -14,7 +15,7 @@ namespace ClearBible.Engine.Translation
         /// </summary>
         /// <param name="parallelTextRow"></param>
         /// <returns></returns>
-        IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(ParallelTextRow parallelTextRow);
+        IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(EngineParallelTextRow engineParallelTextRow);
 
         /// <summary>
         /// Load previously saved generated collections of Translations And Alignments

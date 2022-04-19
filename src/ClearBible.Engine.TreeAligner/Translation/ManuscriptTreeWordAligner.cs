@@ -43,43 +43,22 @@ namespace ClearBible.Engine.TreeAligner.Translation
 			HyperParameters = hyperParameters;
 		}
 
-		public WordAlignmentMatrix GetBestAlignment(IReadOnlyList<string> sourceSegment,
-			IReadOnlyList<string> targetSegment)
+		public WordAlignmentMatrix GetBestAlignment(IReadOnlyList<string> sourceSegment, IReadOnlyList<string> targetSegment)
 		{
-			//FIXME: this should return the tree aligner's results.
-			WordAlignmentMatrix? matrix = SmtModels
-				.FirstOrDefault()
-				?.SmtWordAlignmentModel.GetBestAlignment(sourceSegment, targetSegment)
-				?? throw new InvalidDataException("Not configured with one or more smt models");
-			return matrix;
+			return SmtModels[IndexPrimarySmtModel].SmtWordAlignmentModel.GetBestAlignment(sourceSegment, targetSegment);
 		}
 
         public double GetAlignmentScore(int sourceLen, int prevSourceIndex, int sourceIndex, int targetLen, int prevTargetIndex, int targetIndex)
         {
-			//FIXME: these should probably be adjusted after treealignment
-			return SmtModels
-				.FirstOrDefault()
-				?.SmtWordAlignmentModel.GetAlignmentScore(sourceLen, prevSourceIndex, sourceIndex, targetLen, prevTargetIndex, targetIndex)
-				?? throw new InvalidDataException("Not configured with one or more smt models.");
+			return SmtModels[IndexPrimarySmtModel].SmtWordAlignmentModel.GetAlignmentScore(sourceLen, prevSourceIndex, sourceIndex, targetLen, prevTargetIndex, targetIndex);
 		}
 
-		public IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(ParallelTextRow parallelTextRow)
+		public IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(EngineParallelTextRow engineParallelTextRow)
         {
-			IEnumerable <(SourcePoint, TargetPoint, double)> alignments = ZoneAlignmentAdapter.AlignZone(parallelTextRow, _manuscriptTree, HyperParameters, SmtModels, IndexPrimarySmtModel);
-			//PointsTokensAlignedWordPair((SourcePoint, (TargetPoint, double)) alignment, EngineParallelTextRow engineParallelTextRow)
+			IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> alignments = ZoneAlignmentAdapter.AlignZone(engineParallelTextRow, _manuscriptTree, HyperParameters, SmtModels, IndexPrimarySmtModel);
 
-			if (parallelTextRow is EngineParallelTextRow)
-			{ 
-				return alignments
-						.Select(a => new PointsTokensAlignedWordPair(a.Item1, a.Item2, a.Item3, (EngineParallelTextRow)parallelTextRow))
-						.ToList();
-			}
-			else
-            {
-				return alignments
-						.Select(a => new AlignedWordPair(a.Item1.SourcePosition, a.Item2.Position) {AlignmentScore = a.Item3} )
-						.ToList();
-			}
+			return alignments
+				.Select(a => new TokensAlignedWordPair(a.sourceTokenId, a.targetTokenId, engineParallelTextRow) { AlignmentScore = a.score }).ToList();
         }
 		/// <summary>
 		/// Load generated collections of Translations And Alignments

@@ -50,9 +50,14 @@ namespace ClearBible.Engine.Translation
             return _trainableAligner.GetBestAlignment(sourceSegment, targetSegment);
         }
 
-        public IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(ParallelTextRow parallelTextRow)
+        /// <summary>
+        /// For obtaininng the best aligned word pairs from TreeAligner
+        /// </summary>
+        /// <param name="engineParallelTextRow"></param>
+        /// <returns></returns>
+        public IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(EngineParallelTextRow engineParallelTextRow)
         {
-            return _trainableAligner.GetBestAlignmentAlignedWordPairs(parallelTextRow);
+            return _trainableAligner.GetBestAlignmentAlignedWordPairs(engineParallelTextRow);
         }
         public IEnumerable<(int TargetWordIndex, double Score)> GetTranslations(int sourceWordIndex, double threshold = 0)
         {

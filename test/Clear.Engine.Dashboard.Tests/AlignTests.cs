@@ -92,14 +92,11 @@ namespace Clear.Engine.Dashboard.Tests
 
                     //display smt alignments ordinally and by tokenIds
                     output_.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
-                    output_.WriteLine(
-                        $"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
+                    output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
 
                     //display manuscript alignments ordinally and by tokenIds
-                    output_.WriteLine(
-                        $"Manuscript Alignment : {string.Join(" ", manuscriptOrdinalAlignedWordPairs.Select(a => a.ToString()))}");
-                    output_.WriteLine(
-                        $"Manuscript Alignment : {string.Join(" ", manuscriptSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
+                    output_.WriteLine($"Manuscript Alignment : {string.Join(" ", manuscriptOrdinalAlignedWordPairs.Select(a => a.ToString()))}");
+                    output_.WriteLine($"Manuscript Alignment : {string.Join(" ", manuscriptSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
                 }
             }
         }
