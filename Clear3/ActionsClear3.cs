@@ -343,11 +343,8 @@ namespace Clear3
             //============================ Output/Input Files Used to Pass Data Between Functions ============================
             tokensFoldername = clearSettings["Tokens_Foldername"];
             tokensFolder = Path.Combine(targetFolder, tokensFoldername);
-            if (!Directory.Exists(tokensFolder))
-            {
-                Directory.CreateDirectory(tokensFolder);
-            }
-
+            Directory.CreateDirectory(tokensFolder);
+ 
             tokenTextFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenTextFilename);
             tokenTextIdFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenTextIdFilename);
             tokenLemmaFile = Path.Combine(tokensFolder, translationTestamentPrefix + tokenLemmaFilename);
@@ -357,10 +354,8 @@ namespace Clear3
 
             corporaFoldername = clearSettings["Corpora_Foldername"];
             corporaFolder = Path.Combine(targetFolder, corporaFoldername);
-            if (!Directory.Exists(corporaFolder))
-            {
-                Directory.CreateDirectory(corporaFolder);
-            }
+            Directory.CreateDirectory(corporaFolder);
+
 
             sourceTextFile = Path.Combine(corporaFolder, translationTestamentPrefix + sourceTextFilename);
             sourceLemmaFile = Path.Combine(corporaFolder, translationTestamentPrefix + sourceLemmaFilename);
@@ -373,9 +368,14 @@ namespace Clear3
             targetLemmaIdFile = Path.Combine(corporaFolder, translationTestamentPrefix + targetLemmaIdFilename);
 
             //============================ Output Files Only ============================
+            alignmentsFoldername = clearSettings["Alignments_Foldername"];
+            alignmentsFolder = Path.Combine(targetFolder, alignmentsFoldername);
+            Directory.CreateDirectory(alignmentsFolder);
 
+            // With basic filename so it can be referenced by the scripts
             jsonOutputBase = Path.Combine(targetFolder, translationTestamentPrefix + jsonOutputFilename);
             jsonLemmasOutputBase = Path.Combine(targetFolder, translationTestamentPrefix + jsonLemmasOutputFilename);
+
             jsonFile = Path.Combine(targetFolder, translationTestamentPrefix + jsonFilename);
             // t2gJsonFile = Path.Combine(targetFolder, translationTestamentPrefix + t2gJsonFilename);
 
@@ -389,6 +389,8 @@ namespace Clear3
             //============================ Input Files Only from Lexicon ============================
             lexiconFoldername = clearSettings["Lexicon_Foldername"];
             lexiconFolder = Path.Combine(targetFolder, lexiconFoldername);
+            Directory.CreateDirectory(lexiconFolder);
+
             lemmaDataFile = Path.Combine(lexiconFolder, translationTestamentPrefix + lemmaDataFilename);
 
             InitializeStateFiles();
@@ -516,10 +518,11 @@ namespace Clear3
 
             modelsFoldername = clearSettings["Models_Foldername"];
             modelsFolder = Path.Combine(targetFolder, modelsFoldername);
-            if (!Directory.Exists(modelsFolder))
-            {
-                Directory.CreateDirectory(modelsFolder);
-            }
+            Directory.CreateDirectory(modelsFolder);
+
+            // files with base filename so scripts can access them
+            transModelFileBase = Path.Combine(targetFolder, translationTestamentPrefix + transModelFilename);
+            alignModelFileBase = Path.Combine(targetFolder, translationTestamentPrefix + alignModelFilename);
 
             transModelFile = Path.Combine(modelsFolder, translationTestamentPrefix + transModelFilename);
             alignModelFile = Path.Combine(modelsFolder, translationTestamentPrefix + alignModelFilename);
@@ -743,31 +746,42 @@ namespace Clear3
         //
         public static (bool, string) BuildModels()
         {
-
             Console.WriteLine("Building Models");
 
             // Train a statistical translation model using the parallel corpora producing an estimated translation model and estimated alignment.
             // There are three possible scenarios for how to use parallel corpus with all words or content only words.
-            // In CE2 it converts alignmentModelRest to alignmentModelPre.
-            // But in CE3, this conversion is done when creating new assumptions internally so only need to
-            // make an assignment, no conversion needed.
-            //
-            AlignmentModel alignmentModelRest;
+            AlignmentModel alignModelRest;
+
+            var transModelRestFileBase = transModelFileBase.Replace(".tsv", "Rest.tsv");
+            var alignModelRestFileBase = alignModelFileBase.Replace(".tsv", "Rest.tsv");
 
             if (contentWordsOnlySMT || contentWordsOnlyTC)
             {
                 // Build content only words for TC alignment
-                (translationModel, alignmentModel) = BuildModelTools.BuildOrReuseModels(reuseSmtModelFiles, true, useNoPuncModel, useLemmaCatModel, useNormalizedTransModelProbabilities, useNormalizedAlignModelProbabilities,
+                (var transModelBuilt, var transModelBuiltFile,
+                    var alignModelBuilt, var alignModelBuiltFile) = BuildModelTools.BuildOrReuseModels(
+                                                reuseSmtModelFiles, true, useNoPuncModel, useLemmaCatModel, useNormalizedTransModelProbabilities, useNormalizedAlignModelProbabilities,
                                                 sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetLemmaIdFile,
                                                 runSpec, transModelFile, alignModelFile, clearService);
+
+                transModel = transModelBuilt;
+                alignModel = alignModelBuilt;
+
+                File.Delete(transModelFile);
+                File.Copy(transModelBuiltFile, transModelFileBase);
+                File.Delete(alignModelFile);
+                File.Copy(alignModelBuiltFile, alignModelFileBase);
 
                 // SMT take priority over TC. Probably should not use two booleans but a enum.
                 if (contentWordsOnlySMT)
                 {
                     // use same model as TC for aligning the rest
-                    translationModelRest = translationModel;
-                    alignmentModelRest = alignmentModel;
-                    alignmentModelPre = alignmentModelRest;
+                    transModelRest = transModel;
+                    alignModelRest = alignModel;
+                    alignModelPre = alignModelRest;
+
+                    File.Delete(transModelRestFileBase);
+                    File.Delete(alignModelRestFileBase);
                 }
             }
 
@@ -776,16 +790,36 @@ namespace Clear3
             if (!contentWordsOnlySMT)
             {
                 // Build all words for aligning the rest
-                (translationModelRest, alignmentModelRest) = BuildModelTools.BuildOrReuseModels(reuseSmtModelFiles, false, useNoPuncModel, useLemmaCatModel, useNormalizedTransModelProbabilities, useNormalizedAlignModelProbabilities,
-                                                        sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetLemmaIdFile,
-                                                        runSpec, transModelFile, alignModelFile, clearService);
+                (var transModelRestBuilt, var transModelRestBuiltFile,
+                    var alignModelRestBuilt, var alignModelRestBuiltFile) = BuildModelTools.BuildOrReuseModels(
+                                                    reuseSmtModelFiles, false, useNoPuncModel, useLemmaCatModel, useNormalizedTransModelProbabilities, useNormalizedAlignModelProbabilities,
+                                                    sourceTextFile, sourceLemmaFile, sourceIdFile, targetTextFile, targetLemmaFile, targetLemmaIdFile,
+                                                    runSpec, transModelFile, alignModelFile, clearService);
 
-                alignmentModelPre = alignmentModelRest;
+                transModelRest = transModelRestBuilt;
+                alignModelRest = alignModelRestBuilt;
+
+                alignModelPre = alignModelRest;
 
                 if (!contentWordsOnlyTC)
                 {
-                    translationModel = translationModelRest;
-                    alignmentModel = alignmentModelRest;
+                    transModel = transModelRest;
+                    alignModel = alignModelRest;
+
+                    File.Delete(transModelFileBase);
+                    File.Copy(transModelRestBuiltFile, transModelFileBase);
+                    File.Delete(alignModelFileBase);
+                    File.Copy(alignModelRestBuiltFile, alignModelFileBase);
+
+                    File.Delete(transModelRestFileBase);
+                    File.Delete(alignModelRestFileBase);
+                }
+                else
+                {
+                    File.Delete(transModelRestFileBase);
+                    File.Copy(transModelRestBuiltFile, transModelRestFileBase);
+                    File.Delete(alignModelRestFileBase);
+                    File.Copy(alignModelRestBuiltFile, alignModelRestFileBase);
                 }
             }
 
@@ -828,12 +862,12 @@ namespace Clear3
 
             IAutoAlignAssumptions assumptions =
                 clearService.AutoAlignmentService.MakeStandardAssumptions(
-                    translationModelRest,
-                    translationModel,
+                    transModelRest,
+                    transModel,
                     useLemmaCatModel,
                     manTransModel,
-                    alignmentModel,
-                    alignmentModelPre,
+                    alignModel,
+                    alignModelPre,
                     useAlignModel,
                     puncs,
                     stopWords,
@@ -1038,11 +1072,12 @@ namespace Clear3
 
         // Variables that are different in Clear2
 
-        private static TranslationModel translationModel; // translation model
-        private static TranslationModel translationModelRest; // translation model for all words
+        private static TranslationModel transModel; // translation model
+        private static TranslationModel transModelRest; // translation model for all words
         private static TranslationModel manTransModel; // the translation model created from manually checked alignments
-        private static AlignmentModel alignmentModel; // alignment model
-        private static AlignmentModel alignmentModelPre; // alignment model
+        private static AlignmentModel alignModel; // alignment model
+        private static AlignmentModel alignModelPre; // alignment model
+
         private static SimpleVersification simpleVersification;
         private static GroupTranslationsTable groups; // one-to-many, many-to-one, and many-to-many mappings
 
@@ -1130,15 +1165,19 @@ namespace Clear3
         private static string modelsFolder;
         private static string lexiconFoldername;
         private static string lexiconFolder;
+        private static string alignmentsFoldername;
+        private static string alignmentsFolder;
 
         private static string transModelFilename; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
         private static string transModelFile; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
+        private static string transModelFileBase; // the file that contains the translation model; to be loaded into the transModel Hashtable when the system starts
 
         private static string manTransModelFilename; // the file that contains the translation model created from manually checked alignments
         private static string manTransModelFile; // the file that contains the translation model created from manually checked alignments
 
         private static string alignModelFilename; // the file that contains the alignment model;
         private static string alignModelFile; // the file that contains the alignment model;
+        private static string alignModelFileBase; // the file that contains the alignment model;
 
         private static string glossFilename; // 2020.07.11 CL: The file where the source glosses are kept.
         private static string glossFile; // 2020.07.11 CL: The file where the source glosses are kept.

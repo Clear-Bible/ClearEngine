@@ -8,7 +8,7 @@ namespace Clear3
     public class BuildModelTools
     {
         //
-        public static (TranslationModel, AlignmentModel) BuildOrReuseModels(
+        public static (TranslationModel, string, AlignmentModel, string) BuildOrReuseModels(
             bool reuseSmtModelFiles,
             bool useContentWordsOnly,
             bool useNoPuncModel,
@@ -32,7 +32,7 @@ namespace Clear3
                 modelType = string.Format("(Content Words Only, {0})", runSpec);
             }
 
-            (var transModel, var alignModel) = BuildOrReuseBaseModels(
+            (var transModel, var transModelBuiltFile, var alignModel, var alignModelBuiltFile) = BuildOrReuseBaseModels(
                 reuseSmtModelFiles,
                 useContentWordsOnly,
                 useNoPuncModel,
@@ -56,18 +56,20 @@ namespace Clear3
             if (useNormalizedTransModelProbabilities)
             {
                 transModel = BuildOrReuseNormalizedModel(transModel, reuseSmtModelFiles, modelType, smtTransModelFileNorm);
+                transModelBuiltFile = smtTransModelFileNorm;
             }
 
             if (useNormalizedAlignModelProbabilities)
             {
                 alignModel = BuildOrReuseNormalizedModel(alignModel, reuseSmtModelFiles, modelType, smtAlignModelFileNorm);
+                alignModelBuiltFile = smtAlignModelFileNorm;
             }
 
-            return (transModel, alignModel);
+            return (transModel, transModelBuiltFile, alignModel, alignModelBuiltFile);
         }
 
         //
-        private static (TranslationModel, AlignmentModel) BuildOrReuseBaseModels(
+        private static (TranslationModel, string, AlignmentModel, string) BuildOrReuseBaseModels(
             bool reuseSmtModelFiles,
             bool useContentWordsOnly, 
             bool useNoPuncModel,
@@ -109,10 +111,10 @@ namespace Clear3
                 ShowTime();
             }
 
-            var translationModel = Persistence.ImportTranslationModel(smtTransModelFile);
-            var alignmentModel = Persistence.ImportAlignmentModel(smtAlignModelFile);
+            var transModel = Persistence.ImportTranslationModel(smtTransModelFile);
+            var alignModel = Persistence.ImportAlignmentModel(smtAlignModelFile);
 
-            return (translationModel, alignmentModel);
+            return (transModel, smtTransModelFile, alignModel, smtAlignModelFile);
         }
 
         //

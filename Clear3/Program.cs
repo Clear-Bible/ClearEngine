@@ -13,7 +13,7 @@ namespace Clear3
         BuildModels, // Build Translation Model with these files and specs
         AutoAlign,
         IncrementalUpdate, // Update manTransModel, translationModel (TM), groups, and goodLinks with alignments.json
-        GlobalUpdate, // Rebuild the model with these 3 files:
+        GlobalUpdate, // Build manTransModel, translationModel (TM), groups, and goodLinks with checkedAlignments.json 
         AlignG2TviaM2G, // Align to the gateway translation，using (1) target translation, (2) alignment between manuscript and gateway
         AlignM2TviaM2G, // Create manuscript-to-target alignment through gateway-to-target alignment
         ProcessAll, // Process from Copy the initial files (empty) to Create manTransModel and TM
@@ -35,7 +35,7 @@ namespace Clear3
         SetSmtModel,
         SetSmtIterations,
         SetSmtEpsilon,
-        SetSmtHeuristic,       
+        SetSmtHeuristic,
 
         SetContentWordsOnlySMT,
         SetContentWordsOnlyTC,
@@ -205,16 +205,6 @@ namespace Clear3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} is an unsupported model", optionStr, param));
                     }
                     break;
-                case Options.SetSmtIterations:
-                    if (int.TryParse(param, out int iterations))
-                    {
-                        good = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be an integer", optionStr, param));
-                    }
-                    break;
                 case Options.SetSmtEpsilon:
                     if (double.TryParse(param, out double epsilon))
                     {
@@ -225,7 +215,16 @@ namespace Clear3
                         Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be a number", optionStr, param));
                     }
                     break;
-
+                case Options.SetSmtIterations:
+                    if (int.TryParse(param, out int iterations))
+                    {
+                        good = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine(string.Format("Error: Option {0} parameter {1} should be an integer", optionStr, param));
+                    }
+                    break;
                 case Options.SetSmtHeuristic:
                     if ((param == "Intersection") || (param == "Union") || (param == "Grow") || (param == "GrowDiag") || (param == "GrowDiagFinal") || (param == "GrowDiagFinalAnd") || (param == "Och"))
                     {
@@ -596,7 +595,7 @@ namespace Clear3
                 { "-i", Options.SetSmtIterations }, { "--iterations", Options.SetSmtIterations },
                 { "-e", Options.SetSmtEpsilon }, { "--epsilon", Options.SetSmtEpsilon },
                 { "-h", Options.SetSmtHeuristic }, { "--hueristic", Options.SetSmtHeuristic },
-                
+
                 { "-smt", Options.SetContentWordsOnlySMT }, { "--smt-content-words-only", Options.SetContentWordsOnlySMT },
                 { "-tc", Options.SetContentWordsOnlyTC }, { "--tc-content-words-only", Options.SetContentWordsOnlyTC },
 
