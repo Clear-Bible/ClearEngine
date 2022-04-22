@@ -1,4 +1,5 @@
-﻿using ClearBible.Engine.Tokenization;
+﻿using ClearBible.Engine.Exceptions;
+using ClearBible.Engine.Tokenization;
 using System.Xml.Linq;
 
 using static ClearBible.Engine.Corpora.IManuscriptText;
@@ -44,7 +45,7 @@ namespace ClearBible.Engine.Corpora
         /// <param name="bookAbbreviation"></param>
         /// <param name="includeText"></param>
         /// <returns></returns>
-        /// <exception cref="InvalidDataException"></exception>
+        /// <exception cref="InvalidTreeEngineException"></exception>
         public IEnumerable<(string chapter, string verse, IEnumerable<ManuscriptToken> manuscriptTokens, bool isSentenceStart)> GetTokensTextRowInfos(string bookAbbreviation)
         {
             return GetBookChapters(bookAbbreviation)
@@ -56,13 +57,21 @@ namespace ClearBible.Engine.Corpora
                                 .Where(node => node.FirstNode is XText)
                                 .First()
                                 ?.Chapter()
-                                ?? throw new InvalidDataException($"Syntax tree for book {bookAbbreviation} chapter {c} doesn't have a first textNode"),
+                                ?? throw new InvalidTreeEngineException($"Doesn't have a first textNode", new Dictionary<string, string> 
+                                {
+                                    {"bookAbbreviation", bookAbbreviation },
+                                    {"chapter", c.ToString()}
+                                }),
                             verse: verse
                                 .Descendants()
                                 .Where(node => node.FirstNode is XText)
                                 .First()
                                 ?.Verse()
-                                ?? throw new InvalidDataException($"Syntax tree {bookAbbreviation} chapter {c} doesn't have a first textNode"),
+                                ?? throw new InvalidTreeEngineException($"Doesn't have a first textNode", new Dictionary<string, string>
+                                {
+                                    {"bookAbbreviation", bookAbbreviation },
+                                    {"chapter", c.ToString()}
+                                }),
                             /*FIXME: remove? text: string.Join(
                                     " ",
                                     verse
@@ -144,7 +153,7 @@ namespace ClearBible.Engine.Corpora
         /// <param name="chapterNumber"></param>
         /// <param name="verseNumbers"></param>
         /// <returns></returns>
-        /// <exception cref="InvalidDataException"></exception>
+        /// <exception cref="InvalidTreeEngineException"></exception>
         public XElement? GetVersesXElementsCombined(string book, int chapterNumber, IEnumerable<int> verseNumbers)
         {
             List<XElement> verseXElements = new List<XElement>();
@@ -168,7 +177,12 @@ namespace ClearBible.Engine.Corpora
 
                 if (verseXElement == null)
                 {
-                    throw new InvalidDataException($"Manuscript book {book} chapterNumber {chapterNumber} verse {verseNumber} not found in syntax trees");
+                    throw new InvalidTreeEngineException($"Not found", new Dictionary<string, string>
+                        {
+                            {"book", book },
+                            {"chapterNumber", chapterNumber.ToString()},
+                            {"verseNumber", verseNumber.ToString()}
+                        });
                 }
                 else
                 {
@@ -203,6 +217,8 @@ namespace ClearBible.Engine.Corpora
         /// </summary>
         /// <param name="bookAbbreviation">SIL book abbreviation</param>
         /// <returns></returns>
+        /// <exception cref="InvalidTreeEngineException"></exception>
+        /// <exception cref="InvalidBookMappingEngineException"></exception>
         protected IEnumerable<int> GetBookChapters(string bookAbbreviation)
         {
             if (!_bookChapters.ContainsKey(bookAbbreviation))
@@ -214,7 +230,7 @@ namespace ClearBible.Engine.Corpora
 
                 if (clearBookAbbreviation == null)
                 {
-                    throw new InvalidDataException($"_getBookXElement({bookAbbreviation}) has no mapped clear tree book abbreviation.");
+                    throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookAbbrev", value: bookAbbreviation);
                 }
 
                 _bookChapters.Add(bookAbbreviation, Directory.EnumerateFiles(_manuscriptTreesPath, $"{clearBookAbbreviation}???.trees.xml")
@@ -224,7 +240,11 @@ namespace ClearBible.Engine.Corpora
                         var success = int.TryParse(fileName.Substring(fileName.Length - 13, 3), out chapterNumber);
                         if (!success)
                         {
-                            throw new InvalidDataException($"_getBookXElement({bookAbbreviation}) found tree file whose filename couldn't be parsed for a chapter number {fileName}.");
+                            throw new InvalidTreeEngineException($"Filename couldn't be parsed for chapter number", new Dictionary<string, string>
+                                {
+                                    {"bookAbbreviation", bookAbbreviation },
+                                    {"fileName", fileName}
+                                });
                         }
                         return chapterNumber;
                     }).ToList());
@@ -249,8 +269,8 @@ namespace ClearBible.Engine.Corpora
         /// <param name="bookAbbreviation">SIL book abbreviation</param>
         /// <param name="chapterNumber"></param>
         /// <returns></returns>
-        /// <exception cref="InvalidDataException"></exception>
-        /// <exception cref="FileLoadException"></exception>
+        /// <exception cref="InvalidTreeEngineException"></exception>
+        /// <exception cref="InvalidBookMappingEngineException"></exception>
         private IEnumerable<XElement> _getVerseXElementsForChapter(string bookAbbreviation, int chapterNumber)
         {
             if (!_loadedChapters.ContainsKey((bookAbbreviation, chapterNumber)))
@@ -262,7 +282,7 @@ namespace ClearBible.Engine.Corpora
 
                 if (codes.Count() != 1)
                 {
-                    throw new InvalidDataException("Book not found in ManuscriptFileBookToSILBookPrefixes mapping");
+                    throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookAbbrev", value: bookAbbreviation);
                 }
 
                 var path = Path.GetFullPath(_manuscriptTreesPath);
@@ -270,7 +290,12 @@ namespace ClearBible.Engine.Corpora
 
                 if (!File.Exists(fileName))
                 {
-                    throw new FileLoadException($"{fileName} doesn't exist.");
+                    throw new InvalidTreeEngineException($"File doesn't Exist.", new Dictionary<string, string>
+                        {
+                            {"fileName", fileName },
+                            {"bookAbbreviation", bookAbbreviation },
+                            {"chapterNumber", chapterNumber.ToString() }
+                        });
                 }
                 IEnumerable<XElement> verseXElements = XElement.Load(fileName)
                     .Descendants("Sentence")
@@ -294,7 +319,10 @@ namespace ClearBible.Engine.Corpora
                 .Sum();
 
             string newNodeId =
-                (subTrees[0].Attribute("nodeId")?.Value.Substring(0, 11) ?? throw new InvalidDataException("Node doesn't have nodeId attribute")) +
+                (subTrees[0].Attribute("nodeId")?.Value.Substring(0, 11) ?? throw new InvalidTreeEngineException($"Node doesn't have attribute.", new Dictionary<string, string>
+                        {
+                            {"attribute", "nodeId" }
+                        })) +
                 $"{totalLength:D3}" +
                 "0";
 

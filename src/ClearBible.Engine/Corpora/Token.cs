@@ -1,4 +1,5 @@
-﻿using static ClearBible.Engine.Persistence.FileGetBookIds;
+﻿using ClearBible.Engine.Exceptions;
+using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -30,7 +31,7 @@ namespace ClearBible.Engine.Corpora
             : this(int.Parse(BookIds
                   .Where(b => b.silCannonBookAbbrev.Equals(bookAbbreviation))
                   .Select(b => b.silCannonBookNum)
-                  .FirstOrDefault() ?? throw new InvalidDataException($"TokenId ctor bookAbbreviation parameter cannot be mapped to a sil book number")), 
+                  .FirstOrDefault() ?? throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookAbbrev", value: bookAbbreviation)), 
                   chapterNumber, 
                   verseNumber, 
                   wordNumber, 
@@ -47,7 +48,12 @@ namespace ClearBible.Engine.Corpora
             }
             catch (ArgumentOutOfRangeException)
             {
-                throw new InvalidDataException($"TokenString {tokenString} can't extract substring at position {start} count {count}.");
+                throw new InvalidDataEngineException(message: $"substring out of bounds", new Dictionary<string, string>
+                {
+                    {"string", tokenString },
+                    {"position", start.ToString() },
+                    {"count", count.ToString() }
+                });
             }
 
             if (int.TryParse(substring, out int result))
@@ -56,7 +62,12 @@ namespace ClearBible.Engine.Corpora
             }
             else
             {
-                throw new InvalidDataException($"TokenString {tokenString} can't parse int at position {start} count {count}.");
+                throw new InvalidDataEngineException(message:$"Can't parse string to int", new Dictionary<string, string>
+                {
+                    {"tokenString", tokenString },
+                    {"position", start.ToString() },
+                    {"count", count.ToString() }
+                });
             }
         }
         public TokenId(string tokenIdString)

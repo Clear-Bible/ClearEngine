@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ClearBible.Engine.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +21,11 @@ namespace ClearBible.Engine.Corpora
             }
             else if (morphId.Length != 12)
             {
-                throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} doesn't have a morphId attribute or it isn't length 11 or 12.");
+                throw new InvalidTreeEngineException($"doesn't have attribute or it isn't length 11 or 12.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "morphId" }
+                        });
             }
             return morphId;
         }
@@ -34,7 +39,12 @@ namespace ClearBible.Engine.Corpora
             string subString = GetMorphId(textNode).Substring(0, 2);
             return BookIds
                 .Where(bookId => bookId.clearTreeBookNum.Equals(subString.Trim()))
-                .FirstOrDefault()?.silCannonBookAbbrev ?? throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} morphId attribute 'morphId' position 0 length 2 isn't convertable into a SIL book abbreviation");
+                .FirstOrDefault()?.silCannonBookAbbrev ?? throw new InvalidTreeEngineException($"position 0 length 2 isn't parsable into a SIL book number integer.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute missing>"},
+                            {"attribute", "morphId" },
+                            {"subString(0,2)", subString }
+                        });
         }
         /// <summary>
         /// SIL Book Number
@@ -44,14 +54,23 @@ namespace ClearBible.Engine.Corpora
         public static int BookNum(this XElement textNode)
         {
             string subString = GetMorphId(textNode).Substring(0, 2);
-            string bookNumberString =  BookIds
+            string bookNumberString = BookIds
                 .Where(bookId => bookId.clearTreeBookNum.Equals(subString.Trim()))
-                .FirstOrDefault()?.silCannonBookNum ?? throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} morphId attribute 'morphId' position 0 length 2 isn't convertable into a SIL book number");
+                .FirstOrDefault()?.silCannonBookNum ?? throw new InvalidTreeEngineException($"position 0 length 2 isn't parsable into a SIL book number integer.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute missing>"},
+                            {"attribute", "morphId" },
+                            {"subString(0,2)", subString }
+                        });
 
             bool succeeded = int.TryParse(bookNumberString, out int num);
             if (!succeeded)
             {
-                throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} morphId attribute 'morphId' position 0 length 2 isn't parsable into a SIL book number integer");
+                throw new InvalidTreeEngineException($"position 0 length 2 isn't parsable into a SIL book number integer.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute missing>"},
+                            {"attribute", "morphId" }
+                        });
             }
             else
             {
@@ -68,7 +87,11 @@ namespace ClearBible.Engine.Corpora
             bool succeeded = int.TryParse(GetMorphId(textNode).Substring(2, 3), out int num);
             if (!succeeded)
             {
-                throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} morphId attribute 'morphId' position 2 length 3 isn't parsable into an int");
+                throw new InvalidTreeEngineException($"position 2 length 3 isn't parsable into an int.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "morphId" }
+                        });
             }
             else
             {
@@ -85,7 +108,11 @@ namespace ClearBible.Engine.Corpora
             bool succeeded = int.TryParse(GetMorphId(textNode).Substring(5, 3), out int num);
             if (!succeeded)
             {
-                throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} morphId attribute 'morphId' position 5 length 3 isn't parsable into an int");
+                throw new InvalidTreeEngineException($"position 5 length 3 isn't parsable into an int.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "morphId" }
+                        });
             }
             else
             {
@@ -102,7 +129,11 @@ namespace ClearBible.Engine.Corpora
             bool succeeded = int.TryParse(GetMorphId(textNode).Substring(8, 3), out int num);
             if (!succeeded)
             {
-                throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} morphId attribute 'morphId' position 8 length 3 isn't parsable into an int");
+                throw new InvalidTreeEngineException($"position 8 length 3 isn't parsable into an int.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "morphId" }
+                        });
             }
             else
             {
@@ -119,7 +150,11 @@ namespace ClearBible.Engine.Corpora
             bool succeeded = int.TryParse(GetMorphId(textNode).Substring(11, 1), out int num);
             if (!succeeded)
             {
-                throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} morphId attribute 'morphId' position 11 length 1 isn't parsable into an int");
+                throw new InvalidTreeEngineException($"position 11 length 1 isn't parsable into an int.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "morphId" }
+                        });
             }
             else
             {
@@ -133,16 +168,33 @@ namespace ClearBible.Engine.Corpora
         }
 
         public static string Lemma(this XElement textNode) =>
-            textNode.Attribute("UnicodeLemma")?.Value ?? throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} doesn't have a UnicodeLemma attribute.");
-
+            textNode.Attribute("UnicodeLemma")?.Value ?? throw new InvalidTreeEngineException($"textNode missing attribute.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "UnicodeLemma" }
+                        });
         public static string Surface(this XElement textNode) =>
-            textNode.Attribute("Unicode")?.Value ?? throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} doesn't have a Unicode attribute.");
-
+            textNode.Attribute("Unicode")?.Value ?? throw new InvalidTreeEngineException($"textNode missing attribute.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "Unicode" }
+                        });
         public static string Strong(this XElement textNode) =>
-            (textNode.Attribute("Language")?.Value ?? throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} doesn't have a Language attribute.")) +
-            (textNode.Attribute("StrongNumberX")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have a StrongNumberX attribute."));
-
+            (textNode.Attribute("Language")?.Value ?? throw new InvalidTreeEngineException($"textNode missing attribute.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "Language" }
+                        })) +
+            (textNode.Attribute("StrongNumberX")?.Value ?? throw new InvalidTreeEngineException($"textNode missing attribute.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "StrongNumberX" }
+                        }));
         public static string Category(this XElement textNode) =>
-            textNode.Attribute("Cat")?.Value ?? throw new InvalidDataException($"textNode node id {textNode.Attribute("nodeId")} doesn't have a Cat attribute.");
+            textNode.Attribute("Cat")?.Value ?? throw new InvalidTreeEngineException($"textNode missing attribute.", new Dictionary<string, string>
+                        {
+                            {"nodeId", textNode.Attribute("nodeId")?.Value ?? "<nodeId attribute also missing>"},
+                            {"attribute", "Cat" }
+                        });
     }
 }

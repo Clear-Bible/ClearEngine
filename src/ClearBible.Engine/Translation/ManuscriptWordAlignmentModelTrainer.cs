@@ -17,7 +17,6 @@ namespace ClearBible.Engine.Translation
         /// </summary>
         /// <param name="trainableAligner"></param>
         /// <param name="engineParallelTextRows"></param>
-        /// <exception cref="ManuscriptWordAlignmentException"></exception>
         public ManuscriptWordAlignmentModelTrainer(
             IManuscriptTrainableWordAligner trainableAligner,
             IEnumerable<EngineParallelTextRow> engineParallelTextRows

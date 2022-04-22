@@ -1,4 +1,5 @@
 ﻿using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.Tokenization;
 using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
@@ -20,7 +21,7 @@ namespace ClearBible.Engine.Dashboard.Corpora
         /// Engine versification (retrieved from EngineVerseMappingList property),
         /// or with values to use as versification.
         /// </param>
-        /// <exception cref="InvalidDataException"></exception>
+        /// <exception cref="InvalidDataEngineException"></exception>
         public static void ManuscriptParatextParallelCorporaToDb<T>(
             string syntaxTreesPath, 
             string targetParatextTextCorpusPath,
@@ -49,12 +50,12 @@ namespace ClearBible.Engine.Dashboard.Corpora
                 // tokenId.ToString() -> $"{BookNum.ToString("000")}{ChapterNum.ToString("000")}{VerseNum.ToString("000")}{WordNum.ToString("000")}{SubWordNum.ToString("000")}"
                 //source
                 var sourceTokenIds = string.Join(" ", textRow.SourceTokens?
-                    .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataException());
+                    .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataEngineException("is empty", name: "SourceTokens"));
                 Console.WriteLine($"SourceTokenIds: {sourceTokenIds}");
                 
                 //target
                 var targetTokenIds = string.Join(" ", textRow.TargetTokens?
-                    .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataException());
+                    .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataEngineException("is empty", name: "TargetTokens"));
                 Console.WriteLine($"TargetTokenIds: {targetTokenIds}");
             }
         }
@@ -72,7 +73,7 @@ namespace ClearBible.Engine.Dashboard.Corpora
         /// Engine versification (retrieved from EngineVerseMappingList property),
         /// or with values to use as versification.
         /// </param>
-        /// <exception cref="InvalidDataException"></exception>
+        /// <exception cref="InvalidDataEngineException"></exception>
         public static void ParatextParatextParallelCorporaToDb<TSourceStringTokenizer,TTargetStringTokenizer>(
             string sourceParatextTextCorpusPath,
             string targetParatextTextCorpusPath,
@@ -107,12 +108,12 @@ namespace ClearBible.Engine.Dashboard.Corpora
                     .SelectMany(g => g.Select(t => t.TokenId.VerseNum));
                 */
                 var sourceTokenIds = string.Join(" ", textRow.SourceTokens?
-                    .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataException());
+                    .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataEngineException("is empty", name: "SourceTokens"));
                 Console.WriteLine($"SourceTokenIds: {sourceTokenIds}");
                 
                 //var targetVerseText = string.Join(" ", textRow.TargetSegment);
                 var targetTokenIds = string.Join(" ", textRow.TargetTokens?
-                    .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataException());
+                    .Select(token => token.TokenId.ToString()) ?? throw new InvalidDataEngineException("is empty", name: "TargetTokens"));
                 Console.WriteLine($"TargetTokenIds: {targetTokenIds}");
             }
         }

@@ -1,4 +1,5 @@
 ﻿using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Exceptions;
 using SIL.Machine.Corpora;
 using SIL.Machine.Translation;
 
@@ -72,7 +73,7 @@ namespace ClearBible.Engine.Translation
         /// <param name="targetPreprocessor"></param>
         /// <param name="maxCorpusCount"></param>
         /// <returns></returns>
-        /// <exception cref="InvalidCastException"></exception>
+        /// <exception cref="InvalidConfigurationEngineException"></exception>
         public ITrainer CreateTrainer(IEnumerable<ParallelTextRow> parallelTextRows)
         {
 
@@ -85,7 +86,7 @@ namespace ClearBible.Engine.Translation
             }
             catch (InvalidCastException)
             {
-                throw new InvalidDataException("Trainer requires an IEnumerable<EngineParallelTextRow>, usually implemented from EngineParallelTextCorpus");
+                throw new InvalidConfigurationEngineException(message:"Trainer requires an IEnumerable<EngineParallelTextRow>, usually implemented from EngineParallelTextCorpus");
             }
         }
         public SIL.ObjectModel.IReadOnlySet<int> SpecialSymbolIndices =>

@@ -9,17 +9,18 @@ using ClearBible.Engine.TreeAligner.Legacy;
 using ClearBible.Engine.TreeAligner.Translation;
 using ClearBible.Engine.Translation;
 using static ClearBible.Engine.Persistence.FileGetBookIds;
+using ClearBible.Engine.Exceptions;
 
 namespace ClearBible.Engine.TreeAligner.Adapter
 {
 
     internal class ZoneAlignmentAdapter
     {
-        internal static TranslationModel ToTranslationModel(Dictionary<string, Dictionary<string, double>>? transMod)
+        private static TranslationModel ToTranslationModel(Dictionary<string, Dictionary<string, double>>? transMod)
         {
             if (transMod == null)
             {
-                throw new InvalidDataException("translation model assumption is null");
+                throw new InvalidDataEngineException(message: "translation model assumption is null");
             }
             return new TranslationModel(transMod
                 .Select(kv => KeyValuePair.Create(new SourceLemma(kv.Key), kv.Value
@@ -29,11 +30,11 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 .ToDictionary(x => x.Key, x => x.Value)
             );
         }
-        internal static AlignmentModel ToAlignmentModel(List<IReadOnlyCollection<TokensAlignedWordPair>>? alignMod)
+        private static AlignmentModel ToAlignmentModel(List<IReadOnlyCollection<TokensAlignedWordPair>>? alignMod)
         {    
             if (alignMod == null)
             {
-                throw new InvalidDataException("alignment model assumption is null");
+                throw new InvalidDataEngineException(message: "alignment model assumption is null");
             }
 
             //{book:D2}{chapter:D3}{verse:D3}{word:D3}{subsegment:D1}
@@ -41,8 +42,8 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 .SelectMany(c => c
                     .Select(p => KeyValuePair.Create(
                         new BareLink(
-                            p.SourceToken?.TokenId.ToSourceId() ?? throw new InvalidDataException("Can't create AlignmentModel: sourceToken is null"),
-                            p.TargetToken?.TokenId.ToTargetId() ?? throw new InvalidDataException("Can't create AlignmentModel: targetToken is null")),
+                            p.SourceToken?.TokenId.ToSourceId() ?? throw new InvalidDataEngineException(message: "Can't create AlignmentModel: sourceToken is null"),
+                            p.TargetToken?.TokenId.ToTargetId() ?? throw new InvalidDataEngineException(message: "Can't create AlignmentModel: targetToken is null")),
                         new Score(p.AlignmentScore)))
                      )
                      .ToDictionary(x => x.Key, x => x.Value)
@@ -58,7 +59,7 @@ namespace ClearBible.Engine.TreeAligner.Adapter
         {
             int smtTcIndex = 0;
             if (smtModels.Count > 2)
-                throw new InvalidDataException("more than two smt's provided to AlignZone");
+                throw new InvalidConfigurationEngineException(message: "more than two smt's provided to AlignZone");
             if (smtModels.Count == 2)
                 smtTcIndex = indexPrimarySmtModel == 0 ? 1 : 0;
             if (smtModels.Count == 1)
@@ -93,7 +94,7 @@ namespace ClearBible.Engine.TreeAligner.Adapter
             }
             catch (InvalidCastException)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes refs that are not VerseRefs");
+                throw new InvalidTypeEngineException(message: $"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes refs that are not VerseRefs");
             }
 
             var books = parallelTextRow.SourceRefs
@@ -101,11 +102,11 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 .Distinct();
             if (books.Count() > 1)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref to more than one book");
+                throw new InvalidDataEngineException(message: $"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref to more than one book");
             }
             if (books.Count() == 0)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref without a book");
+                throw new InvalidDataEngineException(message: $"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref without a book");
             }
 
             var chapterNumbers = parallelTextRow.SourceRefs
@@ -113,11 +114,11 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 .Distinct();
             if (chapterNumbers.Count() > 1)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref to more than one chapterNum");
+                throw new InvalidDataEngineException(message: $"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref to more than one chapterNum");
             }
             if (chapterNumbers.Count() == 0)
             {
-                throw new InvalidDataException($"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref without a chapterNum");
+                throw new InvalidDataEngineException(message: $"TreeAligner.Adapters.AlignZone received a ParallelTextRow with a source segment that includes ref without a chapterNum");
             }
 
             var verseNumbers = parallelTextRow.SourceRefs
@@ -128,13 +129,17 @@ namespace ClearBible.Engine.TreeAligner.Adapter
 
             if (versesXElementCombined == null)
             {
-                throw new InvalidDataException(@$"TreeAligner.Adapters.AlignZone got a versesXElementCombined that is null for 
-                    book {books.First()} chapter {chapterNumbers.First()} verses {string.Join(" ", verseNumbers)}");
+                throw new InvalidTreeEngineException($"versesXElementCombined is null", new Dictionary<string, string>
+                    {
+                        {"book", books.First() },
+                        {"chapter", chapterNumbers.First().ToString()},
+                        {"verses", string.Join(" ", verseNumbers)}
+                    });
             }
 
             if (parallelTextRow is not EngineParallelTextRow)
             {
-                throw new InvalidDataException("ParallelTextRow supplied is not a EngineParallelTextRow, which is required for extracting target points.");
+                throw new InvalidConfigurationEngineException(message: "ParallelTextRow supplied is not a EngineParallelTextRow, which is required for extracting target points.");
             }
 
             //FIXME: CHECK THIS!
@@ -142,7 +147,7 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 ?.Select(t => new Target(new TargetText(t.Text), new TargetLemma(t.Text), t.TokenId.ToTargetId())) ?? null;
             if (targets == null)
             {
-                throw new InvalidDataException("ParallelTextRow targets must be transformed to a TargetTextRow (.Transform(textRow => new TokensTextRow(textRow))) ");
+                throw new InvalidConfigurationEngineException(message: "ParallelTextRow targets must be transformed to a TargetTextRow (.Transform(textRow => new TokensTextRow(textRow))) ");
             }
 
             List<MonoLink> monoLinks = ZoneAlignment.GetMonoLinks(

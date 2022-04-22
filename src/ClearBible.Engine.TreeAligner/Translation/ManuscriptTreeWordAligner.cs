@@ -29,7 +29,9 @@ namespace ClearBible.Engine.TreeAligner.Translation
 		/// <param name="hyperParameters"></param>
 		/// <param name="manuscriptTree"></param>
 		/// <param name="prefFileName"></param>
-        public ManuscriptTreeWordAligner(IEnumerable<IWordAlignmentModel> smtModels, int indexPrmarySmtModel, ManuscriptTreeWordAlignerParams hyperParameters, IManuscriptTree manuscriptTree, string? prefFileName = null)
+        public ManuscriptTreeWordAligner(
+			IEnumerable<IWordAlignmentModel> smtModels, int indexPrmarySmtModel, ManuscriptTreeWordAlignerParams hyperParameters, 
+			IManuscriptTree manuscriptTree, string? prefFileName = null)
 		{
 			SmtModels = smtModels
 				.Select(m => new SmtModel(m)).ToList();

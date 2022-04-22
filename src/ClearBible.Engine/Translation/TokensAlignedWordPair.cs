@@ -1,4 +1,5 @@
 ﻿using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Exceptions;
 using SIL.Machine.Corpora;
 using System;
 using System.Collections.Generic;
@@ -12,24 +13,24 @@ namespace ClearBible.Engine.Translation
     {
         public TokensAlignedWordPair(TokenId sourceTokenId, TokenId targetTokenId, EngineParallelTextRow engineParallelTextRow)
             : base(
-                  engineParallelTextRow.SourceTokens?.Select(t => t.TokenId).ToList().IndexOf(sourceTokenId) 
-                    ?? throw new InvalidDataException("EngineParallelTextRow.SourceTokens is null"), 
-                  engineParallelTextRow.TargetTokens?.Select(t => t.TokenId).ToList().IndexOf(targetTokenId) 
-                    ?? throw new InvalidDataException("EngineParallelTextRow.TargetTokens is null"))
+                  engineParallelTextRow.SourceTokens?.Select(t => t.TokenId).ToList().IndexOf(sourceTokenId)
+                    ?? throw new InvalidConfigurationEngineException(message: "engineParallelTextRow SourceTokens must not be null. Make sure source corpus TextRows are transformed into TokensTextRows, e.g. sourceCorpus.Transform<IntoTokensTextRowProcessor>()"), 
+                  engineParallelTextRow.TargetTokens?.Select(t => t.TokenId).ToList().IndexOf(targetTokenId)
+                    ?? throw new InvalidConfigurationEngineException(message: "engineParallelTextRow TargetTokens must not be null. Make sure target corpus TextRows are transformed into TokensTextRows, e.g. targetCorpus.Transform<IntoTokensTextRowProcessor>()"))
         {
             SourceToken = engineParallelTextRow?.SourceTokens?[SourceIndex] 
-                ?? throw new InvalidDataException("engineParallelTextRow SourceTokens must not be null. Make sure source corpus TextRows are transformed into TokensTextRows, e.g. sourceCorpus.Transform<IntoTokensTextRowProcessor>()");
+                ?? throw new InvalidConfigurationEngineException(message: "engineParallelTextRow SourceTokens must not be null. Make sure source corpus TextRows are transformed into TokensTextRows, e.g. sourceCorpus.Transform<IntoTokensTextRowProcessor>()");
             TargetToken = engineParallelTextRow?.TargetTokens?[TargetIndex] 
-                ?? throw new InvalidDataException("engineParallelTextRow TargetTokens must not be null. Make sure target corpus TextRows are transformed into TokensTextRows, e.g. targetCorpus.Transform<IntoTokensTextRowProcessor>()");
+                ?? throw new InvalidConfigurationEngineException(message: "engineParallelTextRow TargetTokens must not be null. Make sure target corpus TextRows are transformed into TokensTextRows, e.g. targetCorpus.Transform<IntoTokensTextRowProcessor>()");
         }
 
         public TokensAlignedWordPair(AlignedWordPair alignedWordPair, EngineParallelTextRow engineParallelTextRow)
             : base(alignedWordPair.SourceIndex, alignedWordPair.TargetIndex)
         {
             SourceToken = engineParallelTextRow?.SourceTokens?[alignedWordPair.SourceIndex] 
-                ?? throw new InvalidDataException("engineParallelTextRow SourceTokens must not be null. Make sure source corpus TextRows are transformed into TokensTextRows, e.g. sourceCorpus.Transform<IntoTokensTextRowProcessor>()");
+                ?? throw new InvalidConfigurationEngineException(message: "engineParallelTextRow SourceTokens must not be null. Make sure source corpus TextRows are transformed into TokensTextRows, e.g. sourceCorpus.Transform<IntoTokensTextRowProcessor>()");
             TargetToken = engineParallelTextRow?.TargetTokens?[alignedWordPair.TargetIndex] 
-                ?? throw new InvalidDataException("engineParallelTextRow TargetTokens must not be null. Make sure target corpus TextRows are transformed into TokensTextRows, e.g. targetCorpus.Transform<IntoTokensTextRowProcessor>()");
+                ?? throw new InvalidConfigurationEngineException(message: "engineParallelTextRow TargetTokens must not be null. Make sure target corpus TextRows are transformed into TokensTextRows, e.g. targetCorpus.Transform<IntoTokensTextRowProcessor>()");
 
             IsSure = alignedWordPair.IsSure;
             TranslationScore = alignedWordPair.TranslationScore;

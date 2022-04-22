@@ -1,4 +1,5 @@
-﻿using SIL.Machine.Corpora;
+﻿using ClearBible.Engine.Exceptions;
+using SIL.Machine.Corpora;
 using SIL.Scripture;
 
 namespace ClearBible.Engine.Corpora
@@ -147,7 +148,7 @@ namespace ClearBible.Engine.Corpora
 			}
 		}
 
-		public IEnumerable<ParallelTextRow> GetRowsUsingEngineVerseMappingList(IEnumerable<TextRow> sourceTextRows, IEnumerable<TextRow> targetTextRows)
+		private IEnumerable<ParallelTextRow> GetRowsUsingEngineVerseMappingList(IEnumerable<TextRow> sourceTextRows, IEnumerable<TextRow> targetTextRows)
 		{
 			/*
 			IEnumerable<string> sourceTextIds = SourceCorpus.Texts.Select(t => t.Id);
@@ -173,7 +174,7 @@ namespace ClearBible.Engine.Corpora
 			//Believe it may be desirable to have ParallelTextSegments in order of EngineVerseMappingList, e.g. for Dashboard display?
 			if (EngineVerseMappingList == null)
             {
-				throw new InvalidDataException("EngineVerseMappingList must not be null to use this method");
+				throw new InvalidStateEngineException(message: "Member must not be null to use this method", name: "method", value: nameof(EngineVerseMappingList));
             }
 
 			foreach (var engineVerseMapping in EngineVerseMappingList)
