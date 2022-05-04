@@ -1,12 +1,10 @@
-﻿using ClearBible.Engine.Corpora;
+﻿using System.Xml.Linq;
+
+using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.TreeAligner.Legacy;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static ClearBible.Engine.Persistence.FileGetBookIds;
+using ClearBible.Engine.TreeAligner.Corpora;
 
 namespace ClearBible.Engine.TreeAligner.Adapter
 {
@@ -51,6 +49,47 @@ namespace ClearBible.Engine.TreeAligner.Adapter
             string silBookNumString = int.Parse(bookId.silCannonBookNum).ToString("000");
 
             return new TokenId($"{silBookNumString}{targetId.Chapter.ToString("000")}{targetId.Verse.ToString("000")}{targetId.Word.ToString("000")}001");
+        }
+
+        /// <summary>
+        /// Get the source points in manuscript order corresponding to
+        /// the leaf nodes beneath a specified syntax tree element.
+        /// </summary>
+        /// 
+        internal static IEnumerable<SourcePoint> GetSourcePoints(this XElement element)
+        {
+            IEnumerable<XElement> leafs = element.GetLeafs();
+
+            double totalSourcePoints = leafs.Count();
+
+            return
+                leafs
+                .Select((term, n) => new
+                {
+                    term,
+                    sourceID = term.SourceID(),
+                    surface = term.Surface(),
+                    treePosition = n
+                })
+                .GroupBy(x => x.surface)
+                .SelectMany(group =>
+                    group.Select((x, groupIndex) => new
+                    {
+                        x.term,
+                        x.sourceID,
+                        altID = $"{x.surface}-{groupIndex + 1}",
+                        x.treePosition
+                    }))
+                .OrderBy(x => x.sourceID.AsCanonicalString)
+                .Select((x, m) => new SourcePoint(
+                    Lemma: x.term.Lemma(),
+                    Category: x.term.Category(),
+                    Terminal: x.term,
+                    SourceID: x.term.SourceID(),
+                    AltID: x.altID,
+                    TreePosition: x.treePosition,
+                    RelativeTreePosition: x.treePosition / totalSourcePoints,
+                    SourcePosition: m));
         }
     }
 }

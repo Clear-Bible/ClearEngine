@@ -1,4 +1,5 @@
 ﻿using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.Translation;
 using ClearBible.Engine.TreeAligner.Adapter;
 
@@ -12,7 +13,7 @@ namespace ClearBible.Engine.TreeAligner.Translation
 {
 	public class ManuscriptTreeWordAligner : IManuscriptWordAligner, IManuscriptTrainableWordAligner
 	{
-        public ManuscriptTreeWordAlignerParams HyperParameters { get; set; } 
+        public ManuscriptTreeWordAlignerHyperparameters HyperParameters { get; set; } 
 
         private string? _prefFileName;
         private readonly IManuscriptTree _manuscriptTree;
@@ -30,7 +31,7 @@ namespace ClearBible.Engine.TreeAligner.Translation
 		/// <param name="manuscriptTree"></param>
 		/// <param name="prefFileName"></param>
         public ManuscriptTreeWordAligner(
-			IEnumerable<IWordAlignmentModel> smtModels, int indexPrmarySmtModel, ManuscriptTreeWordAlignerParams hyperParameters, 
+			IEnumerable<IWordAlignmentModel> smtModels, int indexPrmarySmtModel, ManuscriptTreeWordAlignerHyperparameters hyperParameters, 
 			IManuscriptTree manuscriptTree, string? prefFileName = null)
 		{
 			SmtModels = smtModels
@@ -57,7 +58,20 @@ namespace ClearBible.Engine.TreeAligner.Translation
 
 		public IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(EngineParallelTextRow engineParallelTextRow)
         {
-			IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> alignments = ZoneAlignmentAdapter.AlignZone(engineParallelTextRow, _manuscriptTree, HyperParameters, SmtModels, IndexPrimarySmtModel);
+			int smtTcIndex = 0;
+			if (SmtModels.Count > 2 || SmtModels.Count == 0)
+				throw new InvalidConfigurationEngineException(message: "must have one or two smts to AlignZone");
+			if (SmtModels.Count == 2)
+				smtTcIndex = IndexPrimarySmtModel == 0 ? 1 : 0;
+			if (SmtModels.Count == 1)
+			{
+				smtTcIndex = 0;
+			}
+			HyperParameters.TranslationModel = SmtModels[IndexPrimarySmtModel].TranslationModel;
+			HyperParameters.TranslationModelTC = SmtModels[smtTcIndex].TranslationModel;
+			HyperParameters.AlignmentProbabilities = SmtModels[smtTcIndex].AlignmentModel;
+			HyperParameters.AlignmentProbabilitiesPre = SmtModels[IndexPrimarySmtModel].AlignmentModel;
+			IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> alignments = ZoneAlignmentAdapter.AlignZone(engineParallelTextRow, _manuscriptTree, HyperParameters, IndexPrimarySmtModel);
 
 			return alignments
 				.Select(a => new TokensAlignedWordPair(a.sourceTokenId, a.targetTokenId, engineParallelTextRow) { AlignmentScore = a.score }).ToList();

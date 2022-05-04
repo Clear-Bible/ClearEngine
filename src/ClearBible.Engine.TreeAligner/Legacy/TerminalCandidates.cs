@@ -1,27 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
 using System.Xml.Linq;
+
 using ClearBible.Engine.Corpora;
-
-//-2
-//using ClearBible.Clear3.API;
-//using ClearBible.Clear3.Impl.TreeService;
-
-//+1
-using ClearBible.Engine.TreeAligner.Legacy;
+using ClearBible.Engine.TreeAligner.Corpora;
+using ClearBible.Engine.TreeAligner.Translation;
 
 namespace ClearBible.Engine.TreeAligner.Legacy
 {
-    /// <summary>
-    /// This class contains the principal static method GetTerminalCandidates(),
-    /// and other static methods that support it.
-    /// </summary>
-    /// 
-
-    //-
-    //public class TerminalCandidates
-    //+
     class TerminalCandidates
     {
         /// <summary>
@@ -45,8 +30,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         /// of this zone, expressed as a mapping from source alternate ID
         /// to target alternate ID.
         /// </param>
-        /// <param name="assumptions">
-        /// The assumptions that contrain the auto-alignment.
+        /// <param name="hyperparameters">
         /// </param>
         /// <returns>
         /// A database giving the alternatives for each terminal
@@ -60,13 +44,13 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                 Dictionary<string, string> idMap,
                 List<TargetPoint> targetPoints,
                 Dictionary<string, string> existingLinks,
-                IAutoAlignAssumptions assumptions)
+                ManuscriptTreeWordAlignerHyperparameters hyperparameters)
         {
             Dictionary<SourceID, List<Candidate>> candidateTable2 = new();
 
             // For each terminal node beneath the root node of the
             // syntax tree for this zone:
-            foreach (XElement terminalNode in treeNode.GetTerminalNodes())
+            foreach (XElement terminalNode in treeNode.GetLeafs())
             {
                 // Get data about the source point associated with
                 // this terminal node.
@@ -82,16 +66,8 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                         strong,
                         targetPoints,
                         existingLinks,
-                        assumptions);
+                        hyperparameters);
 
-                // Debugging
-                foreach (var candidate in topCandidates2)
-                {
-                    if (double.IsNaN(candidate.LogScore))
-                    {
-                        ;
-                    }
-                }
 
                 // Add the candidates found to the table of alternatives
                 // for terminals.
@@ -143,9 +119,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         /// <param name="existingLinks">
         /// Old links to be considered for this zone.
         /// </param>
-        /// <param name="assumptions">
-        /// The assumptions that constrain the tree-based auto-alignment
-        /// process.
+        /// <param name="hyperparameters">
         /// </param>
         /// <returns>
         /// A list of alternative candidate target words for the source word.
@@ -156,7 +130,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             string strong,
             List<TargetPoint> targetPoints,
             Dictionary <string, string> existingLinks,
-            IAutoAlignAssumptions assumptions)
+            ManuscriptTreeWordAlignerHyperparameters hyperparameters)
         {
             string sourceID = sourcePoint.SourceID.AsCanonicalString;
             string altID = sourcePoint.AltID;
@@ -194,7 +168,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
             // If the source point is a function word:
             //
-            if (assumptions.IsSourceFunctionWord(lemma))
+            if (hyperparameters.IsSourceFunctionWord(lemma))
             {
                 // There are no alternatives.
                 //
@@ -204,9 +178,9 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // If the Strong's database has a definition for
             // the source word:
             //
-            if (assumptions.Strongs.ContainsKey(strong))
+            if (hyperparameters.Strongs.ContainsKey(strong))
             {
-                Dictionary<string, int> wordIds = assumptions.Strongs[strong];
+                Dictionary<string, int> wordIds = hyperparameters.Strongs[strong];
 
                 // The alternatives are all of those target points in the
                 // current zone that occur as a possible meaning in the Strong's
@@ -223,7 +197,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
             // If the source point is a stop word:
             //
-            if (assumptions.IsStopWord(lemma))
+            if (hyperparameters.IsStopWord(lemma))
             {
                 // There are no alternatives.
                 //
@@ -233,7 +207,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // If the manual translation model has any definitions for
             // the source point:
             //
-            if (assumptions.TryGetManTranslations(lemma,
+            if (hyperparameters.TryGetManTranslations(lemma,
                 out TryGet<string, double> tryGetManScoreForTargetText))
             {
                 // The candidates are the possibly empty set of target words
@@ -272,7 +246,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // Need to create a lemmaKey that has lemma_cat if useLemmaCatModel and pass lemmaKey to TryGetTranslations()
 
             string lemmaKey = lemma;
-            if (assumptions.UseLemmaCatModel)
+            if (hyperparameters.UseLemmaCatModel)
             {
                 lemmaKey += "_" + category; 
             }
@@ -281,7 +255,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // If the estimated translation model has any translations
             // for the source word:
             //
-            if (assumptions.TryGetTranslations(lemmaKey,
+            if (hyperparameters.TryGetTranslations(lemmaKey,
                 out TryGet<string, double> tryGetScoreForTargetText))
             {
                 // The alternatives are the possibly empty set of target
@@ -292,11 +266,10 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                 // by the estimated alignment).
                 //
 
-                // Debugging
                 var candidates = targetPoints
-                    .Where(tp => !assumptions.IsBadLink(lemma, tp.Lemma))
-                    .Where(tp => !assumptions.IsPunctuation(tp.Lemma))
-                    .Where(tp => !assumptions.IsStopWord(tp.Lemma))
+                    .Where(tp => !hyperparameters.IsBadLink(lemma, tp.Lemma))
+                    .Where(tp => !hyperparameters.IsPunctuation(tp.Lemma))
+                    .Where(tp => !hyperparameters.IsStopWord(tp.Lemma))
                     .Select(targetPoint =>
                     {
                         bool ok = tryGetScoreForTargetText(
@@ -324,21 +297,13 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                             x.score)))
                     .ToList();
 
-                // Debugging
-                foreach (var candidate in candidates)
-                {
-                    if (double.IsNaN(candidate.LogScore))
-                    {
-                        ;
-                    }
-                }
                 return candidates;
                 /*
                 return 
                     targetPoints
-                    .Where(tp => !assumptions.IsBadLink(lemma, tp.Lemma))
-                    .Where(tp => !assumptions.IsPunctuation(tp.Lemma))
-                    .Where(tp => !assumptions.IsStopWord(tp.Lemma))
+                    .Where(tp => !legacyHyperparameters.IsBadLink(lemma, tp.Lemma))
+                    .Where(tp => !legacyHyperparameters.IsPunctuation(tp.Lemma))
+                    .Where(tp => !legacyHyperparameters.IsStopWord(tp.Lemma))
                     .Select(targetPoint =>
                     {
                         bool ok = tryGetScoreForTargetText(
@@ -379,9 +344,9 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             //
             double getAdjustedScore(double score, string targetID)
             {
-                if (assumptions.UseAlignModel)
+                if (hyperparameters.UseAlignModel)
                 {
-                    if (assumptions.TryGetAlignment(
+                    if (hyperparameters.TryGetAlignment(
                         sourceID, targetID, out double alignScore))
                     {
                         return score + ((1.0 - score) * alignScore);

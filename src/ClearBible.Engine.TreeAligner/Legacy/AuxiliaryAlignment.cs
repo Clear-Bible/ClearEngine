@@ -1,13 +1,11 @@
 ﻿using System.Xml.Linq;
+
 using ClearBible.Engine.Corpora;
+using ClearBible.Engine.TreeAligner.Translation;
+using ClearBible.Engine.TreeAligner.Corpora;
 
 namespace ClearBible.Engine.TreeAligner.Legacy
 {
-    /// <summary>
-    /// This class contains the principal static method ImproveAlignment(),
-    /// and other static methods that support it.
-    /// </summary>
-    /// 
     public class AuxiliaryAlignment
     {
         /// <summary>
@@ -20,14 +18,13 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         /// <param name="targetPoints">
         /// The target points of the zone.
         /// </param>
-        /// <param name="assumptions">
-        /// Assumptions that constrain auto-alignment.
+        /// <param name="hyperparameters">
         /// </param>
         /// 
         public static void ImproveAlignment(
             List<OpenMonoLink> links,
             List<TargetPoint> targetPoints,
-            IAutoAlignAssumptions assumptions)
+            ManuscriptTreeWordAlignerHyperparameters hyperparameters)
         {
             // Get a list of target IDs (as canonical strings) for
             // the target points that are already linked.
@@ -50,7 +47,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // For each link in the alignment where the source point
             // is unlinked:
             foreach (OpenMonoLink link in
-                links.Where(link => link.OpenTargetBond.MaybeTargetPoint.IsNothing))
+                links.Where(link => link.OpenTargetBond.MaybeTargetPoint.TargetPoint == null))
             {
                 // Try to align the unlinked source point.
                 OpenTargetBond linkedWord =
@@ -59,7 +56,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                         targetPoints,
                         linksTable,
                         linkedTargets,
-                        assumptions);
+                        hyperparameters);
 
                 // If the attempt was successful:
                 if (linkedWord != null)
@@ -91,8 +88,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         /// List of target ID (as a canonical string) for those target
         /// points that are already linked.
         /// </param>
-        /// <param name="assumptions">
-        /// Assumptions that constrain the auto alignment.
+        /// <param name="hyperparameters">
         /// </param>
         /// <returns>
         /// A new OpenTargetBond containing the target point to be
@@ -106,23 +102,23 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             List<TargetPoint> targetPoints,
             Dictionary<string, OpenMonoLink> linksTable,
             List<string> linkedTargets,
-            IAutoAlignAssumptions assumptions)
+            ManuscriptTreeWordAlignerHyperparameters hyperparameters)
         {
             // If the source point is a stop word, then give up.
-            if (assumptions.IsStopWord(sourceNode.Lemma)) return null;
+            if (hyperparameters.IsStopWord(sourceNode.Lemma)) return null;
 
             // If assuming content words only and the source point
             // is a function word, then give up.
-            if (assumptions.ContentWordsOnly &&
-                assumptions.IsSourceFunctionWord(sourceNode.Lemma))
+            if (hyperparameters.ContentWordsOnly &&
+                hyperparameters.IsSourceFunctionWord(sourceNode.Lemma))
             {
                 return null;
             }
 
             // If assuming use of the estimated alignment model and
             // some alignment for the unlinked source point can be found:
-            if (assumptions.UseAlignModel &&
-                assumptions.TryGetPreAlignment(
+            if (hyperparameters.UseAlignModel &&
+                hyperparameters.TryGetPreAlignment(
                     sourceNode.SourceID.AsCanonicalString,
                     out string targetID))
             {
@@ -137,8 +133,8 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
                 // If the source point is a stop word and the proposal
                 // has not been declared as a good link, then give up.
-                if (assumptions.IsStopWord(sourceNode.Lemma) &&
-                    !assumptions.IsGoodLink(
+                if (hyperparameters.IsStopWord(sourceNode.Lemma) &&
+                    !hyperparameters.IsGoodLink(
                         sourceNode.Lemma,
                         targetPoint.Lemma))
                 {
@@ -147,11 +143,11 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
                 // If the proposal has not been declared as a bad link
                 // and the target point is neither punctuation nor stop word:
-                if (!assumptions.IsBadLink(
+                if (!hyperparameters.IsBadLink(
                         sourceNode.Lemma,
                         targetPoint.Lemma) &&
-                    !assumptions.IsPunctuation(targetPoint.Lemma) &&
-                    !assumptions.IsStopWord(targetPoint.Lemma))
+                    !hyperparameters.IsPunctuation(targetPoint.Lemma) &&
+                    !hyperparameters.IsStopWord(targetPoint.Lemma))
                 {
                     // Find it appropriate to link to this target word
                     // with a (log) probability of 0.
@@ -194,7 +190,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                             postNeighbor,
                             targetPoints,
                             linkedTargets,
-                            assumptions);
+                            hyperparameters);
                 }
                 // Otherwise if there is (only) a neighboring link to
                 // the left:
@@ -207,7 +203,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                             preNeighbor,
                             targetPoints,
                             linkedTargets,
-                            assumptions);
+                            hyperparameters);
                 }
                 // Otherwise if there is (only) a neighboring link to
                 // the right:
@@ -220,7 +216,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                             postNeighbor,
                             targetPoints,
                             linkedTargets,
-                            assumptions);
+                            hyperparameters);
                 }
 
                 // If any target candidates were found:
@@ -232,7 +228,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                         sourceNode,
                         targetCandidates,
                         linkedTargets,
-                        assumptions);
+                        hyperparameters);
 
                     // If a best candidate was found:
                     if (newTarget != null)
@@ -262,8 +258,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         /// The source IDs (as canonical strings) for those target points
         /// that are already linked.
         /// </param>
-        /// <param name="assumptions">
-        /// Assumptions that constrain the auto alignment.
+        /// <param name="hyperparameters">
         /// </param>
         /// <returns>
         /// Candidate target points for linking to the unlinked source
@@ -274,7 +269,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             OpenMonoLink anchorLink,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
-            IAutoAlignAssumptions assumptions)
+            ManuscriptTreeWordAlignerHyperparameters hyperparameters)
         {
             // Get the anchor position as an index into the list of
             // target points.
@@ -311,7 +306,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                         positions,
                         targetPoints,
                         linkedTargets,
-                        assumptions);
+                        hyperparameters);
         }
 
 
@@ -332,8 +327,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         /// The source IDs (as canonical strings) for those target points
         /// that are already linked.
         /// </param>
-        /// <param name="assumptions">
-        /// Assumptions that constrain the auto alignment.
+        /// <param name="hyperparameters">
         /// </param>
         /// <returns>
         /// Candidate target points for linking to the unlinked source
@@ -345,7 +339,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             OpenMonoLink rightAnchor,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
-            IAutoAlignAssumptions assumptions)
+            ManuscriptTreeWordAlignerHyperparameters hyperparameters)
         {
             // Helper function that enumerates the indices of target points
             // between the left and right neighbors.
@@ -364,7 +358,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                 span(),
                 targetPoints,
                 linkedTargets,
-                assumptions).ToList();
+                hyperparameters).ToList();
         }
 
 
@@ -383,8 +377,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         /// Target IDs (as canonical strings) of target points that are
         /// already linked.
         /// </param>
-        /// <param name="assumptions">
-        /// Assumptions that constrain the auto-alignment.
+        /// <param name="hyperparameters">
         /// </param>
         /// <returns>
         /// Suitable target points, as a list of MaybeTargetPoint objects.
@@ -394,7 +387,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             IEnumerable<int> positions,
             List<TargetPoint> targetPoints,
             List<string> linkedTargets,
-            IAutoAlignAssumptions assumptions)
+            ManuscriptTreeWordAlignerHyperparameters hyperparameters)
         {
             // Starting from the enumerated positions and keeping only those
             // that are valid indices, look up the target point for each index,
@@ -416,7 +409,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                     targetPoint
                 })
                 .Where(x =>
-                    !assumptions.ContentWordsOnly || isContentWord(x.Lemma))
+                    !hyperparameters.ContentWordsOnly || isContentWord(x.Lemma))
                 .Where(x => isNotLinkedAlready(x.Lemma))
                 .TakeWhile(x => isNotPunctuation(x.Lemma))
                 .Select(x => new MaybeTargetPoint(x.targetPoint))
@@ -426,7 +419,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
             // Helper function to check for a content word.
             bool isContentWord(string text) =>
-                !assumptions.IsTargetFunctionWord(text);
+                !hyperparameters.IsTargetFunctionWord(text);
 
             // Helper function to check that a target point is not
             // linked already.
@@ -435,7 +428,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
             // Helper function to check for punctuation.
             bool isNotPunctuation(string text) =>
-                !assumptions.IsPunctuation(text);
+                !hyperparameters.IsPunctuation(text);
         }
 
 
@@ -454,8 +447,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         /// List of target ID (as a canonical string) for those target
         /// points that are already linked.
         /// </param>
-        /// <param name="assumptions">
-        /// Assumptions that constrain the auto-alignment.
+        /// <param name="hyperparameters">
         /// </param>
         /// <returns>
         /// An OpenTargetBond for the best candidate, or null if there
@@ -466,7 +458,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             SourcePoint sWord,
             List<MaybeTargetPoint> tWords,
             List<string> linkedTargets,
-            IAutoAlignAssumptions assumptions
+            ManuscriptTreeWordAlignerHyperparameters hyperparameters
             )
         {
             // Make a table of probabilities for suitable
@@ -505,11 +497,11 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
             // Helper function to test that target point is not punctuation.
             bool notPunctuation(MaybeTargetPoint tw) =>
-                !assumptions.IsPunctuation(tw.Lemma);
+                !hyperparameters.IsPunctuation(tw.Lemma);
 
             // Helper function to test that target point is not a stopword.
             bool notTargetStopWord(MaybeTargetPoint tw) =>
-                !assumptions.IsStopWord(tw.Lemma);
+                !hyperparameters.IsStopWord(tw.Lemma);
 
             // Helper function to test that target point is not already linked.
             bool notAlreadyLinked(MaybeTargetPoint tw) =>
@@ -517,19 +509,19 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
             // Helper function to test that candidate is not a bad link.
             bool notBadLink(MaybeTargetPoint tw) =>
-                !assumptions.IsBadLink(sWord.Lemma, tw.Lemma);
+                !hyperparameters.IsBadLink(sWord.Lemma, tw.Lemma);
 
             // Helper function to test that if source point is a stopword
             // then candidate is a good link.
             bool sourceStopWordImpliesIsGoodLink(MaybeTargetPoint tw) =>
-                !assumptions.IsStopWord(sWord.Lemma) ||
-                assumptions.IsGoodLink(sWord.Lemma, tw.Lemma);
+                !hyperparameters.IsStopWord(sWord.Lemma) ||
+                hyperparameters.IsGoodLink(sWord.Lemma, tw.Lemma);
 
             // 2021.05.27 CL: This is where we need to check if we used lemma_cat to develop the translation model.
             // We need to use a lemmaKey instead of just the lemma, making the key lemma_cat if UseLemmaCatModel.
 
             string lemmaKey = sWord.Lemma;
-            if (assumptions.UseLemmaCatModel)
+            if (hyperparameters.UseLemmaCatModel)
             {
                 lemmaKey += "_" + sWord.Category;
             }
@@ -537,7 +529,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // Helper function to obtain the score for a candidate
             // from the estimated translation model.
             double getTranslationModelScore(MaybeTargetPoint tw) =>
-                assumptions.GetTranslationModelScore(sWord.Lemma, tw.Lemma);
+                hyperparameters.GetTranslationModelScore(sWord.Lemma, tw.Lemma);
 
             // If the probabilities table has any entries:
             if (probs.Count > 0)
@@ -722,7 +714,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                 List<OpenMonoLink> linkedSiblings =
                     treeNode.Parent.Elements()
                     .Where(child => child != treeNode)
-                    .SelectMany(child => child.GetTerminalNodes())
+                    .SelectMany(child => child.GetLeafs())
                     .Select(term => term.MorphId())
                     .Select(sourceId => linksTable.GetValueOrDefault(sourceId))
                     .Where(x => !(x is null))

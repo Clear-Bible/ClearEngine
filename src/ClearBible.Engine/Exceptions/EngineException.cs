@@ -61,7 +61,7 @@ namespace ClearBible.Engine.Exceptions
             return 
 @$"Base: {base.ToString()}
 
-NameValueMap: {string.Join(" ", NameValueMap)}
+NameValueMap: {(NameValueMap != null ? string.Join(" ", NameValueMap) : "<Empty>")}
 MemberName: { MemberName}
 SourceFilePath {SourceFilePath}
 SourceLineNumber {SourceLineNumber}";

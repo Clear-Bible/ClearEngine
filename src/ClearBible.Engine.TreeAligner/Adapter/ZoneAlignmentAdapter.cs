@@ -13,81 +13,15 @@ using ClearBible.Engine.Exceptions;
 
 namespace ClearBible.Engine.TreeAligner.Adapter
 {
-
     internal class ZoneAlignmentAdapter
     {
-        private static TranslationModel ToTranslationModel(Dictionary<string, Dictionary<string, double>>? transMod)
-        {
-            if (transMod == null)
-            {
-                throw new InvalidDataEngineException(message: "translation model assumption is null");
-            }
-            return new TranslationModel(transMod
-                .Select(kv => KeyValuePair.Create(new SourceLemma(kv.Key), kv.Value
-                    .Select(v => KeyValuePair.Create(new TargetLemma(v.Key), new Score(v.Value)))
-                    .ToDictionary(x => x.Key, x => x.Value)
-                ))
-                .ToDictionary(x => x.Key, x => x.Value)
-            );
-        }
-        private static AlignmentModel ToAlignmentModel(List<IReadOnlyCollection<TokensAlignedWordPair>>? alignMod)
-        {    
-            if (alignMod == null)
-            {
-                throw new InvalidDataEngineException(message: "alignment model assumption is null");
-            }
-
-            //{book:D2}{chapter:D3}{verse:D3}{word:D3}{subsegment:D1}
-            return new AlignmentModel(alignMod
-                .SelectMany(c => c
-                    .Select(p => KeyValuePair.Create(
-                        new BareLink(
-                            p.SourceToken?.TokenId.ToSourceId() ?? throw new InvalidDataEngineException(message: "Can't create AlignmentModel: sourceToken is null"),
-                            p.TargetToken?.TokenId.ToTargetId() ?? throw new InvalidDataEngineException(message: "Can't create AlignmentModel: targetToken is null")),
-                        new Score(p.AlignmentScore)))
-                     )
-                     .ToDictionary(x => x.Key, x => x.Value)
-               );
-        }
         internal static IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> AlignZone(
             ParallelTextRow parallelTextRow, 
             IManuscriptTree manuscriptTree, 
-            ManuscriptTreeWordAlignerParams hyperParameters, 
-            IList<SmtModel> smtModels,
+            ManuscriptTreeWordAlignerHyperparameters hyperParameters, 
             int indexPrimarySmtModel
             )
         {
-            int smtTcIndex = 0;
-            if (smtModels.Count > 2)
-                throw new InvalidConfigurationEngineException(message: "more than two smt's provided to AlignZone");
-            if (smtModels.Count == 2)
-                smtTcIndex = indexPrimarySmtModel == 0 ? 1 : 0;
-            if (smtModels.Count == 1)
-            {
-                smtTcIndex = 0;
-            }
-
-            var assumptions = new AutoAlignAssumptions(
-                ToTranslationModel(smtModels[indexPrimarySmtModel].TranslationModel),
-                ToTranslationModel(smtModels[smtTcIndex].TranslationModel),
-                hyperParameters.useLemmaCatModel,
-                hyperParameters.manTransModel,
-                ToAlignmentModel(smtModels[smtTcIndex].AlignmentModel),
-                ToAlignmentModel(smtModels[indexPrimarySmtModel].AlignmentModel),
-                hyperParameters.useAlignModel,
-                hyperParameters.puncs,
-                hyperParameters.stopWords,
-                hyperParameters.goodLinks,
-                hyperParameters.goodLinkMinCount,
-                hyperParameters.badLinks,
-                hyperParameters.badLinkMinCount,
-                hyperParameters.oldLinks,
-                hyperParameters.sourceFunctionWords,
-                hyperParameters.targetFunctionWords,
-                hyperParameters.contentWordsOnly,
-                hyperParameters.strongs,
-                hyperParameters.maxPaths
-                );
             try
             {
                 parallelTextRow.SourceRefs.Cast<VerseRef>();
@@ -150,11 +84,41 @@ namespace ClearBible.Engine.TreeAligner.Adapter
                 throw new InvalidConfigurationEngineException(message: "ParallelTextRow targets must be transformed to a TargetTextRow (.Transform(textRow => new TokensTextRow(textRow))) ");
             }
 
+            double totalTargetPoints = targets.Count();
+            var targetPoints = targets
+                .Select((target, position) => new
+                {
+                    text = target.TargetText.Text,
+                    lemma = target.TargetLemma.Text,
+                    targetID = target.TargetID,
+                    position
+                })
+                .GroupBy(x => x.text)
+                .SelectMany(group =>
+                    group.Select((x, groupIndex) => new
+                    {
+                        x.text,
+                        x.targetID,
+                        x.lemma,
+                        x.position,
+                        altID = $"{x.text}-{groupIndex + 1}"
+                    }))
+                .OrderBy(x => x.position)
+                .Select(x => new TargetPoint(
+                    Text: x.text,
+                    // Lower: x.text.ToLower(),
+                    Lemma: x.lemma,
+                    TargetID: x.targetID,
+                    AltID: x.altID,
+                    Position: x.position,
+                    RelativePosition: x.position / totalTargetPoints));
+
+
             List<MonoLink> monoLinks = ZoneAlignment.GetMonoLinks(
                 versesXElementCombined,
-                ZoneAlignment.GetSourcePoints(versesXElementCombined),
-                ZoneAlignment.GetTargetPoints(targets.ToList()),
-                assumptions);
+                versesXElementCombined.GetSourcePoints(),
+                targetPoints,
+                hyperParameters);
 
             return monoLinks
                 .OrderBy(ml => ml.SourcePoint.SourceID.AsCanonicalString)

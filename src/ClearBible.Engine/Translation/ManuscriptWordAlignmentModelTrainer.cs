@@ -8,15 +8,9 @@ namespace ClearBible.Engine.Translation
 {
     public class ManuscriptWordAlignmentModelTrainer : DisposableBase, ITrainer
     {
-        //private IEnumerable<ITrainer> _smtTrainers;
         private IManuscriptTrainableWordAligner _trainableAligner;
         private IEnumerable<EngineParallelTextRow> _engineParallelTextRows;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="trainableAligner"></param>
-        /// <param name="engineParallelTextRows"></param>
         public ManuscriptWordAlignmentModelTrainer(
             IManuscriptTrainableWordAligner trainableAligner,
             IEnumerable<EngineParallelTextRow> engineParallelTextRows

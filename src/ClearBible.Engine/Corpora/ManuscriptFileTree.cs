@@ -53,19 +53,19 @@ namespace ClearBible.Engine.Corpora
                     .Select(verse =>
                         (
                             chapter: verse
-                                .GetTerminalNodes()
+                                .GetLeafs()
                                 .First()
                                 ?.Chapter()
-                                ?? throw new InvalidTreeEngineException($"Doesn't have a first textNode", new Dictionary<string, string> 
+                                ?? throw new InvalidTreeEngineException($"Doesn't have a first leaf", new Dictionary<string, string> 
                                 {
                                     {"bookAbbreviation", bookAbbreviation },
                                     {"chapter", c.ToString()}
                                 }),
                             verse: verse
-                                .GetTerminalNodes()
+                                .GetLeafs()
                                 .First()
                                 ?.Verse()
-                                ?? throw new InvalidTreeEngineException($"Doesn't have a first textNode", new Dictionary<string, string>
+                                ?? throw new InvalidTreeEngineException($"Doesn't have a first leaf", new Dictionary<string, string>
                                 {
                                     {"bookAbbreviation", bookAbbreviation },
                                     {"chapter", c.ToString()}
@@ -74,9 +74,9 @@ namespace ClearBible.Engine.Corpora
                                     " ",
                                     verse
                                         .GetTerminalNodes()
-                                        .Select(textNode => textNode.Lemma().Replace(' ', '~'))),*/
+                                        .Select(leaf => leaf.Lemma().Replace(' ', '~'))),*/
                             tokens: verse
-                                .GetTerminalNodes()
+                                .GetLeafs()
                                 .Select((leaf, index) => new ManuscriptToken(
                                     leaf.TokenId(),
                                     leaf.Surface(),
@@ -126,13 +126,13 @@ namespace ClearBible.Engine.Corpora
             IEnumerable<XElement> chapterXElements = _getVerseXElementsForChapter(bookAbbreviation, chapterNumber);
             return chapterXElements
                 .Where(verse => verse
-                    .GetTerminalNodes()
+                    .GetLeafs()
                     .First()
                      ?.Verse().Equals(verseNumber.ToString("000")) ?? false)
                 .SelectMany(chapterElement => chapterElement
                     .Descendants("Node")
                     .Where(node => node.FirstNode is XText)
-                    .Select(textNode => new ManuscriptToken(textNode.TokenId(), textNode.Surface(), textNode.Strong(), textNode.Category(), /*leaf.Analysis(),*/ textNode.Lemma())));
+                    .Select(leaf => new ManuscriptToken(leaf.TokenId(), leaf.Surface(), leaf.Strong(), leaf.Category(), /*leaf.Analysis(),*/ leaf.Lemma())));
         }
 
         #endregion

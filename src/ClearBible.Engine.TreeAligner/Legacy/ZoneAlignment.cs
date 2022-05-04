@@ -1,5 +1,6 @@
 ﻿using System.Xml.Linq;
 using ClearBible.Engine.Corpora;
+using ClearBible.Engine.TreeAligner.Translation;
 
 namespace ClearBible.Engine.TreeAligner.Legacy
 {
@@ -15,185 +16,17 @@ namespace ClearBible.Engine.TreeAligner.Legacy
     class ZoneAlignment
     {
         /// <summary>
-        /// Perform tree-based auto-alignment for a single zone.
-        /// </summary>
-        /// <param name="iTreeService">
-        /// Services for a particular treebank, as obtained from the
-        /// resource manager.
-        /// </param>
-        /// <param name="zoneAlignmentFacts">
-        /// A statement of the zone alignment problem to be posed
-        /// to the auto-alignment algorithm.
-        /// CL: Changed to from first and last source VerseID to SourceZone
-        /// because we need the list of source VerseIDs.
-        /// </param>
-        /// <param name="autoAlignAssumptions">
-        /// Assumptions that condition the auto-alignment algorithm,
-        /// such as identification of source and target functions
-        /// words.
-        /// </param>
-        /// <returns>
-        /// The estimated alignment for the zone, consisting of
-        /// contextual information about the zone and a collection of
-        /// one-to-one links, as computed by the auto-alignment algorithm.
-        /// </returns>
-        ///
-
-        /* //-
-        public static ZoneMonoAlignment AlignZone(
-            ITreeService iTreeService,
-            ZoneAlignmentProblem zoneAlignmentFacts,
-            IAutoAlignAssumptions autoAlignAssumptions)
-        {
-            // Convert ITreeService to concrete type for internal
-            // use.
-            TreeService.TreeService treeService =
-                (TreeService.TreeService)iTreeService;
-
-            // Get the syntax tree node corresponding to the source
-            // verse range.
-            // CL: No longer a range but a list of source VerseIDs.
-            //XElement treeNode = treeService.GetTreeNode(
-            //            zoneAlignmentFacts.FirstSourceVerseID,
-            //            zoneAlignmentFacts.LastSourceVerseID);
-
-            XElement treeNode = treeService.GetTreeNode(
-                        zoneAlignmentFacts.SourceZone);
-            // zoneAlignmentFacts.FirstSourceVerseID,
-            // zoneAlignmentFacts.LastSourceVerseID);
-
-            // Construct a context for the zone with the source
-            // points and target points.
-            ZoneContext zoneContext = new ZoneContext(
-                GetSourcePoints(treeNode),
-                GetTargetPoints(zoneAlignmentFacts.TargetZone.List));
-
-            // Perform an auto alignment based on the zone context,
-            // the tree service, and the requirements.
-            List<MonoLink> monoLinks =
-                GetMonoLinks(
-                    treeNode,
-                    zoneContext.SourcePoints,
-                    zoneContext.TargetPoints,
-                    autoAlignAssumptions);
-
-            return new ZoneMonoAlignment(zoneContext, monoLinks);
-        }
-        */
-
-        /// <summary>
-        /// Get the source points in manuscript order corresponding to
-        /// the terminal nodes beneath a specified syntax tree node.
-        /// </summary>
-        /// 
-        public static List<SourcePoint> GetSourcePoints(XElement treeNode)
-        {
-            // Get the terminal nodes beneath the specified syntax
-            // tree node.
-            IEnumerable<XElement> terminals = treeNode.GetTerminalNodes();
-
-            // Prepare to compute fractional positions.
-            double totalSourcePoints = terminals.Count();
-
-            // Starting from the terminal nodes, get the source ID and
-            // surface text for each terminal, then group the sequence
-            // by the surface text and number the nodes within these
-            // subgroups to create alternate IDs, then sort by source ID
-            // (to achieve manuscript order), and finally produce an
-            // appropriate SourcePoint for each member for the sequence.
-            return
-                terminals
-                .Select((term, n) => new
-                {
-                    term,
-                    sourceID = term.SourceID(),
-                    surface = term.Surface(),
-                    treePosition = n
-                })
-                .GroupBy(x => x.surface)
-                .SelectMany(group =>
-                    group.Select((x, groupIndex) => new
-                    {
-                        x.term,
-                        x.sourceID,
-                        altID = $"{x.surface}-{groupIndex + 1}",
-                        x.treePosition
-                    }))
-                .OrderBy(x => x.sourceID.AsCanonicalString)
-                .Select((x, m) => new SourcePoint(
-                    Lemma: x.term.Lemma(),
-                    Category: x.term.Category(),
-                    Terminal: x.term,
-                    SourceID: x.term.SourceID(),
-                    AltID: x.altID,
-                    TreePosition: x.treePosition,
-                    RelativeTreePosition: x.treePosition / totalSourcePoints,
-                    SourcePosition: m))
-                .ToList();
-        }
-
-
-        /// <summary>
-        /// Enrich the zone targets to produce a list of TargetPoint
-        /// in translation order.
-        /// </summary>
-        /// 
-        public static List<TargetPoint> GetTargetPoints(
-            IReadOnlyList<Target> targets)
-        {
-            // Prepare to compute relative position.
-            double totalTargetPoints = targets.Count();
-
-            // Starting from the targets, get the text, target ID,
-            // and position, then group the sequence by the text
-            // and number the members within these subgroups to
-            // create the alternate IDs, then rearrange by position
-            // (to achieve translation order), and finally produce
-            // an appropriate TargetPoint for each member of the
-            // sequence.
-            return
-                targets
-                .Select((target, position) => new
-                {
-                    text = target.TargetText.Text,
-                    lemma = target.TargetLemma.Text,
-                    targetID = target.TargetID,
-                    position
-                })
-                .GroupBy(x => x.text)
-                .SelectMany(group =>
-                    group.Select((x, groupIndex) => new
-                    {
-                        x.text,
-                        x.targetID,
-                        x.lemma,
-                        x.position,
-                        altID = $"{x.text}-{groupIndex + 1}"
-                    }))
-                .OrderBy(x => x.position)
-                .Select(x => new TargetPoint(
-                    Text: x.text,
-                    // Lower: x.text.ToLower(),
-                    Lemma: x.lemma,
-                    TargetID: x.targetID,
-                    AltID: x.altID,
-                    Position: x.position,
-                    RelativePosition: x.position / totalTargetPoints))
-                .ToList();
-        }
-
-        /// <summary>
         /// Performs an auto-alignment for one zone, based on the
         /// zone context as specified by the source points and
         /// targets points, and using the syntax tree node and
-        /// the assumptions.
+        /// the hyperparameters.
         /// </summary>
         /// 
         public static List<MonoLink> GetMonoLinks(
             XElement treeNode,
-            List<SourcePoint> sourcePoints,
-            List<TargetPoint> targetPoints,
-            IAutoAlignAssumptions assumptions
+            IEnumerable<SourcePoint> sourcePoints,
+            IEnumerable<TargetPoint> targetPoints,
+            ManuscriptTreeWordAlignerHyperparameters hyperparameters
             )
         {
             // Prepare to look up source points by alternate ID.
@@ -203,12 +36,12 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                     sp => sp.AltID);
 
             var bookChapterVerses = 
-                treeNode.GetTerminalNodes()
+                treeNode.GetLeafs()
                     .Select(e => e.BookChapterVerse()) //NOTE: this gets the first 8 characters of morphId. Original implementation got first 8 characters of nodeId. They appear to be the same in the current trees.
                     .Distinct();
             Dictionary<string, string> existingLinks = 
                 bookChapterVerses
-                .SelectMany(bcv => assumptions.OldLinksForVerse(bcv))
+                .SelectMany(bcv => hyperparameters.OldLinksForVerse(bcv))
                 .ToDictionary(x => x.Key, x => x.Value);
 
             // Create index of source points by SourceID.
@@ -226,21 +59,9 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                    treeNode,
                    sourcePointsByID,
                    sourceAltIdMap,
-                   targetPoints,
+                   targetPoints.ToList(),
                    existingLinks,
-                   assumptions);
-
-            // Debugging
-            foreach (var entry in terminalCandidates2)
-            {
-                foreach (var candidate in entry.Value)
-                {
-                    if (double.IsNaN(candidate.LogScore))
-                    {
-                        ;
-                    }
-                }
-            }
+                   hyperparameters);
 
             // Traverse the syntax tree starting from the terminals
             // and working back to the root to construct alignments
@@ -249,8 +70,8 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // CL: Like AlignNodes()?
             Candidate topCandidate2 = TreeBasedAlignment.AlignTree(
                 treeNode,
-                targetPoints.Count,
-                assumptions.MaxPaths,
+                targetPoints.ToList().Count,
+                hyperparameters.MaxPaths,
                 terminalCandidates2);
 
             // Express the result using a list of OpenMonoLink.
@@ -270,8 +91,8 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // CL: Like AlignTheRest()?
             AuxiliaryAlignment.ImproveAlignment(
                 openMonoLinks,
-                targetPoints,
-                assumptions);
+                targetPoints.ToList(),
+                hyperparameters);
 
             // Resolve conflicts again, trying a little harder this time.
             ResolveConflicts(openMonoLinks, tryHarder: true);
@@ -463,7 +284,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                 double minDelta = conflict.Min(mw => relativeDelta(mw));
 
                 // Get the first link that attain the minimum relative delta.
-                OpenMonoLink winner = winners
+                OpenMonoLink? winner = winners
                     .Where(mw => relativeDelta(mw) == minDelta)
                     .FirstOrDefault();
 
@@ -550,7 +371,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // MaybeTargetPoint with a regular TargetPoint.
             TargetBond close(OpenTargetBond bond)
             {
-                if (bond.MaybeTargetPoint.IsNothing)
+                if (bond.MaybeTargetPoint.TargetPoint == null)
                     throw new InvalidOperationException("no target point");
                 return new TargetBond(
                     TargetPoint: bond.MaybeTargetPoint.TargetPoint,

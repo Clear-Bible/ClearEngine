@@ -32,12 +32,12 @@ namespace ClearBible.Engine.Dashboard.Translation
             var manuscriptTree = new ManuscriptFileTree(syntaxTreesPath);
 
             // set the manuscript tree aligner hyperparameters
-            var manuscriptTreeAlignerParams = await FileGetManuscriptTreeAlignerParams.Get().SetLocation(fileGetManuscriptTreeAlignerParamsLocation).GetAsync();
-            manuscriptTreeAlignerParams.useAlignModel = UseAlignModel;
-            manuscriptTreeAlignerParams.maxPaths = MaxPaths;
-            manuscriptTreeAlignerParams.goodLinkMinCount = GoodLinkMinCount;
-            manuscriptTreeAlignerParams.badLinkMinCount = BadLinkMinCount;
-            manuscriptTreeAlignerParams.contentWordsOnly = ContentWordsOnly;
+            var manuscriptTreeAlignerParams = await FileGetManuscriptTreeAlignerHyperparams.Get().SetLocation(fileGetManuscriptTreeAlignerParamsLocation).GetAsync();
+            manuscriptTreeAlignerParams.UseAlignModel = UseAlignModel;
+            manuscriptTreeAlignerParams.MaxPaths = MaxPaths;
+            manuscriptTreeAlignerParams.GoodLinkMinCount = GoodLinkMinCount;
+            manuscriptTreeAlignerParams.BadLinkMinCount = BadLinkMinCount;
+            manuscriptTreeAlignerParams.ContentWordsOnly = ContentWordsOnly;
 
             // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
             IManuscriptTrainableWordAligner manuscriptTrainableWordAligner = new ManuscriptTreeWordAligner(

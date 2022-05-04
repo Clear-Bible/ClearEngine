@@ -55,23 +55,23 @@ namespace ClearBible.Engine.TreeAligner.Legacy
 
 
     public record TargetPoint(
-    string Text,
-    string Lemma,  // lemma text, usually text as converted to lowercase
-    TargetID TargetID,
-    string AltID,  // alternative identification in the form of, for
-                   // example, "word-2" to mean the second occurrence of
-                   // the surface text "word" within this zone FIXME: should use an AltID record
-    int Position,  // zero-based position within the sequence of target
-                   // words in translation order for this zone,
-    double RelativePosition  // the Position restated as a fraction,
-                             // at least 0, less than 1
+        string Text,
+        string Lemma,  // lemma text, usually text as converted to lowercase
+        TargetID TargetID,
+        string AltID,  // alternative identification in the form of, for
+                       // example, "word-2" to mean the second occurrence of
+                       // the surface text "word" within this zone FIXME: should use an AltID record
+        int Position,  // zero-based position within the sequence of target
+                       // words in translation order for this zone,
+        double RelativePosition  // the Position restated as a fraction,
+                                 // at least 0, less than 1
     );
 
 
     public record TargetBond(TargetPoint TargetPoint, double Score);
     public record MonoLink(SourcePoint SourcePoint, TargetBond TargetBond);
 
-    public record MaybeTargetPoint(TargetPoint TargetPoint)
+    public record MaybeTargetPoint(TargetPoint? TargetPoint)
     {
         public string ID =>
             TargetPoint?.TargetID.AsCanonicalString ?? "0";
@@ -88,15 +88,12 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         public int Position =>
             TargetPoint?.Position ?? -1;
 
-        public bool IsNothing =>
-            TargetPoint == null;
-
         public double RelativePos =>
             TargetPoint?.RelativePosition ?? 0.0;
     }
     public record OpenTargetBond(MaybeTargetPoint MaybeTargetPoint, double Score)
     {
-        public bool HasTargetPoint => !MaybeTargetPoint.IsNothing;
+        public bool HasTargetPoint => MaybeTargetPoint.TargetPoint != null;
     }
     public class OpenMonoLink
     {
@@ -117,17 +114,6 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         public void ResetOpenTargetBond(OpenTargetBond bond)
         {
             OpenTargetBond = bond;
-        }
-    }
-        public struct TreeNodeStackID
-    {
-        private string _tag;
-
-        public string AsCanonicalString => _tag;
-
-        public TreeNodeStackID(string canonicalString)
-        {
-            _tag = canonicalString;
         }
     }
 

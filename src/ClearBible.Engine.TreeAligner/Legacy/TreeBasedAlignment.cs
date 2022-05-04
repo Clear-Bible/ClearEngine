@@ -1,25 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
-//-2
-//using ClearBible.Clear3.API;
-//using ClearBible.Clear3.Impl.TreeService;
-
-using ClearBible.Engine.TreeAligner.Legacy;
+using ClearBible.Engine.TreeAligner.Corpora;
 
 namespace ClearBible.Engine.TreeAligner.Legacy
 {
-    /// <summary>
-    /// This class contains the principal static method AlignTree(),
-    /// and other static methods that support it.
-    /// </summary>
-    ///
-    
-    //-
-    //public class TreeBasedAlignment
-    //+
     class TreeBasedAlignment
     {
         /// <summary>
@@ -73,7 +57,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             // candidates for that TreeNodeStackId.  Each of these
             // candidates expresses a link to a target point or to nothing
             // for each source point beneath the tree node(s).
-            Dictionary<TreeNodeStackID, List<Candidate>> alignments =
+            Dictionary<string, List<Candidate>> alignments =
                 new();
 
             // Traverse the syntax tree, starting from the terminal
@@ -87,7 +71,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                 terminalCandidates);
 
             // Return the first candidate for the root node.
-            return alignments[treeNode.TreeNodeStackID()][0];
+            return alignments[treeNode.NodeStackID()][0];
         }
 
 
@@ -117,38 +101,9 @@ namespace ClearBible.Engine.TreeAligner.Legacy
             XElement treeNode,
             int n,
             int maxPaths,
-            Dictionary<TreeNodeStackID, List<Candidate>> alignments,
+            Dictionary<string, List<Candidate>> alignments,
             Dictionary<SourceID, List<Candidate>> terminalCandidates)
         {
-            foreach (var entry in alignments)
-            {
-                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
-                {
-                    ;
-                }
-                foreach (var candidate in entry.Value)
-                {
-                    if (double.IsNaN(candidate.LogScore))
-                    {
-                        ;
-                    }
-                }
-            }
-            foreach (var entry in terminalCandidates)
-            {
-                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41001008011"))
-                {
-                    ;
-                }
-                foreach (var candidate in entry.Value)
-                {
-                    if (double.IsNaN(candidate.LogScore))
-                    {
-                        ;
-                    }
-                }
-            }
-
             // First call ourselves recursively to populate the
             // alignments table for each of the subnodes.
             foreach (XElement subTree in treeNode.Elements())
@@ -161,60 +116,15 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                     terminalCandidates);
             }
 
-            // Debugging. candidate2 has two items, the first is has one Candidate, the second has zero.
-            // alignments has 13 items, and the last one is empty.
-            foreach (var entry in alignments)
-            {
-                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
-                {
-                    ;
-                }
-                foreach (var candidate in entry.Value)
-                {
-                    if (double.IsNaN(candidate.LogScore))
-                    {
-                        ;
-                    }
-                }
-            }
-            foreach (var entry in terminalCandidates)
-            {
-                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41001008011"))
-                {
-                    ;
-                }
-                foreach (var candidate in entry.Value)
-                {
-                    if (double.IsNaN(candidate.LogScore))
-                    {
-                        ;
-                    }
-                }
-            }
-
             // Get the tree node stack ID for the entry that we
             // intend to populate in the candidates table.
-            TreeNodeStackID nodeStackID = treeNode.TreeNodeStackID();
+            string nodeStackID = treeNode.NodeStackID();
 
             // If this is a terminal node:
             if (treeNode.FirstNode is XText)
             {
                 SourceID sourceID = treeNode.SourceID();
                 alignments.Add(nodeStackID, terminalCandidates[sourceID]);
-
-                // Debugging
-                if (terminalCandidates[sourceID].Count == 0)
-                {
-                    ;
-                }
-                // Debugging
-                foreach (var entry in alignments)
-                {
-                    if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
-                    {
-                        ;
-                    }
-                }
             }
             // Otherwise this is a non-terminal node; if it has
             // multiple children:
@@ -228,26 +138,8 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                 List<List<Candidate>> candidates2 =
                     treeNode
                     .Elements()
-                    .Select(node => alignments[node.TreeNodeStackID()])
+                    .Select(node => alignments[node.NodeStackID()])
                     .ToList();
-
-                // Debugging. candidate2 has two items, the first is has one Candidate, the second has zero.
-                // alignments has 13 items, and the last one is empty.
-                foreach (var innerList in candidates2)
-                {
-                    if (innerList.Count == 0)
-                    {
-                        ;
-                    }
-                }
-                // Debugging
-                foreach (var entry in alignments)
-                {
-                    if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
-                    {
-                        ;
-                    }
-                }
 
                 // Keep only the best candidates, and store them into
                 // the alignments table.
@@ -255,25 +147,8 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                     ComputeTopCandidates(
                         n, maxPaths,
                         candidates2);
-
-                // Debugging
-                foreach (var entry in alignments)
-                {
-                    if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
-                    {
-                        ;
-                    }
-                }
             }
 
-            // Debugging
-            foreach (var entry in alignments)
-            {
-                if ((entry.Value.Count == 0) || (entry.Key.AsCanonicalString == "41008001001001"))
-                {
-                    ;
-                }
-            }
             // Otherwise this is a non-terminal node with only one
             // child.  Do nothing, because this node has the same
             // TreeNodeStackId and alternative candidates as the one
