@@ -53,8 +53,7 @@ namespace ClearBible.Engine.Corpora
                     .Select(verse =>
                         (
                             chapter: verse
-                                .Descendants()
-                                .Where(node => node.FirstNode is XText)
+                                .GetTerminalNodes()
                                 .First()
                                 ?.Chapter()
                                 ?? throw new InvalidTreeEngineException($"Doesn't have a first textNode", new Dictionary<string, string> 
@@ -63,8 +62,7 @@ namespace ClearBible.Engine.Corpora
                                     {"chapter", c.ToString()}
                                 }),
                             verse: verse
-                                .Descendants()
-                                .Where(node => node.FirstNode is XText)
+                                .GetTerminalNodes()
                                 .First()
                                 ?.Verse()
                                 ?? throw new InvalidTreeEngineException($"Doesn't have a first textNode", new Dictionary<string, string>
@@ -75,12 +73,10 @@ namespace ClearBible.Engine.Corpora
                             /*FIXME: remove? text: string.Join(
                                     " ",
                                     verse
-                                        .Descendants()
-                                        .Where(node => node.FirstNode is XText)
+                                        .GetTerminalNodes()
                                         .Select(textNode => textNode.Lemma().Replace(' ', '~'))),*/
                             tokens: verse
-                                .Descendants()
-                                .Where(node => node.FirstNode is XText)
+                                .GetTerminalNodes()
                                 .Select((leaf, index) => new ManuscriptToken(
                                     leaf.TokenId(),
                                     leaf.Surface(),
@@ -100,15 +96,13 @@ namespace ClearBible.Engine.Corpora
                         .Select(verse => new BookSegment
                             (
                                 verse
-                                    .Descendants()
-                                    .Where(node => node.FirstNode is XText)
+                                    .GetTerminalNodes()
                                     .First()
                                     ?.Attribute("morphId")?.Value.Substring(2, 3)
                                     ?? throw new InvalidDataException($@"Syntax tree {fileName} has a verse whose first leaf node 
                                                                             doesn't have a nodeId attribute. Cannot determine chapter number"),
                                 verse
-                                    .Descendants()
-                                    .Where(node => node.FirstNode is XText)
+                                    .GetTerminalNodes()
                                     .First()
                                     ?.Attribute("morphId")?.Value.Substring(5, 3)
                                     ?? throw new InvalidDataException($@"Syntax tree {fileName} has a verse whose first leaf node doesn't 
@@ -117,8 +111,7 @@ namespace ClearBible.Engine.Corpora
                                     string.Join(
                                         " ",
                                         verse
-                                            .Descendants()
-                                            .Where(node => node.FirstNode is XText)
+                                            .GetTerminalNodes()
                                             .Select(leaf => leaf?
                                                 .Attribute("UnicodeLemma")?.Value.Replace(' ', '~') ?? "")) 
                                     : ""
@@ -133,8 +126,7 @@ namespace ClearBible.Engine.Corpora
             IEnumerable<XElement> chapterXElements = _getVerseXElementsForChapter(bookAbbreviation, chapterNumber);
             return chapterXElements
                 .Where(verse => verse
-                    .Descendants("Node")
-                    .Where(node => node.FirstNode is XText)
+                    .GetTerminalNodes()
                     .First()
                      ?.Verse().Equals(verseNumber.ToString("000")) ?? false)
                 .SelectMany(chapterElement => chapterElement
@@ -317,7 +309,7 @@ namespace ClearBible.Engine.Corpora
             int totalLength = subTrees
                 .Select(x => Int32.Parse(x.Attribute("Length")?.Value ?? "0"))
                 .Sum();
-
+            //FIXME? this will only include the first verse, but this may not matter if it's never used.
             string newNodeId =
                 (subTrees[0].Attribute("nodeId")?.Value.Substring(0, 11) ?? throw new InvalidTreeEngineException($"Node doesn't have attribute.", new Dictionary<string, string>
                         {

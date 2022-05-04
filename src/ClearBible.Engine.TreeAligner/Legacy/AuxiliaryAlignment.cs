@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using ClearBible.Engine.Corpora;
 
 namespace ClearBible.Engine.TreeAligner.Legacy
 {
@@ -621,12 +622,12 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         {
             // The limiting position is the start position of the
             // terminal node associated with the source point.
-            int limit = sourceNode.Terminal.AttrAsInt("Start");
+            int limit = sourceNode.Terminal.Start();
 
             // Helper function to compute the ending position of
             // a link with respect to the syntax tree.
             int end(OpenMonoLink mw) =>
-                mw.SourcePoint.Terminal.AttrAsInt("End");
+                mw.SourcePoint.Terminal.End();
 
             // Starting with the links to be examined,
             // let the associated distance be the limit minus the
@@ -667,12 +668,12 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         {
             // The limiting position is the end position of the
             // terminal node associated with the source point.
-            int limit = sourceNode.Terminal.AttrAsInt("End");
+            int limit = sourceNode.Terminal.End();
 
             // Helper function to compute the ending position of
             // a link with respect to the syntax tree.
             int end(OpenMonoLink mw) =>
-                mw.SourcePoint.Terminal.AttrAsInt("End");
+                mw.SourcePoint.Terminal.End();
 
             // Starting with the links to be examined,
             // keep only those with ending position greater
@@ -722,7 +723,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                     treeNode.Parent.Elements()
                     .Where(child => child != treeNode)
                     .SelectMany(child => child.GetTerminalNodes())
-                    .Select(term => term.SourceId())
+                    .Select(term => term.MorphId())
                     .Select(sourceId => linksTable.GetValueOrDefault(sourceId))
                     .Where(x => !(x is null))
                     .ToList();

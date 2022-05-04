@@ -1,73 +1,85 @@
-﻿using System;
+﻿using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Exceptions;
+using System;
 using System.Xml.Linq;
 
 namespace ClearBible.Engine.TreeAligner.Legacy
 {
     public static class Extensions
     {
-        public static List<XElement> GetTerminalNodes(this XElement treeNode)
+        #region Node element atributes
+        public static int Start(this XElement node)
         {
-            return treeNode
-                .Descendants()
-                .Where(e => e.FirstNode is XText)
-                .ToList();
-        }
-
-        public static SourceID SourceID(this XElement term)
-        {
-            string sourceIDTag = term.Attribute("morphId")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have a morphId attribute.");
-            if (sourceIDTag.Length == 11)
+            bool successful = int.TryParse(
+                node.Attribute("Start")?.Value ?? throw new InvalidTreeEngineException($"textNode missing attribute.", new Dictionary<string, string>
+                {
+                            {"nodeId", node.NodeId() ?? "<nodeId attribute also missing>"},
+                            {"attribute", "Start" }
+                }), out int endInt);
+            if (!successful)
             {
-                sourceIDTag += "1";
+                throw new InvalidTreeEngineException($"textNode attribute not parsable to int.", new Dictionary<string, string>
+                {
+                            {"nodeId", node.NodeId() ?? "<nodeId attribute also missing>"},
+                            {"attribute", "Start" },
+                            {"value", node.Attribute("Start")?.Value ?? "<Start attribute also missing>"}
+                });
             }
-            return new SourceID(sourceIDTag);
+            else
+            {
+                return endInt;
+            }
         }
-
-        public static string Lemma(this XElement term) =>
-            term.Attribute("UnicodeLemma")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have a UnicodeLemma attribute.");
-
-        public static string Surface(this XElement term) =>
-            term.Attribute("Unicode")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have a Unicode attribute.");
-
-        public static string Strong(this XElement term) =>
-            (term.Attribute("Language")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have a Language attribute.")) +
-            (term.Attribute("StrongNumberX")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have a StrongNumberX attribute."));
-
-        public static string English(this XElement term) =>
-            term.Attribute("English")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have an English attribute.");
-
-        public static string Category(this XElement term) =>
-            term.Attribute("Cat")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have a Cat attribute.");
-
-        public static int Start(this XElement term) =>
-            int.Parse(term.Attribute("Start")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have a morphId attribute."));
-
-        public static string Analysis(this XElement term) =>
-            term.Attribute("Analysis")?.Value ?? throw new InvalidDataException("terminal xelement doesn't have an Analysis attribute.");
-
-        //public string PartOfSpeech { get; }
-
-
-        public static TreeNodeID TreeNodeID(this XElement element)
+        public static int End(this XElement node)
         {
-            return new TreeNodeID(element.Attribute("nodeId")?.Value ?? throw new InvalidDataException($"xelement {element.Name.LocalName} doesn't have a nodeId attribute."));
+            bool successful = int.TryParse(
+                node.Attribute("End")?.Value ?? throw new InvalidTreeEngineException($"textNode missing attribute.", new Dictionary<string, string>
+                {
+                            {"nodeId", node.NodeId() ?? "<nodeId attribute also missing>"},
+                            {"attribute", "End" }
+                }), out int endInt);
+            if (!successful)
+            {
+                throw new InvalidTreeEngineException($"textNode attribute not parsable to int.", new Dictionary<string, string>
+                {
+                            {"nodeId", node.NodeId() ?? "<nodeId attribute also missing>"},
+                            {"attribute", "End" },
+                            {"value", node.Attribute("End")?.Value ?? "<End attribute also missing>"}
+                });
+            }
+            else
+            {
+                return endInt;
+            }
         }
-
         public static TreeNodeStackID TreeNodeStackID(this XElement node)
         {
-            return node.TreeNodeID().TreeNodeStackID;
+            string nodeIdString = node.NodeId() ?? throw new InvalidTreeEngineException($"textNode missing attribute.", new Dictionary<string, string>
+            {
+                    {"xelement node name", node.Name.LocalName },
+                    {"attribute", "nodeId" }
+            });
+            if (nodeIdString.Length < 14)
+            {
+                throw new InvalidTreeEngineException($"textNode attribute value incorrect length.", new Dictionary<string, string>
+                {
+                        {"xelement node name", node.Name.LocalName },
+                        {"attribute", "nodeId" },
+                        {"value", nodeIdString },
+                        {"requiredLength", "at least 14 characters" },
+                });
+            }
+            var treeNodeStackIdString = nodeIdString.Substring(0, 14);
+            return new TreeNodeStackID(treeNodeStackIdString);
+        }
+        #endregion
+
+        #region Node that has XText ('leaf' or 'terminal' node) attributes
+        public static SourceID SourceID(this XElement term)
+        {
+            return new SourceID(term.MorphId());
         }
 
-        public static int AttrAsInt(this XElement element,string attributeName)
-        {
-            return int.Parse(element.Attribute(attributeName)?.Value ?? throw new InvalidDataException($"xelement {element.Name.LocalName} doesn't have a {attributeName} attribute."));
-        }
-
-        public static string SourceId(this XElement element)
-        {
-            string morphId = element.Attribute("morphId")?.Value ?? throw new InvalidDataException($"xelement {element.Name.LocalName} doesn't have a morphId attribute.");
-            if (morphId.Length == 11) morphId += "1";
-            return morphId;
-        }
+        #endregion
     }
 }

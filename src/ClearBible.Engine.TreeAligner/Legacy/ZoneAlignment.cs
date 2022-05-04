@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using ClearBible.Engine.Corpora;
 
 namespace ClearBible.Engine.TreeAligner.Legacy
 {
@@ -89,7 +90,7 @@ namespace ClearBible.Engine.TreeAligner.Legacy
         {
             // Get the terminal nodes beneath the specified syntax
             // tree node.
-            List<XElement> terminals = treeNode.GetTerminalNodes();
+            IEnumerable<XElement> terminals = treeNode.GetTerminalNodes();
 
             // Prepare to compute fractional positions.
             double totalSourcePoints = terminals.Count();
@@ -201,14 +202,14 @@ namespace ClearBible.Engine.TreeAligner.Legacy
                     sp => sp.SourceID.AsCanonicalString,
                     sp => sp.AltID);
 
-            // Get the verseID from the tree, and the old links
-            // corresponding to that verse.
-            // FIXME: This is the way it was done in Clear2; but what
-            // if the zone has more than one verse?
-            string verseIDFromTree =
-                treeNode.TreeNodeID().VerseID.AsCanonicalString;
-            Dictionary<string, string> existingLinks =
-                assumptions.OldLinksForVerse(verseIDFromTree);
+            var bookChapterVerses = 
+                treeNode.GetTerminalNodes()
+                    .Select(e => e.BookChapterVerse()) //NOTE: this gets the first 8 characters of morphId. Original implementation got first 8 characters of nodeId. They appear to be the same in the current trees.
+                    .Distinct();
+            Dictionary<string, string> existingLinks = 
+                bookChapterVerses
+                .SelectMany(bcv => assumptions.OldLinksForVerse(bcv))
+                .ToDictionary(x => x.Key, x => x.Value);
 
             // Create index of source points by SourceID.
             Dictionary<SourceID, SourcePoint> sourcePointsByID =
