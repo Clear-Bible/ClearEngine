@@ -1,18 +1,21 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
+
+using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Tokenization;
+using ClearBible.Engine.Exceptions;
+using ClearBible.Engine.SyntaxTree.Corpora;
+using ClearBible.Alignment.DataServices.Translation;
+using static ClearBible.Alignment.DataServices.Translation.ITranslationCommandable;
 
 using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Machine.Utils;
+using SIL.Machine.Translation;
 
-using ClearBible.Engine.Corpora;
-using ClearBible.Engine.Tokenization;
-using ClearBible.Engine.Dashboard.Translation;
-using Xunit.Abstractions;
-using ClearBible.Engine.Exceptions;
 
 namespace Clear.Engine.Dashboard.Tests
 {
@@ -33,8 +36,8 @@ namespace Clear.Engine.Dashboard.Tests
                 var syntaxTreePath = "..\\..\\..\\..\\..\\Samples\\SyntaxTrees";
                 var corpusProjectPath = "..\\..\\..\\..\\..\\Samples\\data\\WEB-PT";
 
-                var manuscriptTree = new ManuscriptFileTree(syntaxTreePath);
-                var sourceCorpus = new ManuscriptFileTextCorpus(manuscriptTree);
+                var syntaxTree = new SyntaxTrees(syntaxTreePath);
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
                 var targetCorpus = new ParatextTextCorpus(corpusProjectPath)
                     .Tokenize<LatinWordTokenizer>()
@@ -48,59 +51,58 @@ namespace Clear.Engine.Dashboard.Tests
                     .Transform<FunctionWordTextRowProcessor>();
 
                 {
-                    using var smtWordAlignmentModel = await Align.BuildSymmetrizedFastAlignAlignmentModel(
+                    var translationCommandable = new TranslationCommands(null);
+
+                    using var smtWordAlignmentModel = await translationCommandable.TrainSmtModel(
+                        SmtModelType.FastAlign,
                         parallelTextCorpus,
                         new DelegateProgress(status =>
-                            output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")));
+                            output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")),
+                        SymmetrizationHeuristic.GrowDiagFinalAnd);
 
-                    using var manuscriptWordAlignmentModel = await Align.BuildManuscriptWordAlignmentModel(
+                    using var syntaxTreeWordAlignmentModel = await translationCommandable.TrainSyntaxTreeModel(
                         parallelTextCorpus,
                         smtWordAlignmentModel,
                         new DelegateProgress(status =>
-                            output_.WriteLine($"Training manuscript tree align model: {status.PercentCompleted:P}")),
+                            output_.WriteLine($"Training syntax tree alignment model: {status.PercentCompleted:P}")),
                             syntaxTreePath);
 
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Take(5).Cast<EngineParallelTextRow>())
                     {
-                        //Display corpora
+                        //display verse info
                         var verseRefStr = engineParallelTextRow.Ref.ToString();
-                        var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
-                        var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
                         output_.WriteLine(verseRefStr);
 
-                        //source
+                        //display source
+                        var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
                         output_.WriteLine($"Source: {sourceVerseText}");
                         var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
                             .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
                         output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
 
-                        //target
+                        //display target
+                        var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
                         output_.WriteLine($"Target: {targetVerseText}");
                         var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
                             .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
                         output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
 
-                        //get smt alignments
-                        var smtOrdinalAlignments =
-                            smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment,
-                                engineParallelTextRow.TargetSegment);
-                        IEnumerable<(Token, Token)> smtSourceTargetTokenIdPairs =
-                            engineParallelTextRow.GetAlignedTokenIdPairs(smtOrdinalAlignments);
-
-                        //get manuscript tree aligner alignments
-                        var manuscriptOrdinalAlignedWordPairs =
-                            manuscriptWordAlignmentModel.GetBestAlignmentAlignedWordPairs(engineParallelTextRow);
-                        IEnumerable<(Token, Token)> manuscriptSourceTargetTokenIdPairs =
-                            engineParallelTextRow.GetAlignedTokenIdPairs(manuscriptOrdinalAlignedWordPairs);
-
-                        //display smt alignments ordinally and by tokenIds
+                        //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
+                        var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
+                        IEnumerable<(Token, Token)> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(smtOrdinalAlignments);
+                            // (Legacy): Alignments as ordinal positions in versesmap
                         output_.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
+                            // Alignments as source token to target token pairs
                         output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
 
-                        //display manuscript alignments ordinally and by tokenIds
-                        output_.WriteLine($"Manuscript Alignment : {string.Join(" ", manuscriptOrdinalAlignedWordPairs.Select(a => a.ToString()))}");
-                        output_.WriteLine($"Manuscript Alignment : {string.Join(" ", manuscriptSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
+
+                        //predict syntax tree aligner alignments then display
+                        // (Legacy): Alignments as ordinal positions in versesmap - ONLY FOR COMPARISON
+                        output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeWordAlignmentModel.GetBestAlignmentAlignedWordPairs(engineParallelTextRow).Select(a => a.ToString()))}");
+                            // ALIGNMENTS as source token to target token pairs
+                        var syntaxTreeAlignments = translationCommandable.PredictParallelMappedVersesAlignments(syntaxTreeWordAlignmentModel, engineParallelTextRow);
+                        output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
                     }
                 }
             }

@@ -10,7 +10,7 @@ namespace ClearBible.Engine.Corpora
 {
     public static class EngineCorporaExtensions
     {
-		public static ParallelTextCorpus EngineAlignRows(this ITextCorpus sourceCorpus, ITextCorpus targetCorpus,
+		public static EngineParallelTextCorpus EngineAlignRows(this ITextCorpus sourceCorpus, ITextCorpus targetCorpus,
 			List<EngineVerseMapping>? sourceTargetParallelVersesList = null, IAlignmentCorpus? alignmentCorpus = null, bool allSourceRows = false, bool allTargetRows = false,
 			IComparer<object>? rowRefComparer = null)
 		{
