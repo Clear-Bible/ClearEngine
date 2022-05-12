@@ -18,17 +18,17 @@ namespace ClearBible.Alignment.DataServices.Corpora
         public FromDbText(DbContext context, ParallelCorpusId parallelCorpusId, string bookId, bool isSource, ScrVers versification)
             : base(bookId, versification)
         {
-            //FIXME: configures GetVersesInDocOrder() to ONLY return the text parallel related.
+            //IMPLEMENTER'S NOTES:: needs to configure GetVersesInDocOrder() to ONLY return the text parallel related.
         }
 
         public FromDbText(DbContext context, CorpusUri corpusId, string bookId, ScrVers versification)
             : base(bookId, versification)
         {
-            //FIXME: ensures GetVersesInDocOrder return all the corpus text.
+            //IMPLEMENTER'S NOTES:: ensures GetVersesInDocOrder return all the corpus text (for a project)
         }
         protected override IEnumerable<TextRow> GetVersesInDocOrder()
         {
-            //FIXME: get rows from DB, a tuple of chapter, verse, isSentenceStart, where chapter and verse are short.ToString().
+            //IMPLEMENTER'S NOTES:: get rows from DB, a tuple of chapter, verse, isSentenceStart, where chapter and verse are short.ToString().
             var rows = new List<(string chapter, string verse,  IEnumerable<Token> tokens, bool isSentenceStart)>();
 
             return rows

@@ -1,8 +1,6 @@
 ﻿using ClearBible.Engine.Corpora;
 using ClearBible.Alignment.DataServices.Corpora;
 
-using SIL.Machine.Translation;
-
 namespace ClearBible.Alignment.DataServices.Translation
 {
     public interface IITranslationQueriable

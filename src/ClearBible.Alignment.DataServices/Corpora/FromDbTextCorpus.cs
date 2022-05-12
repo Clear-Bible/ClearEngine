@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+
 using SIL.Machine.Corpora;
 using SIL.Scripture;
 
@@ -16,11 +17,11 @@ namespace ClearBible.Alignment.DataServices.Corpora
         {
             // parallelCorpusId is the primary key for the parallel corpus entity.
 
-            //FIXME: get versification int for corpus from DB (missing in Corpus Entity?)
+            //IMPLEMENTER'S NOTES: get versification int for corpus from DB (missing in Corpus Entity?)
             int scrVersType = (int)ScrVersType.RussianOrthodox;
             Versification = new ScrVers((ScrVersType)scrVersType);
 
-            //FIXME: get unique books (ids) for corpus
+            //IMPLEMENTER'S NOTES: get unique books (ids) for corpus
             var bookIds = new List<string>(); //ids are books in three character SIL format.
 
             foreach (var bookId in bookIds)
@@ -33,11 +34,11 @@ namespace ClearBible.Alignment.DataServices.Corpora
         {
             // parallelCorpusId is the primary key for the parallel corpus entity.
 
-            //FIXME: get versification int for corpus from DB (missing in Corpus Entity?)
+            //IMPLEMENTER'S NOTES: get versification int for corpus from DB (missing in Corpus Entity?)
             int scrVersType = (int)ScrVersType.RussianOrthodox;
             Versification = new ScrVers((ScrVersType)scrVersType);
 
-            //FIXME: get unique books (ids) for corpus
+            //IMPLEMENTER'S NOTES: get unique books (ids) for corpus
             var bookIds = new List<string>(); //ids are books in three character SIL format.
 
             foreach (var bookId in bookIds)

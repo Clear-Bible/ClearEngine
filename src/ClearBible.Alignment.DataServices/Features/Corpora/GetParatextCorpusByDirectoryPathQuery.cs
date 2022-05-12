@@ -1,4 +1,5 @@
 ﻿using MediatR;
+
 using SIL.Machine.Corpora;
 
 namespace ClearBible.Alignment.DataServices.Features.Corpora

@@ -1,5 +1,6 @@
-﻿using ClearBible.Alignment.DataServices.Corpora;
-using MediatR;
+﻿using MediatR;
+
+using ClearBible.Alignment.DataServices.Corpora;
 
 using SIL.Machine.Corpora;
 
