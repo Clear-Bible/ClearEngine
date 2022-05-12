@@ -490,8 +490,21 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             // points, and call the standard hashing function on this
             // list.
             // FIXME: maybe reconsider what this function does?
-            int hashCodeOfWordsInPath(Candidate cand) =>
-                cand.GetTargetPoints().GetHashCode();
+            //int hashCodeOfWordsInPath(Candidate cand) =>
+            //    cand.GetTargetPoints().GetHashCode();
+
+            //RM 5/12/2022: the prior implementation is resulting in inconsistent results, possibly because 
+            // it is relying on object.GetHashCode() as applied to a List, and GetHashCode 
+            // is varying each time this function is called because the list varies each time in how it looks in
+            // memory (they are different lists but probably with the same values). Changed this to sort on the
+            // 'contents', calculated by concatenating together the lemma and position of all the elements of the list of Candidates.
+            string getUniqueCandidateString(Candidate cand)
+            {
+                return cand.GetTargetPoints()
+                    .OrderBy(tp => $"{tp.Lemma}-{tp.Position}")
+                    .Select(tp => $"{tp.Lemma}-{tp.Position}")
+                    .Aggregate((aggregate, next) => aggregate + "_" + next);
+            }
 
             // Starting from the candidate probabilities table,
             // order the entries, first by probability in descending order,
@@ -500,7 +513,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             return candProbs
                 .OrderByDescending(kvp => kvp.Value)
                 .ThenByDescending(kvp =>
-                    hashCodeOfWordsInPath(kvp.Key))
+                   // hashCodeOfWordsInPath(kvp.Key)) // not hashcode anymore, see comment directly above.
+                   getUniqueCandidateString(kvp.Key))
                 .Select(kvp => kvp.Key)
                 .ToList();
         }

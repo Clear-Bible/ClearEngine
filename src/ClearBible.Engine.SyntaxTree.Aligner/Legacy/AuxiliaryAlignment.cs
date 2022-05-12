@@ -574,8 +574,18 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             // construct a string mentioning the lower-cased
             // text and position of the candidate, and call the
             // standard hashing function on this string.
-            int hashCodeOfWordAndPosition(MaybeTargetPoint tw) =>
-                $"{tw.Lemma}-{tw.Position}".GetHashCode();
+            //int hashCodeOfWordAndPosition(MaybeTargetPoint tw) =>
+            //    $"{tw.Lemma}-{tw.Position}".GetHashCode();
+            //
+            // RM 5/12/2022: it's believed by Charles that the only purpose of this
+            // is to ensure deterministic ordering so runtime results 
+            // are consistent between runs.GetHashCode, unfortunately, won't 
+            // accomplish this reliably because different strings can result 
+            // in the same hashcode, dependent on app runs. Therefore, changed
+            // to just sorting on the string. It is possible sorting on tw.ID 
+            // would work, as would on tw.Position alone.
+            string getUniqueMaybeTargetPointString(MaybeTargetPoint tw) =>
+                $"{tw.Lemma}-{tw.Position}";
 
             // Starting from the candidates table, order the
             // entries by probability in descending order and
@@ -585,7 +595,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 pathProbs
                     .OrderByDescending(kvp => kvp.Value)
                     .ThenByDescending(kvp =>
-                        hashCodeOfWordAndPosition(kvp.Key))
+                        //hashCodeOfWordAndPosition(kvp.Key)) // not hashcode anymore, just the string. see comment directly above.
+                        getUniqueMaybeTargetPointString(kvp.Key))
                     .Select(kvp => kvp.Key)
                     .ToList();
         }
