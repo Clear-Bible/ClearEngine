@@ -1,14 +1,10 @@
-﻿using MediatR;
-
+﻿using ClearBible.Alignment.DataServices.Features.Corpora;
 using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
-
-using ClearBible.Alignment.DataServices.Features.Corpora;
-using ClearBible.Alignment.DataServices.Features;
 using ClearDashboard.DAL.CQRS;
-using static ClearBible.Alignment.DataServices.Corpora.CorpusUri;
-
+using MediatR;
 using SIL.Machine.Corpora;
+using static ClearBible.Alignment.DataServices.Corpora.CorpusUri;
 
 namespace ClearBible.Alignment.DataServices.Corpora
 {
