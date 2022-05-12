@@ -8,13 +8,13 @@ namespace ClearBible.Alignment.DataServices.Corpora
     {
         /// <summary>
         /// puts corpus in memory into the DB.
-        /// 
-        /// Implementation note: All Tokenized corpus text should be included (e.g. function words not filtered out).
         /// </summary>
-        /// <param name="scriptureTextCorpus"></param>
-        /// <param name="corpusId"></param>
+        /// <param name="scriptureTextCorpus">Must have both .Tokenize<>() to tokenize each verse and 
+        /// .Transform<IntoTokensTextRowProcessor>() to add TokenIds added to each token already attached to it </param>
+        /// <param name="corpusId">null to create,otherwise update.</param>
         /// <returns></returns>
-        CorpusId PutCorpus(ScriptureTextCorpus scriptureTextCorpus, CorpusId? corpusId = null);
+        /// <exception cref="InvalidTypeEngineException">textRow hasn't been transformed into TokensTextRow using .Transform<IntoTokensTextRowProcessor>()</exception>
+        Task<CorpusId?> PutCorpus(ScriptureTextCorpus scriptureTextCorpus, CorpusId? corpusId = null);
 
         /// <summary>
         /// Puts parallel corpus into DB, either INSERT if engineParallelTextCorpusId is null, or UPDATE.
@@ -24,8 +24,8 @@ namespace ClearBible.Alignment.DataServices.Corpora
         /// the resulting database state may not include parallel relationships with all corpora tokens.
         /// </summary>
         /// <param name="engineParallelTextCorpus"></param>
-        /// <param name="engineParallelTextCorpusId"></param>
+        /// <param name="parallelTextCorpusId"></param>
         /// <returns></returns>
-        ParallelCorpusId PutParallelCorpus(EngineParallelTextCorpus engineParallelTextCorpus, ParallelCorpusId? engineParallelTextCorpusId = null);
+        Task<ParallelCorpusId?> PutParallelCorpus(EngineParallelTextCorpus engineParallelTextCorpus, ParallelCorpusId? parallelTextCorpusId = null);
     }
 }

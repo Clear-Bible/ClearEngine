@@ -6,41 +6,51 @@ namespace ClearBible.Alignment.DataServices.Corpora
 {
     internal interface ICorporaQueriable
     {
+        /* IMPLEMENTER'S NOTES:
+         * 
+         * Type Database handler should return (needs implementing, see class) Corpora.FromDbTextCorpus 
+         * Type ParatextPlugin handler should return a derivative of SIL.Machine.Corpora.ScriptureTextCorpus.
+         * Type Paratext handler should return a SIL.Machine.Corpora.ParatextTextCorpus.
+         */
         /// <summary>
-        /// Loads a corpus from external (paratext, usfm, etc.) into memory.
+        /// Loads a corpus
         /// </summary>
-        /// <param name="location"></param>
-        /// <returns></returns>
-        ScriptureTextCorpus GetCorpusFromExternal(string location);
-
-        /// <summary>
-        /// Loads a corpus saved in the DB into memory.
-        /// 
-        /// Implementation node: returns a FromDbTextCorpus.
-        /// </summary>
-        /// <param name="corpusId"></param>
-        /// <returns></returns>
-        ScriptureTextCorpus GetCorpus(CorpusId corpusId);
+        /// <param name="corpusUri"></param>
+        /// <returns>ScriptureTextCorpus if it can be found, else null.</returns>
+        Task<ScriptureTextCorpus?> GetCorpus(CorpusUri corpusUri);
 
         /// <summary>
         /// used by the UI to enumerate project corpora saved in DB ('boxes' that can be connected by 'lines' in project UI view). 
         /// </summary>
         /// <returns></returns>
-        IEnumerable<CorpusId> GetCorpusIds();
+        Task<IEnumerable<CorpusId>?> GetCorpusIds();
 
+        /* IMPLEMENTER'S NOTES:
+         * 
+         * Handler should:
+         * - construct a var targetCorpus = new FromDbTextCorpus(context_, parallelCorpusId, true); for the source,
+         * - construct a var targetCorpus = new FromDbTextCorpus(context_, parallelCorpusId, false); for target
+         * - return them pararallized return sourceCorpus.EngineAlignRows(targetCorpus, GetVerseMappings(parallelCorpusId));
+         * 
+         */
         /// <summary>
-        /// Used to load  EngineParallelTextCorpus from DB into memory.
+        /// Used to load EngineParallelTextCorpus from DB into memory.
         /// </summary>
         /// <param name="engineParallelTextCorpusId"></param>
         /// <returns></returns>
-        EngineParallelTextCorpus GetParallelCorpus(ParallelCorpusId parallelCorpusId);
+        Task<EngineParallelTextCorpus?> GetParallelCorpus(ParallelCorpusId parallelCorpusId);
 
         /// <summary>
         /// used by the UI to enumerate project parallelcorpuses saved in DB ('lines' connecting corpus 'boxes' in project UI view).
         /// </summary>
         /// <returns></returns>
-        IEnumerable<ParallelCorpusId> GetParallelCorpusIds(); //used by UI to enumerate project parallel corpuses saved in db
+        Task<IEnumerable<ParallelCorpusId>?> GetParallelCorpusIds(); //used by UI to enumerate project parallel corpuses saved in db
 
-        List<EngineVerseMapping> GetVerseMappings(ParallelCorpusId parallelCorpusId);
+        /// <summary>
+        /// Used to obtain verse mappings from the DB, which are implied in the DB's parallelcorpus entity.
+        /// </summary>
+        /// <param name="parallelCorpusId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<EngineVerseMapping>?> GetVerseMappings(ParallelCorpusId parallelCorpusId);
     }
 }

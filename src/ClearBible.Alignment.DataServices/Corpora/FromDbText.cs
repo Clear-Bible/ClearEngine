@@ -21,7 +21,7 @@ namespace ClearBible.Alignment.DataServices.Corpora
             //FIXME: configures GetVersesInDocOrder() to ONLY return the text parallel related.
         }
 
-        public FromDbText(DbContext context, CorpusId corpusId, string bookId, ScrVers versification)
+        public FromDbText(DbContext context, CorpusUri corpusId, string bookId, ScrVers versification)
             : base(bookId, versification)
         {
             //FIXME: ensures GetVersesInDocOrder return all the corpus text.

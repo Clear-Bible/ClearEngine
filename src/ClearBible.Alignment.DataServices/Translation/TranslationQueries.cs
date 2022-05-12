@@ -1,25 +1,36 @@
-﻿using ClearBible.Engine.Corpora;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MediatR;
+
+using ClearBible.Alignment.DataServices.Corpora;
+using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Exceptions;
+using ClearBible.Alignment.DataServices.Features.Translation;
 
 namespace ClearBible.Alignment.DataServices.Translation
 {
     public class TranslationQueries : IITranslationQueriable
     {
-        private readonly DbContext context_;
+        private readonly IMediator mediator_;
 
-        public TranslationQueries(DbContext context)
+        public TranslationQueries(IMediator mediator)
         {
-            context_ = context;
+            mediator_ = mediator;
         }
 
-        public IEnumerable<(Token, Token)> GetAlignemnts(Corpora.ParallelCorpusId engineParallelTextCorpusId)
+        public async Task<IEnumerable<(Token, Token)>?> GetAlignemnts(ParallelCorpusId parallelCorpusId)
         {
-            throw new NotImplementedException();
+            var result = await mediator_.Send(new GetAlignmentsByParallelCorpusIdQuery(parallelCorpusId));
+            if (result.Success && result.Data != null)
+            {
+                return result.Data;
+            }
+            else if (!result.Success)
+            {
+                throw new MediatorErrorEngineException(result.Message);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

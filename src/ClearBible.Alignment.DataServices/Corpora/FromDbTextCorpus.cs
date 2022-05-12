@@ -29,7 +29,7 @@ namespace ClearBible.Alignment.DataServices.Corpora
             }
         }
 
-        public FromDbTextCorpus(DbContext context, CorpusId corpusId)
+        public FromDbTextCorpus(DbContext context, CorpusUri corpusId)
         {
             // parallelCorpusId is the primary key for the parallel corpus entity.
 

@@ -5,7 +5,7 @@ using SIL.Machine.Translation;
 
 namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 {
-    public static class EngineTranslationExtensions
+    public static class Extensions
     {
         public static IReadOnlyCollection<TokensAlignedWordPair> GetAlignedWordPairs(this WordAlignmentMatrix wordAlignmentMatrix, IWordAlignmentModel model, EngineParallelTextRow engineParallelTextRow)
         {

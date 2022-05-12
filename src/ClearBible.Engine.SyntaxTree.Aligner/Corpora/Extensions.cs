@@ -5,7 +5,7 @@ using ClearBible.Engine.SyntaxTree.Corpora;
 
 namespace ClearBible.Engine.SyntaxTree.Aligner.Corpora
 {
-    public static class SyntaxTreeExtensions
+    public static class Extensions
     {
         public static int Start(this XElement leaf)
         {

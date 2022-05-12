@@ -32,7 +32,7 @@ namespace ClearBible.Engine.Corpora
 	/// <param name="sourceVerseRefs"></param>
 	/// <param name="targetVerseRefs"></param>
     public record EngineVerseMapping(IEnumerable<EngineVerseId> sourceVerseIds, IEnumerable<EngineVerseId> targetVerseIds);
-	public static class Extensions
+	public static class EngineVerseMappingExtensions
 	{
 		public static List<EngineVerseMapping> Validate(this List<EngineVerseMapping> list, IEnumerable<TextRow> sourceCorpus, IEnumerable<TextRow> targetCorpus)
 		{

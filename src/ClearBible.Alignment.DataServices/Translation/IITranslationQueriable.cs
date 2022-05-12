@@ -12,6 +12,6 @@ namespace ClearBible.Alignment.DataServices.Translation
         /// </summary>
         /// <param name="engineParallelTextCorpusId"></param>
         /// <returns></returns>
-        IEnumerable<(Token, Token)> GetAlignemnts(ParallelCorpusId engineParallelTextCorpusId);
+        Task<IEnumerable<(Token, Token)>?> GetAlignemnts(ParallelCorpusId parallelCorpusId);
     }
 }

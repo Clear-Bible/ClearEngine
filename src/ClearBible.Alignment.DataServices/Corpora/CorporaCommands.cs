@@ -1,62 +1,67 @@
-﻿using ClearBible.Engine.Corpora;
+﻿using MediatR;
+
+using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
-using ClearBible.Engine.Utils;
-using Microsoft.EntityFrameworkCore;
+
 using SIL.Machine.Corpora;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ClearBible.Alignment.DataServices.Features.Corpora;
 
 namespace ClearBible.Alignment.DataServices.Corpora
 {
     public class CorporaCommands : ICorporaCommandable
     {
-        private readonly DbContext context_;
+        private readonly IMediator mediator_;
 
-        public CorporaCommands(DbContext context)
+        public CorporaCommands(IMediator mediator)
         {
-            context_ = context;
+            mediator_ = mediator;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="scriptureTextCorpus">Must have both .Tokenize<>() to tokenize each verse and 
-        /// .Transform<IntoTokensTextRowProcessor>() to add TokenIds added to each token already attached to it </param>
-        /// <param name="corpusId">null to create,otherwise update.</param>
-        /// <returns></returns>
-        /// <exception cref="InvalidTypeEngineException">textRow hasn't been transformed into TokensTextRow using .Transform<IntoTokensTextRowProcessor>()</exception>
-        public CorpusId PutCorpus(ScriptureTextCorpus scriptureTextCorpus, CorpusId? corpusId = null)
+        public async Task<CorpusId?> PutCorpus(ScriptureTextCorpus scriptureTextCorpus, CorpusId? corpusId = null)
         {
-            foreach (TextRow textRow in scriptureTextCorpus)
+            try
             {
-                if (textRow is not TokensTextRow)
+                scriptureTextCorpus.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
+                var result = await mediator_.Send(new PutCorpusCommand(scriptureTextCorpus, corpusId));
+                if (result.Success && result.Data != null)
                 {
+                    return result.Data;
+                }
+                else if (!result.Success)
+                {
+                    throw new MediatorErrorEngineException(result.Message);
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
+            catch (InvalidCastException)
+            {
+
                     throw new InvalidTypeEngineException(
-                        message: "textRow hasn't been transformed into TokensTextRow using .Transform<IntoTokensTextRowProcessor>()", 
-                        name: "textRow", 
+                        message: "corpus hasn't been transformed into TokensTextRow using .Transform<IntoTokensTextRowProcessor>()",
+                        name: "textRow",
                         value: "TokensTextRow");
                 }
-                //insert into db if corpusId is null, else update.
             }
-            return corpusId ?? new CorpusId("new Id");
-        }
 
-        /// <summary>
-        /// Puts parallel corpus into DB, either INSERT if engineParallelTextCorpusId is null, or UPDATE.
-        /// 
-        /// Implementation Note: this method expects all corpora Tokenized text is already in DB (via PutCorpus) and that Tokenized text
-        /// parallelized in engineParallelTextCorpus may not include all original Tokenized corpus text (e.g. function words have been filtered out) and
-        /// the resulting database state may not include parallel relationships with all corpora tokens.        /// </summary>
-        /// <param name="engineParallelTextCorpus"></param>
-        /// <param name="engineParallelTextCorpusId"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public ParallelCorpusId PutParallelCorpus(EngineParallelTextCorpus engineParallelTextCorpus, ParallelCorpusId? parallelCorpusId = null)
+        public async Task<ParallelCorpusId?> PutParallelCorpus(EngineParallelTextCorpus engineParallelTextCorpus, ParallelCorpusId? parallelTextCorpusId = null)
         {
-            throw new NotImplementedException();
+            var result = await mediator_.Send(new PutParallelCorpusCommand(engineParallelTextCorpus, parallelTextCorpusId));
+            if (result.Success && result.Data != null)
+            {
+                return result.Data;
+            }
+            else if (!result.Success)
+            {
+                throw new MediatorErrorEngineException(result.Message);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

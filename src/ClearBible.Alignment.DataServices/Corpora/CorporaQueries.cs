@@ -1,57 +1,115 @@
-﻿using ClearBible.Engine.Corpora;
+﻿using MediatR;
+
+using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
-using ClearBible.Engine.Utils;
-using Microsoft.EntityFrameworkCore;
+
+using ClearBible.Alignment.DataServices.Features.Corpora;
+using ClearBible.Alignment.DataServices.Features;
+using static ClearBible.Alignment.DataServices.Corpora.CorpusUri;
+
 using SIL.Machine.Corpora;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClearBible.Alignment.DataServices.Corpora
 {
     public class CorporaQueries : ICorporaQueriable
     {
-        private readonly DbContext context_;
+        private readonly IMediator mediator_;
 
-        public CorporaQueries(DbContext context)
+        public CorporaQueries(IMediator mediator)
         {
-            context_ = context;
+            mediator_ = mediator;
         }
 
-        public ScriptureTextCorpus GetCorpus(CorpusId corpusId)
+        private async Task<ScriptureTextCorpus?> GetCorpus(IRequest<RequestResult<ScriptureTextCorpus>> command)
         {
-            return new FromDbTextCorpus(context_, corpusId);
+            var result = await mediator_.Send(command);
+            if (result.Success && result.Data != null)
+            {
+                return result.Data;
+            }
+            else if (!result.Success)
+            {
+                throw new MediatorErrorEngineException(result.Message);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        public Task<ScriptureTextCorpus?> GetCorpus(CorpusUri corpusUri) => corpusUri.SourceType switch
+        {
+            SourceTypeEnum.ParatextDirectory => GetCorpus(new GetParatextCorpusByDirectoryPathQuery(corpusUri.Identifier)),
+            SourceTypeEnum.ParatextPlugin => GetCorpus(new GetParatextCorpusByPluginIdQuery(corpusUri.Identifier.AsInt("corpusUri.Identifier"))),
+            SourceTypeEnum.Database => GetCorpus(new GetCorpusByCorpusIdQuery(new CorpusId(corpusUri.Identifier))),
+            _ => throw new InvalidParameterEngineException(message: "Mediator command not found for uri", name: "corpusUri", value: corpusUri.ToString()),
+        };
+
+        public async Task<IEnumerable<CorpusId>?> GetCorpusIds()
+        {
+            var result = await mediator_.Send(new GetCorpusIdsQuery());
+            if (result.Success && result.Data != null)
+            {
+                return result.Data;
+            }
+            else if (!result.Success)
+            {
+                throw new MediatorErrorEngineException(result.Message);
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public ScriptureTextCorpus GetCorpusFromExternal(string location)
+        public async Task<EngineParallelTextCorpus?> GetParallelCorpus(ParallelCorpusId parallelCorpusId)
         {
-            throw new NotImplementedException();
+            var result = await mediator_.Send(new GetParallelCorpusByParallelCorpusIdQuery(parallelCorpusId));
+            if (result.Success && result.Data != null)
+            {
+                return result.Data;
+            }
+            else if (!result.Success)
+            {
+                throw new MediatorErrorEngineException(result.Message);
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public IEnumerable<CorpusId> GetCorpusIds()
+        public async Task<IEnumerable<ParallelCorpusId>?> GetParallelCorpusIds()
         {
-            throw new NotImplementedException();
+            var result = await mediator_.Send(new GetParallelCorpusIdsQuery());
+            if (result.Success && result.Data != null)
+            {
+                return result.Data;
+            }
+            else if (!result.Success)
+            {
+                throw new MediatorErrorEngineException(result.Message);
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public EngineParallelTextCorpus GetParallelCorpus(ParallelCorpusId parallelCorpusId)
+        public async Task<IEnumerable<EngineVerseMapping>?> GetVerseMappings(ParallelCorpusId parallelCorpusId)
         {
-            var sourceCorpus = new FromDbTextCorpus(context_, parallelCorpusId, true);
-
-            var targetCorpus = new FromDbTextCorpus(context_, parallelCorpusId, false);
-
-            return sourceCorpus.EngineAlignRows(targetCorpus, GetVerseMappings(parallelCorpusId));
-        }
-
-        public IEnumerable<ParallelCorpusId> GetParallelCorpusIds()
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<EngineVerseMapping> GetVerseMappings(ParallelCorpusId parallelCorpusId)
-        {
-            throw new NotImplementedException();
+            var result = await mediator_.Send(new GetVerseMappingsByParallelCorpusIdQuery(parallelCorpusId));
+            if (result.Success && result.Data != null)
+            {
+                return result.Data;
+            }
+            else if (!result.Success)
+            {
+                throw new MediatorErrorEngineException(result.Message);
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

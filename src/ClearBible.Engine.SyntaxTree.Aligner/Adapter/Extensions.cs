@@ -8,7 +8,7 @@ using ClearBible.Engine.SyntaxTree.Corpora;
 
 namespace ClearBible.Engine.SyntaxTree.Aligner.Adapter
 {
-    internal static class AdapterExtensions
+    internal static class Extensions
     {
         internal static SourceID ToSourceId(this TokenId tokenId)
         {

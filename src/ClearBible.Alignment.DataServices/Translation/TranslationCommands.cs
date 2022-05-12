@@ -11,16 +11,19 @@ using SIL.Machine.Utils;
 using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.SyntaxTree.Corpora;
 using ClearBible.Engine.SyntaxTree.Aligner.Persistence;
+using MediatR;
+using ClearBible.Alignment.DataServices.Features.Corpora;
+using ClearBible.Alignment.DataServices.Corpora;
 
 namespace ClearBible.Alignment.DataServices.Translation
 {
     public class TranslationCommands : ITranslationCommandable
     {
-        private readonly DbContext context_;
+        private readonly IMediator mediator_;
 
-        public TranslationCommands(DbContext context)
+        public TranslationCommands(IMediator mediator)
         {
-            context_ = context;
+            mediator_ = mediator;
         }
 
         public IEnumerable<(Token, Token)> PredictAllAlignments(IWordAligner wordAligner, EngineParallelTextCorpus parallelCorpus)
@@ -42,9 +45,13 @@ namespace ClearBible.Alignment.DataServices.Translation
             }
         }
 
-        public void PutAlignments(Corpora.ParallelCorpusId engineParallelTextCorpusId, IEnumerable<(Token, Token)> alignments)
+        public async Task PutAlignments(Corpora.ParallelCorpusId parallelCorpusId, IEnumerable<(Token, Token)> sourceTokenToTargetTokenAlignments)
         {
-            throw new NotImplementedException();
+            var result = await mediator_.Send(new PutAlignmentsCommand(sourceTokenToTargetTokenAlignments, parallelCorpusId));
+            if (!result.Success)
+            {
+                throw new MediatorErrorEngineException(result.Message);
+            }
         }
 
         public async Task<IWordAlignmentModel> TrainSmtModel(SmtModelType smtModelType, EngineParallelTextCorpus parallelCorpus, IProgress<ProgressStatus>? progress = null, SymmetrizationHeuristic? symmetrizationHeuristic = null)

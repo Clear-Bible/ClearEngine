@@ -6,7 +6,7 @@ using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.SyntaxTree.Corpora
 {
-    public static class SyntaxTreeExtensions
+    public static class Extensions
     {
         #region Node element atributes
         public static string? NodeId(this XElement node) =>
