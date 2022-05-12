@@ -1,6 +1,5 @@
-﻿using System.Text.RegularExpressions;
-
-using ClearBible.Engine.Exceptions;
+﻿using ClearBible.Engine.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace ClearBible.Alignment.DataServices.Corpora
 {

@@ -1,10 +1,8 @@
-﻿using MediatR;
-
+﻿using ClearBible.Alignment.DataServices.Features.Corpora;
 using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
-
+using MediatR;
 using SIL.Machine.Corpora;
-using ClearBible.Alignment.DataServices.Features.Corpora;
 
 namespace ClearBible.Alignment.DataServices.Corpora
 {
@@ -40,12 +38,12 @@ namespace ClearBible.Alignment.DataServices.Corpora
             catch (InvalidCastException)
             {
 
-                    throw new InvalidTypeEngineException(
-                        message: "corpus hasn't been transformed into TokensTextRow using .Transform<IntoTokensTextRowProcessor>()",
-                        name: "textRow",
-                        value: "TokensTextRow");
-                }
+                throw new InvalidTypeEngineException(
+                    message: "corpus hasn't been transformed into TokensTextRow using .Transform<IntoTokensTextRowProcessor>()",
+                    name: "textRow",
+                    value: "TokensTextRow");
             }
+        }
 
         public async Task<ParallelCorpusId?> PutParallelCorpus(EngineParallelTextCorpus engineParallelTextCorpus, ParallelCorpusId? parallelTextCorpusId = null)
         {

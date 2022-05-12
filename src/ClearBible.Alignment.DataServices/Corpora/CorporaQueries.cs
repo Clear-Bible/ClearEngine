@@ -5,13 +5,14 @@ using ClearBible.Engine.Exceptions;
 
 using ClearBible.Alignment.DataServices.Features.Corpora;
 using ClearBible.Alignment.DataServices.Features;
+using ClearDashboard.DAL.CQRS;
 using static ClearBible.Alignment.DataServices.Corpora.CorpusUri;
 
 using SIL.Machine.Corpora;
 
 namespace ClearBible.Alignment.DataServices.Corpora
 {
-    public class CorporaQueries : ICorporaQueriable
+    public class CorporaQueries : ICorporaQueryable
     {
         private readonly IMediator mediator_;
 

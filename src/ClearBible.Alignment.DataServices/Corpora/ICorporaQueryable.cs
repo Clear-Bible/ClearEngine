@@ -1,10 +1,9 @@
 ﻿using ClearBible.Engine.Corpora;
-
 using SIL.Machine.Corpora;
 
 namespace ClearBible.Alignment.DataServices.Corpora
 {
-    internal interface ICorporaQueriable
+    internal interface ICorporaQueryable
     {
         /* IMPLEMENTER'S NOTES:
          * 

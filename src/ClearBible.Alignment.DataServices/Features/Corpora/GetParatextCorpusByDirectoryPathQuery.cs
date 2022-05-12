@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using ClearDashboard.DAL.CQRS;
+using MediatR;
 
 using SIL.Machine.Corpora;
 
