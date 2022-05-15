@@ -10,12 +10,12 @@ using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.SyntaxTree.Corpora;
 using ClearBible.Alignment.DataServices.Translation;
 using static ClearBible.Alignment.DataServices.Translation.ITranslationCommandable;
+using ClearBible.Engine.SyntaxTree.Aligner.Persistence;
 
 using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Machine.Utils;
 using SIL.Machine.Translation;
-
 
 namespace Clear.Engine.Dashboard.Tests
 {
@@ -60,9 +60,13 @@ namespace Clear.Engine.Dashboard.Tests
                             output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")),
                         SymmetrizationHeuristic.GrowDiagFinalAnd);
 
+                    // set the manuscript tree aligner hyperparameters
+                    var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation("InputCommon").GetAsync();
+
                     using var syntaxTreeWordAlignmentModel = await translationCommandable.TrainSyntaxTreeModel(
                         parallelTextCorpus,
                         smtWordAlignmentModel,
+                        hyperparameters,
                         new DelegateProgress(status =>
                             output_.WriteLine($"Training syntax tree alignment model: {status.PercentCompleted:P}")),
                             syntaxTreePath);
@@ -90,11 +94,11 @@ namespace Clear.Engine.Dashboard.Tests
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
-                        IEnumerable<(Token, Token)> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(smtOrdinalAlignments);
+                        IEnumerable<(Token sourceToken, Token targetToken, double score)> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(smtOrdinalAlignments);
                             // (Legacy): Alignments as ordinal positions in versesmap
                         output_.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
                             // Alignments as source token to target token pairs
-                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
+                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
 
 
                         //predict syntax tree aligner alignments then display
@@ -102,7 +106,7 @@ namespace Clear.Engine.Dashboard.Tests
                         output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeWordAlignmentModel.GetBestAlignmentAlignedWordPairs(engineParallelTextRow).Select(a => a.ToString()))}");
                             // ALIGNMENTS as source token to target token pairs
                         var syntaxTreeAlignments = translationCommandable.PredictParallelMappedVersesAlignments(syntaxTreeWordAlignmentModel, engineParallelTextRow);
-                        output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.Item1.TokenId}->{t.Item2.TokenId}"))}");
+                        output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
                     }
                 }
             }

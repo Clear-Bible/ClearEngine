@@ -1,6 +1,7 @@
 ﻿using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.SyntaxTree.Aligner.Adapter;
+using ClearBible.Engine.SyntaxTree.Aligner.Exceptions;
 using ClearBible.Engine.SyntaxTree.Corpora;
 
 using SIL.Machine.Corpora;
@@ -68,11 +69,18 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 			{
 				smtTcIndex = 0;
 			}
-			HyperParameters.TranslationModel = SmtModels[IndexPrimarySmtModel].TranslationModel;
-			HyperParameters.TranslationModelTC = SmtModels[smtTcIndex].TranslationModel;
-			HyperParameters.AlignmentProbabilities = SmtModels[smtTcIndex].AlignmentModel;
-			HyperParameters.AlignmentProbabilitiesPre = SmtModels[IndexPrimarySmtModel].AlignmentModel;
-			IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> alignments = ZoneAlignmentAdapter.AlignZone(engineParallelTextRow, _syntaxTree, HyperParameters);
+			
+			HyperParameters.TranslationModel = SmtModels[IndexPrimarySmtModel].TranslationModel 
+				?? throw new NotTrainedEngineException(name: "SmtModels[IndexPrimarySmtModel].TranslationModel", value: "null");
+			HyperParameters.TranslationModelTC = SmtModels[smtTcIndex].TranslationModel 
+				?? throw new NotTrainedEngineException(name: "SmtModels[smtTcIndex].TranslationModel", value: "null");
+			HyperParameters.AlignmentProbabilities = SmtModels[smtTcIndex].AlignmentModel 
+				?? throw new NotTrainedEngineException(name: "SmtModels[smtTcIndex].AlignmentModel", value: "null");
+			HyperParameters.AlignmentProbabilitiesPre = SmtModels[IndexPrimarySmtModel].AlignmentModel 
+				?? throw new NotTrainedEngineException(name: "SmtModels[IndexPrimarySmtModel].AlignmentModel", value: "null");
+			
+			IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> alignments 
+				= ZoneAlignmentAdapter.AlignZone(engineParallelTextRow, _syntaxTree, HyperParameters);
 
 			return alignments
 				.Select(a => new TokensAlignedWordPair(a.sourceTokenId, a.targetTokenId, engineParallelTextRow) { AlignmentScore = a.score }).ToList();
@@ -125,12 +133,16 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 				using (PhaseProgress phaseProgress = reporter.StartNextPhase())
 				{
 					smtModel.TranslationModel?.Clear();
+					if (smtModel.TranslationModel == null)
+						smtModel.TranslationModel = new();
 					smtModel.TranslationModel = smtModel.SmtWordAlignmentModel.GetTranslationTable(Epsilon);
 				}
 				checkCanceled?.Invoke();
 				using (PhaseProgress phaseProgress = reporter.StartNextPhase())
 				{
-					smtModel.AlignmentModel.Clear();
+					smtModel.AlignmentModel?.Clear();
+					if (smtModel.AlignmentModel == null)
+						smtModel.AlignmentModel = new();
 					foreach (EngineParallelTextRow engineParallelTextRow in engineParallelTextRows)
 					{
 						WordAlignmentMatrix bestAlignments = smtModel.SmtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);

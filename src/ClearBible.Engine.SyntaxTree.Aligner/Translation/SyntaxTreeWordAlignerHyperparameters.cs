@@ -1,4 +1,5 @@
-﻿using ClearBible.Engine.Exceptions;
+﻿using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.SyntaxTree.Aligner.Adapter;
 using ClearBible.Engine.SyntaxTree.Aligner.Legacy;
 
@@ -7,12 +8,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 {
     public class SyntaxTreeWordAlignerHyperparameters
     {
-        private static TranslationModel ToLegacyTranslationModel(Dictionary<string, Dictionary<string, double>>? transMod)
+        private static TranslationModel ToLegacyTranslationModel(Dictionary<string, Dictionary<string, double>> transMod)
         {
-            if (transMod == null)
-            {
-                throw new InvalidDataEngineException(message: "translation model is null");
-            }
             return new TranslationModel(transMod
                 .Select(kv => KeyValuePair.Create(new SourceLemma(kv.Key), kv.Value
                     .Select(v => KeyValuePair.Create(new TargetLemma(v.Key), new Score(v.Value)))
@@ -22,13 +19,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
             );
         }
 
-        private static AlignmentModel ToLegacyAlignmentModel(List<IReadOnlyCollection<TokensAlignedWordPair>>? alignMod)
+        private static AlignmentModel ToLegacyAlignmentModel(List<IReadOnlyCollection<TokensAlignedWordPair>> alignMod)
         {
-            if (alignMod == null)
-            {
-                throw new InvalidDataEngineException(message: "alignment model is null");
-            }
-
             //{book:D2}{chapter:D3}{verse:D3}{word:D3}{subsegment:D1}
             return new AlignmentModel(alignMod
                 .SelectMany(c => c
@@ -41,77 +33,10 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
                      .ToDictionary(x => x.Key, x => x.Value)
                );
         }
-        public SyntaxTreeWordAlignerHyperparameters(
-            Dictionary<string, Dictionary<string, int>> strongs,
-            //Dictionary<string, Gloss> glossTable,
-            Dictionary<string, Dictionary<string, string>> oldLinks,
-            Dictionary<string, int> goodLinks,
-            Dictionary<string, int> badLinks,
-            List<string> sourceFunctionWords,
-            List<string> targetFunctionWords,
-            List<string> stopWords,
-            List<string> puncs,
-            TranslationModel manTransModel//,
-            //GroupTranslationsTable groups
-            )
-        {
-            this.Strongs = strongs;
-            //this.glossTable = glossTable;
-            this.OldLinks = oldLinks;
-            this.GoodLinks = goodLinks;
-            this.BadLinks = badLinks;
-            this.SourceFunctionWords = sourceFunctionWords;
-            this.TargetFunctionWords = targetFunctionWords;
-            this.StopWords = stopWords;
-            this.Puncs = puncs;
-            this.manTransModel = manTransModel;
-            //this.groups = groups;
-        }
-
-        public SyntaxTreeWordAlignerHyperparameters(
-            Dictionary<string, Dictionary<string, int>> strongs,
-            //Dictionary<string, Gloss> glossTable,
-            Dictionary<string, Dictionary<string, string>> oldLinks,
-            Dictionary<string, int> goodLinks,
-            Dictionary<string, int> badLinks,
-            List<string> sourceFunctionWords,
-            List<string> targetFunctionWords,
-            List<string> stopWords,
-            List<string> puncs,
-            TranslationModel manTransModel,
-            //GroupTranslationsTable groups,
-            int maxPaths,
-            int goodLinkMinCount,
-            int badLinkMinCount,
-            bool useAlignModel,
-            bool contentWordsOnly,
-            bool useLemmaCatModel)
-        {
-            this.MaxPaths = maxPaths;
-            this.GoodLinkMinCount = goodLinkMinCount;
-            this.BadLinkMinCount = badLinkMinCount;
-            this.UseAlignModel = useAlignModel;
-            this.ContentWordsOnly = contentWordsOnly;
-            this.UseLemmaCatModel = useLemmaCatModel;
-            this.Strongs = strongs;
-            //this.glossTable = glossTable;
-            this.OldLinks = oldLinks;
-            this.GoodLinks = goodLinks;
-            this.BadLinks = badLinks;
-            this.SourceFunctionWords = sourceFunctionWords;
-            this.TargetFunctionWords = targetFunctionWords;
-            this.StopWords = stopWords;
-            this.Puncs = puncs;
-            this.manTransModel = manTransModel;
-            //this.groups = groups;
-        }
-
-        public Dictionary<string, Dictionary<string, double>>? TranslationModel { get; set; }
-        public Dictionary<string, Dictionary<string, double>>? TranslationModelTC { get; set; }
-        public List<IReadOnlyCollection<TokensAlignedWordPair>>? AlignmentProbabilities { get; set; }
-        public List<IReadOnlyCollection<TokensAlignedWordPair>>? AlignmentProbabilitiesPre { get; set; }
 
 
+        public Dictionary<TokenId, TokenId> ApprovedAlignedTokenIdPairs { private get; set; } = new();
+        public List<string> TargetPunctuation { private get; set; } = new();
 
         /// <summary>
         /// A database of Strong's information, consisting of a dictionary
@@ -123,16 +48,15 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         ///
         // FIXME: Use Dictionary<string, HashSet<string>> instead?
         //
-        public Dictionary<string, Dictionary<string, int>> Strongs { get; }
+        public Dictionary<string, Dictionary<string, int>> Strongs { get; set; } = new();
         //public Dictionary<string, Gloss> glossTable { get; }
-        private Dictionary<string, Dictionary<string, string>> OldLinks { get; }
-        private Dictionary<string, int> GoodLinks { get; }
-        private Dictionary<string, int> BadLinks { get; }
-        private List<string> SourceFunctionWords { get; }
-        private List<string> TargetFunctionWords { get; }
-        private List<string> StopWords { get; }
-        private List<string> Puncs { get; }
-        public TranslationModel manTransModel { get; }
+        public Dictionary<string, Dictionary<string, string>> OldLinks { private get;  set; } = new();
+        public  Dictionary<string, int> GoodLinks { private get; set; } = new();
+        public Dictionary<string, int> BadLinks { private get; set; } = new();
+        public  List<string> SourceFunctionWords { private get; set; } = new();
+        public List<string> TargetFunctionWords { private get; set; } = new();
+        public List<string> StopWords { private get; set; } = new();
+        public TranslationModel ManTransModel { private get; set; } = new TranslationModel(new Dictionary<SourceLemma, Dictionary<TargetLemma, Score>>());
         //public GroupTranslationsTable groups { get; }
 
         /// <summary>
@@ -140,9 +64,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// permit during its generation of alternatives using tree traversal.
         /// </summary>
         /// 
-        public int MaxPaths { get; set; }
-        public int GoodLinkMinCount { get; set; }
-        public int BadLinkMinCount { get; set; }
+        public int MaxPaths { get; set; } = 1000000;
+        public int GoodLinkMinCount { private get; set; } = 3;
+        public int BadLinkMinCount { private get; set; } = 3;
 
         /// <summary>
         /// True if the estimated AlignmentModel should influence the
@@ -150,52 +74,61 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// source segment.
         /// </summary>
         /// 
-        public bool UseAlignModel { get; set; }
+        public bool UseAlignModel { get; set; } = true;
 
         /// <summary>
         /// True if the auto aligner should use content words only.
         /// </summary>
         /// 
-        public bool ContentWordsOnly { get; set; }
+        public bool ContentWordsOnly { get; set; } = false;
 
         /// <summary>
         /// True if lemma_cat was used to create the SMT models.
         /// </summary>
         /// 
-        public bool UseLemmaCatModel { get; set; }
+        public bool UseLemmaCatModel { get; set; } = false;
 
         /// <summary>
         /// Returns true if the specified target text is punctuation.
         /// </summary>
         /// 
-        public bool IsPunctuation(string text) => Puncs.Contains(text);
+
+
+
+        internal Dictionary<string, Dictionary<string, double>> TranslationModel { private get; set; } = new();
+        internal Dictionary<string, Dictionary<string, double>> TranslationModelTC { private get; set; } = new();
+        internal List<IReadOnlyCollection<TokensAlignedWordPair>> AlignmentProbabilities { private get; set; } = new();
+        internal List<IReadOnlyCollection<TokensAlignedWordPair>> AlignmentProbabilitiesPre { private get; set; } = new();
+
+
+        internal bool IsTargetPunctuation(string text) => TargetPunctuation.Contains(text);
 
         /// <summary>
         /// Returns true if the specified source lemma or lowercased target
         /// text is a stop word.
         /// </summary>
         /// 
-        public bool IsStopWord(string text) => StopWords.Contains(text);
+        internal bool IsStopWord(string text) => StopWords.Contains(text);
 
         /// <summary>
         /// Returns true if the specified source lemma is a function word.
         /// </summary>
         /// 
-        public bool IsSourceFunctionWord(string lemma) => SourceFunctionWords.Contains(lemma);
+        internal bool IsSourceFunctionWord(string lemma) => SourceFunctionWords.Contains(lemma);
 
         /// <summary>
         /// Returns true if the specified lowercased target text is a
         /// function word.
         /// </summary>
         /// 
-        public bool IsTargetFunctionWord(string text) => TargetFunctionWords.Contains(text);
+        internal bool IsTargetFunctionWord(string text) => TargetFunctionWords.Contains(text);
 
         /// <summary>
         /// Returns true if the specified lemma and lowercased target
         /// text has been identified as a bad link.
         /// </summary>
         /// 
-        public bool IsBadLink(string lemma, string targetTextLower)
+        internal bool IsBadLink(string lemma, string targetTextLower)
         {
             string link = $"{lemma}#{targetTextLower}";
             return
@@ -208,7 +141,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// text has been identified as a good link.
         /// </summary>
         /// 
-        public bool IsGoodLink(string lemma, string targetTextLower)
+        internal bool IsGoodLink(string lemma, string targetTextLower)
         {
             string link = $"{lemma}#{targetTextLower}";
             return
@@ -230,7 +163,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// within the verse.)
         /// </returns>
         /// 
-        public Dictionary<string, string> OldLinksForVerse(string legacyVerseID)
+        internal Dictionary<string, string> OldLinksForVerse(string legacyVerseID)
         {
             if (OldLinks.TryGetValue(legacyVerseID, out Dictionary<string, string>? linksForVerse))
             {
@@ -249,7 +182,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// model.
         /// </summary>
         /// 
-        public double GetTranslationModelScore(string sourceLemma, string targetLemma)
+        internal double GetTranslationModelScore(string sourceLemma, string targetLemma)
         {
             var _legacyTranslationModel = ToLegacyTranslationModel(TranslationModel);
             if (_legacyTranslationModel.Dictionary.TryGetValue(new SourceLemma(sourceLemma),
@@ -278,7 +211,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// and false otherwise.
         /// </returns>
         /// 
-        public bool TryGetAlignment(string sourceID, string targetID,  out double score)
+        internal bool TryGetAlignment(string sourceID, string targetID,  out double score)
         {
             var key = new BareLink(new SourceID(sourceID), new TargetID(targetID));
 
@@ -307,7 +240,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// True if some target link was found, and false otherwise.
         /// </returns>
         /// 
-        public bool TryGetPreAlignment(string sourceID, out string? targetID) =>
+        internal bool TryGetPreAlignment(string sourceID, out string? targetID) =>
             ToLegacyAlignmentModel(AlignmentProbabilitiesPre).Dictionary.Keys
                 .GroupBy(bareLink => bareLink.SourceID)
                 .Where(group => group.Any())
@@ -333,7 +266,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// is not null.
         /// </returns>
         /// 
-        public bool TryGetTranslations(string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
+        internal bool TryGetTranslations(string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
             TryGetFromTransModel(ToLegacyTranslationModel(TranslationModelTC), lemma, out tryGetScoreForTargetText);
 
         /// <summary>
@@ -350,8 +283,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// is not null.
         /// </returns>
         /// 
-        public bool TryGetManTranslations( string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
-            TryGetFromTransModel(manTransModel, lemma, out tryGetScoreForTargetText);
+        internal bool TryGetManTranslations( string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
+            TryGetFromTransModel(ManTransModel, lemma, out tryGetScoreForTargetText);
 
 
         private bool TryGetFromTransModel(

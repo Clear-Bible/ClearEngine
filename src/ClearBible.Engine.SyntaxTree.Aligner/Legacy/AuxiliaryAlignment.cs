@@ -146,7 +146,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 if (!hyperparameters.IsBadLink(
                         sourceNode.Lemma,
                         targetPoint.Lemma) &&
-                    !hyperparameters.IsPunctuation(targetPoint.Lemma) &&
+                    !hyperparameters.IsTargetPunctuation(targetPoint.Lemma) &&
                     !hyperparameters.IsStopWord(targetPoint.Lemma))
                 {
                     // Find it appropriate to link to this target word
@@ -428,7 +428,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 
             // Helper function to check for punctuation.
             bool isNotPunctuation(string text) =>
-                !hyperparameters.IsPunctuation(text);
+                !hyperparameters.IsTargetPunctuation(text);
         }
 
 
@@ -497,7 +497,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 
             // Helper function to test that target point is not punctuation.
             bool notPunctuation(MaybeTargetPoint tw) =>
-                !hyperparameters.IsPunctuation(tw.Lemma);
+                !hyperparameters.IsTargetPunctuation(tw.Lemma);
 
             // Helper function to test that target point is not a stopword.
             bool notTargetStopWord(MaybeTargetPoint tw) =>

@@ -5,7 +5,6 @@ using ClearBible.Engine.SyntaxTree.Aligner.Translation;
 using static ClearBible.Alignment.DataServices.Translation.ITranslationCommandable;
 using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.SyntaxTree.Corpora;
-using ClearBible.Engine.SyntaxTree.Aligner.Persistence;
 using ClearBible.Alignment.DataServices.Features.Corpora;
 
 using SIL.Machine.Corpora;
@@ -25,12 +24,14 @@ namespace ClearBible.Alignment.DataServices.Translation
             mediator_ = mediator;
         }
 
-        public IEnumerable<(Token, Token)> PredictAllAlignments(IWordAligner wordAligner, EngineParallelTextCorpus parallelCorpus)
+        public IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictAllAlignments(IWordAligner wordAligner, EngineParallelTextCorpus parallelCorpus)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<(Token, Token)> PredictParallelMappedVersesAlignments(IWordAligner wordAligner, EngineParallelTextRow parallelMappedVerses)
+        public IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictParallelMappedVersesAlignments(
+            IWordAligner wordAligner, 
+            EngineParallelTextRow parallelMappedVerses)
         {
             if (wordAligner is ISyntaxTreeWordAligner)
             {
@@ -53,7 +54,11 @@ namespace ClearBible.Alignment.DataServices.Translation
             }
         }
 
-        public async Task<IWordAlignmentModel> TrainSmtModel(SmtModelType smtModelType, EngineParallelTextCorpus parallelCorpus, IProgress<ProgressStatus>? progress = null, SymmetrizationHeuristic? symmetrizationHeuristic = null)
+        public async Task<IWordAlignmentModel> TrainSmtModel(
+            SmtModelType smtModelType, 
+            EngineParallelTextCorpus parallelCorpus, 
+            IProgress<ProgressStatus>? progress = null, 
+            SymmetrizationHeuristic? symmetrizationHeuristic = null)
         {
             if (symmetrizationHeuristic != null)
             {
@@ -107,30 +112,24 @@ namespace ClearBible.Alignment.DataServices.Translation
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parallelCorpus"></param>
+        /// <param name="smtTrainedWordAlignmentModel"></param>
+        /// <param name="hyperparameters">For now just pass in new SyntaxTreeWordAlignerHyperparameters() and optionally set 
+        /// ApprovedAlignedTokenIdPairs property. </param>
+        /// <param name="progress"></param>
+        /// <param name="syntaxTreesPath"></param>
+        /// <returns></returns>
         public async Task<SyntaxTreeWordAlignmentModel> TrainSyntaxTreeModel(
             EngineParallelTextCorpus parallelCorpus, 
             IWordAlignmentModel smtTrainedWordAlignmentModel, 
+            SyntaxTreeWordAlignerHyperparameters hyperparameters,
             IProgress<ProgressStatus>? progress = null, 
-            string syntaxTreesPath = "SyntaxTrees", 
-            string fileGetSyntaxTreeWordAlignerHyperparametersLocation = "InputCommon")
+            string syntaxTreesPath = "SyntaxTrees")
         {
-            // sane settings for some hyperparameters. Will look into how much these need to be tuned by Dashboard power user.
-            const bool UseAlignModel = true;
-            const int MaxPaths = 1000000;
-            const int GoodLinkMinCount = 3;
-            const int BadLinkMinCount = 3;
-            const bool ContentWordsOnly = true;
-
-
             var manuscriptTree = new SyntaxTrees(syntaxTreesPath);
-
-            // set the manuscript tree aligner hyperparameters
-            var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(fileGetSyntaxTreeWordAlignerHyperparametersLocation).GetAsync();
-            hyperparameters.UseAlignModel = UseAlignModel;
-            hyperparameters.MaxPaths = MaxPaths;
-            hyperparameters.GoodLinkMinCount = GoodLinkMinCount;
-            hyperparameters.BadLinkMinCount = BadLinkMinCount;
-            hyperparameters.ContentWordsOnly = ContentWordsOnly;
 
             // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
             ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(

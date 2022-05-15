@@ -75,19 +75,20 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
 
 
 
-            return await Task.Run(() => new SyntaxTreeWordAlignerHyperparameters(
-                strongs,
+            return await Task.Run(() => new SyntaxTreeWordAlignerHyperparameters()
+            {
+                Strongs = strongs,
                 //glossTable,
-                oldLinks,
-                goodLinks,
-                badLinks,
-                sourceFunctionWords,
-                targetFunctionWords,
-                stopWords,
-                puncs,
-                manTransModel//,
+                OldLinks = oldLinks,
+                GoodLinks = goodLinks,
+                BadLinks = badLinks,
+                SourceFunctionWords = sourceFunctionWords,
+                TargetFunctionWords = targetFunctionWords,
+                StopWords = stopWords,
+                TargetPunctuation = puncs,
+                ManTransModel = manTransModel
                 //groups
-            ));
+            });
         }
 
         private List<string> GetWordList(string file)

@@ -13,7 +13,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 		}
 		public IWordAlignmentModel SmtWordAlignmentModel { get; }
 		public Dictionary<string, Dictionary<string, double>>? TranslationModel { get; set; }
-		public List<IReadOnlyCollection<TokensAlignedWordPair>> AlignmentModel { get; } = new();
+		public List<IReadOnlyCollection<TokensAlignedWordPair>>? AlignmentModel { get; set; }
 	}
 	public interface ISyntaxTreeTrainableWordAligner : ISyntaxTreeWordAligner
     {

@@ -266,7 +266,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 
                 var candidates = targetPoints
                     .Where(tp => !hyperparameters.IsBadLink(lemma, tp.Lemma))
-                    .Where(tp => !hyperparameters.IsPunctuation(tp.Lemma))
+                    .Where(tp => !hyperparameters.IsTargetPunctuation(tp.Lemma))
                     .Where(tp => !hyperparameters.IsStopWord(tp.Lemma))
                     .Select(targetPoint =>
                     {

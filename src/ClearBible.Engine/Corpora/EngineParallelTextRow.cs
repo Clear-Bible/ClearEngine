@@ -127,32 +127,32 @@ namespace ClearBible.Engine.Corpora
 
         public IReadOnlyList<Token>? TargetTokens { get; }
 
-        public IEnumerable<(Token, Token)> GetAlignedTokenIdPairs(WordAlignmentMatrix alignment)
+        public IEnumerable<(Token sourceToken, Token targetToken, double score)> GetAlignedTokenIdPairs(WordAlignmentMatrix alignment)
         {
                 
             IReadOnlyCollection<AlignedWordPair>  alignedWordPairs = alignment.GetAlignedWordPairs();
             foreach (AlignedWordPair alignedWordPair in alignedWordPairs)
             {
-                var sourceTokenId = SourceTokens?[alignedWordPair.SourceIndex];
-                var targetTokenId = TargetTokens?[alignedWordPair.TargetIndex];
+                var sourceToken = SourceTokens?[alignedWordPair.SourceIndex];
+                var targetToken = TargetTokens?[alignedWordPair.TargetIndex];
 
-                if (sourceTokenId != null && targetTokenId != null)
+                if (sourceToken != null && targetToken != null)
                 {
-                    yield return (sourceTokenId, targetTokenId);
+                    yield return (sourceToken, targetToken, alignedWordPair.AlignmentScore);
                 }
             }
         }
 
-        public IEnumerable<(Token, Token)> GetAlignedTokenIdPairs(IReadOnlyCollection<AlignedWordPair> alignedWordPairs)
+        public IEnumerable<(Token sourceToken, Token targetToken, double score)> GetAlignedTokenIdPairs(IReadOnlyCollection<AlignedWordPair> alignedWordPairs)
         {
             foreach (AlignedWordPair alignedWordPair in alignedWordPairs)
             {
-                var sourceTokenId = SourceTokens?[alignedWordPair.SourceIndex];
-                var targetTokenId = TargetTokens?[alignedWordPair.TargetIndex];
+                var sourceToken = SourceTokens?[alignedWordPair.SourceIndex];
+                var targetToken = TargetTokens?[alignedWordPair.TargetIndex];
 
-                if (sourceTokenId != null && targetTokenId != null)
+                if (sourceToken != null && targetToken != null)
                 {
-                    yield return (sourceTokenId, targetTokenId);
+                    yield return (sourceToken, targetToken, alignedWordPair.AlignmentScore);
                 }
             }
         }
