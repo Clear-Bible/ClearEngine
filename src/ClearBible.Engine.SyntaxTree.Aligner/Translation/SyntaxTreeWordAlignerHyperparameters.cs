@@ -333,7 +333,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// is not null.
         /// </returns>
         /// 
-        public bool TryGetTranslations(string lemma, out TryGet<string, double>? tryGetScoreForTargetText) =>
+        public bool TryGetTranslations(string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
             TryGetFromTransModel(ToLegacyTranslationModel(TranslationModelTC), lemma, out tryGetScoreForTargetText);
 
         /// <summary>
@@ -350,14 +350,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// is not null.
         /// </returns>
         /// 
-        public bool TryGetManTranslations( string lemma, out TryGet<string, double>? tryGetScoreForTargetText) =>
+        public bool TryGetManTranslations( string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
             TryGetFromTransModel(manTransModel, lemma, out tryGetScoreForTargetText);
 
 
         private bool TryGetFromTransModel(
             TranslationModel translationModel,
             string lemma,
-            out TryGet<string, double>? tryGetScoreForTargetText)
+            out TryGet<string, double> tryGetScoreForTargetText)
         {
             if (translationModel.Dictionary.TryGetValue(
                 new SourceLemma(lemma),
@@ -383,7 +383,12 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
             }
             else
             {
-                tryGetScoreForTargetText = null;
+                tryGetScoreForTargetText = // should be never used since returning false. This is to avoid making the out nullable.
+                   (string targetLemma, out double score) =>
+                   {
+                           score = 0;
+                           return false;
+                    };
                 return false;
             }
         }

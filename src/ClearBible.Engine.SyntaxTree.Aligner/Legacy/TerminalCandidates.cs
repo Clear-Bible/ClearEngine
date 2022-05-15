@@ -143,7 +143,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             {
                 string targetAltID = existingLinks[altID];
 
-                TargetPoint targetPoint = 
+                TargetPoint? targetPoint = 
                     targetPoints
                     .Where(tp => targetAltID == tp.AltID)
                     .FirstOrDefault();
@@ -456,7 +456,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                     {
                         x.cand,
                         sourceID = kvp.Key,
-                        targetID = x.tp.TargetID,
+                        targetID = x.tp?.TargetID ?? new TargetID(), //to eliminate warning: already checked that x.tp is not null above.
                     }))
                 .GroupBy(x => x.targetID)
                 .Where(group => group.Skip(1).Any())
@@ -491,7 +491,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 // winning candidate, and have logScore less than zero.
                 List<Candidate> toBeRemoved =
                     candidateTable[position]
-                    .Where(cand => cand.TargetPoint.TargetID.Equals(target))
+                    .Where(cand => cand.TargetPoint?.TargetID.Equals(target) ?? false)
                     .Where(cand => cand != winningCandidate.Item2)
                     .Where(cand => cand.LogScore < 0.0)
                     .ToList();

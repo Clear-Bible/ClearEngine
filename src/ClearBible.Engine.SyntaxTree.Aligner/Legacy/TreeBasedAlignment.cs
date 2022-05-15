@@ -500,10 +500,20 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             // 'contents', calculated by concatenating together the lemma and position of all the elements of the list of Candidates.
             string getUniqueCandidateString(Candidate cand)
             {
-                return cand.GetTargetPoints()
-                    .OrderBy(tp => $"{tp.Lemma}-{tp.Position}")
-                    .Select(tp => $"{tp.Lemma}-{tp.Position}")
-                    .Aggregate((aggregate, next) => aggregate + "_" + next);
+                var targetPoints = cand.GetTargetPoints();
+
+                if (targetPoints.Any(tp => tp != null))
+                {
+                    return cand.GetTargetPoints()
+                        .Where(tp => tp != null)
+                        .OrderBy(tp => $"{tp.Lemma}-{tp.Position}")
+                        .Select(tp => $"{tp.Lemma}-{tp.Position}")
+                        .Aggregate((aggregate, next) => aggregate + "_" + next);
+                }
+                else
+                {
+                    return cand.GetTargetPoints().GetHashCode().ToString();
+                }
             }
 
             // Starting from the candidate probabilities table,

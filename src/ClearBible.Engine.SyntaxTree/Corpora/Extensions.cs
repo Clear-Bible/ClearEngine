@@ -19,6 +19,9 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                             {"attribute", "Length" }
                 });
 
+        public static XElement? ParentIfParentNotTreeElement(this XElement node) =>
+            node.Parent?.Name.LocalName != "Tree" ? node.Parent : null;
+
         #endregion
 
 

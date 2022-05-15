@@ -50,7 +50,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 links.Where(link => link.OpenTargetBond.MaybeTargetPoint.TargetPoint == null))
             {
                 // Try to align the unlinked source point.
-                OpenTargetBond linkedWord =
+                OpenTargetBond? linkedWord =
                     AlignUnlinkedSourcePoint(
                         link.SourcePoint,
                         targetPoints,
@@ -97,7 +97,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// </returns>
         ///
         /// CL: Like Align2.AlignWord()
-        public static OpenTargetBond AlignUnlinkedSourcePoint(
+        public static OpenTargetBond? AlignUnlinkedSourcePoint(
             SourcePoint sourceNode,
             List<TargetPoint> targetPoints,
             Dictionary<string, OpenMonoLink> linksTable,
@@ -120,10 +120,10 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             if (hyperparameters.UseAlignModel &&
                 hyperparameters.TryGetPreAlignment(
                     sourceNode.SourceID.AsCanonicalString,
-                    out string targetID))
+                    out string? targetID))
             {
                 // If the proposed target is already linked, then give up.
-                if (linkedTargets.Contains(targetID)) return null;
+                if (targetID == null || linkedTargets.Contains(targetID)) return null;
 
                 // Get the target point associated with the target ID
                 // of the proposal.
@@ -169,11 +169,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             if (linkedSiblings.Count > 0)
             {
                 // Get the nearest such link before the unlinked source point.
-                OpenMonoLink preNeighbor =
+                OpenMonoLink? preNeighbor =
                     GetPreNeighbor(sourceNode, linkedSiblings);
 
                 // Get the nearest such link after the unlinked source point.
-                OpenMonoLink postNeighbor =
+                OpenMonoLink? postNeighbor =
                     GetPostNeighbor(sourceNode, linkedSiblings);
 
                 // Prepare to collect candidate target points.
@@ -224,7 +224,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 {
                     // Perform further analysis to determine the best
                     // candidate from among the target candidates.
-                    OpenTargetBond newTarget = GetTopCandidate(
+                    OpenTargetBond? newTarget = GetTopCandidate(
                         sourceNode,
                         targetCandidates,
                         linkedTargets,
@@ -454,7 +454,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// is no suitable candidate.
         /// </returns>
         /// 
-        public static OpenTargetBond GetTopCandidate(
+        public static OpenTargetBond? GetTopCandidate(
             SourcePoint sWord,
             List<MaybeTargetPoint> tWords,
             List<string> linkedTargets,
@@ -619,7 +619,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// The nearest left neighboring link, or null if none is found.
         /// </returns>
         /// 
-        public static OpenMonoLink GetPreNeighbor(
+        public static OpenMonoLink? GetPreNeighbor(
             SourcePoint sourceNode,
             List<OpenMonoLink> linkedSiblings)
         {
@@ -665,7 +665,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// 
         /// </returns>
         /// 
-        public static OpenMonoLink GetPostNeighbor(
+        public static OpenMonoLink? GetPostNeighbor(
             SourcePoint sourceNode,
             List<OpenMonoLink> linkedSiblings)
         {
@@ -713,8 +713,10 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         {
             // If this tree node has a parent that is not the container
             // for the syntax tree:
-            if (treeNode.Parent != null &&
-                treeNode.Parent.Name.LocalName != "Tree")
+            var parentElement = treeNode.ParentIfParentNotTreeElement();
+            if (parentElement != null)
+            //if (treeNode.Parent != null &&
+            //    treeNode.Parent.Name.LocalName != "Tree")
             {
                 // Starting with the children of the parent
                 // but excluding the start node itself,
@@ -723,12 +725,15 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 // look up these IDs in the table of source points
                 // already linked, and keep only the non-null results.
                 List<OpenMonoLink> linkedSiblings =
-                    treeNode.Parent.Elements()
+                    //treeNode.Parent.Elements()
+                    parentElement.Elements()
                     .Where(child => child != treeNode)
                     .SelectMany(child => child.GetLeafs())
                     .Select(term => term.MorphId())
                     .Select(sourceId => linksTable.GetValueOrDefault(sourceId))
-                    .Where(x => !(x is null))
+                    //.Where(x => !(x is null))
+                    .Where(x => x != null)
+                    .Cast<OpenMonoLink>() // cast it since we've filtered out null items.
                     .ToList();
 
                 // If no links were found:
@@ -736,7 +741,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 {
                     // Try again starting with the parent node
                     // by calling this function recursively.
-                    return GetLinkedSiblings(treeNode.Parent, linksTable);
+                    return GetLinkedSiblings(parentElement, linksTable);
                 }
                 else
                 {
