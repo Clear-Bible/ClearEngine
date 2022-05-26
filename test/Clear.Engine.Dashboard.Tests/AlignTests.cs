@@ -105,7 +105,7 @@ namespace Clear.Engine.Dashboard.Tests
                         // (Legacy): Alignments as ordinal positions in versesmap - ONLY FOR COMPARISON
                         output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeWordAlignmentModel.GetBestAlignmentAlignedWordPairs(engineParallelTextRow).Select(a => a.ToString()))}");
                             // ALIGNMENTS as source token to target token pairs
-                        var syntaxTreeAlignments = translationCommandable.PredictParallelMappedVersesAlignments(syntaxTreeWordAlignmentModel, engineParallelTextRow);
+                        var syntaxTreeAlignments = translationCommandable.PredictParallelMappedVersesAlignedTokenIdPairs(syntaxTreeWordAlignmentModel, engineParallelTextRow);
                         output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
                     }
                 }

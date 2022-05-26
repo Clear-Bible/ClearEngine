@@ -24,12 +24,12 @@ namespace ClearBible.Alignment.DataServices.Translation
             mediator_ = mediator;
         }
 
-        public IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictAllAlignments(IWordAligner wordAligner, EngineParallelTextCorpus parallelCorpus)
+        public IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictAllAlignedTokenIdPairs(IWordAligner wordAligner, EngineParallelTextCorpus parallelCorpus)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictParallelMappedVersesAlignments(
+        public IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictParallelMappedVersesAlignedTokenIdPairs(
             IWordAligner wordAligner, 
             EngineParallelTextRow parallelMappedVerses)
         {

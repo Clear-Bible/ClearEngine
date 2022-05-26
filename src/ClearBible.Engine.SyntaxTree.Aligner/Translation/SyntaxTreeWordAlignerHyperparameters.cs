@@ -35,7 +35,6 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         }
 
 
-        public Dictionary<TokenId, TokenId> ApprovedAlignedTokenIdPairs { private get; set; } = new();
         public List<string> TargetPunctuation { private get; set; } = new();
 
         /// <summary>
@@ -50,6 +49,30 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         //
         public Dictionary<string, Dictionary<string, int>> Strongs { get; set; } = new();
         //public Dictionary<string, Gloss> glossTable { get; }
+
+
+        /// <summary>
+        /// Approved aligned tokenId pairs.
+        /// 1. sourceTokenId and targetTokenId within same aligned verse group are only terminal tree aligner candidate.
+        /// 2. when only approved targetTokenId for a sourceTokenId is outside of the sourceTokenId's aligned verse group, tree aligner 
+        /// does not include sourceTokenId in the alignment refinement process for that verse group.
+        /// 3. when only approved sourcetokenId for a targetTokenId is outside of the targetTokenId's aligned verse group, tree aligner
+        /// does not include targetTokenId in the alignment refinement process for that verse group.
+        /// 
+        /// Replaces legacy OldLinks.
+        /// </summary>
+        public List<(TokenId sourceTokenId, TokenId targetTokenId)> ApprovedAlignedTokenIdPairs { get; set; } = new();
+
+        /// <summary>
+        /// A legacy hyperparameter. 
+        /// 
+        /// Key: first 8 characters of a morphId attribute (and first 8 characters of a nodeId attribute), 
+        /// known as a bookChapterVerse string.
+        /// 
+        /// Value: Dict:
+        ///     Key: source AltId
+        ///     Value: Target AltId
+        /// </summary>
         public Dictionary<string, Dictionary<string, string>> OldLinks { private get;  set; } = new();
         public  Dictionary<string, int> GoodLinks { private get; set; } = new();
         public Dictionary<string, int> BadLinks { private get; set; } = new();
@@ -150,19 +173,21 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         }
 
         /// <summary>
-        /// Get a dictionary of old links for a specified verse.  When there
-        /// is an old link for a source lemma, the auto aligner should give
-        /// priority to it.
+        /// If source altid and target altid are found, that pair is the only candidate considered.
         /// </summary>
+        /// <param name="legacyVerseID">first 8 characters of a morphId attribute (and first 8 characters of a nodeId attribute)
+        /// known as a bookChapterVerse string.</param>
         /// <returns>
-        /// A dictionary that maps source word to target
-        /// word, as identified by their alternate IDs.  (Alternate IDs have
+        /// Dict:
+        ///     Key: source AltId
+        ///     Value: Target AltId
+        ///     
+        /// (Alternate IDs have
         /// the form, for example, of "λόγος-2" to mean the second occurence
         /// of the surface form "λόγος" within the verse, or "word-2" to mean
         /// the second occurrence of the surface target text "word"
         /// within the verse.)
-        /// </returns>
-        /// 
+        ///</returns>
         internal Dictionary<string, string> OldLinksForVerse(string legacyVerseID)
         {
             if (OldLinks.TryGetValue(legacyVerseID, out Dictionary<string, string>? linksForVerse))

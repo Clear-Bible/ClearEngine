@@ -1,5 +1,6 @@
 ﻿using System.Xml.Linq;
-
+using ClearBible.Engine.Exceptions;
+using ClearBible.Engine.SyntaxTree.Aligner.Adapter;
 using ClearBible.Engine.SyntaxTree.Aligner.Translation;
 using ClearBible.Engine.SyntaxTree.Corpora;
 
@@ -41,7 +42,6 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 Dictionary<SourceID, SourcePoint> sourcePointsByID,
                 Dictionary<string, string> idMap,
                 List<TargetPoint> targetPoints,
-                Dictionary<string, string> existingLinks,
                 SyntaxTreeWordAlignerHyperparameters hyperparameters)
         {
             Dictionary<SourceID, List<Candidate>> candidateTable2 = new();
@@ -63,7 +63,6 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                         sourcePoint,
                         strong,
                         targetPoints,
-                        existingLinks,
                         hyperparameters);
 
 
@@ -127,7 +126,6 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             SourcePoint sourcePoint,
             string strong,
             List<TargetPoint> targetPoints,
-            Dictionary <string, string> existingLinks,
             SyntaxTreeWordAlignerHyperparameters hyperparameters)
         {
             string sourceID = sourcePoint.SourceID.AsCanonicalString;
@@ -135,8 +133,35 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             string lemma = sourcePoint.Lemma;
             string category = sourcePoint.Category;
 
-            // If there is an existing link for the source word:
-            //
+            // ApprovedAlignedTokenIdPairs 1 of 3 - return only approved aligned source target candidate
+            // for source and target in verse group 
+            var approvedCandidates = hyperparameters.ApprovedAlignedTokenIdPairs
+                .Where(p => p.sourceTokenId.ToSourceId().Equals(sourcePoint.SourceID))
+                .Select(p => p.targetTokenId.ToTargetId())
+                //.Where(targetId => targetPoints.Select(tp => tp.TargetID).Contains(targetId))
+                //if pair's target not in target points, this will project an empty enumerable, and if all projections are empty
+                //enumerables this will project a flattened empty enumerable.
+                .SelectMany(targetId => targetPoints.Where(tp => tp.TargetID.Equals(targetId))) 
+                .Select(tp => Candidate.NewPoint(sourcePoint, tp, 0.0))
+                .ToList();
+            if (approvedCandidates.Count > 0)
+            {
+                return approvedCandidates;
+            }
+
+            // ApprovedAlignedTokenIdPairs - 2 of 3 - remove targets that are only approved as aligned to sources
+            // not in this verse group.
+            // (If a targetpoint is in the approvedalignedtokenidpairs at this point, it must be only matched with one or more
+            // sourcepoints outside of this verse group).
+            targetPoints = targetPoints
+                .Where(tp => !hyperparameters.ApprovedAlignedTokenIdPairs.Select(p => p.targetTokenId.ToTargetId()).Contains(tp.TargetID))
+                .ToList();
+
+
+            // legacy OldLinks
+            string bookChapterVerse = sourcePoint.SourceID.BookChapterVerse;
+            Dictionary<string, string> existingLinks = hyperparameters.OldLinksForVerse(bookChapterVerse);
+
             if (existingLinks.Count > 0 &&
                 altID != null &&
                 existingLinks.ContainsKey(altID))

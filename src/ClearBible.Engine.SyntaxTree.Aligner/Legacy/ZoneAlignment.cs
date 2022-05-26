@@ -1,7 +1,7 @@
 ﻿using System.Xml.Linq;
 
+using ClearBible.Engine.SyntaxTree.Aligner.Adapter;
 using ClearBible.Engine.SyntaxTree.Aligner.Translation;
-using ClearBible.Engine.SyntaxTree.Corpora;
 
 namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 {
@@ -11,9 +11,6 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
     /// </summary>
     /// 
 
-    //-
-    //public class ZoneAlignment
-    //+
     class ZoneAlignment
     {
         /// <summary>
@@ -30,21 +27,24 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             SyntaxTreeWordAlignerHyperparameters hyperparameters
             )
         {
+            // ApprovedAlignedTokenIdPairs - 3 of 3 - only include source points either not approved to any targets
+            // or those approved to at least one target in this verse group.
+            sourcePoints = sourcePoints
+                .Where(sp =>
+                    !hyperparameters.ApprovedAlignedTokenIdPairs
+                        .Select(p => p.sourceTokenId.ToSourceId()).Contains(sp.SourceID) // source point not approved to any target
+                    || hyperparameters.ApprovedAlignedTokenIdPairs
+                        .Where(p => p.sourceTokenId.ToSourceId().Equals(sp.SourceID)) // approved pairs for source point
+                        .SelectMany(p => targetPoints
+                            .Where(tp => tp.TargetID.Equals(p.targetTokenId.ToTargetId())))
+                        .Count() > 0)
+                .ToList();
+               
             // Prepare to look up source points by alternate ID.
             Dictionary<string, string> sourceAltIdMap =
                 sourcePoints.ToDictionary(
                     sp => sp.SourceID.AsCanonicalString,
                     sp => sp.AltID);
-
-            var bookChapterVerses = 
-                treeNode.GetLeafs()
-                    .Select(e => e.BookChapterVerse()) //NOTE: this gets the first 8 characters of morphId. Original implementation got first 8 characters of nodeId. They appear to be the same in the current trees.
-                    .Distinct() //unordered
-                    .OrderBy(s => s);
-            Dictionary<string, string> existingLinks = 
-                bookChapterVerses
-                .SelectMany(bcv => hyperparameters.OldLinksForVerse(bcv))
-                .ToDictionary(x => x.Key, x => x.Value);
 
             // Create index of source points by SourceID.
             Dictionary<SourceID, SourcePoint> sourcePointsByID =
@@ -62,7 +62,6 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                    sourcePointsByID,
                    sourceAltIdMap,
                    targetPoints,
-                   existingLinks,
                    hyperparameters);
 
             // Traverse the syntax tree starting from the terminals

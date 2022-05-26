@@ -10,12 +10,27 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         public int Word => int.Parse(_tag.Substring(8, 3));
         public int Subsegment => int.Parse(_tag.Substring(11, 1));
 
+        public string BookChapterVerse => _tag.Substring(0, 8);
+
         private readonly string _tag;
 
         public SourceID(string tag) { _tag = tag; }
         public string AsCanonicalString => _tag;
     }
 
+    public readonly struct TargetID
+    {
+        public int Book => int.Parse(_tag.Substring(0, 2));
+        public int Chapter => int.Parse(_tag.Substring(2, 3));
+        public int Verse => int.Parse(_tag.Substring(5, 3));
+        public int Word => int.Parse(_tag.Substring(8, 3));
+        public int Subsegment => int.Parse(_tag.Substring(11, 1));
+        public string BookChapterVerse => _tag.Substring(0, 8);
+
+        private readonly string _tag;
+        public TargetID(string tag) { _tag = tag; }
+        public string AsCanonicalString => _tag;
+    }
     public record SourcePoint(
         string Lemma,
         string Category,
@@ -36,18 +51,6 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                             // source segments in manuscript order for this
                             // zone
     );
-    public readonly struct TargetID
-    {
-        public int Book => int.Parse(_tag.Substring(0, 2));
-        public int Chapter => int.Parse(_tag.Substring(2, 3));
-        public int Verse => int.Parse(_tag.Substring(5, 3));
-        public int Word => int.Parse(_tag.Substring(8, 3));
-
-        private readonly string _tag;
-
-        public TargetID(string tag) { _tag = tag; }
-        public string AsCanonicalString => _tag;
-    }
 
     public record TargetText(string Text);
     public record TargetLemma(string Text);

@@ -59,7 +59,7 @@ namespace ClearBible.Alignment.DataServices.Translation
         /// <param name="wordAligner"></param>
         /// <param name="parallelCorpus"></param>
         /// <returns></returns>
-        IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictAllAlignments(IWordAligner wordAligner, EngineParallelTextCorpus parallelCorpus);
+        IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictAllAlignedTokenIdPairs(IWordAligner wordAligner, EngineParallelTextCorpus parallelCorpus);
 
         /// <summary>
         /// Used to predict the alignments for a specific engine paralel verses (i.e. a single pair of verses or grouping of verses). 
@@ -67,7 +67,7 @@ namespace ClearBible.Alignment.DataServices.Translation
         /// <param name="wordAligner"></param>
         /// <param name="engineParallelVerses"></param>
         /// <returns></returns>
-        IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictParallelMappedVersesAlignments(IWordAligner wordAligner, EngineParallelTextRow parallelMappedVerses);
+        IEnumerable<(Token sourceToken, Token targetToken, double score)> PredictParallelMappedVersesAlignedTokenIdPairs(IWordAligner wordAligner, EngineParallelTextRow parallelMappedVerses);
 
         /* IMPLEMENTER'S NOTES:
          * mediator's result.Data is ignored. Marked as object in Command to accommodate compilation needs of RequestResult only.

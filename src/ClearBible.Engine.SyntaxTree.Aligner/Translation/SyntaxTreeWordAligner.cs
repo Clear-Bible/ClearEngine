@@ -83,8 +83,10 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 				= ZoneAlignmentAdapter.AlignZone(engineParallelTextRow, _syntaxTree, HyperParameters);
 
 			return alignments
-				.Select(a => new TokensAlignedWordPair(a.sourceTokenId, a.targetTokenId, engineParallelTextRow) { AlignmentScore = a.score }).ToList();
-        }
+				.Select(a => new TokensAlignedWordPair(a.sourceTokenId, a.targetTokenId, engineParallelTextRow) { AlignmentScore = Math.Exp(a.score) }).ToList(); 
+				//Math.Exp because tree aligner works in ln of probability.
+				//See https://github.com/Clear-Bible/ClearEngine/blob/prototype_2020_tim_final/src/Impl.Persistence/Persistence.cs#L90
+		}
 		/// <summary>
 		/// Load generated collections of Translations And Alignments
 		/// </summary>

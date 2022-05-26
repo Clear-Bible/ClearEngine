@@ -28,7 +28,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Adapter
 
             string clearBookNumString = int.Parse(bookId.clearTreeBookNum).ToString("00");
 
-            return new TargetID($"{clearBookNumString}{tokenId.ChapterNumber.ToString("000")}{tokenId.VerseNumber.ToString("000")}{tokenId.WordNumber.ToString("000")}");
+            return new TargetID($"{clearBookNumString}{tokenId.ChapterNumber.ToString("000")}{tokenId.VerseNumber.ToString("000")}{tokenId.WordNumber.ToString("000")}{tokenId.SubWordNumber.ToString("0")}");
         }
         internal static TokenId ToTokenId(this SourceID sourceId)
         {
@@ -48,7 +48,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Adapter
 
             string silBookNumString = int.Parse(bookId.silCannonBookNum).ToString("000");
 
-            return new TokenId($"{silBookNumString}{targetId.Chapter.ToString("000")}{targetId.Verse.ToString("000")}{targetId.Word.ToString("000")}001");
+            return new TokenId($"{silBookNumString}{targetId.Chapter.ToString("000")}{targetId.Verse.ToString("000")}{targetId.Word.ToString("000")}{targetId.Subsegment.ToString("000")}");
         }
 
         /// <summary>
