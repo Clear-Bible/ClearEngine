@@ -30,6 +30,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         private readonly string _tag;
         public TargetID(string tag) { _tag = tag; }
         public string AsCanonicalString => _tag;
+        public override bool Equals(object? obj) => obj is TargetID other && Equals(other);
+        public bool Equals(TargetID t) => _tag == t._tag;
+        public override int GetHashCode() => _tag.GetHashCode();
     }
     public record SourcePoint(
         string Lemma,

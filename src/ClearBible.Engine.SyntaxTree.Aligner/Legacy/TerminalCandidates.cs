@@ -36,7 +36,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// node in the syntax tree.
         /// </returns>
         /// 
-        public static Dictionary<SourceID, List<Candidate>>
+        internal static Dictionary<SourceID, List<Candidate>>
             GetTerminalCandidates(
                 XElement treeNode,
                 Dictionary<SourceID, SourcePoint> sourcePointsByID,
@@ -122,7 +122,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// A list of alternative candidate target words for the source word.
         /// </returns>
         /// 
-        public static List<Candidate> GetTerminalCandidatesForWord(
+        private static List<Candidate> GetTerminalCandidatesForWord(
             SourcePoint sourcePoint,
             string strong,
             List<TargetPoint> targetPoints,
@@ -133,6 +133,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             string lemma = sourcePoint.Lemma;
             string category = sourcePoint.Category;
 
+
             // ApprovedAlignedTokenIdPairs 1 of 3 - return only approved aligned source target candidate
             // for source and target in verse group 
             var approvedCandidates = hyperparameters.ApprovedAlignedTokenIdPairs
@@ -141,7 +142,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 //.Where(targetId => targetPoints.Select(tp => tp.TargetID).Contains(targetId))
                 //if pair's target not in target points, this will project an empty enumerable, and if all projections are empty
                 //enumerables this will project a flattened empty enumerable.
-                .SelectMany(targetId => targetPoints.Where(tp => tp.TargetID.Equals(targetId))) 
+                .SelectMany(targetId => targetPoints.Where(tp => tp.TargetID.Equals(targetId)))
+                .Distinct()
                 .Select(tp => Candidate.NewPoint(sourcePoint, tp, 0.0))
                 .ToList();
             if (approvedCandidates.Count > 0)
@@ -149,8 +151,24 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 return approvedCandidates;
             }
 
-            // ApprovedAlignedTokenIdPairs - 2 of 3 - remove targets that are only approved as aligned to sources
-            // not in this verse group.
+            // ApprovedAlignedTokenIdPairs - 2 of 3 - don't align sourcePoints with approvedalignedtokenidpairs where none of the pairs
+            // are to targets in this verse group.
+            if (hyperparameters.ApprovedAlignedTokenIdPairs
+                    .Select(p => p.sourceTokenId.ToSourceId()).Contains(sourcePoint.SourceID) // IF source point is approved to one or more targets
+                &&
+                hyperparameters.ApprovedAlignedTokenIdPairs
+                    .Where(p => p.sourceTokenId.ToSourceId().Equals(sourcePoint.SourceID))  // (enumerable of approved pairs for source point)
+                    .SelectMany(p => targetPoints
+                        .Where(tp => tp.TargetID.Equals(p.targetTokenId.ToTargetId())))     // (enumerable of all targetPoints sourcePoint is approved for for this verse group
+                    .Count() == 0)                                                          // AND none of the target points are in this verse group.
+            {
+                return new List<Candidate>();   //I believe this is the way to indicate to tree aligner that there are no candidates to consider. 
+                                                //Other approach is to remove sourcepoint from consideration at the beginning. Replacement 2114134.
+            }
+
+
+            // ApprovedAlignedTokenIdPairs - 3 of 3 - remove targets that are only approved as aligned to sources
+            // not in this verse group from consideration.
             // (If a targetpoint is in the approvedalignedtokenidpairs at this point, it must be only matched with one or more
             // sourcepoints outside of this verse group).
             targetPoints = targetPoints
@@ -220,17 +238,17 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 
             // If the source point is a stop word:
             //
-            if (hyperparameters.IsStopWord(lemma))
+            if (hyperparameters.ExcludeLemmaFromAlignment(lemma))
             {
                 // There are no alternatives.
                 //
                 return new List<Candidate>();
             }
 
-            // If the manual translation model has any definitions for
+            // If the translation model override has any definitions for
             // the source point:
             //
-            if (hyperparameters.TryGetManTranslations(lemma,
+            if (hyperparameters.TryGetTranslationModelOverride(lemma,
                 out TryGet<string, double> tryGetManScoreForTargetText))
             {
                 // The candidates are the possibly empty set of target words
@@ -292,7 +310,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                 var candidates = targetPoints
                     .Where(tp => !hyperparameters.IsBadLink(lemma, tp.Lemma))
                     .Where(tp => !hyperparameters.IsTargetPunctuation(tp.Lemma))
-                    .Where(tp => !hyperparameters.IsStopWord(tp.Lemma))
+                    .Where(tp => !hyperparameters.ExcludeLemmaFromAlignment(tp.Lemma))
                     .Select(targetPoint =>
                     {
                         bool ok = tryGetScoreForTargetText(
@@ -391,7 +409,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// in the zone currently being aligned.
         /// </param>
         /// 
-        public static void ResolveConflicts(
+        private static void ResolveConflicts(
             Dictionary<SourceID, List<Candidate>> candidateTable)
         {
             // Find competing non-first candidates, expressed as a
@@ -451,7 +469,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// source ID.
         /// </returns>
         ///
-        static List<(TargetID, List<(SourceID, Candidate)>)>
+        private static List<(TargetID, List<(SourceID, Candidate)>)>
             FindConflicts(
                 Dictionary<SourceID, List<Candidate>> candidateTable)
         {
@@ -501,7 +519,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// themselves certain.
         /// </summary>
         /// 
-        static void RemoveLosingCandidates(
+        private static void RemoveLosingCandidates(
             TargetID target,
             List<(SourceID, Candidate)> positions,
             (SourceID, Candidate) winningCandidate,
@@ -540,7 +558,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// Lookup table for obtaining a source point from its source ID.
         /// </param>
         /// 
-        public static void FillGaps(
+        private static void FillGaps(
             Dictionary<SourceID, List<Candidate>> candidateTable,
             Dictionary<SourceID, SourcePoint> sourcePointsById)
         {

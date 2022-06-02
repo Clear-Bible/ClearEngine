@@ -29,7 +29,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// source ID is expressed as the canonical string.
         /// </param>
         /// Like Align.AlignNodes()? Looks like a wrapper around AlignNodes()
-        public static Candidate AlignTree(
+        internal static Candidate AlignTree(
             XElement treeNode,
             int numberTargets,
             int maxPaths,
@@ -81,7 +81,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// A database of possible choices for each source ID.
         /// </param>
         /// 
-        public static void AlignNode(
+        private static void AlignNode(
             XElement treeNode,
             int n,
             int maxPaths,
@@ -158,7 +158,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// A list of alternatives for each of the children.
         /// </param>
         /// Like Candidates.ComputeTopCandidates()
-        public static List<Candidate>
+        private static List<Candidate>
             ComputeTopCandidates(
                 int n,
                 int maxPaths,

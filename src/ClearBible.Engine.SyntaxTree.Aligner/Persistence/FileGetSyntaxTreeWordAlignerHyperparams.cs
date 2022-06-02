@@ -38,10 +38,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
             var strongsPath = AddPathPrefix("strongs.txt");
 
             var puncs = new List<string>();
-            var stopWords = new List<string>();
+            var lemmasToExcludeFromAlignment = new List<string>(); //was stopwords
             var sourceFunctionWords = new List<string>();
             var targetFunctionWords = new List<string>();
-            var manTransModel = new TranslationModel(new Dictionary<SourceLemma, Dictionary<TargetLemma, Score>>());
+            var translationModelOverride = new Dictionary<string, Dictionary<string, double>>();
+            //var manTransModel = new TranslationModel(new Dictionary<SourceLemma, Dictionary<TargetLemma, Score>>());
             var groups = new GroupTranslationsTable(new Dictionary<SourceLemmasAsText, HashSet<TargetGroup>>());
             var goodLinks = new Dictionary<string, int>();
             var badLinks = new Dictionary<string, int>();
@@ -50,13 +51,21 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
             var strongs = new Dictionary<string, Dictionary<string, int>>();
 
             if (File.Exists(puncsPath)) puncs = GetWordList(puncsPath);
-            if (File.Exists(stopWordsPath)) stopWords = GetStopWords(stopWordsPath);
+            if (File.Exists(stopWordsPath)) lemmasToExcludeFromAlignment = GetStopWords(stopWordsPath);
             if (File.Exists(sourceFuncWordsPath)) sourceFunctionWords = GetWordList(sourceFuncWordsPath);
             if (File.Exists(targetFuncWordsPath)) targetFunctionWords = GetWordList(targetFuncWordsPath);
             if (File.Exists(manTransModelPath))
             {
                 var manTransModelOrig = GetTranslationModel2(manTransModelPath);
 
+                translationModelOverride = manTransModelOrig
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value.ToDictionary(
+                            valueKvp => valueKvp.Key,
+                            valueKvp => valueKvp.Value.Prob));
+
+                /*
                 manTransModel =
                 new TranslationModel(
                     manTransModelOrig.ToDictionary(
@@ -64,6 +73,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
                         kvp => kvp.Value.ToDictionary(
                             kvp2 => new TargetLemma(kvp2.Key),
                             kvp2 => new Score(kvp2.Value.Prob))));
+                */
             }
 
             if (File.Exists(goodLinksPath)) goodLinks = GetXLinks(goodLinksPath);
@@ -84,9 +94,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
                 BadLinks = badLinks,
                 SourceFunctionWords = sourceFunctionWords,
                 TargetFunctionWords = targetFunctionWords,
-                StopWords = stopWords,
+                SourceAndTargetLemmasToExcludeFromAlignment = lemmasToExcludeFromAlignment,
                 TargetPunctuation = puncs,
-                ManTransModel = manTransModel
+                TranslationModelOverride = translationModelOverride
                 //groups
             });
         }

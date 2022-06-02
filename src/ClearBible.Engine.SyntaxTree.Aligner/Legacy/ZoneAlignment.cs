@@ -27,7 +27,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             SyntaxTreeWordAlignerHyperparameters hyperparameters
             )
         {
-            // ApprovedAlignedTokenIdPairs - 3 of 3 - only include source points either not approved to any targets
+            /* replacement 2114134
+            // ApprovedAlignedTokenIdPairs - 2 of 3 - only include source points either not approved to any targets
             // or those approved to at least one target in this verse group.
             sourcePoints = sourcePoints
                 .Where(sp =>
@@ -39,7 +40,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                             .Where(tp => tp.TargetID.Equals(p.targetTokenId.ToTargetId())))
                         .Count() > 0)
                 .ToList();
-               
+            */
+            
             // Prepare to look up source points by alternate ID.
             Dictionary<string, string> sourceAltIdMap =
                 sourcePoints.ToDictionary(
@@ -58,7 +60,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             // CL: Like GetTerminalCandidates()
             Dictionary<SourceID, List<Candidate>> terminalCandidates2 =
                TerminalCandidates.GetTerminalCandidates(
-                   treeNode,
+                   treeNode, //FIXME: I dont' think this param is needed.
                    sourcePointsByID,
                    sourceAltIdMap,
                    targetPoints,
@@ -121,7 +123,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// target point.
         /// </summary>
         /// 
-        public static List<OpenMonoLink> MakeOpenMonoLinks(
+        private static List<OpenMonoLink> MakeOpenMonoLinks(
             Candidate topCandidate2)
         {
             return
@@ -154,7 +156,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// choosing which links to keep.
         /// </param>
         /// 
-        public static void ResolveConflicts(
+        private static void ResolveConflicts(
             List<OpenMonoLink> links,
             bool tryHarder)
         {
@@ -223,7 +225,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// of links that share the same target word.
         /// </returns>
         /// 
-        public static List<List<OpenMonoLink>> FindConflictingLinks(
+        private static List<List<OpenMonoLink>> FindConflictingLinks(
             List<OpenMonoLink> links)
         {
             // Compute the result by starting with the links,
@@ -262,7 +264,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// A list of the winning links.
         /// </returns>
         /// 
-        public static List<OpenMonoLink> FindWinners(
+        private static List<OpenMonoLink> FindWinners(
             List<OpenMonoLink> conflict,
             bool tryHarder)
         {
@@ -321,7 +323,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// OpenMonoLink objects.
         /// </param>
         /// 
-        public static void FixCrossingOpenMonoLinks(
+        private static void FixCrossingOpenMonoLinks(
             List<OpenMonoLink> links)
         {
             // Group the links by the lemma of the source point,
@@ -353,7 +355,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// those that do not really have a target point.
         /// </summary>
         /// 
-        public static List<MonoLink> ResolveOpenMonoLinks(
+        private static List<MonoLink> ResolveOpenMonoLinks(
             List<OpenMonoLink> links)
         {
             // Construct the result by starting with the open mono links,
@@ -392,7 +394,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// True if crossing and false if not.
         /// </returns>
         /// 
-        public static bool CrossingMono(IEnumerable<OpenMonoLink> mappedWords)
+        private static bool CrossingMono(IEnumerable<OpenMonoLink> mappedWords)
         {
             // Get the source positions as the tree positions of the source
             // points in the links.

@@ -51,6 +51,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         //public Dictionary<string, Gloss> glossTable { get; }
 
 
+        //NOTE: complete
         /// <summary>
         /// Approved aligned tokenId pairs.
         /// 1. sourceTokenId and targetTokenId within same aligned verse group are only terminal tree aligner candidate.
@@ -78,8 +79,13 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         public Dictionary<string, int> BadLinks { private get; set; } = new();
         public  List<string> SourceFunctionWords { private get; set; } = new();
         public List<string> TargetFunctionWords { private get; set; } = new();
-        public List<string> StopWords { private get; set; } = new();
-        public TranslationModel ManTransModel { private get; set; } = new TranslationModel(new Dictionary<SourceLemma, Dictionary<TargetLemma, Score>>());
+
+        //NOTE: complete
+        /// <summary>
+        /// source or target lemmas to exclude from alignment
+        /// </summary>
+        public List<string> SourceAndTargetLemmasToExcludeFromAlignment { private get; set; } = new();
+
         //public GroupTranslationsTable groups { get; }
 
         /// <summary>
@@ -111,12 +117,19 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// 
         public bool UseLemmaCatModel { get; set; } = false;
 
+
+
+
+
+        //NOTE: complete
         /// <summary>
-        /// Returns true if the specified target text is punctuation.
-        /// </summary>
+        /// Overrides the translation model. 
         /// 
+        /// (formerly ManTransModel)
+        /// </summary>
+        internal Dictionary<string, Dictionary<string, double>> TranslationModelOverride { private get; set; } = new();
 
-
+        //public TranslationModel ManTransModel { private get; set; } = new TranslationModel(new Dictionary<SourceLemma, Dictionary<TargetLemma, Score>>());
 
         internal Dictionary<string, Dictionary<string, double>> TranslationModel { private get; set; } = new();
         internal Dictionary<string, Dictionary<string, double>> TranslationModelTC { private get; set; } = new();
@@ -124,14 +137,17 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         internal List<IReadOnlyCollection<TokensAlignedWordPair>> AlignmentProbabilitiesPre { private get; set; } = new();
 
 
+        /// <summary>
+        /// Returns true if the specified target text is punctuation.
+        /// </summary>
+        /// 
         internal bool IsTargetPunctuation(string text) => TargetPunctuation.Contains(text);
 
         /// <summary>
-        /// Returns true if the specified source lemma or lowercased target
-        /// text is a stop word.
+        /// Returns true if the specified source or target lemma should be ignored during the alignment process.
         /// </summary>
         /// 
-        internal bool IsStopWord(string text) => StopWords.Contains(text);
+        internal bool ExcludeLemmaFromAlignment(string text) => SourceAndTargetLemmasToExcludeFromAlignment.Contains(text);
 
         /// <summary>
         /// Returns true if the specified source lemma is a function word.
@@ -294,22 +310,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         internal bool TryGetTranslations(string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
             TryGetFromTransModel(ToLegacyTranslationModel(TranslationModelTC), lemma, out tryGetScoreForTargetText);
 
-        /// <summary>
-        /// Get the translation of a source lemma from the confirmed
-        /// translation model.
-        /// </summary>
-        /// <param name="tryGetScoreForTargetText">
-        /// Will be set to a function that looks up scores for
-        /// target texts, or null if there are no translations for
-        /// the lemma.
-        /// </param>
-        /// <returns>
-        /// True if any translations exist and so tryGetScoreForTargetText
-        /// is not null.
-        /// </returns>
-        /// 
-        internal bool TryGetManTranslations( string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
-            TryGetFromTransModel(ManTransModel, lemma, out tryGetScoreForTargetText);
+        //NOTE: complete
+        internal bool TryGetTranslationModelOverride( string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
+            TryGetFromTransModel(ToLegacyTranslationModel(TranslationModelOverride), lemma, out tryGetScoreForTargetText);
 
 
         private bool TryGetFromTransModel(

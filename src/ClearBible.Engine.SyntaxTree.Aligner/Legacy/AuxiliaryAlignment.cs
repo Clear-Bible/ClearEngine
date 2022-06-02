@@ -105,7 +105,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             SyntaxTreeWordAlignerHyperparameters hyperparameters)
         {
             // If the source point is a stop word, then give up.
-            if (hyperparameters.IsStopWord(sourceNode.Lemma)) return null;
+            if (hyperparameters.ExcludeLemmaFromAlignment(sourceNode.Lemma)) return null;
 
             // If assuming content words only and the source point
             // is a function word, then give up.
@@ -133,7 +133,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 
                 // If the source point is a stop word and the proposal
                 // has not been declared as a good link, then give up.
-                if (hyperparameters.IsStopWord(sourceNode.Lemma) &&
+                if (hyperparameters.ExcludeLemmaFromAlignment(sourceNode.Lemma) &&
                     !hyperparameters.IsGoodLink(
                         sourceNode.Lemma,
                         targetPoint.Lemma))
@@ -147,7 +147,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
                         sourceNode.Lemma,
                         targetPoint.Lemma) &&
                     !hyperparameters.IsTargetPunctuation(targetPoint.Lemma) &&
-                    !hyperparameters.IsStopWord(targetPoint.Lemma))
+                    !hyperparameters.ExcludeLemmaFromAlignment(targetPoint.Lemma))
                 {
                     // Find it appropriate to link to this target word
                     // with a (log) probability of 0.
@@ -501,7 +501,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 
             // Helper function to test that target point is not a stopword.
             bool notTargetStopWord(MaybeTargetPoint tw) =>
-                !hyperparameters.IsStopWord(tw.Lemma);
+                !hyperparameters.ExcludeLemmaFromAlignment(tw.Lemma);
 
             // Helper function to test that target point is not already linked.
             bool notAlreadyLinked(MaybeTargetPoint tw) =>
@@ -514,7 +514,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             // Helper function to test that if source point is a stopword
             // then candidate is a good link.
             bool sourceStopWordImpliesIsGoodLink(MaybeTargetPoint tw) =>
-                !hyperparameters.IsStopWord(sWord.Lemma) ||
+                !hyperparameters.ExcludeLemmaFromAlignment(sWord.Lemma) ||
                 hyperparameters.IsGoodLink(sWord.Lemma, tw.Lemma);
 
             // 2021.05.27 CL: This is where we need to check if we used lemma_cat to develop the translation model.
