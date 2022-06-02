@@ -69,7 +69,7 @@ namespace ClearBible.Engine.Corpora
             IsSentenceStart = textRow.IsSentenceStart;
             IsInRange = textRow.IsInRange;
             IsRangeStart = textRow.IsRangeStart;
-            IsEmpty = textRow.IsEmpty;
+            IsEmpty = false;
 
             Tokens = tokens;
         }

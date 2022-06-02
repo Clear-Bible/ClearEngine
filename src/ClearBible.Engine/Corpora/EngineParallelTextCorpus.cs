@@ -191,11 +191,11 @@ namespace ClearBible.Engine.Corpora
 				.Where(mapping => mapping.sourceVerseIds
 					.Select(svid => svid.Book)
 					.Except(textIds)
-					.Count() > 0)
-				.Where(mapping => mapping.sourceVerseIds
+					.Count() == 0)
+				.Where(mapping => mapping.targetVerseIds
 					.Select(tvid => tvid.Book)
 					.Except(textIds)
-					.Count() > 0))
+					.Count() == 0))
 			{
 				var parallelSourceTextRows = sourceTextRows
 					.Where(textRow => engineVerseMapping.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textRow.Ref)));

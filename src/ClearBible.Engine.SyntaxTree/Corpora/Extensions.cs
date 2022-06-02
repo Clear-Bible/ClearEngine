@@ -105,28 +105,22 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
         /// <returns></returns>
         public static int BookNum(this XElement leaf)
         {
-            string subString = leaf.MorphId().Substring(0, 2);
-            string bookNumberString = BookIds
-                .Where(bookId => bookId.clearTreeBookNum.Equals(subString.Trim()))
-                .FirstOrDefault()?.silCannonBookNum ?? throw new InvalidTreeEngineException($"leaf attribute position 0 length 2 isn't parsable into a SIL book number integer.", new Dictionary<string, string>
-                        {
-                            {"nodeId", leaf.NodeId() ?? "<nodeId attribute missing>"},
-                            {"attribute", "morphId" },
-                            {"subString(0,2)", subString }
-                        });
-
-            bool succeeded = int.TryParse(bookNumberString, out int num);
+            bool succeeded = int.TryParse(leaf.MorphId().Substring(0, 2), out int num);
             if (!succeeded)
             {
-                throw new InvalidTreeEngineException($"position 0 length 2 isn't parsable into a SIL book number integer.", new Dictionary<string, string>
+                throw new InvalidTreeEngineException($"leaf attribute position 0 length 2 isn't parsable into an int.", new Dictionary<string, string>
                         {
-                            {"nodeId", leaf.NodeId() ?? "<nodeId attribute missing>"},
+                            {"nodeId", leaf.NodeId() ?? "<nodeId attribute also missing>"},
                             {"attribute", "morphId" }
                         });
             }
             else
             {
-                return num;
+                string bookNumberString = BookIds
+                    .Where(bookId => int.Parse(bookId.clearTreeBookNum) == num)
+                    .FirstOrDefault()?.silCannonBookNum ?? throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookNum", value: num.ToString());
+
+                return int.Parse(bookNumberString);
             }
         }
         public static string Chapter(this XElement leaf)
