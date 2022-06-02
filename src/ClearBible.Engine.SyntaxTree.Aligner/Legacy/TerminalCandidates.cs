@@ -139,11 +139,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             var approvedCandidates = hyperparameters.ApprovedAlignedTokenIdPairs
                 .Where(p => p.sourceTokenId.ToSourceId().Equals(sourcePoint.SourceID))
                 .Select(p => p.targetTokenId.ToTargetId())
-                //.Where(targetId => targetPoints.Select(tp => tp.TargetID).Contains(targetId))
-                //if pair's target not in target points, this will project an empty enumerable, and if all projections are empty
-                //enumerables this will project a flattened empty enumerable.
-                .SelectMany(targetId => targetPoints.Where(tp => tp.TargetID.Equals(targetId)))
-                .Distinct()
+                .Intersect(targetPoints.Select(tp => tp.TargetID))
+                .SelectMany(t => targetPoints.Where(tp => tp.TargetID.Equals(t)))
                 .Select(tp => Candidate.NewPoint(sourcePoint, tp, 0.0))
                 .ToList();
             if (approvedCandidates.Count > 0)
@@ -154,18 +151,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             // ApprovedAlignedTokenIdPairs - 2 of 3 - don't align sourcePoints with approvedalignedtokenidpairs where none of the pairs
             // are to targets in this verse group.
             if (hyperparameters.ApprovedAlignedTokenIdPairs
-                    .Select(p => p.sourceTokenId.ToSourceId()).Contains(sourcePoint.SourceID) // IF source point is approved to one or more targets
-                &&
-                hyperparameters.ApprovedAlignedTokenIdPairs
-                    .Where(p => p.sourceTokenId.ToSourceId().Equals(sourcePoint.SourceID))  // (enumerable of approved pairs for source point)
-                    .SelectMany(p => targetPoints
-                        .Where(tp => tp.TargetID.Equals(p.targetTokenId.ToTargetId())))     // (enumerable of all targetPoints sourcePoint is approved for for this verse group
-                    .Count() == 0)                                                          // AND none of the target points are in this verse group.
+                .Where(p => p.sourceTokenId.ToSourceId().Equals(sourcePoint.SourceID))
+                .Select(p => p.targetTokenId.ToTargetId())
+                .Intersect(targetPoints.Select(tp => tp.TargetID))
+                .Count() == 0)
             {
                 return new List<Candidate>();   //I believe this is the way to indicate to tree aligner that there are no candidates to consider. 
                                                 //Other approach is to remove sourcepoint from consideration at the beginning. Replacement 2114134.
             }
-
 
             // ApprovedAlignedTokenIdPairs - 3 of 3 - remove targets that are only approved as aligned to sources
             // not in this verse group from consideration.

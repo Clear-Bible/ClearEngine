@@ -130,46 +130,55 @@ namespace ClearBible.Engine.Corpora
 			else
 				textIds = targetTextIds;
 
-			//ScriptureText.GetSegments is an IEnumerable based on an underlying list (ScriptureText.GetRows())
-			//so retrieving at once shouldn't impact performance or memory.
-
-			List<TextRow> sourceTextRows = SourceCorpus.GetRows(textIds).ToList();
-			List<TextRow> targetTextRows = TargetCorpus.GetRows(textIds).ToList();
-
 			if (EngineVerseMappingList == null)
 			{
+				//ScriptureText.GetSegments is an IEnumerable based on an underlying list (ScriptureText.GetRows())
+				//so retrieving at once shouldn't impact performance or memory.
+				List<TextRow> sourceTextRows = SourceCorpus.GetRows(textIds).ToList();
+				List<TextRow> targetTextRows = TargetCorpus.GetRows(textIds).ToList();
+
 				return GetRows()
-					.Select(r => new EngineParallelTextRow(r, sourceTextRows, targetTextRows))
+					.Select(r =>
+					{
+						List<Token> sourceTokens = new();
+						try
+						{
+							//Only set SourceTokens if all the members of sourceSegments can be cast to a TokensTextSegment
+							sourceTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
+							sourceTokens = sourceTextRows
+								.Where(tr => r.SourceRefs.Cast<VerseRef>().Contains((VerseRef)tr.Ref)) //sourceTextRows that pertain to paralleltextrow's sourcerefs
+								.SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
+						}
+						catch (InvalidCastException)
+						{
+						}
+
+						List<Token> targetTokens = new();
+						try
+						{
+							targetTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
+							targetTokens = targetTextRows
+								.Where(tr => r.SourceRefs.Cast<VerseRef>().Contains((VerseRef)tr.Ref)) //targetTextRows that pertain to paralleltextrow's targetrefs
+								.SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
+						}
+						catch (InvalidCastException)
+						{
+						}
+
+						return new EngineParallelTextRow(r, sourceTokens, targetTokens);
+					})
 					.GetEnumerator();
 			}
 			else
 			{
-				return GetRowsUsingEngineVerseMappingList(sourceTextRows, targetTextRows).GetEnumerator();
+				return GetRowsUsingEngineVerseMappingList(textIds).GetEnumerator();
 			}
 		}
 
-		private IEnumerable<ParallelTextRow> GetRowsUsingEngineVerseMappingList(IEnumerable<TextRow> sourceTextRows, IEnumerable<TextRow> targetTextRows)
+		public IEnumerable<ParallelTextRow> GetRowsUsingEngineVerseMappingList(IEnumerable<string> textIds)
 		{
-			/*
-			IEnumerable<string> sourceTextIds = SourceCorpus.Texts.Select(t => t.Id);
-			IEnumerable<string> targetTextIds = TargetCorpus.Texts.Select(t => t.Id);
-
-			IEnumerable<string> textIds;
-			if (AllSourceRows && AllTargetRows)
-				textIds = sourceTextIds.Union(targetTextIds);
-			else if (!AllSourceRows && !AllTargetRows)
-				textIds = sourceTextIds.Intersect(targetTextIds);
-			else if (AllSourceRows)
-				textIds = sourceTextIds;
-			else
-				textIds = targetTextIds;
-
-			//ScriptureText.GetSegments is an IEnumerable based on an underlying list (ScriptureText.GetRows())
-			//so retrieving at once shouldn't impact performance or memory.
-
 			List<TextRow> sourceTextRows = SourceCorpus.GetRows(textIds).ToList();
 			List<TextRow> targetTextRows = TargetCorpus.GetRows(textIds).ToList();
-			*/
 
 			//Believe it may be desirable to have ParallelTextSegments in order of EngineVerseMappingList, e.g. for Dashboard display?
 			if (EngineVerseMappingList == null)
@@ -177,22 +186,27 @@ namespace ClearBible.Engine.Corpora
 				throw new InvalidStateEngineException(message: "Member must not be null to use this method", name: "method", value: nameof(EngineVerseMappingList));
             }
 
-			foreach (var engineVerseMapping in EngineVerseMappingList)
+			// only include versemappings where both source and target lists only contain books in textIds.
+			foreach (var engineVerseMapping in EngineVerseMappingList
+				.Where(mapping => mapping.sourceVerseIds
+					.Select(svid => svid.Book)
+					.Except(textIds)
+					.Count() > 0)
+				.Where(mapping => mapping.sourceVerseIds
+					.Select(tvid => tvid.Book)
+					.Except(textIds)
+					.Count() > 0))
 			{
-				if (engineVerseMapping != null)
-				{
-					var parallelSourceTextRows = (sourceTextRows)
+				var parallelSourceTextRows = sourceTextRows
 					.Where(textRow => engineVerseMapping.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textRow.Ref)));
-					var parallelTargetTextRows = (targetTextRows)
+				var parallelTargetTextRows = targetTextRows
 					.Where(textRow => engineVerseMapping.targetVerseIds.Contains(new EngineVerseId((VerseRef)textRow.Ref)));
 
-					yield return new EngineParallelTextRow(
-						parallelSourceTextRows,
-						parallelTargetTextRows,
-						AlignmentCorpus
-					);
-
-				}
+				yield return new EngineParallelTextRow(
+					parallelSourceTextRows,
+					parallelTargetTextRows,
+					AlignmentCorpus
+				);
 			}
 		}
 	}

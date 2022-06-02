@@ -62,7 +62,6 @@ namespace ClearBible.Engine.Corpora
                 //Only set SourceTokens if all the members of sourceSegments can be cast to a TokensTextSegment
                 sourceTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
                 SourceTokens = sourceTextRows
-                    ///.Where(textSegment => textSegment is TokensTextSegment)
                     .SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
             }
             catch (InvalidCastException)
@@ -74,7 +73,6 @@ namespace ClearBible.Engine.Corpora
                 //Only set TargetTokens if all the members of sourceSegments can be cast to a TokensTextSegment
                 targetTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
                 TargetTokens = targetTextRows
-                    //.Where(textSegment => textSegment is TokensTextSegment)
                     .SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
             }
             catch (InvalidCastException)
@@ -83,8 +81,8 @@ namespace ClearBible.Engine.Corpora
         }
 
         public EngineParallelTextRow(ParallelTextRow parallelTextRow, 
-            IEnumerable<TextRow> sourceTextRows,
-            IEnumerable<TextRow> targetTextRows)
+            IReadOnlyList<Token> sourceTokens,
+            IReadOnlyList<Token> targetTokens)
             : base(parallelTextRow.SourceRefs, parallelTextRow.TargetRefs)
         {
             SourceSegment = parallelTextRow.SourceSegment;
@@ -98,29 +96,8 @@ namespace ClearBible.Engine.Corpora
             IsTargetRangeStart = parallelTextRow.IsTargetRangeStart;
             IsEmpty = parallelTextRow.IsEmpty;
 
-            try
-            {
-                //Only set SourceTokens if all the members of sourceSegments can be cast to a TokensTextSegment
-                sourceTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
-                SourceTokens = sourceTextRows
-                    ///.Where(textSegment => textSegment is TokensTextSegment)
-                    .SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
-            }
-            catch (InvalidCastException)
-            {
-            }
-
-            try
-            {
-                //Only set TargetTokens if all the members of sourceSegments can be cast to a TokensTextSegment
-                targetTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
-                TargetTokens = targetTextRows
-                    //.Where(textSegment => textSegment is TokensTextSegment)
-                    .SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
-            }
-            catch (InvalidCastException)
-            {
-            }
+            SourceTokens = sourceTokens;
+            TargetTokens = targetTokens;
         }
 
         public IReadOnlyList<Token>? SourceTokens { get; }
