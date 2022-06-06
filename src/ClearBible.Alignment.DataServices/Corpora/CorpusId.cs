@@ -8,11 +8,6 @@ namespace ClearBible.Alignment.DataServices.Corpora
             Id = id;
         }
 
-        public CorpusId(string corpusUriIdentifier)
-        {
-            Id = corpusUriIdentifier.AsInt("corpusUri.Identifier");
-        }
-
         public int Id { get; }
     }
 }
