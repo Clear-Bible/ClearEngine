@@ -13,11 +13,11 @@ namespace ClearBible.Alignment.DataServices.Corpora
     {
         public object Id { get; set; }
 
-        internal TextCorpus(object id, IMediator mediator, int versification, IEnumerable<string> bookAbbreviations)
+        internal TextCorpus(object id, IMediator mediator, ScrVers versification, IEnumerable<string> bookAbbreviations)
         {
             Id = id;
 
-            Versification = new ScrVers((ScrVersType)versification);
+            Versification = versification;
 
             foreach (var bookAbbreviation in bookAbbreviations)
             {

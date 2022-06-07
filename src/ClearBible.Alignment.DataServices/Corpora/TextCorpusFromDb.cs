@@ -1,12 +1,13 @@
 ﻿using ClearBible.Alignment.DataServices.Features.Corpora;
 using ClearBible.Engine.Exceptions;
 using MediatR;
+using SIL.Scripture;
 
 namespace ClearBible.Alignment.DataServices.Corpora
 {
     public class TextCorpusFromDb : TextCorpus<GetTokensByCorpusIdAndBookIdQuery>
     {
-        internal TextCorpusFromDb(object id, IMediator mediator, int versification, IEnumerable<string> bookAbbreviations) 
+        internal TextCorpusFromDb(object id, IMediator mediator, ScrVers versification, IEnumerable<string> bookAbbreviations) 
             : base(id, mediator, versification, bookAbbreviations)
         {
         }
@@ -32,8 +33,11 @@ namespace ClearBible.Alignment.DataServices.Corpora
 
             var result = await mediator.Send(command);
             if (result.Success)
-            {
-                return new TextCorpusFromDb(command.Id, mediator, result.Data.versification, result.Data.bookAbbreviations);
+            {                                                       //this needs to be set even if it's not used, e.g. manuscript or db corpa.
+                                                                    //NOTE: that this requires that corpora that originate from this class must
+                                                                    //be parallelized with Clear's versemapping so underlying base classes don't
+                                                                    //attempt to versify based on this default.
+                return new TextCorpusFromDb(command.Id, mediator, result.Data.versification ?? ScrVers.Original, result.Data.bookAbbreviations);
             }
             else
             {

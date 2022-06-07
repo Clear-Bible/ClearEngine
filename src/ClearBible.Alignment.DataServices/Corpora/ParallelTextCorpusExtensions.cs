@@ -8,7 +8,7 @@ namespace ClearBible.Alignment.DataServices.Corpora
 {
     public static class ParallelTextCorpusExtensions
     {
-        public static async Task<ParallelCorpusFromDb?> Update(ParallelCorpusFromDb parallelCorpus, IMediator mediator)
+        public static async Task<ParallelCorpusFromDb> Update(ParallelCorpusFromDb parallelCorpus, IMediator mediator)
         {
             var sourceCorpusIdVersionId = (CorpusIdVersionId) ((TextCorpus < GetTokensByCorpusIdAndBookIdQuery> ) parallelCorpus.SourceCorpus).Id;
             var targetCorpusIdVersionId = (CorpusIdVersionId) ((TextCorpus < GetTokensByCorpusIdAndBookIdQuery > ) parallelCorpus.TargetCorpus).Id;
@@ -32,7 +32,7 @@ namespace ClearBible.Alignment.DataServices.Corpora
             }
         }
 
-        public static async Task<ParallelCorpusFromDb?> Create(this EngineParallelTextCorpus engineParallelTextCorpus, IMediator mediator)
+        public static async Task<ParallelCorpusFromDb> Create(this EngineParallelTextCorpus engineParallelTextCorpus, IMediator mediator)
         {
             if (
                 engineParallelTextCorpus.SourceCorpus.GetType() != typeof(TextCorpus<GetTokensByCorpusIdAndBookIdQuery>)

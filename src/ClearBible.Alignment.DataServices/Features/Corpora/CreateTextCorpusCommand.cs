@@ -7,7 +7,7 @@ using SIL.Machine.Corpora;
 namespace ClearBible.Alignment.DataServices.Features.Corpora
 {
     public record CreateTextCorpusCommand(
-        ScriptureTextCorpus ScriptureTextCorpus, 
+        ITextCorpus TextCorpus, 
         bool IsRtl, 
         string Name, 
         string Language, 

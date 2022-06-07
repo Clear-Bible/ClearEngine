@@ -19,7 +19,7 @@ namespace ClearBible.Engine.Tests.Corpora.Handlers
 
             return Task.FromResult(
                 new RequestResult<TextCorpusFromDb>
-                (result: Task.Run(() => TextCorpusFromDb.Get(null, new CorpusIdVersionId(7, 7))).GetAwaiter().GetResult(), 
+                (result: Task.Run(() => TextCorpusFromDb.Get(new MediatorMock(), new CorpusIdVersionId(7, 7))).GetAwaiter().GetResult(), 
                 //run async from sync like constructor: good desc. https://stackoverflow.com/a/40344759/13880559
                 success: true,
                 message: "successful result from test"));

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Threading;
 
 using ClearDashboard.DAL.CQRS;
-using ClearBible.Alignment.DataServices.Corpora;
 using ClearBible.Engine.Corpora;
 using ClearBible.Alignment.DataServices.Features.Corpora;
 
