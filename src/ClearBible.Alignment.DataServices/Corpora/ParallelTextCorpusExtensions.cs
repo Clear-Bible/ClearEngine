@@ -119,7 +119,7 @@ namespace ClearBible.Alignment.DataServices.Corpora
                     engineParallelTextCorpus.EngineVerseMappingList ?? throw new InvalidStateEngineException(name: "engineParallelTextCorpus.EngineVerseMappingList", value: "null"),
                     parallelTokenizedCorpusId ?? throw new InvalidStateEngineException(name: "parallelCorpusVersionId", value: "null"),
                     parallelCorpusVersionId,
-                    parallelCorpusId);
+                    parallelCorpusId ?? throw new InvalidStateEngineException(name: "parallelCorpusVId", value: "null"));
             }
             else
             {

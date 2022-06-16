@@ -41,8 +41,9 @@ namespace ClearBible.Engine.Tests.Corpora.Handlers
                 (result: (new TokenizedCorpusId(new Guid()),
                     new TokenizedCorpusId(new Guid()), 
                     new List<EngineVerseMapping>() { 
-                        new EngineVerseMapping(new List<EngineVerseId>() 
-                            {new EngineVerseId("MAT", 1, 1)}, new List<EngineVerseId>() {new EngineVerseId("MAT", 1, 1) })},
+                        new EngineVerseMapping(
+                            new List<EngineVerseId>() {new EngineVerseId("MAT", 1, 1)}, 
+                            new List<EngineVerseId>() {new EngineVerseId("MAT", 1, 1) })},
                     new ParallelCorpusVersionId(new Guid(), DateTime.UtcNow),
                     new ParallelCorpusId(new Guid())),
                 success: true,

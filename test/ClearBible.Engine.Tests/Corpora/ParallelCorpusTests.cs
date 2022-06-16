@@ -136,9 +136,49 @@ namespace ClearBible.Engine.Tests.Corpora
 
 		[Fact]
 		[Trait("Category", "Example")]
-		public async void ParallelCorpus_NewVersion()
+		public async void ParallelCorpus_Get_ChangeVerseMappings_SaveNewParallelVersion()
 		{
-			/*
+			var parallelTokenizedCorpus = await ParallelTokenizedCorpus.Get(mediator_, new ParallelTokenizedCorpusId(new Guid()));
+			Assert.NotNull(parallelTokenizedCorpus.EngineVerseMappingList);
+			Assert.Equal(1, parallelTokenizedCorpus.EngineVerseMappingList?.Count() ?? 0); // should be 1 and not 16: EngineParallelTextCorpus should not have used sil versification to initialize.
+			Assert.True(parallelTokenizedCorpus.SourceCorpus.Count() > 0);
+			Assert.True(parallelTokenizedCorpus.TargetCorpus.Count() > 0);
+
+			parallelTokenizedCorpus.EngineVerseMappingList = parallelTokenizedCorpus.EngineVerseMappingList?.Append(
+				new EngineVerseMapping(
+					new List<EngineVerseId>() { new EngineVerseId("MAT", 1, 2) },
+					new List<EngineVerseId>() { new EngineVerseId("MAT", 1, 2) })).ToList()
+					?? null; //already checked for null, this should never happen.
+			
+			Assert.Equal(2, parallelTokenizedCorpus.EngineVerseMappingList?.Count() ?? 0); // should be 1 and not 16: EngineParallelTextCorpus should not have used sil versification to initialize.
+
+			//since there is only one mapped verse, there should only be one that displays
+			foreach (var engineParallelTextRow in parallelTokenizedCorpus.Cast<EngineParallelTextRow>())
+			{
+				//display verse info
+				var verseRefStr = engineParallelTextRow.Ref.ToString();
+				output_.WriteLine(verseRefStr);
+
+				//display source
+				var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
+				output_.WriteLine($"Source: {sourceVerseText}");
+				var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
+					.Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
+				output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
+
+				//display target
+				var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
+				output_.WriteLine($"Target: {targetVerseText}");
+				var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
+					.Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
+				output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
+			}
+		}
+
+		[Fact]
+		[Trait("Category", "Example")]
+		public async void ParallelCorpus_Get_ChangeTokenizedCorpuses_SaveNewParallelTokenizedCorpus()
+		{
 			var parallelTokenizedCorpus = await ParallelTokenizedCorpus.Get(mediator_, new ParallelTokenizedCorpusId(new Guid()));
 			Assert.NotNull(parallelTokenizedCorpus.EngineVerseMappingList);
 			Assert.Equal(1, parallelTokenizedCorpus.EngineVerseMappingList?.Count() ?? 0); // should be 1 and not 16: EngineParallelTextCorpus should not have used sil versification to initialize.
@@ -166,7 +206,6 @@ namespace ClearBible.Engine.Tests.Corpora
 					.Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
 				output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
 			}
-			*/
 		}
 
 		private static TextRow TextRow(int key, string text = "", bool isSentenceStart = true,
