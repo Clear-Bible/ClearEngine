@@ -24,7 +24,7 @@ namespace ClearBible.Engine.Tests.Corpora.Handlers
 
             return Task.FromResult(
                 new RequestResult<ParallelCorpusVersionId>
-                (result: new ParallelCorpusVersionId(new Guid()),
+                (result: new ParallelCorpusVersionId(new Guid(), DateTime.UtcNow),
                 success: true,
                 message: "successful result from test"));
         }

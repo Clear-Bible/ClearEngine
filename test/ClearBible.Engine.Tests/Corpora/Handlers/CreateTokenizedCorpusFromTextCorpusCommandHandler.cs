@@ -6,6 +6,10 @@ using System;
 using ClearBible.Alignment.DataServices.Corpora;
 using ClearDashboard.DAL.CQRS;
 using ClearBible.Alignment.DataServices.Features.Corpora;
+using Xunit;
+using ClearBible.Engine.Corpora;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ClearBible.Engine.Tests.Corpora.Handlers
 {
@@ -21,6 +25,7 @@ namespace ClearBible.Engine.Tests.Corpora.Handlers
             // 2. creates a new associated CorpusVersion,
             // 3. creates a new associated TokenizedCorpus,
             // 4. then iterates through command.TextCorpus, casting to TokensTextRow, extracting tokens, and inserting associated to TokenizedCorpus into the Tokens table.
+            Assert.All(command.TextCorpus, tc => Assert.IsType<TokensTextRow>(tc));
 
             return Task.FromResult(
                 new RequestResult<TokenizedTextCorpus>

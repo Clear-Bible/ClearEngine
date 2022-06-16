@@ -6,7 +6,8 @@ using MediatR;
 using ClearBible.Alignment.DataServices.Corpora;
 using ClearDashboard.DAL.CQRS;
 using ClearBible.Alignment.DataServices.Features.Corpora;
-
+using Xunit;
+using ClearBible.Engine.Corpora;
 
 namespace ClearBible.Engine.Tests.Corpora.Handlers
 {
@@ -21,6 +22,7 @@ namespace ClearBible.Engine.Tests.Corpora.Handlers
             //create a new TokenizedCorpus under the same Corpus parent
             //enumerate the TokensTextRows and insert associated Tokens
             //return a new TokensTextRow constructed with the new TokenizedCorpus.Id.
+            Assert.All(command.textCorpus, tc => Assert.IsType<TokensTextRow>(tc));
 
             return Task.FromResult(
                 new RequestResult<TokenizedTextCorpus>

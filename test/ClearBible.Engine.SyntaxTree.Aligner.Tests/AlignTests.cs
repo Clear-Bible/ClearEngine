@@ -48,7 +48,7 @@ namespace Clear.Engine.Dashboard.Tests
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                 parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-                    .Transform<FunctionWordTextRowProcessor>();
+                    .Filter<FunctionWordTextRowProcessor>();
 
                 {
                     var translationCommandable = new TranslationCommands(null);

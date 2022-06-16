@@ -12,19 +12,20 @@ using Xunit.Abstractions;
 using ClearBible.Alignment.DataServices.Corpora;
 using MediatR;
 using ClearBible.Engine.Tests.Corpora.Handlers;
+using ClearBible.Engine.Tests.Tokenization;
 
 namespace ClearBible.Engine.Tests.Corpora
 {
-    public class Examples
+    public class Corpus
     {
 		protected readonly ITestOutputHelper output_;
-		public Examples(ITestOutputHelper output)
+		public Corpus(ITestOutputHelper output)
 		{
 			output_ = output;
 		}
 
 		[Fact]
-		public async void CorpusImportAndSaveToDb()
+		public async void Corpus__ImportFromUsfm_SaveToDb()
 		{
 			IMediator mediator = new MediatorMock();
 
@@ -33,9 +34,11 @@ namespace ClearBible.Engine.Tests.Corpora
 				.Tokenize<LatinWordTokenizer>()
 				.Transform<IntoTokensTextRowProcessor>();
 
-			var dbCorpus = await corpus.Create(mediator, true, "NameX", "LanguageX", "LanguageType", ".Tokenize<LatinWordTokenizer>().Transform<IntoTokensTextRowProcessor>()");
+			//ITextCorpus.Create() extension requires that ITextCorpus source and target corpus have been transformed
+			// into TokensTextRow, puts them into the DB, and returns a TokensTextRow.
+			var tokenizedTextCorpus = await corpus.Create(mediator, true, "NameX", "LanguageX", "LanguageType", ".Tokenize<LatinWordTokenizer>().Transform<IntoTokensTextRowProcessor>()");
 
-			foreach (var tokensTextRow in dbCorpus.Take(5).Cast<TokensTextRow>())
+			foreach (var tokensTextRow in tokenizedTextCorpus.Cast<TokensTextRow>())
 			{
 				//display verse info
 				var verseRefStr = tokensTextRow.Ref.ToString();
@@ -61,13 +64,34 @@ namespace ClearBible.Engine.Tests.Corpora
 		}
 
 		[Fact]
-		public async void CorpusGetFromDb()
+		public async void Corpus__GetAllCorpusVersionIds()
 		{
 			IMediator mediator = new MediatorMock();
 
-			var dbCorpus = await TokenizedTextCorpus.Get(mediator, new TokenizedCorpusId(new Guid()));
+			var corpusVersionIds = await TokenizedTextCorpus.GetAllCorpusVersionIds(mediator);
+			Assert.True(corpusVersionIds.Count() > 0);
+		}
 
-			foreach (var tokensTextRow in dbCorpus.Take(5).Cast<TokensTextRow>())
+		[Fact]
+		public async void Corpus__GetAllTokenizedCorpusIds()
+		{
+			IMediator mediator = new MediatorMock();
+
+			var corpusVersionIds = await TokenizedTextCorpus.GetAllCorpusVersionIds(mediator);
+			Assert.True(corpusVersionIds.Count() > 0);
+
+			var tokenizedCorpusIds = await TokenizedTextCorpus.GetAllTokenizedCorpusIds(mediator, corpusVersionIds.First().corpusVersionId);
+			Assert.True(tokenizedCorpusIds.Count() > 0);
+		}
+
+		[Fact]
+		public async void Corpus__GetTokenizedTextCorpusFromDb()
+		{
+			IMediator mediator = new MediatorMock();
+
+			var tokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator, new TokenizedCorpusId(new Guid()));
+
+			foreach (var tokensTextRow in tokenizedTextCorpus.Cast<TokensTextRow>())
 			{
 				//display verse info
 				var verseRefStr = tokensTextRow.Ref.ToString();
@@ -93,20 +117,34 @@ namespace ClearBible.Engine.Tests.Corpora
 		}
 
 		[Fact]
-		public void PutCorpus()
-        {
+		public async void Corpus__GetTokenizedTextCorpusFromDB_Change_SaveToDb()
+		{
+			IMediator mediator = new MediatorMock();
 
-        }
+			var tokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator, new TokenizedCorpusId(new Guid()));
+
+			Assert.Equal(16, tokenizedTextCorpus.Count());
+
+			OnlyUpToCountTextRowProcessor.Train(2);
+
+			var tokenizedTextCorpusWithOnlyTwoTokens = tokenizedTextCorpus
+				.Filter<OnlyUpToCountTextRowProcessor>();
+
+			Assert.Equal(2, tokenizedTextCorpusWithOnlyTwoTokens.Count());
+		}
 
 		[Fact]
 		[Trait("Category", "Example")]
-		public void GetCorpusByBook()
+		public async void Corpus__GetTokenizedCorpus_byBook()
 		{
-			var corpus = new UsfmFileTextCorpus("usfm.sty", Encoding.UTF8, TestDataHelpers.UsfmTestProjectPath)
-				.Tokenize<LatinWordTokenizer>()
-				.Transform<IntoTokensTextRowProcessor>();
+			IMediator mediator = new MediatorMock();
 
-			foreach (var tokensTextRow in corpus.Take(5).Cast<TokensTextRow>())
+			var tokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator, new TokenizedCorpusId(new Guid()));
+
+			Assert.Equal(16, tokenizedTextCorpus.Count());
+			Assert.Equal(4, tokenizedTextCorpus.GetRows(new List<string>() { "MRK" }).Count());
+
+			foreach (var tokensTextRow in tokenizedTextCorpus.GetRows(new List<string>() { "MRK" }).Cast<TokensTextRow>())
 			{
 				//display verse info
 				var verseRefStr = tokensTextRow.Ref.ToString();
@@ -130,14 +168,5 @@ namespace ClearBible.Engine.Tests.Corpora
 				output_.WriteLine($"tokensTextDetokenized: {tokensTextDetokenized}");
 			}
 		}
-		[Fact]
-		public void GetParallelCorpus()
-		{
-		}
-
-		[Fact]
-		public void GetParallelCorpusByBook()
-		{
-		}
-		}
+	}
 }

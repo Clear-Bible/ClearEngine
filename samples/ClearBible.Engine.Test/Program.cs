@@ -27,7 +27,7 @@ var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
 parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-    .Transform<FunctionWordTextRowProcessor>();
+    .Filter<FunctionWordTextRowProcessor>();
 
 {
     var translationCommandable = new TranslationCommands(null);

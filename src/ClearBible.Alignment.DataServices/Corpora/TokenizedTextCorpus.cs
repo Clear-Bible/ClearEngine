@@ -22,10 +22,10 @@ namespace ClearBible.Alignment.DataServices.Corpora
         }
         public override ScrVers Versification { get; }
 
-        public static async Task<IEnumerable<CorpusVersionId>?> GetAllCorpusVersionIds(IMediator mediator)
+        public static async Task<IEnumerable<(CorpusVersionId corpusVersionId, CorpusId corpusId)>> GetAllCorpusVersionIds(IMediator mediator)
         {
             var result = await mediator.Send(new GetAllCorpusVersionIdsQuery());
-            if (result.Success)
+            if (result.Success && result.Data != null)
             {
                 return result.Data;
             }
@@ -35,10 +35,10 @@ namespace ClearBible.Alignment.DataServices.Corpora
             }
         }
 
-        public static async Task<IEnumerable<TokenizedCorpusId>?> GetAllTokenizedCorpusIds(IMediator mediator, CorpusVersionId corpusVersionId)
+        public static async Task<IEnumerable<TokenizedCorpusId>> GetAllTokenizedCorpusIds(IMediator mediator, CorpusVersionId corpusVersionId)
         {
             var result = await mediator.Send(new GetAllTokenizedCorpusIdsQuery(corpusVersionId));
-            if (result.Success)
+            if (result.Success && result.Data != null)
             {
                 return result.Data;
             }

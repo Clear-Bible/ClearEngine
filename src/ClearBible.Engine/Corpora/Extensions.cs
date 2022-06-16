@@ -55,5 +55,50 @@ namespace ClearBible.Engine.Corpora
 				return GetEnumerator();
 			}
 		}
+
+		public static ITextCorpus Filter(this ITextCorpus corpus, Func<TextRow, bool> predicate)
+		{
+			return new FilterTextCorpus(corpus, predicate);
+		}
+
+		public static ITextCorpus Filter(this ITextCorpus corpus, IRowFilter<TextRow> filter)
+		{
+			return corpus.Filter(filter.Process);
+		}
+
+		public static ITextCorpus Filter<T>(this ITextCorpus corpus)
+			where T : IRowFilter<TextRow>, new()
+		{
+			var textRowFilter = new T();
+			return new FilterTextCorpus(corpus, textRowFilter.Process);
+		}
+		private class FilterTextCorpus : ITextCorpus
+		{
+			private readonly ITextCorpus _corpus;
+			private readonly Func<TextRow, bool> _predicate;
+
+			public FilterTextCorpus(ITextCorpus corpus, Func<TextRow, bool> predicate)
+			{
+				_corpus = corpus;
+				_predicate = predicate;
+			}
+
+			public IEnumerable<IText> Texts => _corpus.Texts;
+
+			public IEnumerator<TextRow> GetEnumerator()
+			{
+				return GetRows().GetEnumerator();
+			}
+
+			public IEnumerable<TextRow> GetRows(IEnumerable<string>? textIds = null)
+			{
+				return _corpus.GetRows().Where(_predicate);
+			}
+
+            IEnumerator IEnumerable.GetEnumerator()
+			{
+				return GetEnumerator();
+			}
+		}
 	}
 }

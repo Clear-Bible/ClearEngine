@@ -21,7 +21,7 @@ namespace ClearBible.Engine.Tests.Corpora
 		{
 			IMediator mediator = new MediatorMock();
 			var result = await mediator.Send(
-				new CreateParallelTokenizedCorpusCommand(new ParallelCorpusVersionId(new Guid()), new TokenizedCorpusId(new Guid()), new TokenizedCorpusId(new Guid())));
+				new CreateParallelTokenizedCorpusCommand(new ParallelCorpusVersionId(new Guid(), DateTime.UtcNow), new TokenizedCorpusId(new Guid()), new TokenizedCorpusId(new Guid())));
 		}
 	}
 }
