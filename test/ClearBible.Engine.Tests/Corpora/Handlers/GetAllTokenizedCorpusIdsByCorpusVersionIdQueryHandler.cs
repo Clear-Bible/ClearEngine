@@ -10,12 +10,12 @@ using System;
 
 namespace ClearBible.Engine.Tests.Corpora.Handlers
 {
-    public class GetAllTokenizedCorpusIdsQueryHandler : IRequestHandler<
-        GetAllTokenizedCorpusIdsQuery,
+    public class GetAllTokenizedCorpusIdsByCorpusVersionIdQueryHandler : IRequestHandler<
+        GetAllTokenizedCorpusIdsByCorpusVersionIdQuery,
         RequestResult<IEnumerable<TokenizedCorpusId>>>
     {
         public Task<RequestResult<IEnumerable<TokenizedCorpusId>>>
-            Handle(GetAllTokenizedCorpusIdsQuery command, CancellationToken cancellationToken)
+            Handle(GetAllTokenizedCorpusIdsByCorpusVersionIdQuery command, CancellationToken cancellationToken)
         {
             //DB Impl notes: query TokenizedCorpus table by CorpusVersion.Corpus and return enumerable.
             if (command.CorpusVersionId.Id.Equals(new System.Guid("ca761232ed4211cebacd00aa0057b223")))

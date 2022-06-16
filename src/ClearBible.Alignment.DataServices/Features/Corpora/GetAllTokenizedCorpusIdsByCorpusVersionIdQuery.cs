@@ -5,5 +5,5 @@ using ClearDashboard.DAL.CQRS;
 
 namespace ClearBible.Alignment.DataServices.Features.Corpora
 {
-    public record GetAllParallelCorpusIdVersionIdsQuery() : IRequest<RequestResult<IEnumerable<ParallelCorpusVersionId>>>;
+    public record GetAllTokenizedCorpusIdsByCorpusVersionIdQuery(CorpusVersionId CorpusVersionId) : IRequest<RequestResult<IEnumerable<TokenizedCorpusId>>>;
 }

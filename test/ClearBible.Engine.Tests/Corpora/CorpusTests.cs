@@ -16,19 +16,20 @@ using ClearBible.Engine.Tests.Tokenization;
 
 namespace ClearBible.Engine.Tests.Corpora
 {
-    public class Corpus
+    public class CorpusTests
     {
 		protected readonly ITestOutputHelper output_;
-		public Corpus(ITestOutputHelper output)
+		protected readonly IMediator mediator_;
+		public CorpusTests(ITestOutputHelper output)
 		{
 			output_ = output;
+			mediator_ = new MediatorMock(); //FIXME: inject mediator
 		}
 
 		[Fact]
+		[Trait("Category", "Example")]
 		public async void Corpus__ImportFromUsfm_SaveToDb()
 		{
-			IMediator mediator = new MediatorMock();
-
 			//Import
 			var corpus = new UsfmFileTextCorpus("usfm.sty", Encoding.UTF8, TestDataHelpers.UsfmTestProjectPath)
 				.Tokenize<LatinWordTokenizer>()
@@ -36,7 +37,7 @@ namespace ClearBible.Engine.Tests.Corpora
 
 			//ITextCorpus.Create() extension requires that ITextCorpus source and target corpus have been transformed
 			// into TokensTextRow, puts them into the DB, and returns a TokensTextRow.
-			var tokenizedTextCorpus = await corpus.Create(mediator, true, "NameX", "LanguageX", "LanguageType", ".Tokenize<LatinWordTokenizer>().Transform<IntoTokensTextRowProcessor>()");
+			var tokenizedTextCorpus = await corpus.Create(mediator_, true, "NameX", "LanguageX", "LanguageType", ".Tokenize<LatinWordTokenizer>().Transform<IntoTokensTextRowProcessor>()");
 
 			foreach (var tokensTextRow in tokenizedTextCorpus.Cast<TokensTextRow>())
 			{
@@ -64,32 +65,29 @@ namespace ClearBible.Engine.Tests.Corpora
 		}
 
 		[Fact]
+		[Trait("Category", "Example")]
 		public async void Corpus__GetAllCorpusVersionIds()
 		{
-			IMediator mediator = new MediatorMock();
-
-			var corpusVersionIds = await TokenizedTextCorpus.GetAllCorpusVersionIds(mediator);
+			var corpusVersionIds = await TokenizedTextCorpus.GetAllCorpusVersionIds(mediator_);
 			Assert.True(corpusVersionIds.Count() > 0);
 		}
 
 		[Fact]
+		[Trait("Category", "Example")]
 		public async void Corpus__GetAllTokenizedCorpusIds()
 		{
-			IMediator mediator = new MediatorMock();
-
-			var corpusVersionIds = await TokenizedTextCorpus.GetAllCorpusVersionIds(mediator);
+			var corpusVersionIds = await TokenizedTextCorpus.GetAllCorpusVersionIds(mediator_);
 			Assert.True(corpusVersionIds.Count() > 0);
 
-			var tokenizedCorpusIds = await TokenizedTextCorpus.GetAllTokenizedCorpusIds(mediator, corpusVersionIds.First().corpusVersionId);
+			var tokenizedCorpusIds = await TokenizedTextCorpus.GetAllTokenizedCorpusIds(mediator_, corpusVersionIds.First().corpusVersionId);
 			Assert.True(tokenizedCorpusIds.Count() > 0);
 		}
 
 		[Fact]
+		[Trait("Category", "Example")]
 		public async void Corpus__GetTokenizedTextCorpusFromDb()
 		{
-			IMediator mediator = new MediatorMock();
-
-			var tokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator, new TokenizedCorpusId(new Guid()));
+			var tokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator_, new TokenizedCorpusId(new Guid()));
 
 			foreach (var tokensTextRow in tokenizedTextCorpus.Cast<TokensTextRow>())
 			{
@@ -117,11 +115,10 @@ namespace ClearBible.Engine.Tests.Corpora
 		}
 
 		[Fact]
+		[Trait("Category", "Example")]
 		public async void Corpus__GetTokenizedTextCorpusFromDB_Change_SaveToDb()
 		{
-			IMediator mediator = new MediatorMock();
-
-			var tokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator, new TokenizedCorpusId(new Guid()));
+			var tokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator_, new TokenizedCorpusId(new Guid()));
 
 			Assert.Equal(16, tokenizedTextCorpus.Count());
 
@@ -137,9 +134,7 @@ namespace ClearBible.Engine.Tests.Corpora
 		[Trait("Category", "Example")]
 		public async void Corpus__GetTokenizedCorpus_byBook()
 		{
-			IMediator mediator = new MediatorMock();
-
-			var tokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator, new TokenizedCorpusId(new Guid()));
+			var tokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator_, new TokenizedCorpusId(new Guid()));
 
 			Assert.Equal(16, tokenizedTextCorpus.Count());
 			Assert.Equal(4, tokenizedTextCorpus.GetRows(new List<string>() { "MRK" }).Count());

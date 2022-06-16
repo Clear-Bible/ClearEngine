@@ -41,7 +41,6 @@ namespace ClearBible.Alignment.DataServices.Corpora
         /// else if parallelCorpusVersionId is null (but parallelCorpusId is not), first create parallelCorpusVersionId then parallelTokenizedCorpus.
         /// else create parallelTokenizedCorpus
         /// 
-        /// When creating parallelTokenCorpus, sourceCorpus and targetCorpus are required.
         /// </summary>
         /// <param name="engineParallelTextCorpus"></param>
         /// <param name="mediator"></param>
@@ -56,8 +55,6 @@ namespace ClearBible.Alignment.DataServices.Corpora
             this EngineParallelTextCorpus engineParallelTextCorpus,
             IMediator mediator,
             ParallelCorpusVersionId? parallelCorpusVersionId = null,
-            CorpusId? sourceCorpusId = null,
-            CorpusId? targetCorpusId = null,
             ParallelCorpusId? parallelCorpusId = null)
         {
             if (
@@ -71,25 +68,14 @@ namespace ClearBible.Alignment.DataServices.Corpora
                     message: "both SourceCorpus and TargetCorpus of engineParallelTextCorpus must be from the database (of type TokenizedTextCorpus");
             }
 
-            /*
+
             if (engineParallelTextCorpus.GetType() == typeof(ParallelTokenizedCorpus))
             {
-                throw new InvalidTypeEngineException(
-                    name: "engineParallelTextCorpus",
-                    value: "ParallelTokenizedCorpus");
+                parallelCorpusVersionId = ((ParallelTokenizedCorpus)engineParallelTextCorpus).ParallelCorpusVersionId;
+                parallelCorpusId = ((ParallelTokenizedCorpus)engineParallelTextCorpus).ParallelCorpusId;
             }
-            */
-
-            if (parallelCorpusVersionId == null)
+            else if (parallelCorpusVersionId == null)
             {
-                if (sourceCorpusId == null || targetCorpusId == null)
-                {
-                    throw new InvalidParameterEngineException(
-                        name: "sourceCorpus and/or targetCorpus",
-                        value: "null",
-                        message: "when parallelCorpusVersionId, both of these parameters are required to create a ParallelCorpusVersionId");
-                }
-
                 if (parallelCorpusId == null)
                 {
                     var createParallelCorpusCommand = new CreateParallelCorpusCommand();
@@ -105,10 +91,7 @@ namespace ClearBible.Alignment.DataServices.Corpora
                 }
                 var createParallelCorpusVersionCommand = new CreateParallelCorpusVersionCommand(
                     parallelCorpusId ?? throw new InvalidStateEngineException(name: "parallelCorpusId", value: "null"),
-                    engineParallelTextCorpus,
-                    sourceCorpusId,
-                    targetCorpusId,
-                    engineParallelTextCorpus.EngineVerseMappingList ?? throw new InvalidStateEngineException(name: "engineParallelTextCorpus.EngineVerseMappingList", value: "null"));
+                    engineParallelTextCorpus);
                 
                 var createParallelCorpusVersionCommandResult = await mediator.Send(createParallelCorpusVersionCommand);
                 if (createParallelCorpusVersionCommandResult.Success)
@@ -134,7 +117,9 @@ namespace ClearBible.Alignment.DataServices.Corpora
                     (TokenizedTextCorpus) engineParallelTextCorpus.SourceCorpus,
                     (TokenizedTextCorpus) engineParallelTextCorpus.TargetCorpus,
                     engineParallelTextCorpus.EngineVerseMappingList ?? throw new InvalidStateEngineException(name: "engineParallelTextCorpus.EngineVerseMappingList", value: "null"),
-                    parallelTokenizedCorpusId ?? throw new InvalidStateEngineException(name: "parallelCorpusVersionId", value: "null"));
+                    parallelTokenizedCorpusId ?? throw new InvalidStateEngineException(name: "parallelCorpusVersionId", value: "null"),
+                    parallelCorpusVersionId,
+                    parallelCorpusId);
             }
             else
             {

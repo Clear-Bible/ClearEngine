@@ -5,7 +5,7 @@ using SIL.Scripture;
 
 namespace ClearBible.Alignment.DataServices.Features.Corpora
 {
-    public record GetBookIdsByTokenizedCorpusIdQuery : IRequest<RequestResult<IEnumerable<string>>>
+    public record GetBookIdsByTokenizedCorpusIdQuery : IRequest<RequestResult<(IEnumerable<string> bookIds, CorpusId corpusId)>>
     {
         public GetBookIdsByTokenizedCorpusIdQuery(TokenizedCorpusId tokenizedCorpusId)
         {

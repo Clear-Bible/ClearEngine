@@ -9,9 +9,11 @@ namespace ClearBible.Alignment.DataServices.Corpora
     public class TokenizedTextCorpus : ScriptureTextCorpus
     {
         public TokenizedCorpusId TokenizedCorpusId { get; set; }
-        internal TokenizedTextCorpus(TokenizedCorpusId tokenizedCorpusId, IMediator mediator, IEnumerable<string> bookAbbreviations)
+        public CorpusId CorpusId { get; set; }
+        internal TokenizedTextCorpus(TokenizedCorpusId tokenizedCorpusId, CorpusId corpusId, IMediator mediator, IEnumerable<string> bookAbbreviations)
         {
             TokenizedCorpusId = tokenizedCorpusId;
+            CorpusId = corpusId;
 
             Versification = ScrVers.Original;
 
@@ -37,7 +39,7 @@ namespace ClearBible.Alignment.DataServices.Corpora
 
         public static async Task<IEnumerable<TokenizedCorpusId>> GetAllTokenizedCorpusIds(IMediator mediator, CorpusVersionId corpusVersionId)
         {
-            var result = await mediator.Send(new GetAllTokenizedCorpusIdsQuery(corpusVersionId));
+            var result = await mediator.Send(new GetAllTokenizedCorpusIdsByCorpusVersionIdQuery(corpusVersionId));
             if (result.Success && result.Data != null)
             {
                 return result.Data;
@@ -54,9 +56,9 @@ namespace ClearBible.Alignment.DataServices.Corpora
             var command = new GetBookIdsByTokenizedCorpusIdQuery(tokenizedCorpusId);
 
             var result = await mediator.Send(command);
-            if (result.Success && result.Data != null)
+            if (result.Success)
             {                                                      
-                return new TokenizedTextCorpus(command.TokenizedCorpusId, mediator, result.Data);
+                return new TokenizedTextCorpus(command.TokenizedCorpusId, result.Data.corpusId, mediator, result.Data.bookIds);
             }
             else
             {

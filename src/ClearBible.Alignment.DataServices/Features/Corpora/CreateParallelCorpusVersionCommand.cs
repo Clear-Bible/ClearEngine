@@ -8,9 +8,6 @@ namespace ClearBible.Alignment.DataServices.Features.Corpora
 {
     public record CreateParallelCorpusVersionCommand(
         ParallelCorpusId parallelCorpusId,
-        EngineParallelTextCorpus engineParallelTextCorpus,
-        CorpusId SourceCorpusId, 
-        CorpusId TargetCorpusId, 
-        List<EngineVerseMapping> EngineVerseMappings) 
+        EngineParallelTextCorpus engineParallelTextCorpus) 
         : IRequest<RequestResult<ParallelCorpusVersionId>>;
 }

@@ -9,11 +9,14 @@ namespace ClearBible.Alignment.DataServices.Corpora
     public class ParallelTokenizedCorpus : EngineParallelTextCorpus
     {
         public ParallelTokenizedCorpusId ParallelTokenizedCorpusId { get; set; }
+        public ParallelCorpusVersionId ParallelCorpusVersionId { get; set; }
+        public ParallelCorpusId ParallelCorpusId { get; set; }
 
-        public static async Task<IEnumerable<ParallelCorpusVersionId>?> GetAll(IMediator mediator)
+        public static async Task<IEnumerable<(ParallelCorpusVersionId parallelCorpusVersionId, ParallelCorpusId parallelCorpusId)>> 
+            GetAllParallelCorpusVersionIds(IMediator mediator)
         {
-            var result = await mediator.Send(new GetAllParallelCorpusIdVersionIdsQuery());
-            if (result.Success)
+            var result = await mediator.Send(new GetAllParallelCorpusVersionIdsQuery());
+            if (result.Success && result.Data != null)
             {
                 return result.Data;
             }
@@ -23,7 +26,20 @@ namespace ClearBible.Alignment.DataServices.Corpora
             }
         }
 
-        public static async Task<ParallelTokenizedCorpus?> Get(
+        public static async Task<IEnumerable<ParallelTokenizedCorpusId>> GetAllParallelTokenizedCorpusIds(IMediator mediator, ParallelCorpusVersionId parallelCorpusVersionId)
+        {
+            var result = await mediator.Send(new GetAllParallelTokenizedCorpusIdsByParallelCorpusVersionIdQuery(parallelCorpusVersionId));
+            if (result.Success && result.Data != null)
+            {
+                return result.Data;
+            }
+            else
+            {
+                throw new MediatorErrorEngineException(result.Message);
+            }
+        }
+        
+        public static async Task<ParallelTokenizedCorpus> Get(
             IMediator mediator,
             ParallelTokenizedCorpusId parallelTokenizedCorpusId)
         {
@@ -32,11 +48,14 @@ namespace ClearBible.Alignment.DataServices.Corpora
             var result = await mediator.Send(command);
             if (result.Success)
             {
-                var info =  result.Data;
+                var data =  result.Data;
                 return new ParallelTokenizedCorpus(
-                    await TokenizedTextCorpus.Get(mediator, info.sourceTokenizedCorpusId), 
-                    await TokenizedTextCorpus.Get(mediator, info.targetTokenizedCorpusId), 
-                    info.engineVerseMappings, parallelTokenizedCorpusId);
+                    await TokenizedTextCorpus.Get(mediator, data.sourceTokenizedCorpusId), 
+                    await TokenizedTextCorpus.Get(mediator, data.targetTokenizedCorpusId), 
+                    data.engineVerseMappings, 
+                    parallelTokenizedCorpusId,
+                    data.parallelCorpusVersionId,
+                    data.parallelCorpusId);
             }
             else
             {
@@ -48,10 +67,14 @@ namespace ClearBible.Alignment.DataServices.Corpora
             TokenizedTextCorpus sourceTokenizedTextCorpus,
             TokenizedTextCorpus targetTokenizedTextCorpus,
             IEnumerable<EngineVerseMapping> engineVerseMappings,
-            ParallelTokenizedCorpusId parallelTokenizedCorpusId)
+            ParallelTokenizedCorpusId parallelTokenizedCorpusId,
+            ParallelCorpusVersionId parallelCorpusVersionId,
+            ParallelCorpusId parallelCorpusId)
             : base(sourceTokenizedTextCorpus, targetTokenizedTextCorpus, engineVerseMappings.ToList())
         {
             ParallelTokenizedCorpusId = parallelTokenizedCorpusId;
+            ParallelCorpusVersionId = parallelCorpusVersionId;
+            ParallelCorpusId = parallelCorpusId;
         }
     }
 }
