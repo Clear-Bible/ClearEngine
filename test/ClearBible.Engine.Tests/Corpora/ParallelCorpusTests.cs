@@ -9,10 +9,10 @@ using SIL.Scripture;
 
 namespace ClearBible.Engine.Tests.Corpora
 {
-    public class EngineParallelTextCorpusTests
+    public class ParallelCorpusTests
     {
 		[Fact]
-		public void GetGetRows_SameVerseRefOneToMany()
+		public void ParallelCorpus__GetGetRows_SameVerseRefOneToMany()
 		{
 			Versification.Table.Implementation.RemoveAllUnknownVersifications();
 			string src = "&MAT 1:2-3 = MAT 1:2\nMAT 1:4 = MAT 1:3\n";
