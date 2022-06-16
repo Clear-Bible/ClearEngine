@@ -1,16 +1,17 @@
-﻿using ClearBible.Engine.Corpora;
+﻿using ClearBible.Alignment.DataServices.Features.Corpora;
+using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
+
 using MediatR;
+
 using SIL.Machine.Corpora;
 using SIL.Scripture;
 
 namespace ClearBible.Alignment.DataServices.Corpora
 {
-    internal class Text<T> : ScriptureText
-        where T : GetTokensByBookIdBaseQuery,
-        new()
+    internal class ParatextPluginText : ScriptureText
     {
-        private readonly object id_;
+        private readonly string paratextPluginId_;
         private readonly IMediator mediator_;
 
         /// <summary>
@@ -27,17 +28,15 @@ namespace ClearBible.Alignment.DataServices.Corpora
             //IMPLEMENTER'S NOTES:: needs to configure GetVersesInDocOrder() to ONLY return the text parallel related.
         //}
 
-        public Text(object id, IMediator mediator, ScrVers versification, string bookId )
+        public ParatextPluginText(string paratextPluginId, IMediator mediator, ScrVers versification, string bookId )
             : base(bookId, versification)
         {
-            id_ = id;
+            paratextPluginId_ = paratextPluginId;
             mediator_ = mediator;
         }
         protected override IEnumerable<TextRow> GetVersesInDocOrder()
         {
-            var command = new T();
-            command.Id = id_;
-            command.BookId = Id; //Note that in ScriptureText Id is the book abbreviation bookId.
+            var command = new GetRowsByParatextPluginIdAndBookIdQuery(paratextPluginId_, Id);  //Note that in ScriptureText Id is the book abbreviation bookId.
 
             var result = Task.Run(() => mediator_.Send(command)).GetAwaiter().GetResult();
             if (result.Success)
@@ -45,11 +44,11 @@ namespace ClearBible.Alignment.DataServices.Corpora
                 var verses = result.Data;
 
                 if (verses == null)
-                    throw new MediatorErrorEngineException("GetCorpusTokensByBookIdCommand returned null data");
+                    throw new MediatorErrorEngineException("GetTextRowsByParatextPluginIdAndBookIdQuery returned null data");
 
                 return verses
-                    .SelectMany(verse => CreateRows(verse.chapter, verse.verse, "", verse.isSentenceStart) // text parameter is overridden by TokensTextRow and is therefore not needed here.
-                        .Select(tr => new TokensTextRow(tr, verse.tokens.ToList()))); //MUST return TokensTextRow. 
+                    .SelectMany(verse => CreateRows(verse.chapter, verse.verse, verse.text, verse.isSentenceStart));
+
             }
             else
             {

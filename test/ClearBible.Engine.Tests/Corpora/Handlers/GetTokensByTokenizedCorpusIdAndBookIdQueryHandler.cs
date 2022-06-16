@@ -16,13 +16,16 @@ using SIL.Scripture;
 
 namespace ClearBible.Engine.Tests.Corpora.Handlers
 {
-    public class GetTokensByCorpusIdAndBookIdQueryHandler : IRequestHandler<
-        GetTokensByCorpusIdAndBookIdQuery,
+    public class GetTokensByTokenizedCorpusIdAndBookIdQueryHandler : IRequestHandler<
+        GetTokensByTokenizedCorpusIdAndBookIdQuery,
         RequestResult<IEnumerable<(string chapter, string verse, IEnumerable<Token> tokens, bool isSentenceStart)>>>
     {
         public Task<RequestResult<IEnumerable<(string chapter, string verse, IEnumerable<Token> tokens, bool isSentenceStart)>>>
-            Handle(GetTokensByCorpusIdAndBookIdQuery command, CancellationToken cancellationToken)
+            Handle(GetTokensByTokenizedCorpusIdAndBookIdQuery command, CancellationToken cancellationToken)
         {
+            //DB Impl notes: look at command.TokenizedCorpusId and find in TokenizedCorpus table.
+            //Then iterate tokens and package them by verse then return enumerable.
+
             var corpus = new UsfmFileTextCorpus("usfm.sty", Encoding.UTF8, TestDataHelpers.UsfmTestProjectPath)
                 .Tokenize<LatinWordTokenizer>()
                 .Transform<IntoTokensTextRowProcessor>();

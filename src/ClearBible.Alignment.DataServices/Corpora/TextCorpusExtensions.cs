@@ -8,9 +8,9 @@ namespace ClearBible.Alignment.DataServices.Corpora
 {
     public static class TextCorpusExtensions
     {
-        public static async Task<TextCorpus<GetTokensByCorpusIdAndBookIdQuery>> Update(this TextCorpus<GetTokensByCorpusIdAndBookIdQuery> textCorpusByCorpusId, IMediator mediator)
+        public static async Task<TokenizedTextCorpus> CreateNewTokenization(this TokenizedTextCorpus tokenizedCorpus, IMediator mediator)
         {
-            var command = new UpdateTextCorpusCommand(textCorpusByCorpusId, (CorpusId) textCorpusByCorpusId.Id);
+            var command = new CreateTokenizedCorpusFromTokenizedCorpusCommand(tokenizedCorpus);
 
             var result = await mediator.Send(command);
             if (result.Success)
@@ -24,27 +24,41 @@ namespace ClearBible.Alignment.DataServices.Corpora
         }
 
         /// <summary>
-        /// 
+        /// Creates a new Corpus, associated CorpusVersion,  a new associated TokenizedCorpus, and all the tokens within the corpus. 
         /// </summary>
-        /// <param name="textCorpus"></param>
+        /// <param name="textCorpus">textCorpus must already be tokenized. This is done in this fashion:
+        ///     textCorpus
+        ///         .Tokenize<LatinWordTokenizer>()
+        ///         .Transform<IntoTokensTextRowProcessor>()
+        /// </param>
         /// <param name="mediator"></param>
         /// <param name="isRtl"></param>
         /// <param name="name"></param>
         /// <param name="language"></param>
         /// <param name="corpusType"></param>
-        /// <returns>A TextCorpus<GetTokensByCorpusIdAndBookIdQuery> obtained from the database.</returns>
-        /// <exception cref="InvalidTypeEngineException">Indicates that the supplied scriptureTextCorpus
-        /// is a TextCorpus<GetCorpusTokensByBookIdByCorpusIdCommand> and is therefore already created.</exception>
+        /// <param name="tokenizationQueryString">A linq-style statement that was used to tokenize the corpus in string form, e.g. 
+        /// '.Tokenize<LatinWordTokenizer>().Transform<IntoTokensTextRowProcessor>()'</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidTypeEngineException">textCorpus enumerable is not castable to a TokensTextRow type.</exception>
         /// <exception cref="MediatorErrorEngineException"></exception>
-        public static async Task<TextCorpus<GetTokensByCorpusIdAndBookIdQuery>> Create(this ITextCorpus textCorpus, IMediator mediator, bool isRtl, string name, string language, string corpusType)
+        public static async Task<TokenizedTextCorpus> Create(this ITextCorpus textCorpus, IMediator mediator, bool isRtl, string name, string language, string corpusType, string tokenizationQueryString)
         {
-            if (textCorpus.GetType() == typeof(TextCorpus<GetTokensByCorpusIdAndBookIdQuery>))//scriptureTextCorpus.GetType().GetGenericTypeDefinition() == typeof(TextCorpus<>))
+            if (textCorpus.GetType() == typeof(TokenizedTextCorpus))//scriptureTextCorpus.GetType().GetGenericTypeDefinition() == typeof(TextCorpus<>))
             {
-                throw new InvalidTypeEngineException(name: "scriptureTextCorpus", value: "TextCorpus<GetCorpusTokensByBookIdByCorpusIdCommand>",
+                throw new InvalidTypeEngineException(name: "scriptureTextCorpus", value: "TokenizedCorpus",
                     message: "originated from DB and therefore already created");
             }
 
-            var command = new CreateTextCorpusCommand(textCorpus, isRtl, name, language, corpusType);
+            try
+            {
+                textCorpus.Cast<TokensTextRow>();
+            }
+            catch (InvalidCastException)
+            {
+                throw new InvalidTypeEngineException(message: $"Corpus must be tokenized and transformed into TokensTextRows, e.g. corpus.Tokenize<LatinWordTokenizer>().Transform<IntoTokensTextRowProcessor>()");
+            }
+
+            var command = new CreateTokenizedCorpusFromTextCorpusCommand(textCorpus, isRtl, name, language, corpusType, tokenizationQueryString);
  
             var result = await mediator.Send(command);
             if (result.Success)

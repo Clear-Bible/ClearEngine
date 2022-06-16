@@ -33,7 +33,7 @@ namespace ClearBible.Engine.Tests.Corpora
 				.Tokenize<LatinWordTokenizer>()
 				.Transform<IntoTokensTextRowProcessor>();
 
-			var dbCorpus = await corpus.Create(mediator, true, "NameX", "LanguageX", "LanguageType");
+			var dbCorpus = await corpus.Create(mediator, true, "NameX", "LanguageX", "LanguageType", ".Tokenize<LatinWordTokenizer>().Transform<IntoTokensTextRowProcessor>()");
 
 			foreach (var tokensTextRow in dbCorpus.Take(5).Cast<TokensTextRow>())
 			{
@@ -65,7 +65,7 @@ namespace ClearBible.Engine.Tests.Corpora
 		{
 			IMediator mediator = new MediatorMock();
 
-			var dbCorpus = await TextCorpusFromDb.Get(mediator, new CorpusIdVersionId(1, 2));
+			var dbCorpus = await TokenizedTextCorpus.Get(mediator, new TokenizedCorpusId(new Guid()));
 
 			foreach (var tokensTextRow in dbCorpus.Take(5).Cast<TokensTextRow>())
 			{

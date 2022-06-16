@@ -6,5 +6,5 @@ using ClearDashboard.DAL.CQRS;
 
 namespace ClearBible.Alignment.DataServices.Features.Translation
 {
-    public record GetAlignmentsByParallelCorpusIdQuery(ParallelCorpusId ParallelCorpusId) : IRequest<RequestResult<IEnumerable<(Token, Token)>?>>;
+    public record GetAlignmentsByParallelCorpusIdQuery(ParallelCorpusId ParallelCorpusId) : IRequest<RequestResult<IEnumerable<(Token, Token, double)>?>>;
 }

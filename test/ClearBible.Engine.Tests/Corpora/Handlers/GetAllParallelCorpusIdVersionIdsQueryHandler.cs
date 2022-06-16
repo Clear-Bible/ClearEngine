@@ -11,15 +11,15 @@ namespace ClearBible.Engine.Tests.Corpora.Handlers
 {
     public class GetAllParallelCorpusIdVersionIdsQueryHandler : IRequestHandler<
         GetAllParallelCorpusIdVersionIdsQuery,
-        RequestResult<IEnumerable<ParallelCorpusIdVersionId>>>
+        RequestResult<IEnumerable<ParallelCorpusVersionId>>>
     {
-        public Task<RequestResult<IEnumerable<ParallelCorpusIdVersionId>>>
+        public Task<RequestResult<IEnumerable<ParallelCorpusVersionId>>>
             Handle(GetAllParallelCorpusIdVersionIdsQuery command, CancellationToken cancellationToken)
         {
 
             return Task.FromResult(
-                new RequestResult<IEnumerable<ParallelCorpusIdVersionId>>
-                (result: new List<ParallelCorpusIdVersionId>(),
+                new RequestResult<IEnumerable<ParallelCorpusVersionId>>
+                (result: new List<ParallelCorpusVersionId>(),
                 success: true,
                 message: "successful result from test"));
         }

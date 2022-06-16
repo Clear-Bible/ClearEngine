@@ -45,7 +45,7 @@ namespace ClearBible.Alignment.DataServices.Translation
             }
         }
 
-        public async Task PutAlignments(Corpora.ParallelCorpusId parallelCorpusId, IEnumerable<(Token, Token)> sourceTokenToTargetTokenAlignments)
+        public async Task PutAlignments(Corpora.ParallelCorpusId parallelCorpusId, IEnumerable<(Token, Token, double)> sourceTokenToTargetTokenAlignments)
         {
             var result = await mediator_.Send(new PutAlignmentsCommand(sourceTokenToTargetTokenAlignments, parallelCorpusId));
             if (!result.Success)

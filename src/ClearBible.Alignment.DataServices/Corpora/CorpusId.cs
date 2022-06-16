@@ -1,13 +1,10 @@
 ﻿
 namespace ClearBible.Alignment.DataServices.Corpora
 {
-    public record CorpusId
+    public record CorpusId : BaseId
     {
-        public CorpusId(int id)
+        public CorpusId(Guid id) : base(id)
         {
-            Id = id;
         }
-
-        public int Id { get; }
     }
 }

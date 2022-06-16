@@ -15,5 +15,5 @@ namespace ClearBible.Alignment.DataServices.Features.Corpora
     /// </summary>
     /// <param name="sourceTokenToTargetTokenAlignments"></param>
     /// <param name="parallelCorpusId"></param>
-    public record PutAlignmentsCommand(IEnumerable<(Token, Token)> sourceTokenToTargetTokenAlignments, ParallelCorpusId parallelCorpusId) : IRequest<RequestResult<object>>;
+    public record PutAlignmentsCommand(IEnumerable<(Token, Token, double)> sourceTokenToTargetTokenAlignments, ParallelCorpusId parallelCorpusId) : IRequest<RequestResult<object>>;
 }

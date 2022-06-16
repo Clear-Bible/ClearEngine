@@ -17,11 +17,11 @@ namespace ClearBible.Engine.Tests.Corpora.Handlers
         public Task<RequestResult<(ScrVers? versification, IEnumerable<string> bookAbbreviations)>>
             Handle(GetVersificationAndBookIdByParatextPluginIdQuery command, CancellationToken cancellationToken)
         {
+            //DB Impl notes: extracts the versification and bookAbbreviations (SIL) from the corpus identified by command.ParatextPluginId
 
             return Task.FromResult(
                 new RequestResult<(ScrVers? versification, IEnumerable<string> bookAbbreviations)>
                 (result: (ScrVers.Original, new List<string>()), 
-                        //NOTE: versification must be set for this corpus type so that it can be SIL versified to initialize Clear versifiation mapping.
                 success: true,
                 message: "successful result from test"));
         }

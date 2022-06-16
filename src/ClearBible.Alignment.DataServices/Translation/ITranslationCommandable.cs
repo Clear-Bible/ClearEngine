@@ -78,6 +78,6 @@ namespace ClearBible.Alignment.DataServices.Translation
         /// </summary>
         /// <param name="engineParallelTextCorpusId"></param>
         /// <param name="alignments"></param>
-        Task PutAlignments(ParallelCorpusId parallelCorpusId, IEnumerable<(Token, Token)> alignments);
+        Task PutAlignments(ParallelCorpusId parallelCorpusId, IEnumerable<(Token, Token, double)> alignments);
     }
 }
