@@ -1,34 +1,45 @@
-# ClearEngine3
+# ClearEngine
 
-DotNet library for the Clear technology 
-to aid in Bible translation as developed by Clear Bible, Inc.
+A set of classes extending SIL's Machine that includes:
 
-(Currently under development and should be considered a prototype.)
+- Custom versification,
+- Extensions to tokenization that include adding unique token ids and other data to text tokens,
+- Manuscript syntax tree corpus,
+- Syntax tree-based alignment refining technology.
 
-# Getting Started
+## Setup
 
-To run the console application in RegressionTest1, first adjust
-the startup folder to be:
-  (repository)/test/TestSandbox1
+1. Clone this repository to `directory`.
+2. From `directory`, clone [fork of SIL's Machine](https://github.com/russellmorley/machine.git), `git clone https://github.com/russellmorley/machine.git`.
+3. Go to github and create a new application password, giving it permissions to write/read packages.
+4. Change to ClearEngine directory, `cd ClearEngine`, and create new file named `nuget.config`:
 
-For RegressionTest3, adjust the startup folder to be:
-  (repository)/test/RegressionTest3
+```
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <packageSources>
+        <clear />
+        <add key="ClearBible" value="https://nuget.pkg.github.com/clear-bible/index.json" />
+        <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+    </packageSources>
+    <packageSourceMapping>
+    <packageSource key="nuget.org">
+        <package pattern="*" />
+    </packageSource>
+    <packageSource key="ClearBible">
+        <package pattern="Clear*" />
+    </packageSource>
+    </packageSourceMapping>
+        <packageSourceCredentials>
+            <ClearBible>
+                <add key="Username" value="GITHUB_USERNAME" />
+                <add key="ClearTextPassword" value="GITHUB_APP_PASSWORD_WITH_PACKAGE_READ_WRITE_PERMISSIONS" />
+            </ClearBible>
+        </packageSourceCredentials>
+    </configuration>
+```
 
-If you are using Visual Studio Community on MacOSX, the startup folder for a project may be adjusted by:
+## Run
 
- - highlighting the project in the solution explorer,
- - selecting Options from the context menu,
- - selecting Run | Configurations | Default in the project options dialog,
- - adjusting the "Run in directory" field, perhaps by browsing to the desired location using the "..." button to the right.
-
-If you are using Visual Studio Community on Windows, the startup folder may be adjusted by:
-
-- highlighting the project in the solution explorer,
-- selecting Properties from the context menu,
-- in the editor that opens, choosing the Debug tab in the list at the left,
-- adjusting the Working Directory field, perhaps by using the Browse button to the right.
-
-The regression tests may be further configured by editing the source code at the beginning of the tests.
-
-The tests produce output in the form of an alignment.json file.  In the folders where these output files are created, you will also find files with names like alignment.json.cmp2 to which the output may be compared.  You should expect the output to match the comparison file with the highest numbered final digit.
+Open solution in Visual Studio. Open *Text Explorer* and run ClearBible tests.
 
