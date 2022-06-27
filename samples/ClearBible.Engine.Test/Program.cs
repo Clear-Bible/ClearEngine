@@ -11,14 +11,19 @@ using SIL.Machine.Utils;
 using SIL.Machine.Translation;
 
 
+string SyntaxTreePath = Path.Combine(AppContext.BaseDirectory,
+    "..", "..", "..", "..", "..", "syntaxtrees");
+
+string CorpusProjectPath = Path.Combine(AppContext.BaseDirectory,
+    "..", "..", "..", "..", "data", "WEB-PT");
 
 // create parallel corpus
-var syntaxTrees = new SyntaxTrees("SyntaxTrees");
+var syntaxTrees = new SyntaxTrees(SyntaxTreePath);
 var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTrees)
     .Tokenize<LatinWordTokenizer>()
     .Transform<IntoTokensTextRowProcessor>();
 
-var targetCorpus = new ParatextTextCorpus("data/WEB-PT")
+var targetCorpus = new ParatextTextCorpus(CorpusProjectPath)
     .Tokenize<LatinWordTokenizer>()
     .Transform<IntoTokensTextRowProcessor>();
 
@@ -40,12 +45,13 @@ parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
         SymmetrizationHeuristic.GrowDiagFinalAnd);
 
     // set the manuscript tree aligner hyperparameters
-    var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation("InputCommon").GetAsync();
+    var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation("hyperparametersfiles").GetAsync();
 
     using var syntaxTreeWordAlignmentModel = await translationCommandable.TrainSyntaxTreeModel(
         parallelTextCorpus,
         smtWordAlignmentModel,
         hyperparameters,
+        SyntaxTreePath,
         new DelegateProgress(status =>
             Console.WriteLine($"Training syntax tree alignment model: {status.PercentCompleted:P}")));
 

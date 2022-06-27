@@ -6,6 +6,7 @@ using ClearBible.Engine.SyntaxTree.Aligner.Legacy;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ClearBible.Engine.Exceptions;
 
 namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
 {
@@ -20,6 +21,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
         }
         public override IPersistGettable<FileGetSyntaxTreeWordAlignerHyperparams, SyntaxTreeWordAlignerHyperparameters> SetLocation(string location)
         {
+             
+            if (!Directory.Exists(location))
+            {
+                throw new InvalidParameterEngineException(name: "location", value: location);
+            }
             PathPrefix = location;
             return this;
         }

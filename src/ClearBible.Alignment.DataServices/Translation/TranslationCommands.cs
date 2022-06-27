@@ -126,8 +126,8 @@ namespace ClearBible.Alignment.DataServices.Translation
             EngineParallelTextCorpus parallelCorpus, 
             IWordAlignmentModel smtTrainedWordAlignmentModel, 
             SyntaxTreeWordAlignerHyperparameters hyperparameters,
-            IProgress<ProgressStatus>? progress = null, 
-            string syntaxTreesPath = "SyntaxTrees")
+            string syntaxTreesPath,
+            IProgress<ProgressStatus>? progress = null)
         {
             var manuscriptTree = new SyntaxTrees(syntaxTreesPath);
 

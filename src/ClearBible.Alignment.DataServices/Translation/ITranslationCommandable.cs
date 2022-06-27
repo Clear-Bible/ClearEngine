@@ -48,8 +48,8 @@ namespace ClearBible.Alignment.DataServices.Translation
             EngineParallelTextCorpus parallelCorpus,
             IWordAlignmentModel smtTrainedWordAlignmentModel,
             SyntaxTreeWordAlignerHyperparameters hyperparameters,
-            IProgress<ProgressStatus>? progress = null,
-            string syntaxTreesPath = "SyntaxTrees");
+            string syntaxTreesPath,
+            IProgress<ProgressStatus>? progress = null);
 
         /// <summary>
         /// Used to predict the alignments for all engine parallel verses.

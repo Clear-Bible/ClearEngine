@@ -18,11 +18,21 @@ using SIL.Machine.Utils;
 using SIL.Machine.Translation;
 using MediatR;
 using ClearBible.Alignment.DataServices.Tests.Corpora.Handlers;
+using System.IO;
+using System;
 
 namespace ClearBible.Alignment.DataServices.Tests.Translation
 {
     public class TranslationTests
     {
+        public static readonly string SyntaxTreePath = Path.Combine(AppContext.BaseDirectory,
+            "..", "..", "..", "..", "..", "syntaxtrees");
+        public static readonly string CorpusProjectPath = Path.Combine(AppContext.BaseDirectory,
+            "..", "..", "..", "Translation", "data", "WEB-PT");
+        public static readonly string HyperparametersFiles = Path.Combine(AppContext.BaseDirectory,
+            "..", "..", "..", "hyperparametersfiles");
+
+
         private readonly ITestOutputHelper output_;
         protected readonly IMediator mediator_;
 
@@ -37,14 +47,10 @@ namespace ClearBible.Alignment.DataServices.Tests.Translation
         {
             try
             {
-
-                var syntaxTreePath = "..\\..\\..\\..\\..\\Samples\\SyntaxTrees";
-                var corpusProjectPath = "..\\..\\..\\..\\..\\Samples\\data\\WEB-PT";
-
-                var syntaxTree = new SyntaxTrees(syntaxTreePath);
+                var syntaxTree = new SyntaxTrees(SyntaxTreePath);
                 var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
-                var targetCorpus = new ParatextTextCorpus(corpusProjectPath)
+                var targetCorpus = new ParatextTextCorpus(CorpusProjectPath)
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>();
 
@@ -66,15 +72,15 @@ namespace ClearBible.Alignment.DataServices.Tests.Translation
                         SymmetrizationHeuristic.GrowDiagFinalAnd);
 
                     // set the manuscript tree aligner hyperparameters
-                    var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation("InputCommon").GetAsync();
+                    var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
 
                     using var syntaxTreeWordAlignmentModel = await translationCommandable.TrainSyntaxTreeModel(
                         parallelTextCorpus,
                         smtWordAlignmentModel,
                         hyperparameters,
+                        SyntaxTreePath,
                         new DelegateProgress(status =>
-                            output_.WriteLine($"Training syntax tree alignment model: {status.PercentCompleted:P}")),
-                            syntaxTreePath);
+                            output_.WriteLine($"Training syntax tree alignment model: {status.PercentCompleted:P}")));
 
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Take(5).Cast<EngineParallelTextRow>())

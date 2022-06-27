@@ -1,0 +1,1344 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Sentences>
+  <Sentence ID="ps90:1">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="16" nodeId="190900010010170" Length="17">
+          <Node Id="1.1" Cat="CL" Start="0" End="5" Rule="S-P" Head="1" Language="H" nodeId="190900010010060" Length="6">
+            <Node Id="1.2" Cat="S" Start="0" End="0" Rule="Np2S" Head="0" Language="H" nodeId="190900010010012" Length="1">
+              <Node Id="1.3" Cat="np" Start="0" End="0" Rule="N2NP" Head="0" Language="H" nodeId="190900010010011" Length="1">
+                <Node Id="1.4" Cat="noun" Start="0" End="0" Lemma="T.:PIL.FH" UnicodeLemma="תְּפִלָּה" English="prayer" Analysis="ncfsa" morphId="190900010011" StrongNumberX="8605" Language="H" Unicode="תְּפִלָּה֮‎" nodeId="190900010010010" Length="1">T.:PIL.FH02</Node>
+              </Node>
+            </Node>
+            <Node Id="1.5" Cat="P" Start="1" End="5" Rule="Pp2P" Head="0" Language="H" nodeId="190900010020051" Length="5">
+              <Node Id="1.6" Cat="pp" Start="1" End="5" Rule="PrepNp" Head="1" Language="H" nodeId="190900010020050" Length="5">
+                <Node Id="1.7" Cat="pp" Start="1" End="1" Rule="P2PP" Head="0" Language="H" nodeId="190900010020011" Length="1">
+                  <Node Id="1.8" Cat="prep" Start="1" End="1" Lemma="L:" UnicodeLemma="לְ" English="of" Analysis="Pp" morphId="190900010021" StrongNumberX="3807a" Language="H" Unicode="לְ‎" nodeId="190900010020010" Length="1">L:</Node>
+                </Node>
+                <Node Id="1.9" Cat="np" Start="2" End="5" Rule="Np-Appos" Head="0" Language="H" nodeId="190900010030040" Length="4">
+                  <Node Id="1.10" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900010030011" Length="1">
+                    <Node Id="1.11" Cat="noun" Start="2" End="2" Lemma="MO$EH" UnicodeLemma="מֹשֶׁה" English="Moses" Analysis="np" morphId="190900010022" StrongNumberX="4872" Language="H" Unicode="מֹשֶׁ֪ה‎" nodeId="190900010030010" Length="1">MO$E93H</Node>
+                  </Node>
+                  <Node Id="1.12" Cat="np" Start="3" End="5" Rule="NPofNP" Head="0" Language="H" nodeId="190900010040030" Length="3">
+                    <Node Id="1.13" Cat="np" Start="3" End="3" Rule="N2NP" Head="0" Language="H" nodeId="190900010040011" Length="1">
+                      <Node Id="1.14" Cat="noun" Start="3" End="3" Lemma=")IY$" UnicodeLemma="אִישׁ" English="man of" Analysis="ncmsc" morphId="190900010031" StrongNumberX="0376" Language="H" Unicode="אִֽישׁ־‎" nodeId="190900010040010" Length="1">)I75Y$-</Node>
+                    </Node>
+                    <Node Id="1.15" Cat="np" Start="4" End="5" Rule="DetNP" Head="1" Language="H" nodeId="190900010050020" Length="2">
+                      <Node Id="1.16" Cat="art" Start="4" End="4" Lemma="HA" UnicodeLemma="הַ" English="the" Analysis="Pa" morphId="190900010041" StrongNumberX="1886a" Language="H" Unicode="הָ‎" nodeId="190900010050010" Length="1">HF</Node>
+                      <Node Id="1.17" Cat="np" Start="5" End="5" Rule="N2NP" Head="0" Language="H" nodeId="190900010060011" Length="1">
+                        <Node Id="1.18" Cat="noun" Start="5" End="5" Lemma="):ELOHIYM" UnicodeLemma="אֱלֹהִים" English="God" Analysis="ncmpa" morphId="190900010042" StrongNumberX="0430" Language="H" Unicode="אֱלֹ֫הִ֥ים‎" nodeId="190900010060010" Length="1">):ELO60HI71YM</Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="23.1" Cat="CL" Start="6" End="16" Rule="ClCl2" Head="1" Language="H" nodeId="190900010070110" Length="11">
+            <Node Id="23.2" Cat="CL" Start="6" End="7" Rule="Np2CL" Head="0" Language="H" nodeId="190900010070021" Length="2">
+              <Node Id="23.3" Cat="np" Start="6" End="7" Rule="NPofNP" Head="0" Language="H" nodeId="190900010070020" Length="2">
+                <Node Id="23.4" Cat="np" Start="6" End="6" Rule="N2NP" Head="0" Language="H" nodeId="190900010070011" Length="1">
+                  <Node Id="23.5" Cat="noun" Start="6" End="6" Lemma=")FDOWN" UnicodeLemma="אָדוֹן" English="Lord" Analysis="ncmpc" morphId="190900010051" StrongNumberX="0136" Language="H" Unicode="אֲ‍ֽדֹנ‎" nodeId="190900010070010" Length="1">):A35DON</Node>
+                </Node>
+                <Node Id="23.6" Cat="np" Start="7" End="7" Rule="Pron2NP" Head="0" Language="H" nodeId="190900010080011" Length="1">
+                  <Node Id="23.7" Cat="pron" Start="7" End="7" Lemma="IY" UnicodeLemma="ִי" English="" Analysis="psn1cs" morphId="190900010052" StrongNumberX="2967a" Language="H" Unicode="ָ֗י‎" nodeId="190900010080010" Length="1">F81Y</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="23.8" Cat="CL" Start="8" End="16" Rule="O-S-V-PP-PP" Head="2" Language="H" nodeId="190900010090090" Length="9">
+              <Node Id="23.9" Cat="O" Start="8" End="8" Rule="Np2O" Head="0" Language="H" nodeId="190900010090012" Length="1">
+                <Node Id="23.10" Cat="np" Start="8" End="8" Rule="N2NP" Head="0" Language="H" nodeId="190900010090011" Length="1">
+                  <Node Id="23.11" Cat="noun" Start="8" End="8" Lemma="MF(OWN_1" UnicodeLemma="מָעוֹן_1" English="dwelling place" Analysis="ncmsa" morphId="190900010061" StrongNumberX="4583" Language="H" Unicode="מָע֣וֹן‎" nodeId="190900010090010" Length="1">MF(O74WN</Node>
+                </Node>
+              </Node>
+              <Node Id="23.12" Cat="S" Start="9" End="9" Rule="Np2S" Head="0" Language="H" nodeId="190900010100012" Length="1">
+                <Node Id="23.13" Cat="np" Start="9" End="9" Rule="Pron2NP" Head="0" Language="H" nodeId="190900010100011" Length="1">
+                  <Node Id="23.14" Cat="pron" Start="9" End="9" Lemma=")AT.FH" UnicodeLemma="אַתָּה" English="you" Analysis="pi2ms" morphId="190900010071" StrongNumberX="0859" Language="H" Unicode="אַ֭תָּה‎" nodeId="190900010100010" Length="1">13)AT.FH</Node>
+                </Node>
+              </Node>
+              <Node Id="23.15" Cat="V" Start="10" End="10" Rule="Vp2V" Head="0" Language="H" nodeId="190900010110012" Length="1">
+                <Node Id="23.16" Cat="vp" Start="10" End="10" Rule="V2VP" Head="0" Language="H" nodeId="190900010110011" Length="1">
+                  <Node Id="23.17" Cat="verb" Start="10" End="10" Lemma="HYH" UnicodeLemma="היה" English="you are" Analysis="vqp2ms" morphId="190900010081" StrongNumberX="1961" Language="H" Unicode="הָיִ֥יתָ‎" nodeId="190900010110010" Length="1">HFYI71YTF</Node>
+                </Node>
+              </Node>
+              <Node Id="23.18" Cat="PP" Start="11" End="12" Rule="Pp2PP" Head="0" Language="H" nodeId="190900010120021" Length="2">
+                <Node Id="23.19" Cat="pp" Start="11" End="12" Rule="PrepNp" Head="1" Language="H" nodeId="190900010120020" Length="2">
+                  <Node Id="23.20" Cat="pp" Start="11" End="11" Rule="P2PP" Head="0" Language="H" nodeId="190900010120011" Length="1">
+                    <Node Id="23.21" Cat="prep" Start="11" End="11" Lemma="L:" UnicodeLemma="לְ" English="to" Analysis="Pp" morphId="190900010091" StrongNumberX="3807a" Language="H" Unicode="לּ‎" nodeId="190900010120010" Length="1">L.</Node>
+                  </Node>
+                  <Node Id="23.22" Cat="np" Start="12" End="12" Rule="Pron2NP" Head="0" Language="H" nodeId="190900010130011" Length="1">
+                    <Node Id="23.23" Cat="pron" Start="12" End="12" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900010092" StrongNumberX="5105a" Language="H" Unicode="ָ֗נוּ‎" nodeId="190900010130010" Length="1">F81NW.</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="23.24" Cat="PP" Start="13" End="16" Rule="Pp2PP" Head="0" Language="H" nodeId="190900010140041" Length="4">
+                <Node Id="23.25" Cat="pp" Start="13" End="16" Rule="PrepNp" Head="1" Language="H" nodeId="190900010140040" Length="4">
+                  <Node Id="23.26" Cat="pp" Start="13" End="13" Rule="P2PP" Head="0" Language="H" nodeId="190900010140011" Length="1">
+                    <Node Id="23.27" Cat="prep" Start="13" End="13" Lemma="B.:" UnicodeLemma="בְּ" English="through" Analysis="Pp" morphId="190900010101" StrongNumberX="0871a" Language="H" Unicode="בְּ‎" nodeId="190900010140010" Length="1">B.:</Node>
+                  </Node>
+                  <Node Id="23.28" Cat="np" Start="14" End="16" Rule="NpaNp" Head="0" Language="H" nodeId="190900010150030" Length="3">
+                    <Node Id="23.29" Cat="np" Start="14" End="14" Rule="N2NP" Head="0" Language="H" nodeId="190900010150011" Length="1">
+                      <Node Id="23.30" Cat="noun" Start="14" End="14" Lemma="D.OWR_2" UnicodeLemma="דּוֹר_2" English="generation" Analysis="ncmsa" morphId="190900010102" StrongNumberX="1755" Language="H" Unicode="דֹ֣ר‎" nodeId="190900010150010" Length="1">DO74R</Node>
+                    </Node>
+                    <Node Id="23.31" Cat="cjp" Start="15" End="15" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900010160011" Length="1">
+                      <Node Id="23.32" Cat="cj" Start="15" End="15" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900010111" StrongNumberX="2050b" Language="H" Unicode="וָ‎" nodeId="190900010160010" Length="1">WF</Node>
+                    </Node>
+                    <Node Id="23.33" Cat="np" Start="16" End="16" Rule="N2NP" Head="0" Language="H" nodeId="190900010170011" Length="1">
+                      <Node Id="23.34" Cat="noun" Start="16" End="16" Lemma="D.OWR_2" UnicodeLemma="דּוֹר_2" English="generation" Analysis="ncmsa" morphId="190900010112" StrongNumberX="1755" Language="H" Unicode="׃‎דֹֽר‎" nodeId="190900010170010" Length="1">DO75R00</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:2">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="15" nodeId="190900020010161" Length="16">
+          <Node Id="1.1" Cat="CL" Start="0" End="15" Rule="CLandCL2" Head="2" Language="H" nodeId="190900020010160" Length="16">
+            <Node Id="1.2" Cat="CL" Start="0" End="8" Rule="ppCL" Head="1" Language="H" nodeId="190900020010090" Length="9">
+              <Node Id="1.3" Cat="pp" Start="0" End="1" Rule="PpAdvp" Head="0" Language="H" nodeId="190900020010020" Length="2">
+                <Node Id="1.4" Cat="pp" Start="0" End="0" Rule="P2PP" Head="0" Language="H" nodeId="190900020010011" Length="1">
+                  <Node Id="1.5" Cat="prep" Start="0" End="0" Lemma="B.:" UnicodeLemma="בְּ" English="at" Analysis="Pp" morphId="190900020011" StrongNumberX="0871a" Language="H" Unicode="בְּ‎" nodeId="190900020010010" Length="1">B.:</Node>
+                </Node>
+                <Node Id="1.6" Cat="advp" Start="1" End="1" Rule="Adv2Advp" Head="0" Language="H" nodeId="190900020020011" Length="1">
+                  <Node Id="1.7" Cat="adv" Start="1" End="1" Lemma="+EREM" UnicodeLemma="טֶרֶם" English="before" Analysis="Pd" morphId="190900020012" StrongNumberX="2962" Language="H" Unicode="טֶ֤רֶם ׀‎" nodeId="190900020020010" Length="1">+E70REM05</Node>
+                </Node>
+              </Node>
+              <Node Id="1.8" Cat="CL" Start="2" End="8" Rule="CLaCL" Head="0" Language="H" nodeId="190900020030070" Length="7">
+                <Node Id="1.9" Cat="CL" Start="2" End="3" Rule="S-V" Head="1" Language="H" nodeId="190900020030020" Length="2">
+                  <Node Id="1.10" Cat="S" Start="2" End="2" Rule="Np2S" Head="0" Language="H" nodeId="190900020030012" Length="1">
+                    <Node Id="1.11" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900020030011" Length="1">
+                      <Node Id="1.12" Cat="noun" Start="2" End="2" Lemma="HAR" UnicodeLemma="הַר" English="mountains" Analysis="ncmpa" morphId="190900020021" StrongNumberX="2022" Language="H" Unicode="הָ֘רִ֤ים‎" nodeId="190900020030010" Length="1">HF82RI70YM</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="1.13" Cat="V" Start="3" End="3" Rule="Vp2V" Head="0" Language="H" nodeId="190900020040012" Length="1">
+                    <Node Id="1.14" Cat="vp" Start="3" End="3" Rule="V2VP" Head="0" Language="H" nodeId="190900020040011" Length="1">
+                      <Node Id="1.15" Cat="verb" Start="3" End="3" Lemma="YLD" UnicodeLemma="ילד" English="they were born" Analysis="vQp3cp" morphId="190900020031" StrongNumberX="3205" Language="H" Unicode="יֻלָּ֗דוּ‎" nodeId="190900020040010" Length="1">YUL.F81DW.</Node>
+                    </Node>
+                  </Node>
+                </Node>
+                <Node Id="1.16" Cat="cjp" Start="4" End="4" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900020050011" Length="1">
+                  <Node Id="1.17" Cat="cj" Start="4" End="4" Lemma="W:" UnicodeLemma="וְ" English="or" Analysis="Pc" morphId="190900020041" StrongNumberX="2050b" Language="H" Unicode="וַ‎" nodeId="190900020050010" Length="1">WA</Node>
+                </Node>
+                <Node Id="1.18" Cat="CL" Start="5" End="8" Rule="V-O" Head="0" Language="H" nodeId="190900020060040" Length="4">
+                  <Node Id="1.19" Cat="V" Start="5" End="5" Rule="Vp2V" Head="0" Language="H" nodeId="190900020060012" Length="1">
+                    <Node Id="1.20" Cat="vp" Start="5" End="5" Rule="V2VP" Head="0" Language="H" nodeId="190900020060011" Length="1">
+                      <Node Id="1.21" Cat="verb" Start="5" End="5" Lemma="XYL_1" UnicodeLemma="חיל_1" English="you brought forth" Analysis="vew2ms" morphId="190900020042" StrongNumberX="2342a" Language="H" Unicode="תְּח֣וֹלֵֽל‎" nodeId="190900020060010" Length="1">T.:XO74WL"75L</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="1.22" Cat="O" Start="6" End="8" Rule="Np2O" Head="0" Language="H" nodeId="190900020070031" Length="3">
+                    <Node Id="1.23" Cat="np" Start="6" End="8" Rule="NpaNp" Head="0" Language="H" nodeId="190900020070030" Length="3">
+                      <Node Id="1.24" Cat="np" Start="6" End="6" Rule="N2NP" Head="0" Language="H" nodeId="190900020070011" Length="1">
+                        <Node Id="1.25" Cat="noun" Start="6" End="6" Lemma=")EREC" UnicodeLemma="אֶרֶץ" English="earth" Analysis="ncfsa" morphId="190900020051" StrongNumberX="0776" Language="H" Unicode="אֶ֣רֶץ‎" nodeId="190900020070010" Length="1">)E74REC</Node>
+                      </Node>
+                      <Node Id="1.26" Cat="cjp" Start="7" End="7" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900020080011" Length="1">
+                        <Node Id="1.27" Cat="cj" Start="7" End="7" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900020061" StrongNumberX="2050b" Language="H" Unicode="וְ‎" nodeId="190900020080010" Length="1">W:</Node>
+                      </Node>
+                      <Node Id="1.28" Cat="np" Start="8" End="8" Rule="N2NP" Head="0" Language="H" nodeId="190900020090011" Length="1">
+                        <Node Id="1.29" Cat="noun" Start="8" End="8" Lemma="T.&quot;B&quot;L" UnicodeLemma="תֵּבֵל" English="world" Analysis="ncfsa" morphId="190900020062" StrongNumberX="8398" Language="H" Unicode="תֵבֵ֑ל‎" nodeId="190900020090010" Length="1">T"B"92L</Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.30" Cat="cjp" Start="9" End="9" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900020100011" Length="1">
+              <Node Id="1.31" Cat="cj" Start="9" End="9" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900020071" StrongNumberX="2050b" Language="H" Unicode="וּֽ‎" nodeId="190900020100010" Length="1">W.75</Node>
+            </Node>
+            <Node Id="1.32" Cat="CL" Start="10" End="15" Rule="PP-S-P" Head="2" Language="H" nodeId="190900020110060" Length="6">
+              <Node Id="1.33" Cat="PP" Start="10" End="13" Rule="Pp2PP" Head="0" Language="H" nodeId="190900020110041" Length="4">
+                <Node Id="1.34" Cat="pp" Start="10" End="13" Rule="PpPp" Head="1" Language="H" nodeId="190900020110040" Length="4">
+                  <Node Id="1.35" Cat="pp" Start="10" End="11" Rule="PrepNp" Head="1" Language="H" nodeId="190900020110020" Length="2">
+                    <Node Id="1.36" Cat="pp" Start="10" End="10" Rule="P2PP" Head="0" Language="H" nodeId="190900020110011" Length="1">
+                      <Node Id="1.37" Cat="prep" Start="10" End="10" Lemma="MIN" UnicodeLemma="מִן" English="from" Analysis="Pp" morphId="190900020072" StrongNumberX="4480" Language="H" Unicode="מֵ‎" nodeId="190900020110010" Length="1">M"</Node>
+                    </Node>
+                    <Node Id="1.38" Cat="np" Start="11" End="11" Rule="N2NP" Head="0" Language="H" nodeId="190900020120011" Length="1">
+                      <Node Id="1.39" Cat="noun" Start="11" End="11" Lemma="(OWLFM" UnicodeLemma="עוֹלָם" English="everlasting" Analysis="ncmsa" morphId="190900020073" StrongNumberX="5769" Language="H" Unicode="עוֹלָ֥ם‎" nodeId="190900020120010" Length="1">(OWLF71M</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="1.40" Cat="pp" Start="12" End="13" Rule="PrepNp" Head="1" Language="H" nodeId="190900020130020" Length="2">
+                    <Node Id="1.41" Cat="pp" Start="12" End="12" Rule="P2PP" Head="0" Language="H" nodeId="190900020130011" Length="1">
+                      <Node Id="1.42" Cat="prep" Start="12" End="12" Lemma="(AD_3" UnicodeLemma="עַד_3" English="to" Analysis="Pp" morphId="190900020081" StrongNumberX="5704" Language="H" Unicode="עַד־‎" nodeId="190900020130010" Length="1">(AD-</Node>
+                    </Node>
+                    <Node Id="1.43" Cat="np" Start="13" End="13" Rule="N2NP" Head="0" Language="H" nodeId="190900020140011" Length="1">
+                      <Node Id="1.44" Cat="noun" Start="13" End="13" Lemma="(OWLFM" UnicodeLemma="עוֹלָם" English="everlasting" Analysis="ncmsa" morphId="190900020091" StrongNumberX="5769" Language="H" Unicode="ע֝וֹלָ֗ם‎" nodeId="190900020140010" Length="1">11(OWLF81M</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.45" Cat="S" Start="14" End="14" Rule="Np2S" Head="0" Language="H" nodeId="190900020150012" Length="1">
+                <Node Id="1.46" Cat="np" Start="14" End="14" Rule="Pron2NP" Head="0" Language="H" nodeId="190900020150011" Length="1">
+                  <Node Id="1.47" Cat="pron" Start="14" End="14" Lemma=")AT.FH" UnicodeLemma="אַתָּה" English="you" Analysis="pi2ms" morphId="190900020101" StrongNumberX="0859" Language="H" Unicode="אַתָּ֥ה‎" nodeId="190900020150010" Length="1">)AT.F71H</Node>
+                </Node>
+              </Node>
+              <Node Id="1.48" Cat="P" Start="15" End="15" Rule="Np2P" Head="0" Language="H" nodeId="190900020160012" Length="1">
+                <Node Id="1.49" Cat="np" Start="15" End="15" Rule="N2NP" Head="0" Language="H" nodeId="190900020160011" Length="1">
+                  <Node Id="1.50" Cat="noun" Start="15" End="15" Lemma=")&quot;L_5" UnicodeLemma="אֵל_5" English="God" Analysis="ncmsa" morphId="190900020111" StrongNumberX="0410" Language="H" Unicode="׃‎אֵֽל‎" nodeId="190900020160010" Length="1">)"75L00</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:3">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="8" nodeId="190900030010090" Length="9">
+          <Node Id="3.1" Cat="CL" Start="0" End="3" Rule="V-O-PP" Head="0" Language="H" nodeId="190900030010040" Length="4">
+            <Node Id="3.2" Cat="V" Start="0" End="0" Rule="Vp2V" Head="0" Language="H" nodeId="190900030010012" Length="1">
+              <Node Id="3.3" Cat="vp" Start="0" End="0" Rule="V2VP" Head="0" Language="H" nodeId="190900030010011" Length="1">
+                <Node Id="3.4" Cat="verb" Start="0" End="0" Lemma="$WB" UnicodeLemma="שׁוב" English="you turn back" Analysis="vhi2msXa" morphId="190900030011" StrongNumberX="7725" Language="H" Unicode="תָּשֵׁ֣ב‎" nodeId="190900030010010" Length="1">T.F$"74B</Node>
+              </Node>
+            </Node>
+            <Node Id="3.5" Cat="O" Start="1" End="1" Rule="Np2O" Head="0" Language="H" nodeId="190900030020012" Length="1">
+              <Node Id="3.6" Cat="np" Start="1" End="1" Rule="N2NP" Head="0" Language="H" nodeId="190900030020011" Length="1">
+                <Node Id="3.7" Cat="noun" Start="1" End="1" Lemma="):ENOW$_1" UnicodeLemma="אֱנוֹשׁ_1" English="man" Analysis="ncmsa" morphId="190900030021" StrongNumberX="0582" Language="H" Unicode="אֱ֭נוֹשׁ‎" nodeId="190900030020010" Length="1">13):ENOW$</Node>
+              </Node>
+            </Node>
+            <Node Id="3.8" Cat="PP" Start="2" End="3" Rule="Pp2PP" Head="0" Language="H" nodeId="190900030030021" Length="2">
+              <Node Id="3.9" Cat="pp" Start="2" End="3" Rule="PrepNp" Head="1" Language="H" nodeId="190900030030020" Length="2">
+                <Node Id="3.10" Cat="pp" Start="2" End="2" Rule="P2PP" Head="0" Language="H" nodeId="190900030030011" Length="1">
+                  <Node Id="3.11" Cat="prep" Start="2" End="2" Lemma="(AD_3" UnicodeLemma="עַד_3" English="to" Analysis="Pp" morphId="190900030031" StrongNumberX="5704" Language="H" Unicode="עַד־‎" nodeId="190900030030010" Length="1">(AD-</Node>
+                </Node>
+                <Node Id="3.12" Cat="np" Start="3" End="3" Rule="N2NP" Head="0" Language="H" nodeId="190900030040011" Length="1">
+                  <Node Id="3.13" Cat="noun" Start="3" End="3" Lemma="D.AK.F)_1" UnicodeLemma="דַּכָּא_1" English="dust" Analysis="ncmsa" morphId="190900030041" StrongNumberX="1793" Language="H" Unicode="דַּכָּ֑א‎" nodeId="190900030040010" Length="1">D.AK.F92)</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="8.1" Cat="cjp" Start="4" End="4" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900030050011" Length="1">
+            <Node Id="8.2" Cat="cj" Start="4" End="4" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900030051" StrongNumberX="2050b" Language="H" Unicode="וַ֝‎" nodeId="190900030050010" Length="1">11WA</Node>
+          </Node>
+          <Node Id="9.1" Cat="CL" Start="5" End="5" Rule="V2CL" Head="0" Language="H" nodeId="190900030060013" Length="1">
+            <Node Id="9.2" Cat="V" Start="5" End="5" Rule="Vp2V" Head="0" Language="H" nodeId="190900030060012" Length="1">
+              <Node Id="9.3" Cat="vp" Start="5" End="5" Rule="V2VP" Head="0" Language="H" nodeId="190900030060011" Length="1">
+                <Node Id="9.4" Cat="verb" Start="5" End="5" Lemma=")MR_1" UnicodeLemma="אמר_1" English="you say" Analysis="vqw2ms" morphId="190900030052" StrongNumberX="0559" Language="H" Unicode="תֹּ֗אמֶר‎" nodeId="190900030060010" Length="1">T.O81)MER</Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="10.1" Cat="CL" Start="6" End="8" Rule="ClCl" Head="0" Language="H" nodeId="190900030070030" Length="3">
+            <Node Id="10.2" Cat="CL" Start="6" End="6" Rule="V2CL" Head="0" Language="H" nodeId="190900030070013" Length="1">
+              <Node Id="10.3" Cat="V" Start="6" End="6" Rule="Vp2V" Head="0" Language="H" nodeId="190900030070012" Length="1">
+                <Node Id="10.4" Cat="vp" Start="6" End="6" Rule="V2VP" Head="0" Language="H" nodeId="190900030070011" Length="1">
+                  <Node Id="10.5" Cat="verb" Start="6" End="6" Lemma="$WB" UnicodeLemma="שׁוב" English="return!" Analysis="vqvmp" morphId="190900030061" StrongNumberX="7725" Language="H" Unicode="שׁ֣וּבוּ‎" nodeId="190900030070010" Length="1">$74W.BW.</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="10.6" Cat="CL" Start="7" End="8" Rule="Np2CL" Head="0" Language="H" nodeId="190900030080021" Length="2">
+              <Node Id="10.7" Cat="np" Start="7" End="8" Rule="NPofNP" Head="0" Language="H" nodeId="190900030080020" Length="2">
+                <Node Id="10.8" Cat="np" Start="7" End="7" Rule="N2NP" Head="0" Language="H" nodeId="190900030080011" Length="1">
+                  <Node Id="10.9" Cat="noun" Start="7" End="7" Lemma="B.&quot;N_1" UnicodeLemma="בֵּן_1" English="sons of" Analysis="ncmpc" morphId="190900030071" StrongNumberX="1121" Language="H" Unicode="בְנֵי־‎" nodeId="190900030080010" Length="1">B:N"Y-</Node>
+                </Node>
+                <Node Id="10.10" Cat="np" Start="8" End="8" Rule="N2NP" Head="0" Language="H" nodeId="190900030090011" Length="1">
+                  <Node Id="10.11" Cat="noun" Start="8" End="8" Lemma=")FDFM_1" UnicodeLemma="אָדָם_1" English="man" Analysis="ncmsa" morphId="190900030081" StrongNumberX="0120" Language="H" Unicode="׃‎אָדָֽם‎" nodeId="190900030090010" Length="1">)FDF75M00</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:4">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="15" nodeId="190900040010160" Length="16">
+          <Node Id="1.1" Cat="cjp" Start="0" End="0" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900040010011" Length="1">
+            <Node Id="1.2" Cat="cj" Start="0" End="0" Lemma="K.IY_2" UnicodeLemma="כִּי_2" English="for" Analysis="Pc" morphId="190900040011" StrongNumberX="3588" Language="H" Unicode="כִּ֤י‎" nodeId="190900040010010" Length="1">K.I70Y</Node>
+          </Node>
+          <Node Id="2.1" Cat="CL" Start="1" End="8" Rule="S-PP-P" Head="2" Language="H" nodeId="190900040020080" Length="8">
+            <Node Id="2.2" Cat="S" Start="1" End="2" Rule="Np2S" Head="0" Language="H" nodeId="190900040020021" Length="2">
+              <Node Id="2.3" Cat="np" Start="1" End="2" Rule="NumpNP" Head="1" Language="H" nodeId="190900040020020" Length="2">
+                <Node Id="2.4" Cat="nump" Start="1" End="1" Rule="Num2Nump" Head="0" Language="H" nodeId="190900040020011" Length="1">
+                  <Node Id="2.5" Cat="num" Start="1" End="1" Lemma=")ELEP_2" UnicodeLemma="אֶלֶף_2" English="thousand of" Analysis="ucmsc" morphId="190900040021" StrongNumberX="0505" Language="H" Unicode="אֶ֪לֶף‎" nodeId="190900040020010" Length="1">)E93LEP</Node>
+                </Node>
+                <Node Id="2.6" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900040030011" Length="1">
+                  <Node Id="2.7" Cat="noun" Start="2" End="2" Lemma="$FNFH" UnicodeLemma="שָׁנָה" English="years" Analysis="ncfpa" morphId="190900040031" StrongNumberX="8141" Language="H" Unicode="שָׁנִ֡ים‎" nodeId="190900040030010" Length="1">$FNI83YM</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="2.8" Cat="PP" Start="3" End="5" Rule="Pp2PP" Head="0" Language="H" nodeId="190900040040031" Length="3">
+              <Node Id="2.9" Cat="pp" Start="3" End="5" Rule="PrepNp" Head="1" Language="H" nodeId="190900040040030" Length="3">
+                <Node Id="2.10" Cat="pp" Start="3" End="3" Rule="P2PP" Head="0" Language="H" nodeId="190900040040011" Length="1">
+                  <Node Id="2.11" Cat="prep" Start="3" End="3" Lemma="B.:" UnicodeLemma="בְּ" English="in" Analysis="Pp" morphId="190900040041" StrongNumberX="0871a" Language="H" Unicode="בְּֽ‎" nodeId="190900040040010" Length="1">B.:75</Node>
+                </Node>
+                <Node Id="2.12" Cat="np" Start="4" End="5" Rule="NPofNP" Head="0" Language="H" nodeId="190900040050020" Length="2">
+                  <Node Id="2.13" Cat="np" Start="4" End="4" Rule="N2NP" Head="0" Language="H" nodeId="190900040050011" Length="1">
+                    <Node Id="2.14" Cat="noun" Start="4" End="4" Lemma="(AYIN" UnicodeLemma="עַיִן" English="eyes of" Analysis="ncbdc" morphId="190900040042" StrongNumberX="5869" Language="H" Unicode="עֵינֶ֗י‎" nodeId="190900040050010" Length="1">("YNE81Y</Node>
+                  </Node>
+                  <Node Id="2.15" Cat="np" Start="5" End="5" Rule="Pron2NP" Head="0" Language="H" nodeId="190900040060011" Length="1">
+                    <Node Id="2.16" Cat="pron" Start="5" End="5" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900040043" StrongNumberX="3509b" Language="H" Unicode="ךָ‎" nodeId="190900040060010" Length="1">KF</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="2.17" Cat="P" Start="6" End="8" Rule="Pp2P" Head="0" Language="H" nodeId="190900040070031" Length="3">
+              <Node Id="2.18" Cat="pp" Start="6" End="8" Rule="PrepNp" Head="1" Language="H" nodeId="190900040070030" Length="3">
+                <Node Id="2.19" Cat="pp" Start="6" End="6" Rule="P2PP" Head="0" Language="H" nodeId="190900040070011" Length="1">
+                  <Node Id="2.20" Cat="prep" Start="6" End="6" Lemma="K.:" UnicodeLemma="ךְּ" English="like" Analysis="Pp" morphId="190900040051" StrongNumberX="3509a" Language="H" Unicode="כְּ‎" nodeId="190900040070010" Length="1">K.:</Node>
+                </Node>
+                <Node Id="2.21" Cat="np" Start="7" End="8" Rule="NPofNP" Head="0" Language="H" nodeId="190900040080020" Length="2">
+                  <Node Id="2.22" Cat="np" Start="7" End="7" Rule="N2NP" Head="0" Language="H" nodeId="190900040080011" Length="1">
+                    <Node Id="2.23" Cat="noun" Start="7" End="7" Lemma="YOWM_1" UnicodeLemma="יוֹם_1" English="day of" Analysis="ncmsc" morphId="190900040052" StrongNumberX="3117" Language="H" Unicode="י֣וֹם‎" nodeId="190900040080010" Length="1">YO74WM</Node>
+                  </Node>
+                  <Node Id="2.24" Cat="np" Start="8" End="8" Rule="advp2np" Head="0" Language="H" nodeId="190900040090012" Length="1">
+                    <Node Id="2.25" Cat="advp" Start="8" End="8" Rule="Adv2Advp" Head="0" Language="H" nodeId="190900040090011" Length="1">
+                      <Node Id="2.26" Cat="adv" Start="8" End="8" Lemma=")ET:MOWL" UnicodeLemma="אֶתְמוֹל" English="yesterday" Analysis="Pd" morphId="190900040061" StrongNumberX="0865" Language="H" Unicode="אֶ֭תְמוֹל‎" nodeId="190900040090010" Length="1">13)ET:MOWL</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="20.1" Cat="cjp" Start="9" End="9" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900040100011" Length="1">
+            <Node Id="20.2" Cat="cj" Start="9" End="9" Lemma="K.IY_2" UnicodeLemma="כִּי_2" English="that" Analysis="Pc" morphId="190900040071" StrongNumberX="3588" Language="H" Unicode="כִּ֣י‎" nodeId="190900040100010" Length="1">K.I74Y</Node>
+          </Node>
+          <Node Id="21.1" Cat="CL" Start="10" End="10" Rule="V2CL" Head="0" Language="H" nodeId="190900040110013" Length="1">
+            <Node Id="21.2" Cat="V" Start="10" End="10" Rule="Vp2V" Head="0" Language="H" nodeId="190900040110012" Length="1">
+              <Node Id="21.3" Cat="vp" Start="10" End="10" Rule="V2VP" Head="0" Language="H" nodeId="190900040110011" Length="1">
+                <Node Id="21.4" Cat="verb" Start="10" End="10" Lemma="(BR_1" UnicodeLemma="עבר_1" English="he went by" Analysis="vqi3ms" morphId="190900040081" StrongNumberX="5674" Language="H" Unicode="יַעֲבֹ֑ר‎" nodeId="190900040110010" Length="1">YA(:ABO92R</Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="22.1" Cat="cjp" Start="11" End="11" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900040120011" Length="1">
+            <Node Id="22.2" Cat="cj" Start="11" End="11" Lemma="W:" UnicodeLemma="וְ" English="or" Analysis="Pc" morphId="190900040091" StrongNumberX="2050b" Language="H" Unicode="וְ‎" nodeId="190900040120010" Length="1">W:</Node>
+          </Node>
+          <Node Id="24.1" Cat="CL" Start="12" End="15" Rule="P2CL" Head="0" Language="H" nodeId="190900040130042" Length="4">
+            <Node Id="24.2" Cat="P" Start="12" End="15" Rule="Np2P" Head="0" Language="H" nodeId="190900040130041" Length="4">
+              <Node Id="24.3" Cat="np" Start="12" End="15" Rule="NpPp" Head="0" Language="H" nodeId="190900040130040" Length="4">
+                <Node Id="24.4" Cat="np" Start="12" End="12" Rule="N2NP" Head="0" Language="H" nodeId="190900040130011" Length="1">
+                  <Node Id="24.5" Cat="noun" Start="12" End="12" Lemma=")A$:MW.RFH" UnicodeLemma="אַשְׁמוּרָה" English="watch" Analysis="ncfsa" morphId="190900040092" StrongNumberX="0821" Language="H" Unicode="אַשְׁמוּרָ֥ה‎" nodeId="190900040130010" Length="1">)A$:MW.RF71H</Node>
+                </Node>
+                <Node Id="24.6" Cat="pp" Start="13" End="15" Rule="PrepNp" Head="1" Language="H" nodeId="190900040140030" Length="3">
+                  <Node Id="24.7" Cat="pp" Start="13" End="13" Rule="P2PP" Head="0" Language="H" nodeId="190900040140011" Length="1">
+                    <Node Id="24.8" Cat="prep" Start="13" End="13" Lemma="B.:" UnicodeLemma="בְּ" English="in" Analysis="Pp" morphId="190900040101" StrongNumberX="0871a" Language="H" Unicode="בַ‎" nodeId="190900040140010" Length="1">BA</Node>
+                  </Node>
+                  <Node Id="24.9" Cat="np" Start="14" End="15" Rule="DetNP" Head="1" Language="H" nodeId="190900040150020" Length="2">
+                    <Node Id="24.10" Cat="art" Start="14" End="14" Lemma="HA" UnicodeLemma="הַ" English="the" Analysis="Pa" morphId="190900040102" StrongNumberX="1886a" Language="H" Unicode="‎" nodeId="190900040150010" Length="1">_</Node>
+                    <Node Id="24.11" Cat="np" Start="15" End="15" Rule="N2NP" Head="0" Language="H" nodeId="190900040160011" Length="1">
+                      <Node Id="24.12" Cat="noun" Start="15" End="15" Lemma="LAY:LFH" UnicodeLemma="לַיְלָה" English="night" Analysis="ncmsa" morphId="190900040103" StrongNumberX="3915" Language="H" Unicode="׃‎לָּֽיְלָה‎" nodeId="190900040160010" Length="1">L.F75Y:LFH00</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:5">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="10" nodeId="190900050010110" Length="11">
+          <Node Id="2.1" Cat="CL" Start="0" End="1" Rule="V-O" Head="0" Language="H" nodeId="190900050010020" Length="2">
+            <Node Id="2.2" Cat="V" Start="0" End="0" Rule="Vp2V" Head="0" Language="H" nodeId="190900050010012" Length="1">
+              <Node Id="2.3" Cat="vp" Start="0" End="0" Rule="V2VP" Head="0" Language="H" nodeId="190900050010011" Length="1">
+                <Node Id="2.4" Cat="verb" Start="0" End="0" Lemma="ZRM_1" UnicodeLemma="זרם_1" English="you sweep away" Analysis="vqp2ms" morphId="190900050011" StrongNumberX="2229" Language="H" Unicode="זְ֭רַמְתָּ‎" nodeId="190900050010010" Length="1">13Z:RAM:T.F</Node>
+              </Node>
+            </Node>
+            <Node Id="2.5" Cat="O" Start="1" End="1" Rule="Np2O" Head="0" Language="H" nodeId="190900050020012" Length="1">
+              <Node Id="2.6" Cat="np" Start="1" End="1" Rule="Pron2NP" Head="0" Language="H" nodeId="190900050020011" Length="1">
+                <Node Id="2.7" Cat="pron" Start="1" End="1" Lemma="FM" UnicodeLemma="ָמ" English="them" Analysis="psv3mp" morphId="190900050012" StrongNumberX="3963a" Language="H" Unicode="ם‎" nodeId="190900050020010" Length="1">M</Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="3.1" Cat="CL" Start="2" End="3" Rule="O-V" Head="1" Language="H" nodeId="190900050030020" Length="2">
+            <Node Id="3.2" Cat="O" Start="2" End="2" Rule="Np2O" Head="0" Language="H" nodeId="190900050030012" Length="1">
+              <Node Id="3.3" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900050030011" Length="1">
+                <Node Id="3.4" Cat="noun" Start="2" End="2" Lemma="$&quot;NFH" UnicodeLemma="שֵׁנָה" English="sleep" Analysis="ncfsa" morphId="190900050021" StrongNumberX="8142" Language="H" Unicode="שֵׁנָ֣ה‎" nodeId="190900050030010" Length="1">$"NF74H</Node>
+              </Node>
+            </Node>
+            <Node Id="3.5" Cat="V" Start="3" End="3" Rule="Vp2V" Head="0" Language="H" nodeId="190900050040012" Length="1">
+              <Node Id="3.6" Cat="vp" Start="3" End="3" Rule="V2VP" Head="0" Language="H" nodeId="190900050040011" Length="1">
+                <Node Id="3.7" Cat="verb" Start="3" End="3" Lemma="HYH" UnicodeLemma="היה" English="they are" Analysis="vqi3mp" morphId="190900050031" StrongNumberX="1961" Language="H" Unicode="יִהְי֑וּ‎" nodeId="190900050040010" Length="1">YIH:Y92W.</Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="7.1" Cat="CL" Start="4" End="10" Rule="PP-PP-V" Head="2" Language="H" nodeId="190900050050070" Length="7">
+            <Node Id="7.2" Cat="PP" Start="4" End="6" Rule="Pp2PP" Head="0" Language="H" nodeId="190900050050031" Length="3">
+              <Node Id="7.3" Cat="pp" Start="4" End="6" Rule="PrepNp" Head="1" Language="H" nodeId="190900050050030" Length="3">
+                <Node Id="7.4" Cat="pp" Start="4" End="4" Rule="P2PP" Head="0" Language="H" nodeId="190900050050011" Length="1">
+                  <Node Id="7.5" Cat="prep" Start="4" End="4" Lemma="B.:" UnicodeLemma="בְּ" English="in" Analysis="Pp" morphId="190900050041" StrongNumberX="0871a" Language="H" Unicode="בַּ֝‎" nodeId="190900050050010" Length="1">11B.A</Node>
+                </Node>
+                <Node Id="7.6" Cat="np" Start="5" End="6" Rule="DetNP" Head="1" Language="H" nodeId="190900050060020" Length="2">
+                  <Node Id="7.7" Cat="art" Start="5" End="5" Lemma="HA" UnicodeLemma="הַ" English="the" Analysis="Pa" morphId="190900050042" StrongNumberX="1886a" Language="H" Unicode="‎" nodeId="190900050060010" Length="1">_</Node>
+                  <Node Id="7.8" Cat="np" Start="6" End="6" Rule="N2NP" Head="0" Language="H" nodeId="190900050070011" Length="1">
+                    <Node Id="7.9" Cat="noun" Start="6" End="6" Lemma="B.OQER_2" UnicodeLemma="בֹּקֶר_2" English="morning" Analysis="ncmsa" morphId="190900050043" StrongNumberX="1242" Language="H" Unicode="בֹּ֗קֶר‎" nodeId="190900050070010" Length="1">B.O81QER</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="7.10" Cat="PP" Start="7" End="9" Rule="Pp2PP" Head="0" Language="H" nodeId="190900050080031" Length="3">
+              <Node Id="7.11" Cat="pp" Start="7" End="9" Rule="PrepNp" Head="1" Language="H" nodeId="190900050080030" Length="3">
+                <Node Id="7.12" Cat="pp" Start="7" End="7" Rule="P2PP" Head="0" Language="H" nodeId="190900050080011" Length="1">
+                  <Node Id="7.13" Cat="prep" Start="7" End="7" Lemma="K.:" UnicodeLemma="ךְּ" English="like" Analysis="Pp" morphId="190900050051" StrongNumberX="3509a" Language="H" Unicode="כֶּ‎" nodeId="190900050080010" Length="1">K.E</Node>
+                </Node>
+                <Node Id="7.14" Cat="np" Start="8" End="9" Rule="DetNP" Head="1" Language="H" nodeId="190900050090020" Length="2">
+                  <Node Id="7.15" Cat="art" Start="8" End="8" Lemma="HA" UnicodeLemma="הַ" English="the" Analysis="Pa" morphId="190900050052" StrongNumberX="1886a" Language="H" Unicode="‎" nodeId="190900050090010" Length="1">_</Node>
+                  <Node Id="7.16" Cat="np" Start="9" End="9" Rule="N2NP" Head="0" Language="H" nodeId="190900050100011" Length="1">
+                    <Node Id="7.17" Cat="noun" Start="9" End="9" Lemma="XFCIYR_1" UnicodeLemma="חָצִיר_1" English="new grass" Analysis="ncmsa" morphId="190900050053" StrongNumberX="2682" Language="H" Unicode="חָצִ֥יר‎" nodeId="190900050100010" Length="1">XFCI71YR</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="7.18" Cat="V" Start="10" End="10" Rule="Vp2V" Head="0" Language="H" nodeId="190900050110012" Length="1">
+              <Node Id="7.19" Cat="vp" Start="10" End="10" Rule="V2VP" Head="0" Language="H" nodeId="190900050110011" Length="1">
+                <Node Id="7.20" Cat="verb" Start="10" End="10" Lemma="XLP_1" UnicodeLemma="חלף_1" English="he sprouts" Analysis="vqi3ms" morphId="190900050061" StrongNumberX="2498" Language="H" Unicode="׃‎יַחֲלֹֽף‎" nodeId="190900050110010" Length="1">YAX:ALO75P00</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:6">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="11" nodeId="190900060010120" Length="12">
+          <Node Id="1.1" Cat="CL" Start="0" End="5" Rule="PP-V" Head="1" Language="H" nodeId="190900060010060" Length="6">
+            <Node Id="1.2" Cat="PP" Start="0" End="2" Rule="Pp2PP" Head="0" Language="H" nodeId="190900060010031" Length="3">
+              <Node Id="1.3" Cat="pp" Start="0" End="2" Rule="PrepNp" Head="1" Language="H" nodeId="190900060010030" Length="3">
+                <Node Id="1.4" Cat="pp" Start="0" End="0" Rule="P2PP" Head="0" Language="H" nodeId="190900060010011" Length="1">
+                  <Node Id="1.5" Cat="prep" Start="0" End="0" Lemma="B.:" UnicodeLemma="בְּ" English="in" Analysis="Pp" morphId="190900060011" StrongNumberX="0871a" Language="H" Unicode="בַּ֭‎" nodeId="190900060010010" Length="1">13B.A</Node>
+                </Node>
+                <Node Id="1.6" Cat="np" Start="1" End="2" Rule="DetNP" Head="1" Language="H" nodeId="190900060020020" Length="2">
+                  <Node Id="1.7" Cat="art" Start="1" End="1" Lemma="HA" UnicodeLemma="הַ" English="the" Analysis="Pa" morphId="190900060012" StrongNumberX="1886a" Language="H" Unicode="‎" nodeId="190900060020010" Length="1">_</Node>
+                  <Node Id="1.8" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900060030011" Length="1">
+                    <Node Id="1.9" Cat="noun" Start="2" End="2" Lemma="B.OQER_2" UnicodeLemma="בֹּקֶר_2" English="morning" Analysis="ncmsa" morphId="190900060013" StrongNumberX="1242" Language="H" Unicode="בֹּקֶר‎" nodeId="190900060030010" Length="1">B.OQER</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.10" Cat="V" Start="3" End="5" Rule="Vp2V" Head="0" Language="H" nodeId="190900060040031" Length="3">
+              <Node Id="1.11" Cat="vp" Start="3" End="5" Rule="VPandVP" Head="2" Language="H" nodeId="190900060040030" Length="3">
+                <Node Id="1.12" Cat="vp" Start="3" End="3" Rule="V2VP" Head="0" Language="H" nodeId="190900060040011" Length="1">
+                  <Node Id="1.13" Cat="verb" Start="3" End="3" Lemma="CWC_1" UnicodeLemma="צוץ_1" English="he springs up" Analysis="vqi3ms" morphId="190900060021" StrongNumberX="6692" Language="H" Unicode="יָצִ֣יץ‎" nodeId="190900060040010" Length="1">YFCI74YC</Node>
+                </Node>
+                <Node Id="1.14" Cat="cjp" Start="4" End="4" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900060050011" Length="1">
+                  <Node Id="1.15" Cat="cj" Start="4" End="4" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900060031" StrongNumberX="2050b" Language="H" Unicode="וְ‎" nodeId="190900060050010" Length="1">W:</Node>
+                </Node>
+                <Node Id="1.16" Cat="vp" Start="5" End="5" Rule="V2VP" Head="0" Language="H" nodeId="190900060060011" Length="1">
+                  <Node Id="1.17" Cat="verb" Start="5" End="5" Lemma="XLP_1" UnicodeLemma="חלף_1" English="he sprouts" Analysis="vqp3ms{2}" morphId="190900060032" StrongNumberX="2498" Language="H" Unicode="חָלָ֑ף‎" nodeId="190900060060010" Length="1">XFLF92P</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="17.1" Cat="CL" Start="6" End="11" Rule="PP-V" Head="1" Language="H" nodeId="190900060070060" Length="6">
+            <Node Id="17.2" Cat="PP" Start="6" End="8" Rule="Pp2PP" Head="0" Language="H" nodeId="190900060070031" Length="3">
+              <Node Id="17.3" Cat="pp" Start="6" End="8" Rule="PrepNp" Head="1" Language="H" nodeId="190900060070030" Length="3">
+                <Node Id="17.4" Cat="pp" Start="6" End="6" Rule="P2PP" Head="0" Language="H" nodeId="190900060070011" Length="1">
+                  <Node Id="17.5" Cat="prep" Start="6" End="6" Lemma="L:" UnicodeLemma="לְ" English="by" Analysis="Pp" morphId="190900060041" StrongNumberX="3807a" Language="H" Unicode="לָ֝‎" nodeId="190900060070010" Length="1">11LF</Node>
+                </Node>
+                <Node Id="17.6" Cat="np" Start="7" End="8" Rule="DetNP" Head="1" Language="H" nodeId="190900060080020" Length="2">
+                  <Node Id="17.7" Cat="art" Start="7" End="7" Lemma="HA" UnicodeLemma="הַ" English="the" Analysis="Pa" morphId="190900060042" StrongNumberX="1886a" Language="H" Unicode="‎" nodeId="190900060080010" Length="1">_</Node>
+                  <Node Id="17.8" Cat="np" Start="8" End="8" Rule="N2NP" Head="0" Language="H" nodeId="190900060090011" Length="1">
+                    <Node Id="17.9" Cat="noun" Start="8" End="8" Lemma="(EREB_1" UnicodeLemma="עֶרֶב_1" English="evening" Analysis="ncmsa" morphId="190900060043" StrongNumberX="6153" Language="H" Unicode="עֶ֗רֶב‎" nodeId="190900060090010" Length="1">(E81REB</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="17.10" Cat="V" Start="9" End="11" Rule="Vp2V" Head="0" Language="H" nodeId="190900060100031" Length="3">
+              <Node Id="17.11" Cat="vp" Start="9" End="11" Rule="VPandVP" Head="2" Language="H" nodeId="190900060100030" Length="3">
+                <Node Id="17.12" Cat="vp" Start="9" End="9" Rule="V2VP" Head="0" Language="H" nodeId="190900060100011" Length="1">
+                  <Node Id="17.13" Cat="verb" Start="9" End="9" Lemma="MLL_1" UnicodeLemma="מלל_1" English="he is withered" Analysis="vki3ms" morphId="190900060051" StrongNumberX="4448b" Language="H" Unicode="יְמוֹלֵ֥ל‎" nodeId="190900060100010" Length="1">Y:MOWL"71L</Node>
+                </Node>
+                <Node Id="17.14" Cat="cjp" Start="10" End="10" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900060110011" Length="1">
+                  <Node Id="17.15" Cat="cj" Start="10" End="10" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900060061" StrongNumberX="2050b" Language="H" Unicode="וְ‎" nodeId="190900060110010" Length="1">W:</Node>
+                </Node>
+                <Node Id="17.16" Cat="vp" Start="11" End="11" Rule="V2VP" Head="0" Language="H" nodeId="190900060120011" Length="1">
+                  <Node Id="17.17" Cat="verb" Start="11" End="11" Lemma="YB$" UnicodeLemma="יבשׁ" English="he is dry" Analysis="vqp3ms{2}" morphId="190900060062" StrongNumberX="3001" Language="H" Unicode="׃‎יָבֵֽשׁ‎" nodeId="190900060120010" Length="1">YFB"75$00</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:7">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="9" nodeId="190900070010100" Length="10">
+          <Node Id="1.1" Cat="cjp" Start="0" End="0" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900070010011" Length="1">
+            <Node Id="1.2" Cat="cj" Start="0" End="0" Lemma="K.IY_2" UnicodeLemma="כִּי_2" English="indeed" Analysis="Pc" morphId="190900070011" StrongNumberX="3588" Language="H" Unicode="כִּֽי־‎" nodeId="190900070010010" Length="1">K.I75Y-</Node>
+          </Node>
+          <Node Id="3.1" Cat="CL" Start="1" End="4" Rule="V-PP" Head="0" Language="H" nodeId="190900070020040" Length="4">
+            <Node Id="3.2" Cat="V" Start="1" End="1" Rule="Vp2V" Head="0" Language="H" nodeId="190900070020012" Length="1">
+              <Node Id="3.3" Cat="vp" Start="1" End="1" Rule="V2VP" Head="0" Language="H" nodeId="190900070020011" Length="1">
+                <Node Id="3.4" Cat="verb" Start="1" End="1" Lemma="KLH" UnicodeLemma="כלה" English="we are consumed" Analysis="vqp1cp" morphId="190900070021" StrongNumberX="3615" Language="H" Unicode="כָלִ֥ינוּ‎" nodeId="190900070020010" Length="1">KFLI71YNW.</Node>
+              </Node>
+            </Node>
+            <Node Id="3.5" Cat="PP" Start="2" End="4" Rule="Pp2PP" Head="0" Language="H" nodeId="190900070030031" Length="3">
+              <Node Id="3.6" Cat="pp" Start="2" End="4" Rule="PrepNp" Head="1" Language="H" nodeId="190900070030030" Length="3">
+                <Node Id="3.7" Cat="pp" Start="2" End="2" Rule="P2PP" Head="0" Language="H" nodeId="190900070030011" Length="1">
+                  <Node Id="3.8" Cat="prep" Start="2" End="2" Lemma="B.:" UnicodeLemma="בְּ" English="by" Analysis="Pp" morphId="190900070031" StrongNumberX="0871a" Language="H" Unicode="בְ‎" nodeId="190900070030010" Length="1">B:</Node>
+                </Node>
+                <Node Id="3.9" Cat="np" Start="3" End="4" Rule="NPofNP" Head="0" Language="H" nodeId="190900070040020" Length="2">
+                  <Node Id="3.10" Cat="np" Start="3" End="3" Rule="N2NP" Head="0" Language="H" nodeId="190900070040011" Length="1">
+                    <Node Id="3.11" Cat="noun" Start="3" End="3" Lemma=")AP_2" UnicodeLemma="אַף_2" English="anger of" Analysis="ncmsc" morphId="190900070032" StrongNumberX="0639" Language="H" Unicode="אַפּ‎" nodeId="190900070040010" Length="1">)AP.</Node>
+                  </Node>
+                  <Node Id="3.12" Cat="np" Start="4" End="4" Rule="Pron2NP" Head="0" Language="H" nodeId="190900070050011" Length="1">
+                    <Node Id="3.13" Cat="pron" Start="4" End="4" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900070033" StrongNumberX="3509b" Language="H" Unicode="ֶ֑ךָ‎" nodeId="190900070050010" Length="1">E92KF</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="9.1" Cat="cjp" Start="5" End="5" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900070060011" Length="1">
+            <Node Id="9.2" Cat="cj" Start="5" End="5" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900070041" StrongNumberX="2050b" Language="H" Unicode="וּֽ‎" nodeId="190900070060010" Length="1">W.75</Node>
+          </Node>
+          <Node Id="10.1" Cat="CL" Start="6" End="9" Rule="PP-V" Head="1" Language="H" nodeId="190900070070040" Length="4">
+            <Node Id="10.2" Cat="PP" Start="6" End="8" Rule="Pp2PP" Head="0" Language="H" nodeId="190900070070031" Length="3">
+              <Node Id="10.3" Cat="pp" Start="6" End="8" Rule="PrepNp" Head="1" Language="H" nodeId="190900070070030" Length="3">
+                <Node Id="10.4" Cat="pp" Start="6" End="6" Rule="P2PP" Head="0" Language="H" nodeId="190900070070011" Length="1">
+                  <Node Id="10.5" Cat="prep" Start="6" End="6" Lemma="B.:" UnicodeLemma="בְּ" English="by" Analysis="Pp" morphId="190900070042" StrongNumberX="0871a" Language="H" Unicode="בַ‎" nodeId="190900070070010" Length="1">BA</Node>
+                </Node>
+                <Node Id="10.6" Cat="np" Start="7" End="8" Rule="NPofNP" Head="0" Language="H" nodeId="190900070080020" Length="2">
+                  <Node Id="10.7" Cat="np" Start="7" End="7" Rule="N2NP" Head="0" Language="H" nodeId="190900070080011" Length="1">
+                    <Node Id="10.8" Cat="noun" Start="7" End="7" Lemma="X&quot;MFH" UnicodeLemma="חֵמָה" English="indignation of" Analysis="ncfsc" morphId="190900070043" StrongNumberX="2534" Language="H" Unicode="חֲמָת‎" nodeId="190900070080010" Length="1">X:AMFT</Node>
+                  </Node>
+                  <Node Id="10.9" Cat="np" Start="8" End="8" Rule="Pron2NP" Head="0" Language="H" nodeId="190900070090011" Length="1">
+                    <Node Id="10.10" Cat="pron" Start="8" End="8" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900070044" StrongNumberX="3509b" Language="H" Unicode="ְךָ֥‎" nodeId="190900070090010" Length="1">:KF71</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="10.11" Cat="V" Start="9" End="9" Rule="Vp2V" Head="0" Language="H" nodeId="190900070100012" Length="1">
+              <Node Id="10.12" Cat="vp" Start="9" End="9" Rule="V2VP" Head="0" Language="H" nodeId="190900070100011" Length="1">
+                <Node Id="10.13" Cat="verb" Start="9" End="9" Lemma="BHL" UnicodeLemma="בהל" English="we are terrified" Analysis="vnp1cp" morphId="190900070051" StrongNumberX="0926" Language="H" Unicode="׃‎נִבְהָֽלְנוּ‎" nodeId="190900070100010" Length="1">NIB:HF75L:NW.00</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:8">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="11" nodeId="190900080010121" Length="12">
+          <Node Id="1.1" Cat="CL" Start="0" End="11" Rule="ClCl" Head="0" Language="H" nodeId="190900080010120" Length="12">
+            <Node Id="1.2" Cat="CL" Start="0" End="5" Rule="V-O-PP" Head="0" Language="H" nodeId="190900080010060" Length="6">
+              <Node Id="1.3" Cat="V" Start="0" End="0" Rule="Vp2V" Head="0" Language="H" nodeId="190900080010012" Length="1">
+                <Node Id="1.4" Cat="vp" Start="0" End="0" Rule="V2VP" Head="0" Language="H" nodeId="190900080010011" Length="1">
+                  <Node Id="1.5" Cat="verb" Start="0" End="0" Lemma="$YT" UnicodeLemma="שׁית" English="you set" Analysis="vqp2ms" morphId="190900080021" StrongNumberX="7896" Language="H" Unicode="שַׁתָּ֣ה‎" nodeId="190900080010010" Length="1">**$AT.F74H</Node>
+                </Node>
+              </Node>
+              <Node Id="1.6" Cat="O" Start="1" End="2" Rule="Np2O" Head="0" Language="H" nodeId="190900080020021" Length="2">
+                <Node Id="1.7" Cat="np" Start="1" End="2" Rule="NPofNP" Head="0" Language="H" nodeId="190900080020020" Length="2">
+                  <Node Id="1.8" Cat="np" Start="1" End="1" Rule="N2NP" Head="0" Language="H" nodeId="190900080020011" Length="1">
+                    <Node Id="1.9" Cat="noun" Start="1" End="1" Lemma="(FWON" UnicodeLemma="עָוֺן" English="iniquities of" Analysis="ncbpc" morphId="190900080031" StrongNumberX="5771" Language="H" Unicode="עֲוֺנֹתֵ֣י‎" nodeId="190900080020010" Length="1">(:AWONOT"74Y</Node>
+                  </Node>
+                  <Node Id="1.10" Cat="np" Start="2" End="2" Rule="Pron2NP" Head="0" Language="H" nodeId="190900080030011" Length="1">
+                    <Node Id="1.11" Cat="pron" Start="2" End="2" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900080032" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900080030010" Length="1">NW.</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.12" Cat="PP" Start="3" End="5" Rule="Pp2PP" Head="0" Language="H" nodeId="190900080040031" Length="3">
+                <Node Id="1.13" Cat="pp" Start="3" End="5" Rule="PrepNp" Head="1" Language="H" nodeId="190900080040030" Length="3">
+                  <Node Id="1.14" Cat="pp" Start="3" End="4" Rule="PpPp" Head="1" Language="H" nodeId="190900080040020" Length="2">
+                    <Node Id="1.15" Cat="pp" Start="3" End="3" Rule="P2PP" Head="0" Language="H" nodeId="190900080040011" Length="1">
+                      <Node Id="1.16" Cat="prep" Start="3" End="3" Lemma="L:" UnicodeLemma="לְ" English="at" Analysis="Pp" morphId="190900080041" StrongNumberX="3807a" Language="H" Unicode="לְ‎" nodeId="190900080040010" Length="1">L:</Node>
+                    </Node>
+                    <Node Id="1.17" Cat="pp" Start="4" End="4" Rule="P2PP" Head="0" Language="H" nodeId="190900080050011" Length="1">
+                      <Node Id="1.18" Cat="prep" Start="4" End="4" Lemma="NEGED" UnicodeLemma="נֶגֶד" English="before" Analysis="Pp" morphId="190900080042" StrongNumberX="5048" Language="H" Unicode="נֶגְדּ‎" nodeId="190900080050010" Length="1">NEG:D.</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="1.19" Cat="np" Start="5" End="5" Rule="Pron2NP" Head="0" Language="H" nodeId="190900080060011" Length="1">
+                    <Node Id="1.20" Cat="pron" Start="5" End="5" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900080043" StrongNumberX="3509b" Language="H" Unicode="ֶ֑ךָ‎" nodeId="190900080060010" Length="1">E92KF</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.21" Cat="CL" Start="6" End="11" Rule="O-PP" Head="0" Language="H" nodeId="190900080070060" Length="6">
+              <Node Id="1.22" Cat="O" Start="6" End="7" Rule="Np2O" Head="0" Language="H" nodeId="190900080070021" Length="2">
+                <Node Id="1.23" Cat="np" Start="6" End="7" Rule="NPofNP" Head="0" Language="H" nodeId="190900080070020" Length="2">
+                  <Node Id="1.24" Cat="np" Start="6" End="6" Rule="Vp2Np" Head="0" Language="H" nodeId="190900080070012" Length="1">
+                    <Node Id="1.25" Cat="vp" Start="6" End="6" Rule="V2VP" Head="0" Language="H" nodeId="190900080070011" Length="1">
+                      <Node Id="1.26" Cat="verb" Start="6" End="6" Lemma="(LM_1" UnicodeLemma="עלם_1" English="ones being secret of" Analysis="vqsmsc" morphId="190900080051" StrongNumberX="5956" Language="H" Unicode="עֲ֝לֻמ‎" nodeId="190900080070010" Length="1">11(:ALUM</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="1.27" Cat="np" Start="7" End="7" Rule="Pron2NP" Head="0" Language="H" nodeId="190900080080011" Length="1">
+                    <Node Id="1.28" Cat="pron" Start="7" End="7" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900080052" StrongNumberX="5105a" Language="H" Unicode="ֵ֗נוּ‎" nodeId="190900080080010" Length="1">"81NW.</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.29" Cat="PP" Start="8" End="11" Rule="Pp2PP" Head="0" Language="H" nodeId="190900080090041" Length="4">
+                <Node Id="1.30" Cat="pp" Start="8" End="11" Rule="PrepNp" Head="1" Language="H" nodeId="190900080090040" Length="4">
+                  <Node Id="1.31" Cat="pp" Start="8" End="8" Rule="P2PP" Head="0" Language="H" nodeId="190900080090011" Length="1">
+                    <Node Id="1.32" Cat="prep" Start="8" End="8" Lemma="L:" UnicodeLemma="לְ" English="in" Analysis="Pp" morphId="190900080061" StrongNumberX="3807a" Language="H" Unicode="לִ‎" nodeId="190900080090010" Length="1">LI</Node>
+                  </Node>
+                  <Node Id="1.33" Cat="np" Start="9" End="11" Rule="NPofNP" Head="0" Language="H" nodeId="190900080100030" Length="3">
+                    <Node Id="1.34" Cat="np" Start="9" End="9" Rule="N2NP" Head="0" Language="H" nodeId="190900080100011" Length="1">
+                      <Node Id="1.35" Cat="noun" Start="9" End="9" Lemma="MF)OWR" UnicodeLemma="מָאוֹר" English="light of" Analysis="ncmsc" morphId="190900080062" StrongNumberX="3974" Language="H" Unicode="מְא֥וֹר‎" nodeId="190900080100010" Length="1">M:)O71WR</Node>
+                    </Node>
+                    <Node Id="1.36" Cat="np" Start="10" End="11" Rule="NPofNP" Head="0" Language="H" nodeId="190900080110020" Length="2">
+                      <Node Id="1.37" Cat="np" Start="10" End="10" Rule="N2NP" Head="0" Language="H" nodeId="190900080110011" Length="1">
+                        <Node Id="1.38" Cat="noun" Start="10" End="10" Lemma="P.FNEH" UnicodeLemma="פָּנֶה" English="presences of" Analysis="ncbpc" morphId="190900080071" StrongNumberX="6440" Language="H" Unicode="פָּנֶֽי‎" nodeId="190900080110010" Length="1">P.FNE75Y</Node>
+                      </Node>
+                      <Node Id="1.39" Cat="np" Start="11" End="11" Rule="Pron2NP" Head="0" Language="H" nodeId="190900080120011" Length="1">
+                        <Node Id="1.40" Cat="pron" Start="11" End="11" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900080072" StrongNumberX="3509b" Language="H" Unicode="׃‎ךָ‎" nodeId="190900080120010" Length="1">KF00</Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:9">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="12" nodeId="190900090010130" Length="13">
+          <Node Id="1.1" Cat="cjp" Start="0" End="0" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900090010011" Length="1">
+            <Node Id="1.2" Cat="cj" Start="0" End="0" Lemma="K.IY_2" UnicodeLemma="כִּי_2" English="indeed" Analysis="Pc" morphId="190900090011" StrongNumberX="3588" Language="H" Unicode="כִּ֣י‎" nodeId="190900090010010" Length="1">K.I74Y</Node>
+          </Node>
+          <Node Id="3.1" Cat="CL" Start="1" End="7" Rule="S-V-PP" Head="1" Language="H" nodeId="190900090020070" Length="7">
+            <Node Id="3.2" Cat="S" Start="1" End="3" Rule="Np2S" Head="0" Language="H" nodeId="190900090020031" Length="3">
+              <Node Id="3.3" Cat="np" Start="1" End="3" Rule="QuanNP" Head="1" Language="H" nodeId="190900090020030" Length="3">
+                <Node Id="3.4" Cat="np" Start="1" End="1" Rule="N2NP" Head="0" Language="H" nodeId="190900090020011" Length="1">
+                  <Node Id="3.5" Cat="noun" Start="1" End="1" Lemma="K.OL" UnicodeLemma="כֹּל" English="all of" Analysis="ncmsc" morphId="190900090021" StrongNumberX="3605" Language="H" Unicode="כָל־‎" nodeId="190900090020010" Length="1">KFL-</Node>
+                </Node>
+                <Node Id="3.6" Cat="np" Start="2" End="3" Rule="NPofNP" Head="0" Language="H" nodeId="190900090030020" Length="2">
+                  <Node Id="3.7" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900090030011" Length="1">
+                    <Node Id="3.8" Cat="noun" Start="2" End="2" Lemma="YOWM_1" UnicodeLemma="יוֹם_1" English="days of" Analysis="ncmpc" morphId="190900090031" StrongNumberX="3117" Language="H" Unicode="יָ֭מֵי‎" nodeId="190900090030010" Length="1">13YFM"Y</Node>
+                  </Node>
+                  <Node Id="3.9" Cat="np" Start="3" End="3" Rule="Pron2NP" Head="0" Language="H" nodeId="190900090040011" Length="1">
+                    <Node Id="3.10" Cat="pron" Start="3" End="3" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900090032" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900090040010" Length="1">NW.</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="3.11" Cat="V" Start="4" End="4" Rule="Vp2V" Head="0" Language="H" nodeId="190900090050012" Length="1">
+              <Node Id="3.12" Cat="vp" Start="4" End="4" Rule="V2VP" Head="0" Language="H" nodeId="190900090050011" Length="1">
+                <Node Id="3.13" Cat="verb" Start="4" End="4" Lemma="PNH" UnicodeLemma="פנה" English="they pass away" Analysis="vqp3cp" morphId="190900090041" StrongNumberX="6437" Language="H" Unicode="פָּנ֣וּ‎" nodeId="190900090050010" Length="1">P.FN74W.</Node>
+              </Node>
+            </Node>
+            <Node Id="3.14" Cat="PP" Start="5" End="7" Rule="Pp2PP" Head="0" Language="H" nodeId="190900090060031" Length="3">
+              <Node Id="3.15" Cat="pp" Start="5" End="7" Rule="PrepNp" Head="1" Language="H" nodeId="190900090060030" Length="3">
+                <Node Id="3.16" Cat="pp" Start="5" End="5" Rule="P2PP" Head="0" Language="H" nodeId="190900090060011" Length="1">
+                  <Node Id="3.17" Cat="prep" Start="5" End="5" Lemma="B.:" UnicodeLemma="בְּ" English="under" Analysis="Pp" morphId="190900090051" StrongNumberX="0871a" Language="H" Unicode="בְ‎" nodeId="190900090060010" Length="1">B:</Node>
+                </Node>
+                <Node Id="3.18" Cat="np" Start="6" End="7" Rule="NPofNP" Head="0" Language="H" nodeId="190900090070020" Length="2">
+                  <Node Id="3.19" Cat="np" Start="6" End="6" Rule="N2NP" Head="0" Language="H" nodeId="190900090070011" Length="1">
+                    <Node Id="3.20" Cat="noun" Start="6" End="6" Lemma="(EB:RFH" UnicodeLemma="עֶבְרָה" English="wrath of" Analysis="ncfsc" morphId="190900090052" StrongNumberX="5678" Language="H" Unicode="עֶבְרָת‎" nodeId="190900090070010" Length="1">(EB:RFT</Node>
+                  </Node>
+                  <Node Id="3.21" Cat="np" Start="7" End="7" Rule="Pron2NP" Head="0" Language="H" nodeId="190900090080011" Length="1">
+                    <Node Id="3.22" Cat="pron" Start="7" End="7" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900090053" StrongNumberX="3509b" Language="H" Unicode="ֶ֑ךָ‎" nodeId="190900090080010" Length="1">E92KF</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="19.1" Cat="CL" Start="8" End="12" Rule="V-S-PP" Head="0" Language="H" nodeId="190900090090050" Length="5">
+            <Node Id="19.2" Cat="V" Start="8" End="8" Rule="Vp2V" Head="0" Language="H" nodeId="190900090090012" Length="1">
+              <Node Id="19.3" Cat="vp" Start="8" End="8" Rule="V2VP" Head="0" Language="H" nodeId="190900090090011" Length="1">
+                <Node Id="19.4" Cat="verb" Start="8" End="8" Lemma="KLH" UnicodeLemma="כלה" English="we finish" Analysis="vpp1cp" morphId="190900090061" StrongNumberX="3615" Language="H" Unicode="כִּלִּ֖ינוּ‎" nodeId="190900090090010" Length="1">K.IL.I73YNW.</Node>
+              </Node>
+            </Node>
+            <Node Id="19.5" Cat="S" Start="9" End="10" Rule="Np2S" Head="0" Language="H" nodeId="190900090100021" Length="2">
+              <Node Id="19.6" Cat="np" Start="9" End="10" Rule="NPofNP" Head="0" Language="H" nodeId="190900090100020" Length="2">
+                <Node Id="19.7" Cat="np" Start="9" End="9" Rule="N2NP" Head="0" Language="H" nodeId="190900090100011" Length="1">
+                  <Node Id="19.8" Cat="noun" Start="9" End="9" Lemma="$FNFH" UnicodeLemma="שָׁנָה" English="years of" Analysis="ncfpc" morphId="190900090071" StrongNumberX="8141" Language="H" Unicode="שָׁנֵ֣י‎" nodeId="190900090100010" Length="1">$FN"74Y</Node>
+                </Node>
+                <Node Id="19.9" Cat="np" Start="10" End="10" Rule="Pron2NP" Head="0" Language="H" nodeId="190900090110011" Length="1">
+                  <Node Id="19.10" Cat="pron" Start="10" End="10" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900090072" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900090110010" Length="1">NW.</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="19.11" Cat="PP" Start="11" End="12" Rule="Pp2PP" Head="0" Language="H" nodeId="190900090120021" Length="2">
+              <Node Id="19.12" Cat="pp" Start="11" End="12" Rule="PrepNp" Head="1" Language="H" nodeId="190900090120020" Length="2">
+                <Node Id="19.13" Cat="pp" Start="11" End="11" Rule="P2PP" Head="0" Language="H" nodeId="190900090120011" Length="1">
+                  <Node Id="19.14" Cat="prep" Start="11" End="11" Lemma="K.:MOW" UnicodeLemma="כְּמוֹ" English="with" Analysis="Pp" morphId="190900090081" StrongNumberX="3644" Language="H" Unicode="כְמוֹ־‎" nodeId="190900090120010" Length="1">K:MOW-</Node>
+                </Node>
+                <Node Id="19.15" Cat="np" Start="12" End="12" Rule="N2NP" Head="0" Language="H" nodeId="190900090130011" Length="1">
+                  <Node Id="19.16" Cat="noun" Start="12" End="12" Lemma="HEGEH" UnicodeLemma="הֶגֶה" English="moan" Analysis="ncmsa" morphId="190900090091" StrongNumberX="1899" Language="H" Unicode="׃‎הֶֽגֶה‎" nodeId="190900090130010" Length="1">HE75GEH00</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:10">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="24" nodeId="190900100010250" Length="25">
+          <Node Id="3.1" Cat="CL" Start="0" End="6" Rule="ClCl2" Head="1" Language="H" nodeId="190900100010070" Length="7">
+            <Node Id="3.2" Cat="CL" Start="0" End="2" Rule="Np2CL" Head="0" Language="H" nodeId="190900100010031" Length="3">
+              <Node Id="3.3" Cat="np" Start="0" End="2" Rule="NPofNP" Head="0" Language="H" nodeId="190900100010030" Length="3">
+                <Node Id="3.4" Cat="np" Start="0" End="0" Rule="N2NP" Head="0" Language="H" nodeId="190900100010011" Length="1">
+                  <Node Id="3.5" Cat="noun" Start="0" End="0" Lemma="YOWM_1" UnicodeLemma="יוֹם_1" English="days of" Analysis="ncmpc" morphId="190900100011" StrongNumberX="3117" Language="H" Unicode="יְמֵֽי־‎" nodeId="190900100010010" Length="1">Y:M"75Y-</Node>
+                </Node>
+                <Node Id="3.6" Cat="np" Start="1" End="2" Rule="NPofNP" Head="0" Language="H" nodeId="190900100020020" Length="2">
+                  <Node Id="3.7" Cat="np" Start="1" End="1" Rule="N2NP" Head="0" Language="H" nodeId="190900100020011" Length="1">
+                    <Node Id="3.8" Cat="noun" Start="1" End="1" Lemma="$FNFH" UnicodeLemma="שָׁנָה" English="years of" Analysis="ncfpc" morphId="190900100021" StrongNumberX="8141" Language="H" Unicode="שְׁנוֹתֵ֨י‎" nodeId="190900100020010" Length="1">$:NOWT"63Y</Node>
+                  </Node>
+                  <Node Id="3.9" Cat="np" Start="2" End="2" Rule="Pron2NP" Head="0" Language="H" nodeId="190900100030011" Length="1">
+                    <Node Id="3.10" Cat="pron" Start="2" End="2" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900100022" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900100030010" Length="1">NW.</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="3.11" Cat="CL" Start="3" End="6" Rule="P-S" Head="0" Language="H" nodeId="190900100040040" Length="4">
+              <Node Id="3.12" Cat="P" Start="3" End="4" Rule="Pp2P" Head="0" Language="H" nodeId="190900100040021" Length="2">
+                <Node Id="3.13" Cat="pp" Start="3" End="4" Rule="PrepNp" Head="1" Language="H" nodeId="190900100040020" Length="2">
+                  <Node Id="3.14" Cat="pp" Start="3" End="3" Rule="P2PP" Head="0" Language="H" nodeId="190900100040011" Length="1">
+                    <Node Id="3.15" Cat="prep" Start="3" End="3" Lemma="B.:" UnicodeLemma="בְּ" English="of" Analysis="Pp" morphId="190900100031" StrongNumberX="0871a" Language="H" Unicode="ב‎" nodeId="190900100040010" Length="1">B</Node>
+                  </Node>
+                  <Node Id="3.16" Cat="np" Start="4" End="4" Rule="Pron2NP" Head="0" Language="H" nodeId="190900100050011" Length="1">
+                    <Node Id="3.17" Cat="pron" Start="4" End="4" Lemma="FM" UnicodeLemma="ָמ" English="them" Analysis="psn3mp" morphId="190900100032" StrongNumberX="3963a" Language="H" Unicode="ָהֶ֥ם‎" nodeId="190900100050010" Length="1">FHE71M</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="3.18" Cat="S" Start="5" End="6" Rule="Np2S" Head="0" Language="H" nodeId="190900100060021" Length="2">
+                <Node Id="3.19" Cat="np" Start="5" End="6" Rule="NumpNP" Head="1" Language="H" nodeId="190900100060020" Length="2">
+                  <Node Id="3.20" Cat="nump" Start="5" End="5" Rule="Num2Nump" Head="0" Language="H" nodeId="190900100060011" Length="1">
+                    <Node Id="3.21" Cat="num" Start="5" End="5" Lemma="$EBA(_1" UnicodeLemma="שֶׁבַע_1" English="seventy" Analysis="ucbpa" morphId="190900100041" StrongNumberX="7657" Language="H" Unicode="שִׁבְעִ֪ים‎" nodeId="190900100060010" Length="1">$IB:(I93YM</Node>
+                  </Node>
+                  <Node Id="3.22" Cat="np" Start="6" End="6" Rule="N2NP" Head="0" Language="H" nodeId="190900100070011" Length="1">
+                    <Node Id="3.23" Cat="noun" Start="6" End="6" Lemma="$FNFH" UnicodeLemma="שָׁנָה" English="year" Analysis="ncfsa" morphId="190900100051" StrongNumberX="8141" Language="H" Unicode="שָׁנָ֡ה‎" nodeId="190900100070010" Length="1">$FNF83H</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="20.1" Cat="cjp" Start="7" End="7" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900100080011" Length="1">
+            <Node Id="20.2" Cat="cj" Start="7" End="7" Lemma="W:" UnicodeLemma="וְ" English="or" Analysis="Pc" morphId="190900100061" StrongNumberX="2050b" Language="H" Unicode="וְ‎" nodeId="190900100080010" Length="1">W:</Node>
+          </Node>
+          <Node Id="21.1" Cat="CL" Start="8" End="12" Rule="ClCl2" Head="1" Language="H" nodeId="190900100090050" Length="5">
+            <Node Id="21.2" Cat="CL" Start="8" End="10" Rule="cjpCLx" Head="1" Language="H" nodeId="190900100090030" Length="3">
+              <Node Id="21.3" Cat="cjp" Start="8" End="8" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900100090011" Length="1">
+                <Node Id="21.4" Cat="cj" Start="8" End="8" Lemma=")IM" UnicodeLemma="אִם" English="if" Analysis="Pc" morphId="190900100062" StrongNumberX="0518" Language="H" Unicode="אִ֤ם‎" nodeId="190900100090010" Length="1">)I70M</Node>
+              </Node>
+              <Node Id="21.5" Cat="CL" Start="9" End="10" Rule="P2CL" Head="0" Language="H" nodeId="190900100100022" Length="2">
+                <Node Id="21.6" Cat="P" Start="9" End="10" Rule="Pp2P" Head="0" Language="H" nodeId="190900100100021" Length="2">
+                  <Node Id="21.7" Cat="pp" Start="9" End="10" Rule="PrepNp" Head="1" Language="H" nodeId="190900100100020" Length="2">
+                    <Node Id="21.8" Cat="pp" Start="9" End="9" Rule="P2PP" Head="0" Language="H" nodeId="190900100100011" Length="1">
+                      <Node Id="21.9" Cat="prep" Start="9" End="9" Lemma="B.:" UnicodeLemma="בְּ" English="in" Analysis="Pp" morphId="190900100071" StrongNumberX="0871a" Language="H" Unicode="בִּ‎" nodeId="190900100100010" Length="1">B.I</Node>
+                    </Node>
+                    <Node Id="21.10" Cat="np" Start="10" End="10" Rule="N2NP" Head="0" Language="H" nodeId="190900100110011" Length="1">
+                      <Node Id="21.11" Cat="noun" Start="10" End="10" Lemma="G.:BW.RFH" UnicodeLemma="גְּבוּרָה" English="strengths" Analysis="ncfpa" morphId="190900100072" StrongNumberX="1369" Language="H" Unicode="גְבוּרֹ֨ת ׀‎" nodeId="190900100110010" Length="1">G:BW.RO63T05</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="21.12" Cat="CL" Start="11" End="12" Rule="S2CL" Head="0" Language="H" nodeId="190900100120022" Length="2">
+              <Node Id="21.13" Cat="S" Start="11" End="12" Rule="Np2S" Head="0" Language="H" nodeId="190900100120021" Length="2">
+                <Node Id="21.14" Cat="np" Start="11" End="12" Rule="NumpNP" Head="1" Language="H" nodeId="190900100120020" Length="2">
+                  <Node Id="21.15" Cat="nump" Start="11" End="11" Rule="Num2Nump" Head="0" Language="H" nodeId="190900100120011" Length="1">
+                    <Node Id="21.16" Cat="num" Start="11" End="11" Lemma="$:MONEH" UnicodeLemma="שְׁמֹנֶה" English="eighty" Analysis="ucbpa" morphId="190900100081" StrongNumberX="8084" Language="H" Unicode="שְׁמ֘וֹנִ֤ים‎" nodeId="190900100120010" Length="1">$:MO82WNI70YM</Node>
+                  </Node>
+                  <Node Id="21.17" Cat="np" Start="12" End="12" Rule="N2NP" Head="0" Language="H" nodeId="190900100130011" Length="1">
+                    <Node Id="21.18" Cat="noun" Start="12" End="12" Lemma="$FNFH" UnicodeLemma="שָׁנָה" English="year" Analysis="ncfsa" morphId="190900100091" StrongNumberX="8141" Language="H" Unicode="שָׁנָ֗ה‎" nodeId="190900100130010" Length="1">$FNF81H</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="32.1" Cat="cjp" Start="13" End="13" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900100140011" Length="1">
+            <Node Id="32.2" Cat="cj" Start="13" End="13" Lemma="W:" UnicodeLemma="וְ" English="yet" Analysis="Pc" morphId="190900100101" StrongNumberX="2050b" Language="H" Unicode="וְ֭‎" nodeId="190900100140010" Length="1">13W:</Node>
+          </Node>
+          <Node Id="33.1" Cat="CL" Start="14" End="18" Rule="S-P" Head="1" Language="H" nodeId="190900100150050" Length="5">
+            <Node Id="33.2" Cat="S" Start="14" End="15" Rule="Np2S" Head="0" Language="H" nodeId="190900100150021" Length="2">
+              <Node Id="33.3" Cat="np" Start="14" End="15" Rule="NPofNP" Head="0" Language="H" nodeId="190900100150020" Length="2">
+                <Node Id="33.4" Cat="np" Start="14" End="14" Rule="N2NP" Head="0" Language="H" nodeId="190900100150011" Length="1">
+                  <Node Id="33.5" Cat="noun" Start="14" End="14" Lemma="ROHAB" UnicodeLemma="רֹהַב" English="best of" Analysis="ncmsc" morphId="190900100102" StrongNumberX="7296" Language="H" Unicode="רָהְבּ‎" nodeId="190900100150010" Length="1">RFH:B.</Node>
+                </Node>
+                <Node Id="33.6" Cat="np" Start="15" End="15" Rule="Pron2NP" Head="0" Language="H" nodeId="190900100160011" Length="1">
+                  <Node Id="33.7" Cat="pron" Start="15" End="15" Lemma="FM" UnicodeLemma="ָמ" English="them" Analysis="psn3mp" morphId="190900100103" StrongNumberX="3963a" Language="H" Unicode="ָם‎" nodeId="190900100160010" Length="1">FM</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="33.8" Cat="P" Start="16" End="18" Rule="Np2P" Head="0" Language="H" nodeId="190900100170031" Length="3">
+              <Node Id="33.9" Cat="np" Start="16" End="18" Rule="NpaNp" Head="0" Language="H" nodeId="190900100170030" Length="3">
+                <Node Id="33.10" Cat="np" Start="16" End="16" Rule="N2NP" Head="0" Language="H" nodeId="190900100170011" Length="1">
+                  <Node Id="33.11" Cat="noun" Start="16" End="16" Lemma="(FMFL_1" UnicodeLemma="עָמָל_1" English="trouble" Analysis="ncmsa" morphId="190900100111" StrongNumberX="5999" Language="H" Unicode="עָמָ֣ל‎" nodeId="190900100170010" Length="1">(FMF74L</Node>
+                </Node>
+                <Node Id="33.12" Cat="cjp" Start="17" End="17" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900100180011" Length="1">
+                  <Node Id="33.13" Cat="cj" Start="17" End="17" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900100121" StrongNumberX="2050b" Language="H" Unicode="וָ‎" nodeId="190900100180010" Length="1">WF</Node>
+                </Node>
+                <Node Id="33.14" Cat="np" Start="18" End="18" Rule="N2NP" Head="0" Language="H" nodeId="190900100190011" Length="1">
+                  <Node Id="33.15" Cat="noun" Start="18" End="18" Lemma=")FWEN" UnicodeLemma="אָוֶן" English="sorrow" Analysis="ncmsa" morphId="190900100122" StrongNumberX="0205" Language="H" Unicode="אָ֑וֶן‎" nodeId="190900100190010" Length="1">)F92WEN</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="45.1" Cat="cjp" Start="19" End="19" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900100200011" Length="1">
+            <Node Id="45.2" Cat="cj" Start="19" End="19" Lemma="K.IY_2" UnicodeLemma="כִּי_2" English="for" Analysis="Pc" morphId="190900100131" StrongNumberX="3588" Language="H" Unicode="כִּי־‎" nodeId="190900100200010" Length="1">K.IY-</Node>
+          </Node>
+          <Node Id="47.1" Cat="CL" Start="20" End="21" Rule="V-ADV" Head="0" Language="H" nodeId="190900100210020" Length="2">
+            <Node Id="47.2" Cat="V" Start="20" End="20" Rule="Vp2V" Head="0" Language="H" nodeId="190900100210012" Length="1">
+              <Node Id="47.3" Cat="vp" Start="20" End="20" Rule="V2VP" Head="0" Language="H" nodeId="190900100210011" Length="1">
+                <Node Id="47.4" Cat="verb" Start="20" End="20" Lemma="GWZ" UnicodeLemma="גוז" English="he passes" Analysis="vqp3ms" morphId="190900100141" StrongNumberX="1468" Language="H" Unicode="גָ֥ז‎" nodeId="190900100210010" Length="1">GF71Z</Node>
+              </Node>
+            </Node>
+            <Node Id="47.5" Cat="ADV" Start="21" End="21" Rule="Advp2ADV" Head="0" Language="H" nodeId="190900100220012" Length="1">
+              <Node Id="47.6" Cat="advp" Start="21" End="21" Rule="Adv2Advp" Head="0" Language="H" nodeId="190900100220011" Length="1">
+                <Node Id="47.7" Cat="adv" Start="21" End="21" Lemma="XIY$" UnicodeLemma="חִישׁ" English="quickly" Analysis="Pd" morphId="190900100151" StrongNumberX="2440" Language="H" Unicode="חִ֝֗ישׁ‎" nodeId="190900100220010" Length="1">11XI81Y$</Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="49.1" Cat="cjp" Start="22" End="22" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900100230011" Length="1">
+            <Node Id="49.2" Cat="cj" Start="22" End="22" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900100161" StrongNumberX="2050b" Language="H" Unicode="וַ‎" nodeId="190900100230010" Length="1">WA</Node>
+          </Node>
+          <Node Id="52.1" Cat="CL" Start="23" End="24" Rule="V2CL" Head="0" Language="H" nodeId="190900100240022" Length="2">
+            <Node Id="52.2" Cat="V" Start="23" End="24" Rule="Vp2V" Head="0" Language="H" nodeId="190900100240021" Length="2">
+              <Node Id="52.3" Cat="vp" Start="23" End="24" Rule="VerbX" Head="0" Language="H" nodeId="190900100240020" Length="2">
+                <Node Id="52.4" Cat="verb" Start="23" End="23" Lemma="(WP_1" UnicodeLemma="עוף_1" English="we fly away" Analysis="vqw1cp" morphId="190900100162" StrongNumberX="5774" Language="H" Unicode="נָּעֻֽפ‎" nodeId="190900100240010" Length="1">N.F(U75P</Node>
+                <Node Id="52.5" Cat="x" Start="24" End="24" Lemma="H" UnicodeLemma="ה" English="" Analysis="Xh" morphId="190900100163" StrongNumberX="1886j" Language="H" Unicode="׃‎ָה‎" nodeId="190900100250010" Length="1">FH00</Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:11">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="10" nodeId="190900110010111" Length="11">
+          <Node Id="1.1" Cat="CL" Start="0" End="10" Rule="CLaCL" Head="0" Language="H" nodeId="190900110010110" Length="11">
+            <Node Id="1.2" Cat="CL" Start="0" End="4" Rule="S-V-O" Head="1" Language="H" nodeId="190900110010050" Length="5">
+              <Node Id="1.3" Cat="S" Start="0" End="0" Rule="Np2S" Head="0" Language="H" nodeId="190900110010012" Length="1">
+                <Node Id="1.4" Cat="np" Start="0" End="0" Rule="Pron2NP" Head="0" Language="H" nodeId="190900110010011" Length="1">
+                  <Node Id="1.5" Cat="pron" Start="0" End="0" Lemma="MIY" UnicodeLemma="מִי" English="who?" Analysis="pii" morphId="190900110011" StrongNumberX="4310" Language="H" Unicode="מִֽי־‎" nodeId="190900110010010" Length="1">MI75Y-</Node>
+                </Node>
+              </Node>
+              <Node Id="1.6" Cat="V" Start="1" End="1" Rule="Vp2V" Head="0" Language="H" nodeId="190900110020012" Length="1">
+                <Node Id="1.7" Cat="vp" Start="1" End="1" Rule="V2VP" Head="0" Language="H" nodeId="190900110020011" Length="1">
+                  <Node Id="1.8" Cat="verb" Start="1" End="1" Lemma="YD(" UnicodeLemma="ידע" English="one knowing" Analysis="vqPmsa" morphId="190900110021" StrongNumberX="3045" Language="H" Unicode="י֭וֹדֵעַ‎" nodeId="190900110020010" Length="1">13YOWD"(A</Node>
+                </Node>
+              </Node>
+              <Node Id="1.9" Cat="O" Start="2" End="4" Rule="Np2O" Head="0" Language="H" nodeId="190900110030031" Length="3">
+                <Node Id="1.10" Cat="np" Start="2" End="4" Rule="NPofNP" Head="0" Language="H" nodeId="190900110030030" Length="3">
+                  <Node Id="1.11" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900110030011" Length="1">
+                    <Node Id="1.12" Cat="noun" Start="2" End="2" Lemma="(OZ_1" UnicodeLemma="עֹז_1" English="power of" Analysis="ncmsc" morphId="190900110031" StrongNumberX="5797" Language="H" Unicode="עֹ֣ז‎" nodeId="190900110030010" Length="1">(O74Z</Node>
+                  </Node>
+                  <Node Id="1.13" Cat="np" Start="3" End="4" Rule="NPofNP" Head="0" Language="H" nodeId="190900110040020" Length="2">
+                    <Node Id="1.14" Cat="np" Start="3" End="3" Rule="N2NP" Head="0" Language="H" nodeId="190900110040011" Length="1">
+                      <Node Id="1.15" Cat="noun" Start="3" End="3" Lemma=")AP_2" UnicodeLemma="אַף_2" English="anger of" Analysis="ncmsc" morphId="190900110041" StrongNumberX="0639" Language="H" Unicode="אַפּ‎" nodeId="190900110040010" Length="1">)AP.</Node>
+                    </Node>
+                    <Node Id="1.16" Cat="np" Start="4" End="4" Rule="Pron2NP" Head="0" Language="H" nodeId="190900110050011" Length="1">
+                      <Node Id="1.17" Cat="pron" Start="4" End="4" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900110042" StrongNumberX="3509b" Language="H" Unicode="ֶ֑ךָ‎" nodeId="190900110050010" Length="1">E92KF</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.18" Cat="cjp" Start="5" End="5" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900110060011" Length="1">
+              <Node Id="1.19" Cat="cj" Start="5" End="5" Lemma="W:" UnicodeLemma="וְ" English="for" Analysis="Pc" morphId="190900110051" StrongNumberX="2050b" Language="H" Unicode="וּ֝‎" nodeId="190900110060010" Length="1">11W.</Node>
+            </Node>
+            <Node Id="1.20" Cat="CL" Start="6" End="10" Rule="PP-O" Head="1" Language="H" nodeId="190900110070050" Length="5">
+              <Node Id="1.21" Cat="PP" Start="6" End="8" Rule="Pp2PP" Head="0" Language="H" nodeId="190900110070031" Length="3">
+                <Node Id="1.22" Cat="pp" Start="6" End="8" Rule="PrepNp" Head="1" Language="H" nodeId="190900110070030" Length="3">
+                  <Node Id="1.23" Cat="pp" Start="6" End="6" Rule="P2PP" Head="0" Language="H" nodeId="190900110070011" Length="1">
+                    <Node Id="1.24" Cat="prep" Start="6" End="6" Lemma="K.:" UnicodeLemma="ךְּ" English="as" Analysis="Pp" morphId="190900110052" StrongNumberX="3509a" Language="H" Unicode="כְ‎" nodeId="190900110070010" Length="1">K:</Node>
+                  </Node>
+                  <Node Id="1.25" Cat="np" Start="7" End="8" Rule="NPofNP" Head="0" Language="H" nodeId="190900110080020" Length="2">
+                    <Node Id="1.26" Cat="np" Start="7" End="7" Rule="N2NP" Head="0" Language="H" nodeId="190900110080011" Length="1">
+                      <Node Id="1.27" Cat="noun" Start="7" End="7" Lemma="YIR:)FH" UnicodeLemma="יִרְאָה" English="fear of" Analysis="ncfsc" morphId="190900110053" StrongNumberX="3374" Language="H" Unicode="יִרְאָת‎" nodeId="190900110080010" Length="1">YIR:)FT</Node>
+                    </Node>
+                    <Node Id="1.28" Cat="np" Start="8" End="8" Rule="Pron2NP" Head="0" Language="H" nodeId="190900110090011" Length="1">
+                      <Node Id="1.29" Cat="pron" Start="8" End="8" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900110054" StrongNumberX="3509b" Language="H" Unicode="ְךָ֗‎" nodeId="190900110090010" Length="1">:KF81</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.30" Cat="O" Start="9" End="10" Rule="Np2O" Head="0" Language="H" nodeId="190900110100021" Length="2">
+                <Node Id="1.31" Cat="np" Start="9" End="10" Rule="NPofNP" Head="0" Language="H" nodeId="190900110100020" Length="2">
+                  <Node Id="1.32" Cat="np" Start="9" End="9" Rule="N2NP" Head="0" Language="H" nodeId="190900110100011" Length="1">
+                    <Node Id="1.33" Cat="noun" Start="9" End="9" Lemma="(EB:RFH" UnicodeLemma="עֶבְרָה" English="wrath of" Analysis="ncfsc" morphId="190900110061" StrongNumberX="5678" Language="H" Unicode="עֶבְרָת‎" nodeId="190900110100010" Length="1">(EB:RFT</Node>
+                  </Node>
+                  <Node Id="1.34" Cat="np" Start="10" End="10" Rule="Pron2NP" Head="0" Language="H" nodeId="190900110110011" Length="1">
+                    <Node Id="1.35" Cat="pron" Start="10" End="10" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900110062" StrongNumberX="3509b" Language="H" Unicode="׃‎ֶֽךָ‎" nodeId="190900110110010" Length="1">E75KF00</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:12">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="9" nodeId="190900120010100" Length="10">
+          <Node Id="2.1" Cat="CL" Start="0" End="5" Rule="PP-ADV-V" Head="2" Language="H" nodeId="190900120010060" Length="6">
+            <Node Id="2.2" Cat="PP" Start="0" End="3" Rule="Pp2PP" Head="0" Language="H" nodeId="190900120010041" Length="4">
+              <Node Id="2.3" Cat="pp" Start="0" End="3" Rule="PrepCL" Head="1" Language="H" nodeId="190900120010040" Length="4">
+                <Node Id="2.4" Cat="pp" Start="0" End="0" Rule="P2PP" Head="0" Language="H" nodeId="190900120010011" Length="1">
+                  <Node Id="2.5" Cat="prep" Start="0" End="0" Lemma="L:" UnicodeLemma="לְ" English="to" Analysis="Pp" morphId="190900120011" StrongNumberX="3807a" Language="H" Unicode="לִ‎" nodeId="190900120010010" Length="1">LI</Node>
+                </Node>
+                <Node Id="2.6" Cat="CL" Start="1" End="3" Rule="V-O" Head="0" Language="H" nodeId="190900120020030" Length="3">
+                  <Node Id="2.7" Cat="V" Start="1" End="1" Rule="Vp2V" Head="0" Language="H" nodeId="190900120020012" Length="1">
+                    <Node Id="2.8" Cat="vp" Start="1" End="1" Rule="V2VP" Head="0" Language="H" nodeId="190900120020011" Length="1">
+                      <Node Id="2.9" Cat="verb" Start="1" End="1" Lemma="MNH" UnicodeLemma="מנה" English="number" Analysis="vqc" morphId="190900120012" StrongNumberX="4487" Language="H" Unicode="מְנ֣וֹת‎" nodeId="190900120020010" Length="1">M:NO74WT</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="2.10" Cat="O" Start="2" End="3" Rule="Np2O" Head="0" Language="H" nodeId="190900120030021" Length="2">
+                    <Node Id="2.11" Cat="np" Start="2" End="3" Rule="NPofNP" Head="0" Language="H" nodeId="190900120030020" Length="2">
+                      <Node Id="2.12" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900120030011" Length="1">
+                        <Node Id="2.13" Cat="noun" Start="2" End="2" Lemma="YOWM_1" UnicodeLemma="יוֹם_1" English="days of" Analysis="ncmpc" morphId="190900120021" StrongNumberX="3117" Language="H" Unicode="יָ֭מֵי‎" nodeId="190900120030010" Length="1">13YFM"Y</Node>
+                      </Node>
+                      <Node Id="2.14" Cat="np" Start="3" End="3" Rule="Pron2NP" Head="0" Language="H" nodeId="190900120040011" Length="1">
+                        <Node Id="2.15" Cat="pron" Start="3" End="3" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900120022" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900120040010" Length="1">NW.</Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="2.16" Cat="ADV" Start="4" End="4" Rule="adjp2ADV" Head="0" Language="H" nodeId="190900120050012" Length="1">
+              <Node Id="2.17" Cat="adjp" Start="4" End="4" Rule="Adj2Adjp" Head="0" Language="H" nodeId="190900120050011" Length="1">
+                <Node Id="2.18" Cat="adj" Start="4" End="4" Lemma="K.&quot;N_1" UnicodeLemma="כֵּן_1" English="aright" Analysis="amsa" morphId="190900120031" StrongNumberX="3651a" Language="H" Unicode="כֵּ֣ן‎" nodeId="190900120050010" Length="1">K."74N</Node>
+              </Node>
+            </Node>
+            <Node Id="2.19" Cat="V" Start="5" End="5" Rule="Vp2V" Head="0" Language="H" nodeId="190900120060012" Length="1">
+              <Node Id="2.20" Cat="vp" Start="5" End="5" Rule="V2VP" Head="0" Language="H" nodeId="190900120060011" Length="1">
+                <Node Id="2.21" Cat="verb" Start="5" End="5" Lemma="YD(" UnicodeLemma="ידע" English="teach!" Analysis="vhvms" morphId="190900120041" StrongNumberX="3045" Language="H" Unicode="הוֹדַ֑ע‎" nodeId="190900120060010" Length="1">HOWDA92(</Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="13.1" Cat="cjp" Start="6" End="6" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900120070011" Length="1">
+            <Node Id="13.2" Cat="cj" Start="6" End="6" Lemma="W:" UnicodeLemma="וְ" English="that" Analysis="Pc" morphId="190900120051" StrongNumberX="2050b" Language="H" Unicode="וְ֝‎" nodeId="190900120070010" Length="1">11W:</Node>
+          </Node>
+          <Node Id="15.1" Cat="CL" Start="7" End="9" Rule="V-O" Head="0" Language="H" nodeId="190900120080030" Length="3">
+            <Node Id="15.2" Cat="V" Start="7" End="7" Rule="Vp2V" Head="0" Language="H" nodeId="190900120080012" Length="1">
+              <Node Id="15.3" Cat="vp" Start="7" End="7" Rule="V2VP" Head="0" Language="H" nodeId="190900120080011" Length="1">
+                <Node Id="15.4" Cat="verb" Start="7" End="7" Lemma="BW)" UnicodeLemma="בוא" English="we may gain" Analysis="vhi1cp{1}Cm" morphId="190900120052" StrongNumberX="0935" Language="H" Unicode="נָבִ֗א‎" nodeId="190900120080010" Length="1">NFBI81)</Node>
+              </Node>
+            </Node>
+            <Node Id="15.5" Cat="O" Start="8" End="9" Rule="Np2O" Head="0" Language="H" nodeId="190900120090021" Length="2">
+              <Node Id="15.6" Cat="np" Start="8" End="9" Rule="NPofNP" Head="0" Language="H" nodeId="190900120090020" Length="2">
+                <Node Id="15.7" Cat="np" Start="8" End="8" Rule="N2NP" Head="0" Language="H" nodeId="190900120090011" Length="1">
+                  <Node Id="15.8" Cat="noun" Start="8" End="8" Lemma="L&quot;BFB" UnicodeLemma="לֵבָב" English="heart of" Analysis="ncmsc" morphId="190900120061" StrongNumberX="3824" Language="H" Unicode="לְבַ֣ב‎" nodeId="190900120090010" Length="1">L:BA74B</Node>
+                </Node>
+                <Node Id="15.9" Cat="np" Start="9" End="9" Rule="N2NP" Head="0" Language="H" nodeId="190900120100011" Length="1">
+                  <Node Id="15.10" Cat="noun" Start="9" End="9" Lemma="XFK:MFH" UnicodeLemma="חָכְמָה" English="wisdom" Analysis="ncfsa" morphId="190900120071" StrongNumberX="2451" Language="H" Unicode="׃‎חָכְמָֽה‎" nodeId="190900120100010" Length="1">XFK:MF75H00</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:13">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="9" nodeId="190900130010100" Length="10">
+          <Node Id="3.1" Cat="CL" Start="0" End="4" Rule="ClCl" Head="0" Language="H" nodeId="190900130010050" Length="5">
+            <Node Id="3.2" Cat="CL" Start="0" End="2" Rule="ClCl" Head="0" Language="H" nodeId="190900130010030" Length="3">
+              <Node Id="3.3" Cat="CL" Start="0" End="1" Rule="V2CL" Head="0" Language="H" nodeId="190900130010022" Length="2">
+                <Node Id="3.4" Cat="V" Start="0" End="1" Rule="Vp2V" Head="0" Language="H" nodeId="190900130010021" Length="2">
+                  <Node Id="3.5" Cat="vp" Start="0" End="1" Rule="VerbX" Head="0" Language="H" nodeId="190900130010020" Length="2">
+                    <Node Id="3.6" Cat="verb" Start="0" End="0" Lemma="$WB" UnicodeLemma="שׁוב" English="relent!" Analysis="vqvms" morphId="190900130011" StrongNumberX="7725" Language="H" Unicode="שׁוּב‎" nodeId="190900130010010" Length="1">$W.B</Node>
+                    <Node Id="3.7" Cat="x" Start="1" End="1" Lemma="H" UnicodeLemma="ה" English="" Analysis="Xh" morphId="190900130012" StrongNumberX="1886j" Language="H" Unicode="ָ֣ה‎" nodeId="190900130020010" Length="1">F74H</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="3.8" Cat="CL" Start="2" End="2" Rule="Np2CL" Head="0" Language="H" nodeId="190900130030012" Length="1">
+                <Node Id="3.9" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900130030011" Length="1">
+                  <Node Id="3.10" Cat="noun" Start="2" End="2" Lemma="YHWH" UnicodeLemma="יהוה" English="Yahweh" Analysis="np" morphId="190900130021" StrongNumberX="3068" Language="H" Unicode="יְ֭הוָה‎" nodeId="190900130030010" Length="1">13Y:HWFH</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="3.11" Cat="CL" Start="3" End="4" Rule="PP2CL" Head="0" Language="H" nodeId="190900130040022" Length="2">
+              <Node Id="3.12" Cat="PP" Start="3" End="4" Rule="Pp2PP" Head="0" Language="H" nodeId="190900130040021" Length="2">
+                <Node Id="3.13" Cat="pp" Start="3" End="4" Rule="PrepNp" Head="1" Language="H" nodeId="190900130040020" Length="2">
+                  <Node Id="3.14" Cat="pp" Start="3" End="3" Rule="P2PP" Head="0" Language="H" nodeId="190900130040011" Length="1">
+                    <Node Id="3.15" Cat="prep" Start="3" End="3" Lemma="(AD_3" UnicodeLemma="עַד_3" English="until" Analysis="Pp" morphId="190900130031" StrongNumberX="5704" Language="H" Unicode="עַד־‎" nodeId="190900130040010" Length="1">(AD-</Node>
+                  </Node>
+                  <Node Id="3.16" Cat="np" Start="4" End="4" Rule="Ptcl2Np" Head="0" Language="H" nodeId="190900130050011" Length="1">
+                    <Node Id="3.17" Cat="ptcl" Start="4" End="4" Lemma="MFTAY" UnicodeLemma="מָתַי" English="when?" Analysis="Pg" morphId="190900130041" StrongNumberX="4970" Language="H" Unicode="מָתָ֑י‎" nodeId="190900130050010" Length="1">MFTF92Y</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="11.1" Cat="cjp" Start="5" End="5" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900130060011" Length="1">
+            <Node Id="11.2" Cat="cj" Start="5" End="5" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900130051" StrongNumberX="2050b" Language="H" Unicode="וְ֝‎" nodeId="190900130060010" Length="1">11W:</Node>
+          </Node>
+          <Node Id="13.1" Cat="CL" Start="6" End="9" Rule="V-PP" Head="0" Language="H" nodeId="190900130070040" Length="4">
+            <Node Id="13.2" Cat="V" Start="6" End="6" Rule="Vp2V" Head="0" Language="H" nodeId="190900130070012" Length="1">
+              <Node Id="13.3" Cat="vp" Start="6" End="6" Rule="V2VP" Head="0" Language="H" nodeId="190900130070011" Length="1">
+                <Node Id="13.4" Cat="verb" Start="6" End="6" Lemma="NXM" UnicodeLemma="נחם" English="have compassion!" Analysis="vnvms" morphId="190900130052" StrongNumberX="5162" Language="H" Unicode="הִנָּחֵ֗ם‎" nodeId="190900130070010" Length="1">HIN.FX"81M</Node>
+              </Node>
+            </Node>
+            <Node Id="13.5" Cat="PP" Start="7" End="9" Rule="Pp2PP" Head="0" Language="H" nodeId="190900130080031" Length="3">
+              <Node Id="13.6" Cat="pp" Start="7" End="9" Rule="PrepNp" Head="1" Language="H" nodeId="190900130080030" Length="3">
+                <Node Id="13.7" Cat="pp" Start="7" End="7" Rule="P2PP" Head="0" Language="H" nodeId="190900130080011" Length="1">
+                  <Node Id="13.8" Cat="prep" Start="7" End="7" Lemma="(AL_2" UnicodeLemma="עַל_2" English="on" Analysis="Pp" morphId="190900130061" StrongNumberX="5921" Language="H" Unicode="עַל־‎" nodeId="190900130080010" Length="1">(AL-</Node>
+                </Node>
+                <Node Id="13.9" Cat="np" Start="8" End="9" Rule="NPofNP" Head="0" Language="H" nodeId="190900130090020" Length="2">
+                  <Node Id="13.10" Cat="np" Start="8" End="8" Rule="N2NP" Head="0" Language="H" nodeId="190900130090011" Length="1">
+                    <Node Id="13.11" Cat="noun" Start="8" End="8" Lemma="(EBED_1" UnicodeLemma="עֶבֶד_1" English="servants of" Analysis="ncmpc" morphId="190900130071" StrongNumberX="5650" Language="H" Unicode="עֲבָדֶֽי‎" nodeId="190900130090010" Length="1">(:ABFDE75Y</Node>
+                  </Node>
+                  <Node Id="13.12" Cat="np" Start="9" End="9" Rule="Pron2NP" Head="0" Language="H" nodeId="190900130100011" Length="1">
+                    <Node Id="13.13" Cat="pron" Start="9" End="9" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900130072" StrongNumberX="3509b" Language="H" Unicode="׃‎ךָ‎" nodeId="190900130100010" Length="1">KF00</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:14">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="14" nodeId="190900140010150" Length="15">
+          <Node Id="3.1" Cat="CL" Start="0" End="6" Rule="V-O-PP-ADV" Head="0" Language="H" nodeId="190900140010070" Length="7">
+            <Node Id="3.2" Cat="V" Start="0" End="0" Rule="Vp2V" Head="0" Language="H" nodeId="190900140010012" Length="1">
+              <Node Id="3.3" Cat="vp" Start="0" End="0" Rule="V2VP" Head="0" Language="H" nodeId="190900140010011" Length="1">
+                <Node Id="3.4" Cat="verb" Start="0" End="0" Lemma="&amp;B(" UnicodeLemma="שׂבע" English="satisfy" Analysis="vpvms" morphId="190900140011" StrongNumberX="7646" Language="H" Unicode="שַׂבְּע‎" nodeId="190900140010010" Length="1">&amp;AB.:(</Node>
+              </Node>
+            </Node>
+            <Node Id="3.5" Cat="O" Start="1" End="1" Rule="Np2O" Head="0" Language="H" nodeId="190900140020012" Length="1">
+              <Node Id="3.6" Cat="np" Start="1" End="1" Rule="Pron2NP" Head="0" Language="H" nodeId="190900140020011" Length="1">
+                <Node Id="3.7" Cat="pron" Start="1" End="1" Lemma="FNW." UnicodeLemma="ָנוּ" English="us!" Analysis="psv1cp" morphId="190900140012" StrongNumberX="5105a" Language="H" Unicode="ֵ֣נוּ‎" nodeId="190900140020010" Length="1">"74NW.</Node>
+              </Node>
+            </Node>
+            <Node Id="3.8" Cat="PP" Start="2" End="4" Rule="Pp2PP" Head="0" Language="H" nodeId="190900140030031" Length="3">
+              <Node Id="3.9" Cat="pp" Start="2" End="4" Rule="PrepNp" Head="1" Language="H" nodeId="190900140030030" Length="3">
+                <Node Id="3.10" Cat="pp" Start="2" End="2" Rule="P2PP" Head="0" Language="H" nodeId="190900140030011" Length="1">
+                  <Node Id="3.11" Cat="prep" Start="2" End="2" Lemma="B.:" UnicodeLemma="בְּ" English="in" Analysis="Pp" morphId="190900140021" StrongNumberX="0871a" Language="H" Unicode="בַ‎" nodeId="190900140030010" Length="1">BA</Node>
+                </Node>
+                <Node Id="3.12" Cat="np" Start="3" End="4" Rule="DetNP" Head="1" Language="H" nodeId="190900140040020" Length="2">
+                  <Node Id="3.13" Cat="art" Start="3" End="3" Lemma="HA" UnicodeLemma="הַ" English="the" Analysis="Pa" morphId="190900140022" StrongNumberX="1886a" Language="H" Unicode="‎" nodeId="190900140040010" Length="1">_</Node>
+                  <Node Id="3.14" Cat="np" Start="4" End="4" Rule="N2NP" Head="0" Language="H" nodeId="190900140050011" Length="1">
+                    <Node Id="3.15" Cat="noun" Start="4" End="4" Lemma="B.OQER_2" UnicodeLemma="בֹּקֶר_2" English="morning" Analysis="ncmsa" morphId="190900140023" StrongNumberX="1242" Language="H" Unicode="בֹּ֣קֶר‎" nodeId="190900140050010" Length="1">B.O74QER</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="3.16" Cat="ADV" Start="5" End="6" Rule="Np2ADV" Head="0" Language="H" nodeId="190900140060021" Length="2">
+              <Node Id="3.17" Cat="np" Start="5" End="6" Rule="NPofNP" Head="0" Language="H" nodeId="190900140060020" Length="2">
+                <Node Id="3.18" Cat="np" Start="5" End="5" Rule="N2NP" Head="0" Language="H" nodeId="190900140060011" Length="1">
+                  <Node Id="3.19" Cat="noun" Start="5" End="5" Lemma="XESED_2" UnicodeLemma="חֶסֶד_2" English="unfailing love of" Analysis="ncmsc" morphId="190900140031" StrongNumberX="2617" Language="H" Unicode="חַסְדּ‎" nodeId="190900140060010" Length="1">XAS:D.</Node>
+                </Node>
+                <Node Id="3.20" Cat="np" Start="6" End="6" Rule="Pron2NP" Head="0" Language="H" nodeId="190900140070011" Length="1">
+                  <Node Id="3.21" Cat="pron" Start="6" End="6" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900140032" StrongNumberX="3509b" Language="H" Unicode="ֶ֑ךָ‎" nodeId="190900140070010" Length="1">E92KF</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="14.1" Cat="cjp" Start="7" End="7" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900140080011" Length="1">
+            <Node Id="14.2" Cat="cj" Start="7" End="7" Lemma="W:" UnicodeLemma="וְ" English="that" Analysis="Pc" morphId="190900140041" StrongNumberX="2050b" Language="H" Unicode="וּֽ‎" nodeId="190900140080010" Length="1">W.75</Node>
+          </Node>
+          <Node Id="17.1" Cat="CL" Start="8" End="14" Rule="V-PP" Head="0" Language="H" nodeId="190900140090070" Length="7">
+            <Node Id="17.2" Cat="V" Start="8" End="10" Rule="Vp2V" Head="0" Language="H" nodeId="190900140090031" Length="3">
+              <Node Id="17.3" Cat="vp" Start="8" End="10" Rule="VPandVP" Head="2" Language="H" nodeId="190900140090030" Length="3">
+                <Node Id="17.4" Cat="vp" Start="8" End="8" Rule="V2VP" Head="0" Language="H" nodeId="190900140090011" Length="1">
+                  <Node Id="17.5" Cat="verb" Start="8" End="8" Lemma="RNN" UnicodeLemma="רנן" English="we may sing for joy" Analysis="vpi1cp{1}Ct" morphId="190900140042" StrongNumberX="7442" Language="H" Unicode="נְרַנְּנָ֥ה‎" nodeId="190900140090010" Length="1">N:RAN.:NF71H</Node>
+                </Node>
+                <Node Id="17.6" Cat="cjp" Start="9" End="9" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900140100011" Length="1">
+                  <Node Id="17.7" Cat="cj" Start="9" End="9" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900140051" StrongNumberX="2050b" Language="H" Unicode="וְ֝‎" nodeId="190900140100010" Length="1">11W:</Node>
+                </Node>
+                <Node Id="17.8" Cat="vp" Start="10" End="10" Rule="V2VP" Head="0" Language="H" nodeId="190900140110011" Length="1">
+                  <Node Id="17.9" Cat="verb" Start="10" End="10" Lemma="&amp;MX" UnicodeLemma="שׂמח" English="we may be glad" Analysis="vqi1cp{1}Ct" morphId="190900140052" StrongNumberX="8055" Language="H" Unicode="נִשְׂמְחָ֗ה‎" nodeId="190900140110010" Length="1">NI&amp;:M:XF81H</Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="17.10" Cat="PP" Start="11" End="14" Rule="Pp2PP" Head="0" Language="H" nodeId="190900140120041" Length="4">
+              <Node Id="17.11" Cat="pp" Start="11" End="14" Rule="PrepNp" Head="1" Language="H" nodeId="190900140120040" Length="4">
+                <Node Id="17.12" Cat="pp" Start="11" End="11" Rule="P2PP" Head="0" Language="H" nodeId="190900140120011" Length="1">
+                  <Node Id="17.13" Cat="prep" Start="11" End="11" Lemma="B.:" UnicodeLemma="בְּ" English="for" Analysis="Pp" morphId="190900140061" StrongNumberX="0871a" Language="H" Unicode="בְּ‎" nodeId="190900140120010" Length="1">B.:</Node>
+                </Node>
+                <Node Id="17.14" Cat="np" Start="12" End="14" Rule="QuanNP" Head="1" Language="H" nodeId="190900140130030" Length="3">
+                  <Node Id="17.15" Cat="np" Start="12" End="12" Rule="N2NP" Head="0" Language="H" nodeId="190900140130011" Length="1">
+                    <Node Id="17.16" Cat="noun" Start="12" End="12" Lemma="K.OL" UnicodeLemma="כֹּל" English="all of" Analysis="ncmsc" morphId="190900140062" StrongNumberX="3605" Language="H" Unicode="כָל־‎" nodeId="190900140130010" Length="1">KFL-</Node>
+                  </Node>
+                  <Node Id="17.17" Cat="np" Start="13" End="14" Rule="NPofNP" Head="0" Language="H" nodeId="190900140140020" Length="2">
+                    <Node Id="17.18" Cat="np" Start="13" End="13" Rule="N2NP" Head="0" Language="H" nodeId="190900140140011" Length="1">
+                      <Node Id="17.19" Cat="noun" Start="13" End="13" Lemma="YOWM_1" UnicodeLemma="יוֹם_1" English="days of" Analysis="ncmpc" morphId="190900140071" StrongNumberX="3117" Language="H" Unicode="יָמֵֽי‎" nodeId="190900140140010" Length="1">YFM"75Y</Node>
+                    </Node>
+                    <Node Id="17.20" Cat="np" Start="14" End="14" Rule="Pron2NP" Head="0" Language="H" nodeId="190900140150011" Length="1">
+                      <Node Id="17.21" Cat="pron" Start="14" End="14" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900140072" StrongNumberX="5105a" Language="H" Unicode="׃‎נוּ‎" nodeId="190900140150010" Length="1">NW.00</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:15">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="8" nodeId="190900150010091" Length="9">
+          <Node Id="1.1" Cat="CL" Start="0" End="8" Rule="ClCl" Head="0" Language="H" nodeId="190900150010090" Length="9">
+            <Node Id="1.2" Cat="CL" Start="0" End="5" Rule="V-O-PP" Head="0" Language="H" nodeId="190900150010060" Length="6">
+              <Node Id="1.3" Cat="V" Start="0" End="0" Rule="Vp2V" Head="0" Language="H" nodeId="190900150010012" Length="1">
+                <Node Id="1.4" Cat="vp" Start="0" End="0" Rule="V2VP" Head="0" Language="H" nodeId="190900150010011" Length="1">
+                  <Node Id="1.5" Cat="verb" Start="0" End="0" Lemma="&amp;MX" UnicodeLemma="שׂמח" English="make glad" Analysis="vpvms" morphId="190900150011" StrongNumberX="8055" Language="H" Unicode="שַׂ֭מְּח‎" nodeId="190900150010010" Length="1">13&amp;AM.:X</Node>
+                </Node>
+              </Node>
+              <Node Id="1.6" Cat="O" Start="1" End="1" Rule="Np2O" Head="0" Language="H" nodeId="190900150020012" Length="1">
+                <Node Id="1.7" Cat="np" Start="1" End="1" Rule="Pron2NP" Head="0" Language="H" nodeId="190900150020011" Length="1">
+                  <Node Id="1.8" Cat="pron" Start="1" End="1" Lemma="FNW." UnicodeLemma="ָנוּ" English="us!" Analysis="psv1cp" morphId="190900150012" StrongNumberX="5105a" Language="H" Unicode="ֵנוּ‎" nodeId="190900150020010" Length="1">"NW.</Node>
+                </Node>
+              </Node>
+              <Node Id="1.9" Cat="PP" Start="2" End="5" Rule="Pp2PP" Head="0" Language="H" nodeId="190900150030041" Length="4">
+                <Node Id="1.10" Cat="pp" Start="2" End="5" Rule="PrepNp" Head="1" Language="H" nodeId="190900150030040" Length="4">
+                  <Node Id="1.11" Cat="pp" Start="2" End="2" Rule="P2PP" Head="0" Language="H" nodeId="190900150030011" Length="1">
+                    <Node Id="1.12" Cat="prep" Start="2" End="2" Lemma="K.:" UnicodeLemma="ךְּ" English="as" Analysis="Pp" morphId="190900150021" StrongNumberX="3509a" Language="H" Unicode="כִּ‎" nodeId="190900150030010" Length="1">K.I</Node>
+                  </Node>
+                  <Node Id="1.13" Cat="np" Start="3" End="5" Rule="NpCL" Head="0" Language="H" nodeId="190900150040030" Length="3">
+                    <Node Id="1.14" Cat="np" Start="3" End="3" Rule="N2NP" Head="0" Language="H" nodeId="190900150040011" Length="1">
+                      <Node Id="1.15" Cat="noun" Start="3" End="3" Lemma="YOWM_1" UnicodeLemma="יוֹם_1" English="days of" Analysis="ncmpc" morphId="190900150022" StrongNumberX="3117" Language="H" Unicode="ימ֣וֹת‎" nodeId="190900150040010" Length="1">YMO74WT</Node>
+                    </Node>
+                    <Node Id="1.16" Cat="CL" Start="4" End="5" Rule="V-O" Head="0" Language="H" nodeId="190900150050020" Length="2">
+                      <Node Id="1.17" Cat="V" Start="4" End="4" Rule="Vp2V" Head="0" Language="H" nodeId="190900150050012" Length="1">
+                        <Node Id="1.18" Cat="vp" Start="4" End="4" Rule="V2VP" Head="0" Language="H" nodeId="190900150050011" Length="1">
+                          <Node Id="1.19" Cat="verb" Start="4" End="4" Lemma="(NH_2" UnicodeLemma="ענה_2" English="you afflicted" Analysis="vpp2ms" morphId="190900150031" StrongNumberX="6031" Language="H" Unicode="עִנִּיתָ֑‎" nodeId="190900150050010" Length="1">(IN.IYTF92</Node>
+                        </Node>
+                      </Node>
+                      <Node Id="1.20" Cat="O" Start="5" End="5" Rule="Np2O" Head="0" Language="H" nodeId="190900150060012" Length="1">
+                        <Node Id="1.21" Cat="np" Start="5" End="5" Rule="Pron2NP" Head="0" Language="H" nodeId="190900150060011" Length="1">
+                          <Node Id="1.22" Cat="pron" Start="5" End="5" Lemma="FNW." UnicodeLemma="ָנוּ" English="us" Analysis="psv1cp" morphId="190900150032" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900150060010" Length="1">NW.</Node>
+                        </Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.23" Cat="CL" Start="6" End="8" Rule="ADV2CL" Head="0" Language="H" nodeId="190900150070032" Length="3">
+              <Node Id="1.24" Cat="ADV" Start="6" End="8" Rule="Np2ADV" Head="0" Language="H" nodeId="190900150070031" Length="3">
+                <Node Id="1.25" Cat="np" Start="6" End="8" Rule="NpCL" Head="0" Language="H" nodeId="190900150070030" Length="3">
+                  <Node Id="1.26" Cat="np" Start="6" End="6" Rule="N2NP" Head="0" Language="H" nodeId="190900150070011" Length="1">
+                    <Node Id="1.27" Cat="noun" Start="6" End="6" Lemma="$FNFH" UnicodeLemma="שָׁנָה" English="years of" Analysis="ncfpc" morphId="190900150041" StrongNumberX="8141" Language="H" Unicode="שְׁ֝נ֗וֹת‎" nodeId="190900150070010" Length="1">11$:NO81WT</Node>
+                  </Node>
+                  <Node Id="1.28" Cat="CL" Start="7" End="8" Rule="V-O" Head="0" Language="H" nodeId="190900150080020" Length="2">
+                    <Node Id="1.29" Cat="V" Start="7" End="7" Rule="Vp2V" Head="0" Language="H" nodeId="190900150080012" Length="1">
+                      <Node Id="1.30" Cat="vp" Start="7" End="7" Rule="V2VP" Head="0" Language="H" nodeId="190900150080011" Length="1">
+                        <Node Id="1.31" Cat="verb" Start="7" End="7" Lemma="R)H" UnicodeLemma="ראה" English="we saw" Analysis="vqp1cp" morphId="190900150051" StrongNumberX="7200" Language="H" Unicode="רָאִ֥ינוּ‎" nodeId="190900150080010" Length="1">RF)I71YNW.</Node>
+                      </Node>
+                    </Node>
+                    <Node Id="1.32" Cat="O" Start="8" End="8" Rule="Np2O" Head="0" Language="H" nodeId="190900150090012" Length="1">
+                      <Node Id="1.33" Cat="np" Start="8" End="8" Rule="N2NP" Head="0" Language="H" nodeId="190900150090011" Length="1">
+                        <Node Id="1.34" Cat="noun" Start="8" End="8" Lemma="RF(FH" UnicodeLemma="רָעָה" English="trouble" Analysis="ncfsa" morphId="190900150061" StrongNumberX="7451b" Language="H" Unicode="׃‎רָעָֽה‎" nodeId="190900150090010" Length="1">RF(F75H00</Node>
+                      </Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:16">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="11" nodeId="190900160010121" Length="12">
+          <Node Id="1.1" Cat="CL" Start="0" End="11" Rule="CLaCL" Head="0" Language="H" nodeId="190900160010120" Length="12">
+            <Node Id="1.2" Cat="CL" Start="0" End="5" Rule="V-PP-S" Head="0" Language="H" nodeId="190900160010060" Length="6">
+              <Node Id="1.3" Cat="V" Start="0" End="0" Rule="Vp2V" Head="0" Language="H" nodeId="190900160010012" Length="1">
+                <Node Id="1.4" Cat="vp" Start="0" End="0" Rule="V2VP" Head="0" Language="H" nodeId="190900160010011" Length="1">
+                  <Node Id="1.5" Cat="verb" Start="0" End="0" Lemma="R)H" UnicodeLemma="ראה" English="may he be shown" Analysis="vni3ms{1}Jm" morphId="190900160011" StrongNumberX="7200" Language="H" Unicode="יֵרָאֶ֣ה‎" nodeId="190900160010010" Length="1">Y"RF)E74H</Node>
+                </Node>
+              </Node>
+              <Node Id="1.6" Cat="PP" Start="1" End="3" Rule="Pp2PP" Head="0" Language="H" nodeId="190900160020031" Length="3">
+                <Node Id="1.7" Cat="pp" Start="1" End="3" Rule="PrepNp" Head="1" Language="H" nodeId="190900160020030" Length="3">
+                  <Node Id="1.8" Cat="pp" Start="1" End="1" Rule="P2PP" Head="0" Language="H" nodeId="190900160020011" Length="1">
+                    <Node Id="1.9" Cat="prep" Start="1" End="1" Lemma=")EL" UnicodeLemma="אֶל" English="to" Analysis="Pp" morphId="190900160021" StrongNumberX="0413" Language="H" Unicode="אֶל־‎" nodeId="190900160020010" Length="1">)EL-</Node>
+                  </Node>
+                  <Node Id="1.10" Cat="np" Start="2" End="3" Rule="NPofNP" Head="0" Language="H" nodeId="190900160030020" Length="2">
+                    <Node Id="1.11" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900160030011" Length="1">
+                      <Node Id="1.12" Cat="noun" Start="2" End="2" Lemma="(EBED_1" UnicodeLemma="עֶבֶד_1" English="servants of" Analysis="ncmpc" morphId="190900160031" StrongNumberX="5650" Language="H" Unicode="עֲבָדֶ֣י‎" nodeId="190900160030010" Length="1">(:ABFDE74Y</Node>
+                    </Node>
+                    <Node Id="1.13" Cat="np" Start="3" End="3" Rule="Pron2NP" Head="0" Language="H" nodeId="190900160040011" Length="1">
+                      <Node Id="1.14" Cat="pron" Start="3" End="3" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900160032" StrongNumberX="3509b" Language="H" Unicode="ךָ‎" nodeId="190900160040010" Length="1">KF</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.15" Cat="S" Start="4" End="5" Rule="Np2S" Head="0" Language="H" nodeId="190900160050021" Length="2">
+                <Node Id="1.16" Cat="np" Start="4" End="5" Rule="NPofNP" Head="0" Language="H" nodeId="190900160050020" Length="2">
+                  <Node Id="1.17" Cat="np" Start="4" End="4" Rule="N2NP" Head="0" Language="H" nodeId="190900160050011" Length="1">
+                    <Node Id="1.18" Cat="noun" Start="4" End="4" Lemma="P.O(AL" UnicodeLemma="פֹּעַל" English="deed of" Analysis="ncmsc" morphId="190900160041" StrongNumberX="6467" Language="H" Unicode="פָעֳל‎" nodeId="190900160050010" Length="1">PF(:FL</Node>
+                  </Node>
+                  <Node Id="1.19" Cat="np" Start="5" End="5" Rule="Pron2NP" Head="0" Language="H" nodeId="190900160060011" Length="1">
+                    <Node Id="1.20" Cat="pron" Start="5" End="5" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900160042" StrongNumberX="3509b" Language="H" Unicode="ֶ֑ךָ‎" nodeId="190900160060010" Length="1">E92KF</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="1.21" Cat="cjp" Start="6" End="6" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900160070011" Length="1">
+              <Node Id="1.22" Cat="cj" Start="6" End="6" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900160051" StrongNumberX="2050b" Language="H" Unicode="וַ֝‎" nodeId="190900160070010" Length="1">11WA</Node>
+            </Node>
+            <Node Id="1.23" Cat="CL" Start="7" End="11" Rule="S-PP" Head="0" Language="H" nodeId="190900160080050" Length="5">
+              <Node Id="1.24" Cat="S" Start="7" End="8" Rule="Np2S" Head="0" Language="H" nodeId="190900160080021" Length="2">
+                <Node Id="1.25" Cat="np" Start="7" End="8" Rule="NPofNP" Head="0" Language="H" nodeId="190900160080020" Length="2">
+                  <Node Id="1.26" Cat="np" Start="7" End="7" Rule="N2NP" Head="0" Language="H" nodeId="190900160080011" Length="1">
+                    <Node Id="1.27" Cat="noun" Start="7" End="7" Lemma="HFDFR" UnicodeLemma="הָדָר" English="splendor of" Analysis="ncmsc" morphId="190900160052" StrongNumberX="1926" Language="H" Unicode="הֲדָר‎" nodeId="190900160080010" Length="1">H:ADFR</Node>
+                  </Node>
+                  <Node Id="1.28" Cat="np" Start="8" End="8" Rule="Pron2NP" Head="0" Language="H" nodeId="190900160090011" Length="1">
+                    <Node Id="1.29" Cat="pron" Start="8" End="8" Lemma=":KF" UnicodeLemma="ְכָ" English="you" Analysis="psn2ms" morphId="190900160053" StrongNumberX="3509b" Language="H" Unicode="ְךָ֗‎" nodeId="190900160090010" Length="1">:KF81</Node>
+                  </Node>
+                </Node>
+              </Node>
+              <Node Id="1.30" Cat="PP" Start="9" End="11" Rule="Pp2PP" Head="0" Language="H" nodeId="190900160100031" Length="3">
+                <Node Id="1.31" Cat="pp" Start="9" End="11" Rule="PrepNp" Head="1" Language="H" nodeId="190900160100030" Length="3">
+                  <Node Id="1.32" Cat="pp" Start="9" End="9" Rule="P2PP" Head="0" Language="H" nodeId="190900160100011" Length="1">
+                    <Node Id="1.33" Cat="prep" Start="9" End="9" Lemma="(AL_2" UnicodeLemma="עַל_2" English="to" Analysis="Pp" morphId="190900160061" StrongNumberX="5921" Language="H" Unicode="עַל־‎" nodeId="190900160100010" Length="1">(AL-</Node>
+                  </Node>
+                  <Node Id="1.34" Cat="np" Start="10" End="11" Rule="NPofNP" Head="0" Language="H" nodeId="190900160110020" Length="2">
+                    <Node Id="1.35" Cat="np" Start="10" End="10" Rule="N2NP" Head="0" Language="H" nodeId="190900160110011" Length="1">
+                      <Node Id="1.36" Cat="noun" Start="10" End="10" Lemma="B.&quot;N_1" UnicodeLemma="בֵּן_1" English="children of" Analysis="ncmpc" morphId="190900160071" StrongNumberX="1121" Language="H" Unicode="בְּנֵי‎" nodeId="190900160110010" Length="1">B.:N"Y</Node>
+                    </Node>
+                    <Node Id="1.37" Cat="np" Start="11" End="11" Rule="Pron2NP" Head="0" Language="H" nodeId="190900160120011" Length="1">
+                      <Node Id="1.38" Cat="pron" Start="11" End="11" Lemma="FM" UnicodeLemma="ָמ" English="them" Analysis="psn3mp" morphId="190900160072" StrongNumberX="3963a" Language="H" Unicode="׃‎הֶֽם‎" nodeId="190900160120010" Length="1">HE75M00</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+  <Sentence ID="ps90:17">
+    <Trees>
+      <Tree>
+        <Node Cat="S" Head="0" Start="0" End="22" nodeId="190900170010230" Length="23">
+          <Node Id="1.1" Cat="cjp" Start="0" End="0" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900170010011" Length="1">
+            <Node Id="1.2" Cat="cj" Start="0" End="0" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900170011" StrongNumberX="2050b" Language="H" Unicode="וִ‎" nodeId="190900170010010" Length="1">WI</Node>
+          </Node>
+          <Node Id="4.1" Cat="CL" Start="1" End="8" Rule="V-S-PP" Head="0" Language="H" nodeId="190900170020080" Length="8">
+            <Node Id="4.2" Cat="V" Start="1" End="1" Rule="Vp2V" Head="0" Language="H" nodeId="190900170020012" Length="1">
+              <Node Id="4.3" Cat="vp" Start="1" End="1" Rule="V2VP" Head="0" Language="H" nodeId="190900170020011" Length="1">
+                <Node Id="4.4" Cat="verb" Start="1" End="1" Lemma="HYH" UnicodeLemma="היה" English="may he rest" Analysis="vqi3msXa{1}Jt" morphId="190900170012" StrongNumberX="1961" Language="H" Unicode="יהִ֤י ׀‎" nodeId="190900170020010" Length="1">YHI70Y05</Node>
+              </Node>
+            </Node>
+            <Node Id="4.5" Cat="S" Start="2" End="6" Rule="Np2S" Head="0" Language="H" nodeId="190900170030051" Length="5">
+              <Node Id="4.6" Cat="np" Start="2" End="6" Rule="NPofNP" Head="0" Language="H" nodeId="190900170030050" Length="5">
+                <Node Id="4.7" Cat="np" Start="2" End="2" Rule="N2NP" Head="0" Language="H" nodeId="190900170030011" Length="1">
+                  <Node Id="4.8" Cat="noun" Start="2" End="2" Lemma="NO(AM" UnicodeLemma="נֹעַם" English="favor of" Analysis="ncmsc" morphId="190900170021" StrongNumberX="5278" Language="H" Unicode="נֹ֤עַם‎" nodeId="190900170030010" Length="1">NO70(AM</Node>
+                </Node>
+                <Node Id="4.9" Cat="np" Start="3" End="6" Rule="Np-Appos" Head="0" Language="H" nodeId="190900170040040" Length="4">
+                  <Node Id="4.10" Cat="np" Start="3" End="4" Rule="NPofNP" Head="0" Language="H" nodeId="190900170040020" Length="2">
+                    <Node Id="4.11" Cat="np" Start="3" End="3" Rule="N2NP" Head="0" Language="H" nodeId="190900170040011" Length="1">
+                      <Node Id="4.12" Cat="noun" Start="3" End="3" Lemma=")FDOWN" UnicodeLemma="אָדוֹן" English="Lord" Analysis="ncmpc" morphId="190900170031" StrongNumberX="0136" Language="H" Unicode="אֲדֹנ‎" nodeId="190900170040010" Length="1">):ADON</Node>
+                    </Node>
+                    <Node Id="4.13" Cat="np" Start="4" End="4" Rule="Pron2NP" Head="0" Language="H" nodeId="190900170050011" Length="1">
+                      <Node Id="4.14" Cat="pron" Start="4" End="4" Lemma="IY" UnicodeLemma="ִי" English="" Analysis="psn1cs" morphId="190900170032" StrongNumberX="2967a" Language="H" Unicode="ָ֥י‎" nodeId="190900170050010" Length="1">F71Y</Node>
+                    </Node>
+                  </Node>
+                  <Node Id="4.15" Cat="np" Start="5" End="6" Rule="NPofNP" Head="0" Language="H" nodeId="190900170060020" Length="2">
+                    <Node Id="4.16" Cat="np" Start="5" End="5" Rule="N2NP" Head="0" Language="H" nodeId="190900170060011" Length="1">
+                      <Node Id="4.17" Cat="noun" Start="5" End="5" Lemma="):ELOHIYM" UnicodeLemma="אֱלֹהִים" English="God of" Analysis="ncmpc" morphId="190900170041" StrongNumberX="0430" Language="H" Unicode="אֱלֹהֵ֗י‎" nodeId="190900170060010" Length="1">):ELOH"81Y</Node>
+                    </Node>
+                    <Node Id="4.18" Cat="np" Start="6" End="6" Rule="Pron2NP" Head="0" Language="H" nodeId="190900170070011" Length="1">
+                      <Node Id="4.19" Cat="pron" Start="6" End="6" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900170042" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900170070010" Length="1">NW.</Node>
+                    </Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="4.20" Cat="PP" Start="7" End="8" Rule="Pp2PP" Head="0" Language="H" nodeId="190900170080021" Length="2">
+              <Node Id="4.21" Cat="pp" Start="7" End="8" Rule="PrepNp" Head="1" Language="H" nodeId="190900170080020" Length="2">
+                <Node Id="4.22" Cat="pp" Start="7" End="7" Rule="P2PP" Head="0" Language="H" nodeId="190900170080011" Length="1">
+                  <Node Id="4.23" Cat="prep" Start="7" End="7" Lemma="(AL_2" UnicodeLemma="עַל_2" English="upon" Analysis="Pp" morphId="190900170051" StrongNumberX="5921" Language="H" Unicode="עָ֫לֵ֥י‎" nodeId="190900170080010" Length="1">(F60L"71Y</Node>
+                </Node>
+                <Node Id="4.24" Cat="np" Start="8" End="8" Rule="Pron2NP" Head="0" Language="H" nodeId="190900170090011" Length="1">
+                  <Node Id="4.25" Cat="pron" Start="8" End="8" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900170052" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900170090010" Length="1">NW.</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="24.1" Cat="cjp" Start="9" End="9" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900170100011" Length="1">
+            <Node Id="24.2" Cat="cj" Start="9" End="9" Lemma="W:" UnicodeLemma="וְ" English="and" Analysis="Pc" morphId="190900170061" StrongNumberX="2050b" Language="H" Unicode="וּ‎" nodeId="190900170100010" Length="1">W.</Node>
+          </Node>
+          <Node Id="26.1" Cat="CL" Start="10" End="16" Rule="O-V-PP" Head="1" Language="H" nodeId="190900170110070" Length="7">
+            <Node Id="26.2" Cat="O" Start="10" End="12" Rule="Np2O" Head="0" Language="H" nodeId="190900170110031" Length="3">
+              <Node Id="26.3" Cat="np" Start="10" End="12" Rule="NPofNP" Head="0" Language="H" nodeId="190900170110030" Length="3">
+                <Node Id="26.4" Cat="np" Start="10" End="10" Rule="N2NP" Head="0" Language="H" nodeId="190900170110011" Length="1">
+                  <Node Id="26.5" Cat="noun" Start="10" End="10" Lemma="MA(:A&amp;EH" UnicodeLemma="מַעֲשֶׂה" English="work of" Analysis="ncmsc" morphId="190900170062" StrongNumberX="4639" Language="H" Unicode="מַעֲשֵׂ֣ה‎" nodeId="190900170110010" Length="1">MA(:A&amp;"74H</Node>
+                </Node>
+                <Node Id="26.6" Cat="np" Start="11" End="12" Rule="NPofNP" Head="0" Language="H" nodeId="190900170120020" Length="2">
+                  <Node Id="26.7" Cat="np" Start="11" End="11" Rule="N2NP" Head="0" Language="H" nodeId="190900170120011" Length="1">
+                    <Node Id="26.8" Cat="noun" Start="11" End="11" Lemma="YFD" UnicodeLemma="יָד" English="hands of" Analysis="ncfdc" morphId="190900170071" StrongNumberX="3027" Language="H" Unicode="יָ֭דֵי‎" nodeId="190900170120010" Length="1">13YFD"Y</Node>
+                  </Node>
+                  <Node Id="26.9" Cat="np" Start="12" End="12" Rule="Pron2NP" Head="0" Language="H" nodeId="190900170130011" Length="1">
+                    <Node Id="26.10" Cat="pron" Start="12" End="12" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900170072" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900170130010" Length="1">NW.</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="26.11" Cat="V" Start="13" End="14" Rule="Vp2V" Head="0" Language="H" nodeId="190900170140021" Length="2">
+              <Node Id="26.12" Cat="vp" Start="13" End="14" Rule="VerbX" Head="0" Language="H" nodeId="190900170140020" Length="2">
+                <Node Id="26.13" Cat="verb" Start="13" End="13" Lemma="KWN" UnicodeLemma="כון" English="establish!" Analysis="vevms" morphId="190900170081" StrongNumberX="3559" Language="H" Unicode="כּוֹנְנ‎" nodeId="190900170140010" Length="1">K.OWN:N</Node>
+                <Node Id="26.14" Cat="x" Start="14" End="14" Lemma="H" UnicodeLemma="ה" English="" Analysis="Xh" morphId="190900170082" StrongNumberX="1886j" Language="H" Unicode="ָ֥ה‎" nodeId="190900170150010" Length="1">F71H</Node>
+              </Node>
+            </Node>
+            <Node Id="26.15" Cat="PP" Start="15" End="16" Rule="Pp2PP" Head="0" Language="H" nodeId="190900170160021" Length="2">
+              <Node Id="26.16" Cat="pp" Start="15" End="16" Rule="PrepNp" Head="1" Language="H" nodeId="190900170160020" Length="2">
+                <Node Id="26.17" Cat="pp" Start="15" End="15" Rule="P2PP" Head="0" Language="H" nodeId="190900170160011" Length="1">
+                  <Node Id="26.18" Cat="prep" Start="15" End="15" Lemma="(AL_2" UnicodeLemma="עַל_2" English="for" Analysis="Pp" morphId="190900170091" StrongNumberX="5921" Language="H" Unicode="עָלֵ֑י‎" nodeId="190900170160010" Length="1">(FL"92Y</Node>
+                </Node>
+                <Node Id="26.19" Cat="np" Start="16" End="16" Rule="Pron2NP" Head="0" Language="H" nodeId="190900170170011" Length="1">
+                  <Node Id="26.20" Cat="pron" Start="16" End="16" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900170092" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900170170010" Length="1">NW.</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+          <Node Id="38.1" Cat="cjp" Start="17" End="17" Rule="Cj2Cjp" Head="0" Language="H" nodeId="190900170180011" Length="1">
+            <Node Id="38.2" Cat="cj" Start="17" End="17" Lemma="W:" UnicodeLemma="וְ" English="yes" Analysis="Pc" morphId="190900170101" StrongNumberX="2050b" Language="H" Unicode="וּֽ‎" nodeId="190900170180010" Length="1">W.75</Node>
+          </Node>
+          <Node Id="41.1" Cat="CL" Start="18" End="22" Rule="ClCl2" Head="1" Language="H" nodeId="190900170190050" Length="5">
+            <Node Id="41.2" Cat="CL" Start="18" End="20" Rule="Np2CL" Head="0" Language="H" nodeId="190900170190031" Length="3">
+              <Node Id="41.3" Cat="np" Start="18" End="20" Rule="NPofNP" Head="0" Language="H" nodeId="190900170190030" Length="3">
+                <Node Id="41.4" Cat="np" Start="18" End="18" Rule="N2NP" Head="0" Language="H" nodeId="190900170190011" Length="1">
+                  <Node Id="41.5" Cat="noun" Start="18" End="18" Lemma="MA(:A&amp;EH" UnicodeLemma="מַעֲשֶׂה" English="work of" Analysis="ncmsc" morphId="190900170102" StrongNumberX="4639" Language="H" Unicode="מַעֲשֵׂ֥ה‎" nodeId="190900170190010" Length="1">MA(:A&amp;"71H</Node>
+                </Node>
+                <Node Id="41.6" Cat="np" Start="19" End="20" Rule="NPofNP" Head="0" Language="H" nodeId="190900170200020" Length="2">
+                  <Node Id="41.7" Cat="np" Start="19" End="19" Rule="N2NP" Head="0" Language="H" nodeId="190900170200011" Length="1">
+                    <Node Id="41.8" Cat="noun" Start="19" End="19" Lemma="YFD" UnicodeLemma="יָד" English="hands of" Analysis="ncfdc" morphId="190900170111" StrongNumberX="3027" Language="H" Unicode="יָ֝דֵ֗י‎" nodeId="190900170200010" Length="1">11YFD"81Y</Node>
+                  </Node>
+                  <Node Id="41.9" Cat="np" Start="20" End="20" Rule="Pron2NP" Head="0" Language="H" nodeId="190900170210011" Length="1">
+                    <Node Id="41.10" Cat="pron" Start="20" End="20" Lemma="&quot;NW." UnicodeLemma="ֵנוּ" English="us" Analysis="psn1cp" morphId="190900170112" StrongNumberX="5105a" Language="H" Unicode="נוּ‎" nodeId="190900170210010" Length="1">NW.</Node>
+                  </Node>
+                </Node>
+              </Node>
+            </Node>
+            <Node Id="41.11" Cat="CL" Start="21" End="22" Rule="V-O" Head="0" Language="H" nodeId="190900170220020" Length="2">
+              <Node Id="41.12" Cat="V" Start="21" End="21" Rule="Vp2V" Head="0" Language="H" nodeId="190900170220012" Length="1">
+                <Node Id="41.13" Cat="vp" Start="21" End="21" Rule="V2VP" Head="0" Language="H" nodeId="190900170220011" Length="1">
+                  <Node Id="41.14" Cat="verb" Start="21" End="21" Lemma="KWN" UnicodeLemma="כון" English="establish" Analysis="vevms" morphId="190900170121" StrongNumberX="3559" Language="H" Unicode="כּוֹנְנ‎" nodeId="190900170220010" Length="1">K.OWN:N</Node>
+                </Node>
+              </Node>
+              <Node Id="41.15" Cat="O" Start="22" End="22" Rule="Np2O" Head="0" Language="H" nodeId="190900170230012" Length="1">
+                <Node Id="41.16" Cat="np" Start="22" End="22" Rule="Pron2NP" Head="0" Language="H" nodeId="190900170230011" Length="1">
+                  <Node Id="41.17" Cat="pron" Start="22" End="22" Lemma="OW" UnicodeLemma="וֹ" English="him!" Analysis="psv3ms" morphId="190900170122" StrongNumberX="1930a" Language="H" Unicode="׃‎ֵֽהוּ‎" nodeId="190900170230010" Length="1">"75HW.00</Node>
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </Node>
+      </Tree>
+    </Trees>
+  </Sentence>
+</Sentences>
