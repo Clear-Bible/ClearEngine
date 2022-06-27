@@ -7,43 +7,18 @@ using Xunit;
 using SIL.Machine.Corpora;
 using SIL.Scripture;
 using Xunit.Abstractions;
-using MediatR;
-using ClearBible.Engine.Tests.Corpora.Handlers;
-using ClearBible.Alignment.DataServices.Corpora;
-using ClearBible.Engine.Corpora;
+
 
 namespace ClearBible.Engine.Tests.Corpora
 {
 	public class ParallelCorpusTests
     {
 		protected readonly ITestOutputHelper output_;
-		protected readonly IMediator mediator_; 
+
 		public ParallelCorpusTests(ITestOutputHelper output)
 		{
 			output_ = output;
-			mediator_ = new MediatorMock(); //FIXME: inject mediator
 		}
-
-		[Fact]
-		[Trait("Category", "Example")]
-		public async void ParallelCorpus__GetAllParallelCorpusVersionIds()
-        {
-			var parallelCorpusVersionIds = await ParallelTokenizedCorpus.GetAllParallelCorpusVersionIds(mediator_);
-			Assert.True(parallelCorpusVersionIds.Count() > 0);
-        }
-
-		[Fact]
-		[Trait("Category", "Example")]
-		public async void ParallelCorpus__GetAllParallelTokenizedCorpusIds()
-		{
-			var parallelCorpusVersionIds = await ParallelTokenizedCorpus.GetAllParallelCorpusVersionIds(mediator_);
-			Assert.True(parallelCorpusVersionIds.Count() > 0);
-
-			var parallelTokenizedCorpusIds = 
-				await ParallelTokenizedCorpus.GetAllParallelTokenizedCorpusIds(mediator_, parallelCorpusVersionIds.First().parallelCorpusVersionId);
-			Assert.True(parallelTokenizedCorpusIds.Count() > 0);
-		}
-
 
 		[Fact]
 		public void ParallelCorpus__GetGetRows_SameVerseRefOneToMany()
@@ -81,131 +56,6 @@ namespace ClearBible.Engine.Tests.Corpora
 			Assert.Equal(Refs(new VerseRef("MAT 1:2", versification), new VerseRef("MAT 1:3", versification)), rows[1].TargetRefs.Cast<VerseRef>());
 			Assert.Equal("source chapter one, verse two .".Split(), rows[1].SourceSegment);
 			Assert.Equal("target chapter one, verse two . target chapter one, verse three .".Split(), rows[1].TargetSegment);
-		}
-
-		[Fact]
-		[Trait("Category", "Example")]
-		public async void ParallelCorpus__Create()
-        {
-			var sourceTokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator_, new TokenizedCorpusId(new Guid()));
-
-			var targetTokenizedTextCorpus = await TokenizedTextCorpus.Get(mediator_, new TokenizedCorpusId(new Guid()));
-
-			var parallelTextCorpusWithTokenizedTextCorpuses = sourceTokenizedTextCorpus.EngineAlignRows(targetTokenizedTextCorpus, new());
-
-			var parallelTokenizedCorpus = await parallelTextCorpusWithTokenizedTextCorpuses.Create(mediator_);
-
-			Assert.Equal(16, parallelTokenizedCorpus.EngineVerseMappingList?.Count() ?? 0);
-			Assert.True(parallelTokenizedCorpus.SourceCorpus.Count() == 16);
-			Assert.True(parallelTokenizedCorpus.TargetCorpus.Count() == 16);
-		}
-
-
-		[Fact]
-		[Trait("Category", "Example")]
-		public async void ParallelCorpus_Get()
-		{
-			var parallelTokenizedCorpus = await ParallelTokenizedCorpus.Get(mediator_, new ParallelTokenizedCorpusId(new Guid()));
-			Assert.NotNull(parallelTokenizedCorpus.EngineVerseMappingList);
-			Assert.Equal(1, parallelTokenizedCorpus.EngineVerseMappingList?.Count() ?? 0); // should be 1 and not 16: EngineParallelTextCorpus should not have used sil versification to initialize.
-			Assert.True(parallelTokenizedCorpus.SourceCorpus.Count() > 0);
-			Assert.True(parallelTokenizedCorpus.TargetCorpus.Count() > 0);
-
-			//since there is only one mapped verse, there should only be one that displays
-			foreach (var engineParallelTextRow in parallelTokenizedCorpus.Cast<EngineParallelTextRow>())
-			{
-				//display verse info
-				var verseRefStr = engineParallelTextRow.Ref.ToString();
-				output_.WriteLine(verseRefStr);
-
-				//display source
-				var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
-				output_.WriteLine($"Source: {sourceVerseText}");
-				var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
-					.Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-				output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
-
-				//display target
-				var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
-				output_.WriteLine($"Target: {targetVerseText}");
-				var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
-					.Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-				output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
-			}
-		}
-
-		[Fact]
-		[Trait("Category", "Example")]
-		public async void ParallelCorpus_Get_ChangeVerseMappings_SaveNewParallelVersion()
-		{
-			var parallelTokenizedCorpus = await ParallelTokenizedCorpus.Get(mediator_, new ParallelTokenizedCorpusId(new Guid()));
-			Assert.NotNull(parallelTokenizedCorpus.EngineVerseMappingList);
-			Assert.Equal(1, parallelTokenizedCorpus.EngineVerseMappingList?.Count() ?? 0); // should be 1 and not 16: EngineParallelTextCorpus should not have used sil versification to initialize.
-			Assert.True(parallelTokenizedCorpus.SourceCorpus.Count() > 0);
-			Assert.True(parallelTokenizedCorpus.TargetCorpus.Count() > 0);
-
-			parallelTokenizedCorpus.EngineVerseMappingList = parallelTokenizedCorpus.EngineVerseMappingList?.Append(
-				new EngineVerseMapping(
-					new List<EngineVerseId>() { new EngineVerseId("MAT", 1, 2) },
-					new List<EngineVerseId>() { new EngineVerseId("MAT", 1, 2) })).ToList()
-					?? null; //already checked for null, this should never happen.
-			
-			Assert.Equal(2, parallelTokenizedCorpus.EngineVerseMappingList?.Count() ?? 0); // should be 1 and not 16: EngineParallelTextCorpus should not have used sil versification to initialize.
-
-			//since there is only one mapped verse, there should only be one that displays
-			foreach (var engineParallelTextRow in parallelTokenizedCorpus.Cast<EngineParallelTextRow>())
-			{
-				//display verse info
-				var verseRefStr = engineParallelTextRow.Ref.ToString();
-				output_.WriteLine(verseRefStr);
-
-				//display source
-				var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
-				output_.WriteLine($"Source: {sourceVerseText}");
-				var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
-					.Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-				output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
-
-				//display target
-				var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
-				output_.WriteLine($"Target: {targetVerseText}");
-				var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
-					.Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-				output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
-			}
-		}
-
-		[Fact]
-		[Trait("Category", "Example")]
-		public async void ParallelCorpus_Get_ChangeTokenizedCorpuses_SaveNewParallelTokenizedCorpus()
-		{
-			var parallelTokenizedCorpus = await ParallelTokenizedCorpus.Get(mediator_, new ParallelTokenizedCorpusId(new Guid()));
-			Assert.NotNull(parallelTokenizedCorpus.EngineVerseMappingList);
-			Assert.Equal(1, parallelTokenizedCorpus.EngineVerseMappingList?.Count() ?? 0); // should be 1 and not 16: EngineParallelTextCorpus should not have used sil versification to initialize.
-			Assert.True(parallelTokenizedCorpus.SourceCorpus.Count() > 0);
-			Assert.True(parallelTokenizedCorpus.TargetCorpus.Count() > 0);
-
-			//since there is only one mapped verse, there should only be one that displays
-			foreach (var engineParallelTextRow in parallelTokenizedCorpus.Cast<EngineParallelTextRow>())
-			{
-				//display verse info
-				var verseRefStr = engineParallelTextRow.Ref.ToString();
-				output_.WriteLine(verseRefStr);
-
-				//display source
-				var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
-				output_.WriteLine($"Source: {sourceVerseText}");
-				var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
-					.Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-				output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
-
-				//display target
-				var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
-				output_.WriteLine($"Target: {targetVerseText}");
-				var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
-					.Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-				output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
-			}
 		}
 
 		private static TextRow TextRow(int key, string text = "", bool isSentenceStart = true,

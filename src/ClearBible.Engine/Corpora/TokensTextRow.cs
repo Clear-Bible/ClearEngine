@@ -46,6 +46,11 @@ namespace ClearBible.Engine.Corpora
             }
         }
         */
+
+        public TokensTextRow(object rowRef, IReadOnlyList<Token>? tokens = null) : base(rowRef)
+        {
+            Tokens = tokens ?? new List<Token>();
+        }
         public TokensTextRow(TextRow textRow)
             : base(textRow.Ref)
         {
@@ -65,7 +70,10 @@ namespace ClearBible.Engine.Corpora
         public TokensTextRow(TextRow textRow, IReadOnlyList<Token> tokens)
             : base(textRow.Ref)
         {
-            base.Segment = textRow.Segment;
+            //base.Segment = textRow.Segment;
+            base.Segment = tokens
+                    .Select(t => t.Text)
+                    .ToList();
             IsSentenceStart = textRow.IsSentenceStart;
             IsInRange = textRow.IsInRange;
             IsRangeStart = textRow.IsRangeStart;
@@ -74,16 +82,18 @@ namespace ClearBible.Engine.Corpora
             Tokens = tokens;
         }
 
+        /*
         public override IReadOnlyList<string> Segment
         {
             get
             {
                 return Tokens
-                    .Where(t => t.Use)
+                    //.Where(t => t.Use)
                     .Select(t => t.Text)
                     .ToList();
             }
         }
+        */
         public IReadOnlyList<Token> Tokens { get; }
     }
 }

@@ -33,7 +33,7 @@ namespace ClearBible.Alignment.DataServices.Corpora
                     throw new MediatorErrorEngineException("GetTokensByTokenizedCorpusIdAndBookIdQuery returned null data");
 
                 return verses
-                    .SelectMany(verse => CreateRows(verse.chapter, verse.verse, "", verse.isSentenceStart) // text parameter is overridden by TokensTextRow and is therefore not needed here.
+                    .SelectMany(verse => CreateRows(verse.chapter, verse.verse, "", verse.isSentenceStart) // text parameter is set by TokensTextRow from the tokens
                         .Select(tr => new TokensTextRow(tr, verse.tokens.ToList()))); //MUST return TokensTextRow. 
             }
             else

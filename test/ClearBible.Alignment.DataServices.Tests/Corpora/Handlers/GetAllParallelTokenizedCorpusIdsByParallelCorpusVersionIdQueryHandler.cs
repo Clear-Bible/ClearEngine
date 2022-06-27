@@ -8,7 +8,7 @@ using ClearDashboard.DAL.CQRS;
 using ClearBible.Alignment.DataServices.Features.Corpora;
 using System;
 
-namespace ClearBible.Engine.Tests.Corpora.Handlers
+namespace ClearBible.Alignment.DataServices.Tests.Corpora.Handlers
 {
     public class GetAllParallelTokenizedCorpusIdsByParallelCorpusVersionIdQueryHandler : IRequestHandler<
         GetAllParallelTokenizedCorpusIdsByParallelCorpusVersionIdQuery,

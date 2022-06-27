@@ -11,7 +11,7 @@ using ClearBible.Engine.Corpora;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ClearBible.Engine.Tests.Corpora.Handlers
+namespace ClearBible.Alignment.DataServices.Tests.Corpora.Handlers
 {
     public class CreateTokenizedCorpusFromTextCorpusCommandHandler : IRequestHandler<
         CreateTokenizedCorpusFromTextCorpusCommand,

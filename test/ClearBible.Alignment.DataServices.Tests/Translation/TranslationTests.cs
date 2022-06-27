@@ -16,19 +16,24 @@ using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Machine.Utils;
 using SIL.Machine.Translation;
+using MediatR;
+using ClearBible.Alignment.DataServices.Tests.Corpora.Handlers;
 
-namespace Clear.Engine.Dashboard.Tests
+namespace ClearBible.Alignment.DataServices.Tests.Translation
 {
-    public class AlignTests
+    public class TranslationTests
     {
         private readonly ITestOutputHelper output_;
+        protected readonly IMediator mediator_;
 
-        public AlignTests(ITestOutputHelper output)
+        public TranslationTests(ITestOutputHelper output)
         {
             output_ = output;
+            mediator_ = new MediatorMock(); //FIXME: inject mediator
         }
         [Fact]
-        public async Task AlignTest()
+        [Trait("Category", "Example")]
+        public async Task Translation__SyntaxTreeAlignment()
         {
             try
             {
@@ -51,7 +56,7 @@ namespace Clear.Engine.Dashboard.Tests
                     .Filter<FunctionWordTextRowProcessor>();
 
                 {
-                    var translationCommandable = new TranslationCommands(null);
+                    var translationCommandable = new TranslationCommands(mediator_);
 
                     using var smtWordAlignmentModel = await translationCommandable.TrainSmtModel(
                         SmtModelType.FastAlign,

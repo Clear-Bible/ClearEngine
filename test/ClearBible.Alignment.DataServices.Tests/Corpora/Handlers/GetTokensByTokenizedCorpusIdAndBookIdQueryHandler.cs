@@ -14,7 +14,7 @@ using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Scripture;
 
-namespace ClearBible.Engine.Tests.Corpora.Handlers
+namespace ClearBible.Alignment.DataServices.Tests.Corpora.Handlers
 {
     public class GetTokensByTokenizedCorpusIdAndBookIdQueryHandler : IRequestHandler<
         GetTokensByTokenizedCorpusIdAndBookIdQuery,

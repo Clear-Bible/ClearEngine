@@ -181,7 +181,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// for other kinds of Candidate.
         /// </summary>
         /// 
-        public abstract SourcePoint SourcePoint { get; }
+        public abstract SourcePoint? SourcePoint { get; }
 
         /// <summary>
         /// The target point if this Candidate was created
@@ -190,21 +190,21 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// certainty of linking a source point to nothing.
         /// </summary>
         /// 
-        public abstract TargetPoint TargetPoint { get; }
+        public abstract TargetPoint? TargetPoint { get; }
 
         /// <summary>
         /// The right child of a union candidate.
         /// Is null for other kinds of candidate.
         /// </summary>
         /// 
-        public abstract Candidate Head { get; }
+        public abstract Candidate? Head { get; }
 
         /// <summary>
         /// The left child of a union candidate.
         /// Is null for other kinds of candidates.
         /// </summary>
         /// 
-        public abstract Candidate Tail { get; }
+        public abstract Candidate? Tail { get; }
 
         /// <summary>
         /// The logarithm of a probability-like score for
@@ -354,9 +354,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 
         public override TargetPoint TargetPoint => _targetPoint;
 
-        public override Candidate Head => null;
+        public override Candidate? Head => null;
 
-        public override Candidate Tail => null;
+        public override Candidate? Tail => null;
 
         public override double LogScore => _logScore;
 
@@ -403,11 +403,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 
         public override SourcePoint SourcePoint => _sourcePoint;
 
-        public override TargetPoint TargetPoint => null;
+        public override TargetPoint? TargetPoint => null;
 
-        public override Candidate Head => null;
+        public override Candidate? Head => null;
 
-        public override Candidate Tail => null;
+        public override Candidate? Tail => null;
 
         public override double LogScore => 0.0;
 
@@ -499,9 +499,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
 
         public override bool IsUnion => true;
 
-        public override SourcePoint SourcePoint => null;
+        public override SourcePoint? SourcePoint => null;
 
-        public override TargetPoint TargetPoint => null;
+        public override TargetPoint? TargetPoint => null;
 
         public override Candidate Head => _head;
 

@@ -2,7 +2,7 @@
 
 using SIL.Machine.Corpora;
 
-namespace ClearBible.Engine.Tests.Tokenization
+namespace ClearBible.Alignment.DataServices.Tests.Tokenization
 {
     public class OnlyUpToCountTextRowProcessor : IRowFilter<TextRow>
     {

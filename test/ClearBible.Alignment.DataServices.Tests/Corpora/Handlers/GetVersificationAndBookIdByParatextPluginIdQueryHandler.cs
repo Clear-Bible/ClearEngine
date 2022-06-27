@@ -8,7 +8,7 @@ using ClearBible.Alignment.DataServices.Features.Corpora;
 
 using SIL.Scripture;
 
-namespace ClearBible.Engine.Tests.Corpora.Handlers
+namespace ClearBible.Alignment.DataServices.Tests.Corpora.Handlers
 {
     public class GetVersificationAndBookIdByParatextPluginIdQueryHandler : IRequestHandler<
         GetVersificationAndBookIdByParatextPluginIdQuery,

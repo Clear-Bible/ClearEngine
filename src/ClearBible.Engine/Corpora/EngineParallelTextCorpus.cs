@@ -209,5 +209,40 @@ namespace ClearBible.Engine.Corpora
 				);
 			}
 		}
+
+		protected override TargetCorpusEnumerator GetTargetCorpusEnumerator(IEnumerator<TextRow> enumerator)
+		{
+			return new EngineTargetCorpusEnumerator(enumerator);
+		}
+		protected class EngineTargetCorpusEnumerator : TargetCorpusEnumerator
+        {
+			public EngineTargetCorpusEnumerator(IEnumerator<TextRow> enumerator) : base(enumerator) 
+			{ 
+			}
+			protected override TextRow CreateTextRow(TextRow textRow, TextRow? concatSegmentTextRow = null)
+			{
+				if (textRow is TokensTextRow)
+				{
+					if (concatSegmentTextRow != null && concatSegmentTextRow is not TokensTextRow)
+                    {
+						throw new InvalidTypeEngineException(name: "concatSegmentTextRow", value: "not TokensTextRow", message: "concatSegmentTextRow should always be TokensTextRow if textRow is TokensTextRow. ");
+                    }
+					else if (concatSegmentTextRow != null)
+                    {
+						var newTextRow = new TokensTextRow(textRow.Ref, ((TokensTextRow)textRow).Tokens.Concat(((TokensTextRow)concatSegmentTextRow).Tokens).ToArray());
+						newTextRow.Segment = textRow.Segment.Concat(concatSegmentTextRow.Segment).ToArray();
+						return newTextRow;
+					}
+					else //textRowSegmentConcatted == null
+					{
+						return new TokensTextRow(textRow.Ref);
+					}
+				}
+				else
+				{
+					return new TextRow(textRow.Ref);
+				}
+			}
+		}
 	}
 }

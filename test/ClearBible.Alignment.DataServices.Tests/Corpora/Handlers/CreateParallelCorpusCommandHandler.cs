@@ -8,7 +8,7 @@ using ClearBible.Alignment.DataServices.Features.Corpora;
 using ClearDashboard.DAL.CQRS;
 
 
-namespace ClearBible.Engine.Tests.Corpora.Handlers
+namespace ClearBible.Alignment.DataServices.Tests.Corpora.Handlers
 {
     public class CreateParallelCorpusCommandHandler : IRequestHandler<
         CreateParallelCorpusCommand,

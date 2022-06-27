@@ -9,12 +9,13 @@ namespace ClearBible.Engine.Corpora
         {
             TokenId = tokenId;
             Text = text;
-            Use = true;
+            //Use = true;
         }
 
         public TokenId TokenId { get; }
         public string Text { get; }
-        public bool Use { get; set; }
+        public int? Group { get; set; }
+        //public bool Use { get; set; } //FIXME: not sure why I added this?!
     }
 
     /// <summary>
