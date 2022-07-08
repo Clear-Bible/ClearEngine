@@ -307,13 +307,13 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
         /// to anything.  Each link is accompanied by its log score.
         /// </summary>
         /// 
-        public IEnumerable<(SourcePoint, TargetPoint, double)> GetCorrespondence()
+        public IEnumerable<(SourcePoint?, TargetPoint?, double)> GetCorrespondence()
         {
             if (IsPoint) yield return (SourcePoint, TargetPoint, LogScore);
             else if (IsUnion)
             {
-                foreach (var x in Head.GetCorrespondence()) yield return x;
-                foreach (var x in Tail.GetCorrespondence()) yield return x;
+                foreach (var x in Head!.GetCorrespondence()) yield return x;
+                foreach (var x in Tail!.GetCorrespondence()) yield return x;
             }
         }
     }

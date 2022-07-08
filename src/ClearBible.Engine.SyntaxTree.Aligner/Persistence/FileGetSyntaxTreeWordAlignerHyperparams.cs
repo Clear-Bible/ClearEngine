@@ -246,43 +246,43 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
             /// second occurence of the surface text "λόγος" within this zone
             /// </summary>
             /// 
-            public string altId;
+            public string? altId;
 
             /// <summary>
             /// Surface text.
             /// </summary>
             /// 
-            public string text;
+            public string? text;
 
             /// <summary>
             /// Strong number, with prefix such as "G" or "H" to indicate
             /// language, as obtained from the treebank.
             /// </summary>
             /// 
-            public string strong;
+            public string? strong;
 
-            public string gloss;
-            public string gloss2;
+            public string? gloss;
+            public string? gloss2;
 
-            public string lemma;
+            public string? lemma;
 
             /// <summary>
             /// Part of speech, as obtained from the treebank.
             /// </summary>
             /// 
-            public string pos;
+            public string? pos;
 
             /// <summary>
             /// Morphology, a string that encodes the linguistic morphological
             /// analysis of this word, as obtained from the treebank.
             /// </summary>
             /// 
-            public string morph;
+            public string? morph;
         }
 
         private class LpaManuscript
         {
-            public LpaManuscriptWord[] words;
+            public LpaManuscriptWord[]? words;
         }
 
         private class LpaLink
@@ -300,13 +300,13 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
         }
         private class LpaLine
         {
-            public LpaManuscript manuscript;
+            public LpaManuscript? manuscript;
 
-            public LpaTranslation translation;
+            public LpaTranslation? translation;
 
             //public int[][][] links;
             [JsonConverter(typeof(LpaLinkJsonConverter))]
-            public List<LpaLink> links;
+            public List<LpaLink>? links;
         }
         private class LpaTranslationWord
         {
@@ -319,22 +319,22 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
 
             /// <summary>
             /// Alternate ID of the form, for example, "word-2" to mean the
-            /// second occurence of the surface text "word" within this zone.
+            /// second occurrence of the surface text "word" within this zone.
             /// </summary>
             /// 
 
-            public string altId;
+            public string? altId;
 
 
             /// <summary>
             /// Text, not lowercased.
             /// </summary>
             /// 
-            public string text;
+            public string? text;
         }
         private class LpaTranslation
         {
-            public LpaTranslationWord[] words;
+            public LpaTranslationWord[]? words;
         }
 
         #endregion
@@ -423,7 +423,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
             {
                 LpaLine line = lines[i];
 
-                for (int j = 0; j < line.links.Count; j++)
+                for (int j = 0; j < line.links!.Count; j++)
                 {
                     LpaLink link = line.links[j];
                     int[] sourceLinks = link.source;
@@ -431,26 +431,26 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
 
                     if (sourceLinks.Length > 1 || targetLinks.Length > 1)
                     {
-                        UpdateGroups(groups, sourceLinks, targetLinks, line.manuscript, line.translation);
+                        UpdateGroups(groups, sourceLinks, targetLinks, line.manuscript!, line!.translation!);
                     }
                     else
                     {
                         int sourceLink = sourceLinks[0];
                         int targetLink = targetLinks[0];
-                        LpaManuscriptWord mWord = line.manuscript.words[sourceLink];
-                        LpaTranslationWord tWord = line.translation.words[targetLink];
+                        LpaManuscriptWord mWord = line!.manuscript!.words![sourceLink];
+                        LpaTranslationWord tWord = line!.translation!.words![targetLink];
 
                         string verseID = mWord.id.ToString().PadLeft(12, '0').Substring(0, 8);
 
                         if (oldLinks.ContainsKey(verseID))
                         {
                             Dictionary<string, string> verseLinks = oldLinks[verseID];
-                            verseLinks.Add(mWord.altId, tWord.altId);
+                            verseLinks.Add(mWord.altId!, tWord.altId!);
                         }
                         else
                         {
                             Dictionary<string, string> verseLinks = new Dictionary<string, string>();
-                            verseLinks.Add(mWord.altId, tWord.altId);
+                            verseLinks.Add(mWord.altId!, tWord.altId!);
                             oldLinks.Add(verseID, verseLinks);
                         }
                     }
@@ -470,7 +470,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
             SourceLemmasAsText source = new SourceLemmasAsText(
                 String.Join(
                     " ",
-                    sourceLinks.Select(link => manuscript.words[link].lemma))
+                    sourceLinks.Select(link => manuscript.words![link].lemma))
                 .Trim());
 
             int firstTargetLink = targetLinks[0];
@@ -497,7 +497,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Persistence
                               : " ";
                         return Tuple.Create(
                             targetLink,
-                            text + sep + translation.words[targetLink].text);
+                            text + sep + translation.words![targetLink].text);
                     })
                 .Item2
                 .Trim()
