@@ -5,7 +5,7 @@ using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.SyntaxTree.Corpora
 {
-
+    public record BookChapterVerseXElements(string Book, int ChapterNumber, IEnumerable<XElement> VerseXElements);
     public class SyntaxTrees : ISyntaxTreeText, ISyntaxTree
     {
         private readonly string _syntaxTreesPath;
@@ -48,7 +48,7 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
         public IEnumerable<(string chapter, string verse, IEnumerable<SyntaxTreeToken> syntaxTreeTokens, bool isSentenceStart)> GetTokensTextRowInfos(string bookAbbreviation)
         {
             return GetBookChapters(bookAbbreviation)
-                .SelectMany(c => _getVerseXElementsForChapter(bookAbbreviation, c)
+                .SelectMany(c => GetVerseXElementsForBookChapter(bookAbbreviation, c).VerseXElements
                     .Select(verse =>
                         (
                             chapter: verse
@@ -122,7 +122,7 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
 
         public IEnumerable<SyntaxTreeToken> GetSyntaxTreeTokensForSegment(string bookAbbreviation, int chapterNumber, int verseNumber)
         {
-            IEnumerable<XElement> chapterXElements = _getVerseXElementsForChapter(bookAbbreviation, chapterNumber);
+            IEnumerable<XElement> chapterXElements = GetVerseXElementsForBookChapter(bookAbbreviation, chapterNumber).VerseXElements;
             return chapterXElements
                 .Where(verse => verse
                     .GetLeafs()
@@ -145,13 +145,13 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
         /// <param name="verseNumbers"></param>
         /// <returns></returns>
         /// <exception cref="InvalidTreeEngineException"></exception>
-        public XElement? GetVersesXElementsCombined(string book, int chapterNumber, IEnumerable<int> verseNumbers)
+        public XElement? GetVersesXElementsCombined(BookChapterVerseXElements bookChapterVerseXElements, IEnumerable<int> verseNumbers)
         {
             List<XElement> verseXElements = new List<XElement>();
 
             foreach (int verseNumber in verseNumbers)
             {
-                var verseXElement = _getVerseXElementsForChapter(book, chapterNumber)
+                var verseXElement = bookChapterVerseXElements.VerseXElements
                     .Where(x =>
                     {
                         bool success = int.TryParse(x.NodeId()?.Substring(5, 3), out int attrVerseNumber);
@@ -170,8 +170,8 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                 {
                     throw new InvalidTreeEngineException($"Not found", new Dictionary<string, string>
                         {
-                            {"book", book },
-                            {"chapterNumber", chapterNumber.ToString()},
+                            {"book", bookChapterVerseXElements.Book },
+                            {"chapterNumber", bookChapterVerseXElements.ChapterNumber.ToString()},
                             {"verseNumber", verseNumber.ToString()}
                         });
                 }
@@ -245,59 +245,42 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
 
         #endregion
 
-        #region chapter XElement cache from files and access method.
-
-        /// <summary>
-        /// A cache of loaded verses by chapter.
-        /// 
-        /// key is tuple if (bookAbbreviation (SIL), chapterNumber) and returns an enumerble of verse XElements.
-        /// </summary>
-        private Dictionary<(string, int), IEnumerable<XElement>> _loadedChapters = new Dictionary<(string, int), IEnumerable<XElement>>();
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="bookAbbreviation">SIL book abbreviation</param>
+        /// <param name="book">SIL book abbreviation</param>
         /// <param name="chapterNumber"></param>
         /// <returns></returns>
         /// <exception cref="InvalidTreeEngineException"></exception>
         /// <exception cref="InvalidBookMappingEngineException"></exception>
-        private IEnumerable<XElement> _getVerseXElementsForChapter(string bookAbbreviation, int chapterNumber)
+        public BookChapterVerseXElements GetVerseXElementsForBookChapter(string book, int chapterNumber)
         {
-            if (!_loadedChapters.ContainsKey((bookAbbreviation, chapterNumber)))
+            var codes = BookIds
+                .Where(BookId => BookId.silCannonBookAbbrev.Equals(book))
+                .Select(bookId => bookId.clearTreeBookAbbrev);
+
+            if (codes.Count() != 1)
             {
-
-                var codes = BookIds
-                    .Where(BookId => BookId.silCannonBookAbbrev.Equals(bookAbbreviation))
-                    .Select(bookId => bookId.clearTreeBookAbbrev);
-
-                if (codes.Count() != 1)
-                {
-                    throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookAbbrev", value: bookAbbreviation);
-                }
-
-                var path = Path.GetFullPath(_syntaxTreesPath);
-                var fileName = Path.Combine(path, $"{codes.First()}{chapterNumber.ToString("000")}.trees.xml");
-
-                if (!File.Exists(fileName))
-                {
-                    throw new InvalidTreeEngineException($"File doesn't Exist.", new Dictionary<string, string>
-                        {
-                            {"fileName", fileName },
-                            {"bookAbbreviation", bookAbbreviation },
-                            {"chapterNumber", chapterNumber.ToString() }
-                        });
-                }
-                IEnumerable<XElement> verseXElements = XElement.Load(fileName)
-                    .Descendants("Sentence")
-                    .Select(s => s.Descendants("Node").First());
-                //FIXME: _loadedChapters[(bookAbbreviation, chapterNumber)] = verseXElements;
-                return verseXElements;
+                throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookAbbrev", value: book);
             }
 
-            return _loadedChapters[(bookAbbreviation, chapterNumber)];
+            var path = Path.GetFullPath(_syntaxTreesPath);
+            var fileName = Path.Combine(path, $"{codes.First()}{chapterNumber.ToString("000")}.trees.xml");
 
-
+            if (!File.Exists(fileName))
+            {
+                throw new InvalidTreeEngineException($"File doesn't Exist.", new Dictionary<string, string>
+                    {
+                        {"fileName", fileName },
+                        {"bookAbbreviation", book },
+                        {"chapterNumber", chapterNumber.ToString() }
+                    });
+            }
+            IEnumerable<XElement> verseXElements = XElement.Load(fileName)
+                .Descendants("Sentence")
+                .Select(s => s.Descendants("Node").First());
+            return new BookChapterVerseXElements(book, chapterNumber, verseXElements);
         }
         protected XElement CombineVerseXElementsIntoOne(List<XElement> verseXElements)
         {
@@ -326,8 +309,5 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                     subTrees);
         }
     }
-
-    #endregion
-
 }
 

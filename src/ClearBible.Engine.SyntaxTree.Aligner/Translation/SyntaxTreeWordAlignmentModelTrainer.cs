@@ -39,7 +39,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         {
 
             List<Phase> phases = new List<Phase>();
-            phases.Add(new Phase("Building collections of translations and alignments"));
+            phases.Add(new Phase("Building collections of smt translations and alignments"));
             var reporter = new PhasedProgressReporter(progress, phases.ToArray());
 
             using (PhaseProgress phaseProgress = reporter.StartNextPhase())

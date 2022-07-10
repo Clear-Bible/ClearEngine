@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\machine\src\SIL.Machine.Translation.Thot\SIL.Machine.Translation.Thot.csproj" />
     <ProjectReference Include="..\ClearBible.Engine.SyntaxTree\ClearBible.Engine.SyntaxTree.csproj" />
   </ItemGroup>
 

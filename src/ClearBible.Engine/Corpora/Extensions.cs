@@ -92,7 +92,7 @@ namespace ClearBible.Engine.Corpora
 
 			public IEnumerable<TextRow> GetRows(IEnumerable<string>? textIds = null)
 			{
-				return _corpus.GetRows().Where(_predicate);
+				return _corpus.GetRows(textIds).Where(_predicate);
 			}
 
             IEnumerator IEnumerable.GetEnumerator()

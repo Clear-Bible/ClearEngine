@@ -13,7 +13,9 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
         /// <param name="chapterNumber"></param>
         /// <param name="verseNumbers"></param>
         /// <returns></returns>
-        XElement? GetVersesXElementsCombined(string book, int chapterNumber, IEnumerable<int> verseNumbers);
+        XElement? GetVersesXElementsCombined(BookChapterVerseXElements bookChapterVerseXElements, IEnumerable<int> verseNumbers);
+
+        BookChapterVerseXElements GetVerseXElementsForBookChapter(string bookAbbreviation, int chapterNumber);
 
         //IEnumerable<SyntaxTreeToken> GetVerseSyntaxTreeTokenInfos(string book, int chapterNumber, int verseNumber);
     }

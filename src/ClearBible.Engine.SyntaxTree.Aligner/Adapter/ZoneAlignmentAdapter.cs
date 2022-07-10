@@ -13,6 +13,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Adapter
 {
     internal class ZoneAlignmentAdapter
     {
+
+        private static BookChapterVerseXElements? LastChapterVerseXElements_ = null;
+
         internal static IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> AlignZone(
             ParallelTextRow parallelTextRow, 
             ISyntaxTree syntaxTree, 
@@ -48,7 +51,16 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Adapter
                 .Distinct() // this results in an unordered enumerable. sort so getversesXelement doesn't have chance to combine tree in non-deterministic way.
                 .OrderBy(i => i);
 
-            XElement? versesXElementCombined = syntaxTree.GetVersesXElementsCombined(books.First(), chapterNumbers.First(), verseNumbers);
+
+            if ( LastChapterVerseXElements_ == null 
+                || 
+                (!LastChapterVerseXElements_.Book.Equals(books.First()) || ( LastChapterVerseXElements_?.ChapterNumber != chapterNumbers.First() )) )
+            {
+                LastChapterVerseXElements_ = syntaxTree.GetVerseXElementsForBookChapter(books.First(), chapterNumbers.First());
+
+            }
+
+            XElement? versesXElementCombined = syntaxTree.GetVersesXElementsCombined(LastChapterVerseXElements_, verseNumbers);
 
             if (versesXElementCombined == null)
             {

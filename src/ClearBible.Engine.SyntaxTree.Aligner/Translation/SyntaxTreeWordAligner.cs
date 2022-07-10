@@ -29,7 +29,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 		/// <param name="hyperParameters"></param>
 		/// <param name="syntaxTree"></param>
 		/// <param name="prefFileName"></param>
-        public SyntaxTreeWordAligner(
+		public SyntaxTreeWordAligner(
 			IEnumerable<IWordAlignmentModel> smtModels, 
 			int indexPrimarySmtModel, 
 			SyntaxTreeWordAlignerHyperparameters hyperParameters, 
@@ -123,10 +123,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 			int count = 0;
 			foreach (var _ in SmtModels)
             {
-				phases.Add(new Phase($"Generating translation model collection for smt {count}"));
-				phases.Add(new Phase($"Generating alignment model collection for smt {count}"));
+				phases.Add(new Phase($"Calculating translation model collection for smt {count}"));
 				count++;
 			}
+			phases.Add(new Phase($"Clearing smt alignment models"));
+			phases.Add(new Phase($"Calculating smt alignment models"));
 			var reporter = new PhasedProgressReporter(progress, phases.ToArray());
 
 			count = 0;
@@ -140,22 +141,33 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 					smtModel.TranslationModel = smtModel.SmtWordAlignmentModel.GetTranslationTable(Epsilon);
 				}
 				checkCanceled?.Invoke();
-				using (PhaseProgress phaseProgress = reporter.StartNextPhase())
+			}
+
+			using (PhaseProgress phaseProgress = reporter.StartNextPhase())
+			{
+				foreach (var smtModel in SmtModels)
 				{
 					smtModel.AlignmentModel?.Clear();
 					if (smtModel.AlignmentModel == null)
 						smtModel.AlignmentModel = new();
-					foreach (EngineParallelTextRow engineParallelTextRow in engineParallelTextRows)
+				}
+				checkCanceled?.Invoke();
+			}
+
+			using (PhaseProgress phaseProgress = reporter.StartNextPhase())
+			{
+				foreach (EngineParallelTextRow engineParallelTextRow in engineParallelTextRows)
+				{
+					foreach (var smtModel in SmtModels)
 					{
 						WordAlignmentMatrix bestAlignments = smtModel.SmtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
-						smtModel.AlignmentModel.Add(bestAlignments.GetAlignedWordPairs(smtModel.SmtWordAlignmentModel, engineParallelTextRow));
+						smtModel.AlignmentModel!.Add(bestAlignments.GetAlignedWordPairs(smtModel.SmtWordAlignmentModel, engineParallelTextRow));
 					}
 				}
 				checkCanceled?.Invoke();
 			}
 		}
-
-        public Task SaveAsync()
+		public Task SaveAsync()
         {
 			Save();
 			return Task.CompletedTask;
