@@ -1,17 +1,44 @@
-﻿using SIL.Machine.Corpora;
-using System;
+﻿using ClearBible.Engine.Exceptions;
+using SIL.Machine.Corpora;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClearBible.Engine.Corpora
 {
     public static class Extensions
     {
+		public static List<VerseMapping> Validate(this List<VerseMapping> verseMappingList, IEnumerable<TextRow> sourceCorpus, IEnumerable<TextRow> targetCorpus)
+		{
+			foreach (var verseMapping in verseMappingList)
+            {
+				if (
+					verseMapping.SourceVerses //not all of the sourceverses for a given verseMapping are for the same book
+					.Distinct()
+					.Skip(1)
+					.Any()
+						||
+					verseMapping.TargetVerses //not all of the targetVerses for a given verseMapping are for the same book
+					.Distinct()
+					.Skip(1)
+					.Any()
+						||
+					! verseMapping.SourceVerses // the sourceVerses book and targetVerses book are not the same
+					.Distinct()
+					.First().Equals(verseMapping.TargetVerses
+					.Distinct()
+					.First())
+					)
+                {
+					throw new InvalidDataEngineException(
+						name: "List<VerseMapping>", 
+						value: "VerseMapping.SourceVerses andVerseMapping.TargetVerses not all for same book", 
+						message: "all sourceVerses and targetverses for a given versemapping must be for the same book");
+				}
+
+			}
+			return verseMappingList;
+		}
 		public static EngineParallelTextCorpus EngineAlignRows(this ITextCorpus sourceCorpus, ITextCorpus targetCorpus,
-			List<EngineVerseMapping>? sourceTargetParallelVersesList = null, IAlignmentCorpus? alignmentCorpus = null, bool allSourceRows = false, bool allTargetRows = false,
+			List<VerseMapping>? sourceTargetParallelVersesList = null, IAlignmentCorpus? alignmentCorpus = null, bool allSourceRows = false, bool allTargetRows = false,
 			IComparer<object>? rowRefComparer = null)
 		{
 			return new EngineParallelTextCorpus(sourceCorpus, targetCorpus, sourceTargetParallelVersesList, alignmentCorpus, rowRefComparer)

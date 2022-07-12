@@ -4,45 +4,6 @@ using SIL.Scripture;
 
 namespace ClearBible.Engine.Corpora
 {
-    #region Versification map data structure
-
-	public record EngineVerseId
-    {
-		public EngineVerseId(string book, int chapterNum, int verseNum)
-        {
-			Book = book;
-			ChapterNum = chapterNum;
-			VerseNum = verseNum;
-        }
-
-		public EngineVerseId(VerseRef verseRef)
-        {
-			Book = verseRef.Book;
-			ChapterNum = verseRef.ChapterNum;
-			VerseNum = verseRef.VerseNum;
-        }
-
-		public string Book { get; }
-		public int ChapterNum { get; }
-		public int VerseNum { get;  }
-	}
-	/// <summary>
-	/// Engine's versification map structure.
-	/// </summary>
-	/// <param name="sourceVerseRefs"></param>
-	/// <param name="targetVerseRefs"></param>
-    public record EngineVerseMapping(IEnumerable<EngineVerseId> sourceVerseIds, IEnumerable<EngineVerseId> targetVerseIds);
-	public static class EngineVerseMappingExtensions
-	{
-		public static List<EngineVerseMapping> Validate(this List<EngineVerseMapping> list, IEnumerable<TextRow> sourceCorpus, IEnumerable<TextRow> targetCorpus)
-		{
-			//FIXME:validate that entries in each enumerable in engineVerseMapping are from the same book and chapter.
-			//FIXME: Validate that entries in each enumerable have accompanying entries that together comprise a file verse grouping, e.g. "Fee fi fo" is for verses 1-3.
-			return list;
-		}
-	}
-	#endregion
-
 	/// <summary>
 	/// Used to create parallel segments of sourceCorpus with targetCorpus from method GetRows(), which returns enhanced ParallelTextRows, which
 	/// is included with either source and/or target corpus when corpus TextRows have been transformed into TokensTextRows.
@@ -60,7 +21,7 @@ namespace ClearBible.Engine.Corpora
 		/// </summary>
 		/// <param name="sourceCorpus"></param>
 		/// <param name="targetCorpus"></param>
-		/// <param name="engineVerseMappingList">
+		/// <param name="verseMappingList">
 		/// Engine's versification mapping. 
 		/// 
 		/// - If null, use Machine's versification.
@@ -75,14 +36,14 @@ namespace ClearBible.Engine.Corpora
 		public EngineParallelTextCorpus(
 			ITextCorpus sourceCorpus,
 			ITextCorpus targetCorpus,
-			List<EngineVerseMapping>? engineVerseMappingList = null,
+			List<VerseMapping>? verseMappingList = null,
 			IAlignmentCorpus? alignmentCorpus = null,
 			IComparer<object>? rowRefComparer = null)
 			: base(sourceCorpus, targetCorpus, alignmentCorpus, rowRefComparer = null)
 		{
 			// If engineVersificationMappingList is null, use Machine/sil/scripture versification to create it.
 
-			if (engineVerseMappingList != null && engineVerseMappingList.Count == 0)
+			if (verseMappingList != null && verseMappingList.Count == 0)
             {
 				_segmentRefComparer = rowRefComparer;
 
@@ -91,29 +52,29 @@ namespace ClearBible.Engine.Corpora
                 _ = base.GetRows()
 					.Select(parallelTextRow =>
 						{
-							var engineVerseMapping = new EngineVerseMapping
+							var verseMapping = new VerseMapping
 							(
 								// assume SegmentRef is VerseRef since corpora are ScriptureTextCorpus.
 								parallelTextRow.SourceRefs
-									.Select(sourceSegmentRef => new EngineVerseId((VerseRef)sourceSegmentRef)),
+									.Select(sourceSegmentRef => new Verse((VerseRef)sourceSegmentRef)),
 								parallelTextRow.TargetRefs
-									.Select(targetSegmentRef => new EngineVerseId((VerseRef)targetSegmentRef))
+									.Select(targetSegmentRef => new Verse((VerseRef)targetSegmentRef))
 
 							);
-							engineVerseMappingList.Add(engineVerseMapping);
-							return engineVerseMapping;
+							verseMappingList.Add(verseMapping);
+							return verseMapping;
 						}
 					).ToList(); //cause the enumerable to evaluate
 
-				EngineVerseMappingList = engineVerseMappingList.Validate(sourceCorpus, targetCorpus);
+				VerseMappingList = verseMappingList.Validate(sourceCorpus, targetCorpus);
 			}
-			else if (engineVerseMappingList != null) // && engineVerseMappingList.Count > 0
+			else if (verseMappingList != null) // && verseMappingList.Count > 0
 			{
 				//for rebuilding map from file: use to VerseRef.VerseRef(int bookNum, int chapterNum, int verseNum, ScrVers versification) constructor.
-				EngineVerseMappingList = engineVerseMappingList;
+				VerseMappingList = verseMappingList;
 			}
 		}
-		public List<EngineVerseMapping>? EngineVerseMappingList { get; set; } = null;
+		public List<VerseMapping>? VerseMappingList { get; set; } = null;
 
 		public override IEnumerator<ParallelTextRow> GetEnumerator()
 		{
@@ -130,7 +91,7 @@ namespace ClearBible.Engine.Corpora
 			else
 				textIds = targetTextIds;
 
-			if (EngineVerseMappingList == null)
+			if (VerseMappingList == null)
 			{
 				//ScriptureText.GetSegments is an IEnumerable based on an underlying list (ScriptureText.GetRows())
 				//so retrieving at once shouldn't impact performance or memory.
@@ -144,10 +105,10 @@ namespace ClearBible.Engine.Corpora
 						try
 						{
 							//Only set SourceTokens if all the members of sourceSegments can be cast to a TokensTextSegment
-							sourceTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
 							sourceTokens = sourceTextRows
+								.Cast<TokensTextRow>()  //throws an invalidCastException if any of the members can't be cast to type
 								.Where(tr => r.SourceRefs.Cast<VerseRef>().Contains((VerseRef)tr.Ref)) //sourceTextRows that pertain to paralleltextrow's sourcerefs
-								.SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
+								.SelectMany(tokensTextRow => tokensTextRow.Tokens).ToList();
 						}
 						catch (InvalidCastException)
 						{
@@ -156,10 +117,10 @@ namespace ClearBible.Engine.Corpora
 						List<Token> targetTokens = new();
 						try
 						{
-							targetTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
 							targetTokens = targetTextRows
+								.Cast<TokensTextRow>() //throws an invalidCastException if any of the members can't be cast to type
 								.Where(tr => r.SourceRefs.Cast<VerseRef>().Contains((VerseRef)tr.Ref)) //targetTextRows that pertain to paralleltextrow's targetrefs
-								.SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
+								.SelectMany(tokensTextRow => ((TokensTextRow)tokensTextRow).Tokens).ToList();
 						}
 						catch (InvalidCastException)
 						{
@@ -171,36 +132,106 @@ namespace ClearBible.Engine.Corpora
 			}
 			else
 			{
-				return GetRowsUsingEngineVerseMappingList(textIds).GetEnumerator();
+				return GetRowsUsingVerseMappingList(textIds).GetEnumerator();
 			}
 		}
 
-		public IEnumerable<ParallelTextRow> GetRowsUsingEngineVerseMappingList(IEnumerable<string> textIds)
+		public IEnumerable<ParallelTextRow> GetRowsUsingVerseMappingList(IEnumerable<string> textIds)
 		{
+
+			if (VerseMappingList == null)
+			{
+				throw new InvalidStateEngineException(message: "Member must not be null to use this method", name: "method", value: nameof(VerseMappingList));
+			}
+
+			bool corporaHaveTokensTextRows = false;
+			if ((SourceCorpus.Any() && SourceCorpus.First() is TokensTextRow) && (TargetCorpus.Any() && TargetCorpus.First() is TokensTextRow)) //don't use .Cast<>() approach because it needs to be evaluated which will impact memory.
+			{
+				corporaHaveTokensTextRows = true;
+			}
+
+			foreach (var text in textIds)
+            {
+				List<TextRow> sourceTextRows = SourceCorpus.GetRows(new List<string>() { text }).ToList();
+				List<TextRow> targetTextRows = TargetCorpus.GetRows(new List<string>() { text }).ToList();
+
+				foreach (var verseMappingForBook in VerseMappingList // resulting verses are in VerseMappingList order
+					.Where(verseMapping => verseMapping.SourceVerses
+						.First().Book.Equals(text))) 
+					//already verified in this that all Verses in each VerseMapping is from same book from call to Validate(this List<VerseMapping> ....) extension method
+					//.Where(verseMapping => verseMapping.SourceVerses
+					//	.Select(verse => verse.Book)
+					//	.Except(new List<string>() { text })
+					//	.Count() == 0))
+					//.Where(mapping => mapping.TargetVerses // this should never filter anything out since Validate(this List<VerseMapping> ....) extension method ensures that the verses in every versemapping are from the same book.
+					//	.Select(tvid => tvid.Book)
+					//	.Except(new List<string>() { text })
+					//	.Count() == 0))
+				{
+
+					bool notTokenMode = verseMappingForBook.SourceVerses
+						.SelectMany(verse => verse.TokenIds)
+						.Count() == 0
+						&&
+					verseMappingForBook.TargetVerses
+						.SelectMany(verse => verse.TokenIds)
+						.Count() == 0;
+
+					if (!notTokenMode && !corporaHaveTokensTextRows) //token mode and corpora arent tokens text row
+                    {
+						throw new InvalidTypeEngineException(name: "VerseMapping", value: verseMappingForBook.ToString(), message: "Corpora are not tokens textrow and a versemapping contains one or more Verses with TokenIds.");
+					}
+
+					if (notTokenMode)
+					{
+						var parallelSourceTextRows = verseMappingForBook.SourceVerses
+							.SelectMany(verse => sourceTextRows
+								.Where(textRow => (new Verse((VerseRef)textRow.Ref).Equals(verse))));
+
+						var parallelTargetTextRows = verseMappingForBook.TargetVerses
+							.Where(verse => verse.TokenIds.Count() == 0)
+							.SelectMany(verse => targetTextRows
+								.Where(textRow => (new Verse((VerseRef)textRow.Ref).Equals(verse))));
+
+						yield return new EngineParallelTextRow(
+							parallelSourceTextRows,
+							parallelTargetTextRows,
+							AlignmentCorpus
+						);
+					}
+					else //token mode
+                    {
+						throw new NotImplementedException();
+                    }
+				}
+			}
+
+			/*
 			List<TextRow> sourceTextRows = SourceCorpus.GetRows(textIds).ToList();
 			List<TextRow> targetTextRows = TargetCorpus.GetRows(textIds).ToList();
 
-			//Believe it may be desirable to have ParallelTextSegments in order of EngineVerseMappingList, e.g. for Dashboard display?
-			if (EngineVerseMappingList == null)
-            {
-				throw new InvalidStateEngineException(message: "Member must not be null to use this method", name: "method", value: nameof(EngineVerseMappingList));
-            }
+
+			//Believe it may be desirable to have ParallelTextSegments in order of VerseMappingList, e.g. for Dashboard display?
+			if (VerseMappingList == null)
+			{
+				throw new InvalidStateEngineException(message: "Member must not be null to use this method", name: "method", value: nameof(VerseMappingList));
+			}
 
 			// only include versemappings where both source and target lists only contain books in textIds.
-			foreach (var engineVerseMapping in EngineVerseMappingList
-				.Where(mapping => mapping.sourceVerseIds
+			foreach (var verseMapping in VerseMappingList
+				.Where(mapping => mapping.SourceVerses
 					.Select(svid => svid.Book)
 					.Except(textIds)
 					.Count() == 0)
-				.Where(mapping => mapping.targetVerseIds
+				.Where(mapping => mapping.TargetVerses
 					.Select(tvid => tvid.Book)
 					.Except(textIds)
 					.Count() == 0))
 			{
 				var parallelSourceTextRows = sourceTextRows
-					.Where(textRow => engineVerseMapping.sourceVerseIds.Contains(new EngineVerseId((VerseRef)textRow.Ref)));
+					.Where(textRow => verseMapping.SourceVerses.Contains(new Verse((VerseRef)textRow.Ref)));
 				var parallelTargetTextRows = targetTextRows
-					.Where(textRow => engineVerseMapping.targetVerseIds.Contains(new EngineVerseId((VerseRef)textRow.Ref)));
+					.Where(textRow => verseMapping.TargetVerses.Contains(new Verse((VerseRef)textRow.Ref)));
 
 				yield return new EngineParallelTextRow(
 					parallelSourceTextRows,
@@ -208,6 +239,7 @@ namespace ClearBible.Engine.Corpora
 					AlignmentCorpus
 				);
 			}
+			*/
 		}
 
 		protected override TargetCorpusEnumerator GetTargetCorpusEnumerator(IEnumerator<TextRow> enumerator)

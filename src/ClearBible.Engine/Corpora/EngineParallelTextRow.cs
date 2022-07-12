@@ -60,9 +60,9 @@ namespace ClearBible.Engine.Corpora
             try
             {
                 //Only set SourceTokens if all the members of sourceSegments can be cast to a TokensTextSegment
-                sourceTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
                 SourceTokens = sourceTextRows
-                    .SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
+                    .Cast<TokensTextRow>() //throws an invalidCastException if any of the members can't be cast to type
+                    .SelectMany(tokensTextRow => tokensTextRow.Tokens).ToList();
             }
             catch (InvalidCastException)
             {
@@ -71,9 +71,9 @@ namespace ClearBible.Engine.Corpora
             try
             {
                 //Only set TargetTokens if all the members of sourceSegments can be cast to a TokensTextSegment
-                targetTextRows.Cast<TokensTextRow>(); //throws an invalidCastException if any of the members can't be cast to type
                 TargetTokens = targetTextRows
-                    .SelectMany(textRow => ((TokensTextRow)textRow).Tokens).ToList();
+                    .Cast<TokensTextRow>() //throws an invalidCastException if any of the members can't be cast to type
+                    .SelectMany(tokensTextRow => tokensTextRow.Tokens).ToList();
             }
             catch (InvalidCastException)
             {

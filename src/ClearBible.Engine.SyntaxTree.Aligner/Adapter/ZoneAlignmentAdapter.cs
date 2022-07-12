@@ -23,7 +23,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Adapter
         {
             try
             {
-                parallelTextRow.SourceRefs.Cast<VerseRef>();
+                parallelTextRow.SourceRefs.Cast<VerseRef>().ToList();
             }
             catch (InvalidCastException)
             {
