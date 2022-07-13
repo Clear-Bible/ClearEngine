@@ -4,7 +4,7 @@ namespace ClearBible.Engine.Corpora
 {
 	public class Verse : IEquatable<Verse>, IComparable<Verse>
 	{
-		public Verse(string book, int ChapterNumber, int VerseNumber,IEnumerable<TokenId>? tokenIds)
+		public Verse(string book, int ChapterNumber, int VerseNumber,IEnumerable<TokenId>? tokenIds = null)
 		{
 			Book = book;
 			ChapterNum = ChapterNumber;
