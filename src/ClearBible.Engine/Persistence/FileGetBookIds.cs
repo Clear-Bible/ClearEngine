@@ -8,24 +8,30 @@ namespace ClearBible.Engine.Persistence
     {
         static FileGetBookIds()
         {
-            using (var reader = new StreamReader(
-                       Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
-                       Path.DirectorySeparatorChar + _fileName))
+            using (Mutex mutex = new Mutex(true, "booksFileMutex"))
             {
-                string? line;
-                while ((line = reader.ReadLine()) != null)
+                mutex.WaitOne();
+                using (var reader = new StreamReader(
+                           Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) +
+                           Path.DirectorySeparatorChar + _fileName))
                 {
-                    int commentLocation = line?.IndexOf('#') ?? -1;
-                    if (commentLocation != -1)
+                    string? line;
+                    while ((line = reader.ReadLine()) != null)
                     {
-                        line = line?.Substring(0, commentLocation) ?? "";
+                        int commentLocation = line?.IndexOf('#') ?? -1;
+                        if (commentLocation != -1)
+                        {
+                            line = line?.Substring(0, commentLocation) ?? "";
+                        }
+
+                        var pieces = line?.Split(',') ?? new string[0];
+                        if (pieces.Length >= 4)
+                        {
+                            _bookIds.Add(new BookId(pieces[0], pieces[1], pieces[2], pieces[3]));
+                        }
                     }
 
-                    var pieces = line?.Split(',') ?? new string[0];
-                    if (pieces.Length >= 4)
-                    {
-                        _bookIds.Add(new BookId(pieces[0], pieces[1], pieces[2], pieces[3]));
-                    }
+                    mutex.ReleaseMutex();
                 }
             }
         }
