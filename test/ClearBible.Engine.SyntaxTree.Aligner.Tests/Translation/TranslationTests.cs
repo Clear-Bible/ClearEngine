@@ -23,8 +23,6 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 {
     public class TranslationTests
     {
-        public static readonly string SyntaxTreesPath = Path.Combine(AppContext.BaseDirectory,
-            "..", "..", "..", "..", "..", "syntaxtrees");
         public static readonly string TargetCorpusProjectPath = Path.Combine(AppContext.BaseDirectory,
             "..", "..", "..", "..", "..", "samples", "data", "WEB-PT");
         public static readonly string SourceCorpusProjectPath = Path.Combine(AppContext.BaseDirectory,
@@ -46,7 +44,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
         {
             try
             {
-                var syntaxTree = new SyntaxTrees(SyntaxTreesPath);
+                var syntaxTree = new SyntaxTrees();
                 var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
                 var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
@@ -77,7 +75,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // set the manuscript tree aligner hyperparameters
                     var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
 
-                    var manuscriptTree = new SyntaxTrees(SyntaxTreesPath);
+                    var manuscriptTree = new SyntaxTrees();
 
                     // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                     ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
@@ -153,7 +151,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                 //parallelized
                 {
-                    var syntaxTree = new SyntaxTrees(SyntaxTreesPath);
+                    var syntaxTree = new SyntaxTrees();
                     var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
                     var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
@@ -183,7 +181,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         // set the manuscript tree aligner hyperparameters
                         var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
 
-                        var manuscriptTree = new SyntaxTrees(SyntaxTreesPath);
+                        var manuscriptTree = new SyntaxTrees();
 
                         // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                         ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
@@ -217,7 +215,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                 //sequential
                 {
-                    var syntaxTree = new SyntaxTrees(SyntaxTreesPath);
+                    var syntaxTree = new SyntaxTrees();
                     var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
                     var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
@@ -247,7 +245,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         // set the manuscript tree aligner hyperparameters
                         var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
 
-                        var manuscriptTree = new SyntaxTrees(SyntaxTreesPath);
+                        var manuscriptTree = new SyntaxTrees();
 
                         // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                         ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
@@ -282,7 +280,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
         {
             try
             {
-                var syntaxTree = new SyntaxTrees(SyntaxTreesPath);
+                var syntaxTree = new SyntaxTrees();
                 var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
                 var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
@@ -313,7 +311,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // set the manuscript tree aligner hyperparameters
                     var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
 
-                    var manuscriptTree = new SyntaxTrees(SyntaxTreesPath);
+                    var manuscriptTree = new SyntaxTrees();
 
                     // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                     ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
@@ -401,7 +399,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
         {
             try
             {
-                var syntaxTree = new SyntaxTrees(SyntaxTreesPath);
+                var syntaxTree = new SyntaxTrees();
                 var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
                 var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
@@ -432,7 +430,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // set the manuscript tree aligner hyperparameters
                     var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFilesNone).GetAsync();
 
-                    var manuscriptTree = new SyntaxTrees(SyntaxTreesPath);
+                    var manuscriptTree = new SyntaxTrees();
 
                     // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                     ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
@@ -577,7 +575,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
         {
             try
             {
-                var syntaxTree = new SyntaxTrees(SyntaxTreesPath);
+                var syntaxTree = new SyntaxTrees();
                 var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
                 var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)

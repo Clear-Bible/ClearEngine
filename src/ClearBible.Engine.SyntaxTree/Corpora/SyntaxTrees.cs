@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Reflection;
+using System.Xml.Linq;
 
 using ClearBible.Engine.Exceptions;
 using static ClearBible.Engine.Persistence.FileGetBookIds;
@@ -10,9 +11,14 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
     {
         private readonly string _syntaxTreesPath;
 
-        public SyntaxTrees(string syntaxTreesPath)
+        public SyntaxTrees(string? syntaxTreesPath = null)
         {
-            _syntaxTreesPath = syntaxTreesPath;
+            _syntaxTreesPath = syntaxTreesPath ?? 
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) 
+                + Path.DirectorySeparatorChar 
+                + "Corpora"
+                + Path.DirectorySeparatorChar
+                + "syntaxtrees";
         }
 
         #region ISyntaxTreeText

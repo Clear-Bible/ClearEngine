@@ -10,4 +10,10 @@
     <ProjectReference Include="..\ClearBible.Engine\ClearBible.Engine.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Corpora\syntaxtrees\*.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
