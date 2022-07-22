@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ClearBible.Engine</id>
+    <version>1.0.5</version>
+    <authors>Clear Bible</authors>
+    <projectUrl>https://github.com/Clear-Bible/ClearEngine</projectUrl>
+    <description>ClearBible's Engine with SIL's Machine</description>
+    <repository url="https://github.com/Clear-Bible/ClearEngine" type="git"/>
+    <dependencies>
+      <group targetFramework="net6.0">
+      </group>
+    </dependencies>
+	<contentFiles>
+		<files include="any/any/books.csv" buildAction="None" copyToOutput="true" />
+	</contentFiles>
+  </metadata>
+  <files>
+    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.Aligner.dll" target="lib\net6.0\ClearBible.Engine.SyntaxTree.Aligner.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.dll" target="lib\net6.0\ClearBible.Engine.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.dll" target="lib\net6.0\ClearBible.Engine.SyntaxTree.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.dll" target="lib\net6.0\SIL.Machine.dll" />
+    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.Translation.Thot.dll" target="lib\net6.0\SIL.Machine.Translation.Thot.dll" />
+	<file src="src\ClearBible.Engine\books.csv" target="contentFiles/any/any/books.csv" />
+  </files>
+</package>
