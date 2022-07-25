@@ -75,14 +75,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // set the manuscript tree aligner hyperparameters
                     var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
 
-                    var manuscriptTree = new SyntaxTrees();
+                    var syntaxTrees = new SyntaxTrees();
 
                     // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                     ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
                         new List<IWordAlignmentModel>() { smtWordAlignmentModel },
                         0,
                         hyperparameters,
-                        manuscriptTree);
+                        syntaxTrees);
 
                     // initialize a manuscript word alignment model. At this point it has not yet been trained.
                     using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
@@ -181,14 +181,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         // set the manuscript tree aligner hyperparameters
                         var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
 
-                        var manuscriptTree = new SyntaxTrees();
+                        var syntaxTrees = new SyntaxTrees();
 
                         // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                         ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
                             new List<IWordAlignmentModel>() { smtWordAlignmentModel },
                             0,
                             hyperparameters,
-                            manuscriptTree);
+                            syntaxTrees);
 
                         // initialize a manuscript word alignment model. At this point it has not yet been trained.
                         using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
@@ -245,14 +245,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         // set the manuscript tree aligner hyperparameters
                         var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
 
-                        var manuscriptTree = new SyntaxTrees();
+                        var syntaxTrees = new SyntaxTrees();
 
                         // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                         ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
                             new List<IWordAlignmentModel>() { smtWordAlignmentModel },
                             0,
                             hyperparameters,
-                            manuscriptTree);
+                            syntaxTrees);
 
                         // initialize a manuscript word alignment model. At this point it has not yet been trained.
                         using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
@@ -311,14 +311,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // set the manuscript tree aligner hyperparameters
                     var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
 
-                    var manuscriptTree = new SyntaxTrees();
+                    var syntaxTrees = new SyntaxTrees();
 
                     // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                     ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
                         new List<IWordAlignmentModel>() { smtWordAlignmentModel },
                         0,
                         hyperparameters,
-                        manuscriptTree);
+                        syntaxTrees);
 
                     // initialize a manuscript word alignment model. At this point it has not yet been trained.
                     using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
@@ -430,14 +430,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // set the manuscript tree aligner hyperparameters
                     var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFilesNone).GetAsync();
 
-                    var manuscriptTree = new SyntaxTrees();
+                    var syntaxTrees = new SyntaxTrees();
 
                     // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
                     ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
                         new List<IWordAlignmentModel>() { smtWordAlignmentModel },
                         0,
                         hyperparameters,
-                        manuscriptTree);
+                        syntaxTrees);
 
                     // initialize a manuscript word alignment model. At this point it has not yet been trained.
                     using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
