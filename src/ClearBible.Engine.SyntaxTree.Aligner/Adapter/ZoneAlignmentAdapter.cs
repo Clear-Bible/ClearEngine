@@ -79,7 +79,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Adapter
 
             //FIXME: CHECK THIS!
             IEnumerable<Target>? targets = ((EngineParallelTextRow)parallelTextRow).TargetTokens
-                ?.Select(t => new Target(new TargetText(t.Text), new TargetLemma(t.Text.ToUpper()), t.TokenId.ToTargetId())) ?? null;
+                ?.Select(t => new Target(new TargetText(t.SurfaceText), new TargetLemma(t.TrainingText.ToUpper()), t.TokenId.ToTargetId())) ?? null;
             if (targets == null)
             {
                 throw new InvalidConfigurationEngineException(message: "ParallelTextRow targets must be transformed to a TargetTextRow (.Transform(textRow => new TokensTextRow(textRow))) ");

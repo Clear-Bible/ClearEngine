@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
@@ -58,11 +59,13 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                             {"attribute", "UnicodeLemma" }
                 });
         public static string Surface(this XElement leaf) =>
-            leaf.Attribute("Unicode")?.Value ?? throw new InvalidTreeEngineException($"leaf missing attribute.", new Dictionary<string, string>
+            Regex.Replace(
+                leaf.Attribute("Unicode")?.Value ?? throw new InvalidTreeEngineException($"leaf missing attribute.", new Dictionary<string, string>
                         {
                             {"nodeId", leaf.NodeId() ?? "<nodeId attribute also missing>"},
                             {"attribute", "Unicode" }
-                        });
+                        }), "\u200E", "", RegexOptions.Compiled);  //TREEBUG: trees have u+200E left to right character in them.
+
         public static string Strong(this XElement leaf) =>
             (leaf.Attribute("Language")?.Value ?? throw new InvalidTreeEngineException($"leaf missing attribute.", new Dictionary<string, string>
                         {

@@ -262,7 +262,6 @@ namespace ClearBible.Engine.Corpora
 					else if (concatSegmentTextRow != null)
                     {
 						var newTextRow = new TokensTextRow(textRow.Ref, ((TokensTextRow)textRow).Tokens.Concat(((TokensTextRow)concatSegmentTextRow).Tokens).ToArray());
-						newTextRow.Segment = textRow.Segment.Concat(concatSegmentTextRow.Segment).ToArray();
 						return newTextRow;
 					}
 					else //textRowSegmentConcatted == null
@@ -272,7 +271,7 @@ namespace ClearBible.Engine.Corpora
 				}
 				else
 				{
-					return new TextRow(textRow.Ref);
+					return base.CreateTextRow(textRow, concatSegmentTextRow);
 				}
 			}
 		}

@@ -9,6 +9,7 @@ using ClearBible.Engine.SyntaxTree.Aligner.Persistence;
 using ClearBible.Engine.SyntaxTree.Aligner.Translation;
 using ClearBible.Engine.SyntaxTree.Corpora;
 using ClearBible.Engine.Tokenization;
+using ClearBible.Engine.Translation;
 using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Machine.Translation;
@@ -21,7 +22,7 @@ using Xunit.Abstractions;
 
 namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 {
-    public class TranslationTests
+    public class AlignmentTests
     {
         public static readonly string TargetCorpusProjectPath = Path.Combine(AppContext.BaseDirectory,
             "..", "..", "..", "..", "..", "samples", "data", "WEB-PT");
@@ -34,13 +35,13 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
         private readonly ITestOutputHelper output_;
 
-        public TranslationTests(ITestOutputHelper output)
+        public AlignmentTests(ITestOutputHelper output)
         {
             output_ = output;
         }
         [Fact]
         [Trait("Category", "Example")]
-        public async Task Translation__SyntaxTreeAlignment()
+        public async Task Alignment__SyntaxTreeAlignment()
         {
             try
             {
@@ -116,20 +117,20 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
-                        IEnumerable<(Token sourceToken, Token targetToken, double score)> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(smtOrdinalAlignments);
+                        IEnumerable<AlignedTokenPairs> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenPairs(smtOrdinalAlignments);
                             // (Legacy): Alignments as ordinal positions in versesmap
                         output_.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
                             // Alignments as source token to target token pairs
-                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
+                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.SourceToken.TokenId}->{t.TargetToken.TokenId}"))}");
 
                         //predict syntax tree aligner alignments then display
                         var syntaxTreeOrdinalAlignedWordPairs = syntaxTreeWordAlignmentModel.GetBestAlignmentAlignedWordPairs(engineParallelTextRow);
                         // (Legacy): Alignments as ordinal positions in versesmap - ONLY FOR COMPARISON
                         output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeOrdinalAlignedWordPairs.Select(a => a.ToString()))}");
                         // ALIGNMENTS as source token to target token pairs
-                        var syntaxTreeAlignments = engineParallelTextRow.GetAlignedTokenIdPairs(syntaxTreeOrdinalAlignedWordPairs);
+                        var syntaxTreeAlignments = engineParallelTextRow.GetAlignedTokenPairs(syntaxTreeOrdinalAlignedWordPairs);
 
-                        output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
+                        output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.SourceToken.TokenId}->{t.TargetToken.TokenId}"))}");
                     }
                 }
             }
@@ -142,7 +143,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
         [Fact]
         [Trait("Category", "Example")]
-        public async Task Translation__SyntaxTreeAlignmentSequentialAndParallelComparison()
+        public async Task Alignment__SyntaxTreeAlignmentSequentialAndParallelComparison()
         {
             int count = 5;
             while(count > 0)
@@ -276,7 +277,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
         [Fact]
         [Trait("Category", "Example")]
-        public async Task Translation__SyntaxTreeAlignmentParallelized()
+        public async Task Alignment__SyntaxTreeAlignmentParallelized()
         {
             try
             {
@@ -367,11 +368,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                             //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                             var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
-                            IEnumerable<(Token sourceToken, Token targetToken, double score)> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(smtOrdinalAlignments);
+                            IEnumerable<AlignedTokenPairs> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenPairs(smtOrdinalAlignments);
                             // (Legacy): Alignments as ordinal positions in versesmap
                             output_.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
                             // Alignments as source token to target token pairs
-                            output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
+                            output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.SourceToken.TokenId}->{t.TargetToken.TokenId}"))}");
 
 
                             //predict syntax tree aligner alignments then display
@@ -379,9 +380,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                             // (Legacy): Alignments as ordinal positions in versesmap - ONLY FOR COMPARISON
                             output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeOrdinalAlignedWordPairs.Select(a => a.ToString()))}");
                             // ALIGNMENTS as source token to target token pairs
-                            var syntaxTreeAlignments = engineParallelTextRow.GetAlignedTokenIdPairs(syntaxTreeOrdinalAlignedWordPairs);
+                            var syntaxTreeAlignments = engineParallelTextRow.GetAlignedTokenPairs(syntaxTreeOrdinalAlignedWordPairs);
 
-                            output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
+                            output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.SourceToken.TokenId}->{t.TargetToken.TokenId}"))}");
                         }
                     }
                 }
@@ -395,7 +396,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
         [Fact]
         [Trait("Category", "Example")]
-        public async Task Translation__SyntaxTreeAlignment_hyperparametersfiles_none()
+        public async Task Alignment__SyntaxTreeAlignment_hyperparametersfiles_none()
         {
             try
             {
@@ -471,11 +472,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
-                        IEnumerable<(Token sourceToken, Token targetToken, double score)> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(smtOrdinalAlignments);
+                        IEnumerable<AlignedTokenPairs> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenPairs(smtOrdinalAlignments);
                         // (Legacy): Alignments as ordinal positions in versesmap
                         output_.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
                         // Alignments as source token to target token pairs
-                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
+                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.SourceToken.TokenId}->{t.TargetToken.TokenId}"))}");
 
 
                         //predict syntax tree aligner alignments then display
@@ -483,9 +484,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         // (Legacy): Alignments as ordinal positions in versesmap - ONLY FOR COMPARISON
                         output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeOrdinalAlignedWordPairs.Select(a => a.ToString()))}");
                         // ALIGNMENTS as source token to target token pairs
-                        var syntaxTreeAlignments = engineParallelTextRow.GetAlignedTokenIdPairs(syntaxTreeOrdinalAlignedWordPairs);
+                        var syntaxTreeAlignments = engineParallelTextRow.GetAlignedTokenPairs(syntaxTreeOrdinalAlignedWordPairs);
 
-                        output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
+                        output_.WriteLine($"Syntax tree Alignment: {string.Join(" ", syntaxTreeAlignments.Select(t => $"{t.SourceToken.TokenId}->{t.TargetToken.TokenId}"))}");
                     }
                 }
             }
@@ -498,7 +499,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
         [Fact]
         [Trait("Category", "Example")]
-        public async Task Translation__SmtAlignment()
+        public async Task Alignment__SmtAlignment()
         {
             try
             {
@@ -555,11 +556,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
-                        IEnumerable<(Token sourceToken, Token targetToken, double score)> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(smtOrdinalAlignments);
+                        IEnumerable<AlignedTokenPairs> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenPairs(smtOrdinalAlignments);
                         // (Legacy): Alignments as ordinal positions in versesmap
                         output_.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
                         // Alignments as source token to target token pairs
-                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
+                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.SourceToken.TokenId}->{t.TargetToken.TokenId}"))}");
                     }
                 }
             }
@@ -571,7 +572,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
         }
         [Fact]
         [Trait("Category", "Example")]
-        public async Task Translation__SmtAlignmentManuscript()
+        public async Task Alignment__SmtAlignmentManuscript()
         {
             try
             {
@@ -626,11 +627,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
-                        IEnumerable<(Token sourceToken, Token targetToken, double score)> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenIdPairs(smtOrdinalAlignments);
+                        IEnumerable<AlignedTokenPairs> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenPairs(smtOrdinalAlignments);
                         // (Legacy): Alignments as ordinal positions in versesmap
                         output_.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
                         // Alignments as source token to target token pairs
-                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.sourceToken.TokenId}->{t.targetToken.TokenId}"))}");
+                        output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.SourceToken.TokenId}->{t.TargetToken.TokenId}"))}");
                     }
                 }
             }

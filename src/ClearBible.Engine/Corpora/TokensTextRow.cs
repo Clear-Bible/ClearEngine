@@ -6,6 +6,8 @@ namespace ClearBible.Engine.Corpora
 {
     public class TokensTextRow : TextRow
     {
+        private List<Token>? tokens_;
+
         /// <summary>
         /// 
         /// </summary>
@@ -19,42 +21,13 @@ namespace ClearBible.Engine.Corpora
                 ((VerseRef)segmentRef).VerseNum);
         }
 
-        /*FIXME: not used. Remove?
-        public TokensTextRow(
-            object segmentRef, 
-            IReadOnlyList<string> segment, 
-            bool isSentenceStart,
-            bool isInRange, 
-            bool isRangeStart, 
-            bool isEmpty,
-            IReadOnlyList<Token> tokens)
-            : base(segmentRef)
-        {
-            base.Segment = segment;
-            IsSentenceStart = isSentenceStart;
-            IsInRange = isInRange;
-            IsRangeStart = isRangeStart;
-            IsEmpty = isEmpty;
-
-            if (Segment.Count() == tokens.Count())
-            {
-                Tokens = tokens;
-            }
-            else
-            {
-                throw new InvalidDataException($"textRow ref {(VerseRef)Ref} tokens count don't match segment count");
-            }
-        }
-        */
-
         public TokensTextRow(object rowRef, IReadOnlyList<Token>? tokens = null) : base(rowRef)
         {
-            Tokens = tokens ?? new List<Token>();
+            Tokens = tokens?.ToList() ?? new List<Token>();
         }
         public TokensTextRow(TextRow textRow)
             : base(textRow.Ref)
         {
-            base.Segment = textRow.Segment;
             IsSentenceStart = textRow.IsSentenceStart;
             IsInRange = textRow.IsInRange;
             IsRangeStart = textRow.IsRangeStart;
@@ -62,38 +35,33 @@ namespace ClearBible.Engine.Corpora
 
             (string bookAbbreviation, int chapterNumber, int verseNumber) = GetBookChapterVerse(Ref);
 
-            Tokens = base.Segment
-                .Select((stringToken, index) => new Token(new TokenId(bookAbbreviation, chapterNumber, verseNumber, index + 1, 1), stringToken))
+            Tokens = textRow.Segment
+                .Select((stringToken, index) => new Token(new TokenId(bookAbbreviation, chapterNumber, verseNumber, index + 1, 1), stringToken, stringToken))
                 .ToList();
         }
 
         public TokensTextRow(TextRow textRow, IReadOnlyList<Token> tokens)
             : base(textRow.Ref)
         {
-            //base.Segment = textRow.Segment;
-            base.Segment = tokens
-                    .Select(t => t.Text)
-                    .ToList();
             IsSentenceStart = textRow.IsSentenceStart;
             IsInRange = textRow.IsInRange;
             IsRangeStart = textRow.IsRangeStart;
             IsEmpty = false;
-
-            Tokens = tokens;
+            Tokens = tokens.ToList();
         }
 
-        /*
-        public override IReadOnlyList<string> Segment
-        {
+        public List<Token> Tokens {
             get
             {
-                return Tokens
-                    //.Where(t => t.Use)
-                    .Select(t => t.Text)
+                return tokens_ ?? new List<Token>();
+            }
+            set
+            {
+                tokens_ = value;
+                Segment = tokens_
+                    .Select(t => t.TrainingText)
                     .ToList();
             }
         }
-        */
-        public IReadOnlyList<Token> Tokens { get; }
     }
 }

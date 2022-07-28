@@ -103,35 +103,5 @@ namespace ClearBible.Engine.Corpora
         public IReadOnlyList<Token>? SourceTokens { get; }
 
         public IReadOnlyList<Token>? TargetTokens { get; }
-
-        public IEnumerable<(Token sourceToken, Token targetToken, double score)> GetAlignedTokenIdPairs(WordAlignmentMatrix alignment)
-        {
-                
-            IReadOnlyCollection<AlignedWordPair>  alignedWordPairs = alignment.GetAlignedWordPairs();
-            foreach (AlignedWordPair alignedWordPair in alignedWordPairs)
-            {
-                var sourceToken = SourceTokens?[alignedWordPair.SourceIndex];
-                var targetToken = TargetTokens?[alignedWordPair.TargetIndex];
-
-                if (sourceToken != null && targetToken != null)
-                {
-                    yield return (sourceToken, targetToken, alignedWordPair.AlignmentScore);
-                }
-            }
-        }
-
-        public IEnumerable<(Token sourceToken, Token targetToken, double score)> GetAlignedTokenIdPairs(IReadOnlyCollection<AlignedWordPair> alignedWordPairs)
-        {
-            foreach (AlignedWordPair alignedWordPair in alignedWordPairs)
-            {
-                var sourceToken = SourceTokens?[alignedWordPair.SourceIndex];
-                var targetToken = TargetTokens?[alignedWordPair.TargetIndex];
-
-                if (sourceToken != null && targetToken != null)
-                {
-                    yield return (sourceToken, targetToken, alignedWordPair.AlignmentScore);
-                }
-            }
-        }
     }
 }
