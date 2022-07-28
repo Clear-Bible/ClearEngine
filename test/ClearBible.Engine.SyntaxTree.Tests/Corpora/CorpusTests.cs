@@ -85,11 +85,11 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
             var corpusList = corpus.ToList();
 
             Assert.NotEmpty(((TokensTextRow)corpusList[0]).Tokens);
-            Assert.NotEmpty(((TokensTextRow)corpusList[0]).Tokens[0].SurfaceText);
-            Assert.NotEmpty(((TokensTextRow)corpusList[0]).Tokens[0].TrainingText);
-            Assert.NotEmpty(corpusList[0].Segment[0]);
-            Assert.NotEqual(((TokensTextRow)corpusList[0]).Tokens[0].TrainingText, ((TokensTextRow)corpusList[0]).Tokens[0].SurfaceText);
-            Assert.Equal(((TokensTextRow)corpusList[0]).Tokens[0].TrainingText, corpusList[0].Segment[0]);
+            Assert.NotEmpty(((TokensTextRow)corpusList[0]).Tokens[9].SurfaceText);
+            Assert.NotEmpty(((TokensTextRow)corpusList[0]).Tokens[9].TrainingText);
+            Assert.NotEmpty(corpusList[0].Segment[9]);
+            Assert.NotEqual(((TokensTextRow)corpusList[0]).Tokens[9].TrainingText, ((TokensTextRow)corpusList[0]).Tokens[9].SurfaceText);
+            Assert.Equal(((TokensTextRow)corpusList[0]).Tokens[9].TrainingText, corpusList[0].Segment[9]);
         }
     }
 }
