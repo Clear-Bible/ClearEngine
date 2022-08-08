@@ -127,5 +127,25 @@ namespace ClearBible.Engine.Corpora
 				return GetEnumerator();
 			}
 		}
+
+		public static IEnumerable<string> GetSurfaceTexts(this IEnumerable<Token>? tokens)
+        {
+			return tokens?
+				.GetBaseTokens()
+				.Select(t => t.SurfaceText)
+				?? new List<string>();
+		}
+
+		public static IEnumerable<Token> GetBaseTokens(this IEnumerable<Token>? tokens)
+		{
+			return tokens?
+				.OrderBy(t => t.TokenId)
+				.SelectMany(t =>
+					(t is CompositeToken) ?
+						((CompositeToken)t).Tokens
+					:
+						new List<Token>() { t })
+				?? new List<Token>();
+		}
 	}
 }

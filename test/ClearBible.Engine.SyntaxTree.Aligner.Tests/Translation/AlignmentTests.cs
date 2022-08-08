@@ -8,6 +8,8 @@ using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.SyntaxTree.Aligner.Persistence;
 using ClearBible.Engine.SyntaxTree.Aligner.Translation;
 using ClearBible.Engine.SyntaxTree.Corpora;
+using ClearBible.Engine.SyntaxTree.Tokenization;
+using ClearBible.Engine.Tests.Corpora;
 using ClearBible.Engine.Tokenization;
 using ClearBible.Engine.Translation;
 using SIL.Machine.Corpora;
@@ -97,23 +99,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Cast<EngineParallelTextRow>())
                     {
-                        //display verse info
-                        var verseRefStr = engineParallelTextRow.Ref.ToString();
-                        output_.WriteLine(verseRefStr);
-
-                        //display source
-                        var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
-                        output_.WriteLine($"Source: {sourceVerseText}");
-                        var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
-                            .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                        output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
-
-                        //display target
-                        var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
-                        output_.WriteLine($"Target: {targetVerseText}");
-                        var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
-                            .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                        output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
+                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new SyntaxTreeWordDetokenizer(), new LatinWordDetokenizer());
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
@@ -348,23 +334,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         {
                             var engineParallelTextRow = pair.engineParallelTextRow;
 
-                            //display verse info
-                            var verseRefStr = engineParallelTextRow.Ref.ToString();
-                            output_.WriteLine(verseRefStr);
-
-                            //display source
-                            var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
-                            output_.WriteLine($"Source: {sourceVerseText}");
-                            var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
-                                .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                            output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
-
-                            //display target
-                            var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
-                            output_.WriteLine($"Target: {targetVerseText}");
-                            var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
-                                .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                            output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
+                            TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new SyntaxTreeWordDetokenizer(), new LatinWordDetokenizer());
 
                             //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                             var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
@@ -452,23 +422,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Cast<EngineParallelTextRow>())
                     {
-                        //display verse info
-                        var verseRefStr = engineParallelTextRow.Ref.ToString();
-                        output_.WriteLine(verseRefStr);
-
-                        //display source
-                        var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
-                        output_.WriteLine($"Source: {sourceVerseText}");
-                        var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
-                            .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                        output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
-
-                        //display target
-                        var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
-                        output_.WriteLine($"Target: {targetVerseText}");
-                        var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
-                            .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                        output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
+                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new SyntaxTreeWordDetokenizer(), new LatinWordDetokenizer());
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
@@ -505,12 +459,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
             {
                 var sourceCorpus = new ParatextTextCorpus(SourceCorpusProjectPath)
                     .Tokenize<LatinWordTokenizer>()
-                    .Transform<IntoTokensTextRowProcessor>();
+                    .Transform<IntoTokensTextRowProcessor>()
+                    .Transform<SetTrainingBySurfaceTokensTextRowProcessor>();
 
 
                 var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
                     .Tokenize<LatinWordTokenizer>()
-                    .Transform<IntoTokensTextRowProcessor>();
+                    .Transform<IntoTokensTextRowProcessor>()
+                    .Transform<SetTrainingBySurfaceTokensTextRowProcessor>();
 
                 var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
 
@@ -536,23 +492,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Cast<EngineParallelTextRow>())
                     {
-                        //display verse info
-                        var verseRefStr = engineParallelTextRow.Ref.ToString();
-                        output_.WriteLine(verseRefStr);
-
-                        //display source
-                        var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
-                        output_.WriteLine($"Source: {sourceVerseText}");
-                        var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
-                            .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                        output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
-
-                        //display target
-                        var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
-                        output_.WriteLine($"Target: {targetVerseText}");
-                        var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
-                            .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                        output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
+                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new LatinWordDetokenizer(), new LatinWordDetokenizer());
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
@@ -607,23 +547,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Cast<EngineParallelTextRow>())
                     {
-                        //display verse info
-                        var verseRefStr = engineParallelTextRow.Ref.ToString();
-                        output_.WriteLine(verseRefStr);
-
-                        //display source
-                        var sourceVerseText = string.Join(" ", engineParallelTextRow.SourceSegment);
-                        output_.WriteLine($"Source: {sourceVerseText}");
-                        var sourceTokenIds = string.Join(" ", engineParallelTextRow.SourceTokens?
-                            .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                        output_.WriteLine($"SourceTokenIds: {sourceTokenIds}");
-
-                        //display target
-                        var targetVerseText = string.Join(" ", engineParallelTextRow.TargetSegment);
-                        output_.WriteLine($"Target: {targetVerseText}");
-                        var targetTokenIds = string.Join(" ", engineParallelTextRow.TargetTokens?
-                            .Select(token => token.TokenId.ToString()) ?? new string[] { "NONE" });
-                        output_.WriteLine($"TargetTokenIds: {targetTokenIds}");
+                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new SyntaxTreeWordDetokenizer(), new LatinWordDetokenizer());
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);

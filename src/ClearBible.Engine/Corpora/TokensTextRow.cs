@@ -1,4 +1,5 @@
 ﻿
+using ClearBible.Engine.Exceptions;
 using SIL.Machine.Corpora;
 using SIL.Scripture;
 
@@ -53,10 +54,21 @@ namespace ClearBible.Engine.Corpora
         public List<Token> Tokens {
             get
             {
-                return tokens_ ?? new List<Token>();
+                return tokens_?
+                    .OrderBy(t => t.TokenId)
+                    .ToList()
+                    ?? new List<Token>();
             }
             set
             {
+                // if there are Tokens with duplicate tokenIds
+                if (value
+                    .SelectMany(t => (t is CompositeToken) ? ((CompositeToken)t).Tokens : new List<Token>() { t })
+                    .GroupBy(t => t.TokenId)
+                    .Any(g => g.Count() > 1))
+                {
+                    throw new InvalidDataEngineException(name: "Tokens", message: "set of all Tokens and CompositeToken children Tokens cannot have duplicate Token.TokenIds");
+                }
                 tokens_ = value;
                 Segment = tokens_
                     .Select(t => t.TrainingText)

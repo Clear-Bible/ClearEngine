@@ -3,6 +3,7 @@ using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.SyntaxTree.Corpora;
 using ClearBible.Engine.SyntaxTree.Tokenization;
+using ClearBible.Engine.Tests.Corpora;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -29,12 +30,7 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
                 // now get the first 5 verses
                 foreach (var tokensTextRow in sourceCorpus["GEN"].GetRows().Cast<TokensTextRow>().Take(5))
                 {
-                    output_.WriteLine(tokensTextRow.Ref.ToString());
-                    output_.WriteLine($"Segments spaced    : {string.Join(" ", tokensTextRow.Segment)}");
-                    output_.WriteLine($"TrainingText spaced: {string.Join(" ", tokensTextRow.Tokens.Select(t => t.TrainingText))}");
-                    output_.WriteLine($"SurfaceText spaced : {string.Join(" ", tokensTextRow.Tokens.Select(t => t.SurfaceText))}");
-                    output_.WriteLine($"Detokenized surfaceText: {new SyntaxTreeWordDetokenizer().Detokenize(tokensTextRow.Tokens)}");
-                    output_.WriteLine("");
+                    TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new SyntaxTreeWordDetokenizer());
                 }
                 Assert.NotEmpty(sourceCorpus);
             }
@@ -57,12 +53,7 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
                 // now get the first 5 verses
                 foreach (var tokensTextRow in sourceCorpus["MAT"].GetRows().Cast<TokensTextRow>().Take(5))
                 {
-                    output_.WriteLine(tokensTextRow.Ref.ToString());
-                    output_.WriteLine($"Segments spaced    : {string.Join(" ", tokensTextRow.Segment)}");
-                    output_.WriteLine($"TrainingText spaced: {string.Join(" ", tokensTextRow.Tokens.Select(t => t.TrainingText))}");
-                    output_.WriteLine($"SurfaceText spaced : {string.Join(" ", tokensTextRow.Tokens.Select(t => t.SurfaceText))}");
-                    output_.WriteLine($"Detokenized surfaceText: {(new SyntaxTreeWordDetokenizer()).Detokenize(tokensTextRow.Tokens)}");
-                    output_.WriteLine("");
+                    TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new SyntaxTreeWordDetokenizer());
                 }
                 Assert.NotEmpty(sourceCorpus);
             }

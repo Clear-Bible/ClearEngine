@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ClearBible.Engine.SyntaxTree.Aligner\ClearBible.Engine.SyntaxTree.Aligner.csproj" />
+    <ProjectReference Include="..\ClearBible.Engine.Tests\ClearBible.Engine.Tests.csproj" />
   </ItemGroup>
 
 </Project>

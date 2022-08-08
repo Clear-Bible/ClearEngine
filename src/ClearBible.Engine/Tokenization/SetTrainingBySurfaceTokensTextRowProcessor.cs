@@ -17,17 +17,25 @@ namespace ClearBible.Engine.Tokenization
             }
 
             //Transform the tokens, then set the result back on the Tokens property so the Segments are also changed.
-            ((TokensTextRow) textRow).Tokens = ((TokensTextRow) textRow).Tokens.Select(t =>
-            {
-                t.TrainingText = GetTrainingText(t.SurfaceText);
-                return t;
-            }).ToList();
+            ((TokensTextRow)textRow).Tokens
+                .SelectMany(t =>
+                    (t is CompositeToken) ?
+                        ((CompositeToken)t).Tokens
+                    :
+                        new List<Token>() { t })
+                .Select(t =>
+                {
+                    t.TrainingText = GetTrainingText(t.SurfaceText);
+                    return t;
+                })
+                .ToList();
+            ((TokensTextRow)textRow).Tokens = ((TokensTextRow)textRow).Tokens;
             return textRow;
         }
 
         protected virtual string GetTrainingText(string surfaceText)
         {
-            return surfaceText.ToUpper();
+            return surfaceText.ToLower();
         }
     }
 }

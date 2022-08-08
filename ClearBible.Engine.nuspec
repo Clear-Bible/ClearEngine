@@ -2,14 +2,19 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>ClearBible.Engine</id>
-    <version>1.0.8</version>
+    <version>1.0.12</version>
     <authors>Clear Bible</authors>
     <projectUrl>https://github.com/Clear-Bible/ClearEngine</projectUrl>
     <description>ClearBible's Engine with SIL's Machine</description>
     <repository url="https://github.com/Clear-Bible/ClearEngine" type="git"/>
     <dependencies>
-      <group targetFramework="net6.0">
-      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Newtonsoft.Json" version="12.0.3" exclude="Build,Analyzers" />
+        <dependency id="SIL.Scripture" version="7.0.0" exclude="Build,Analyzers" />
+        <dependency id="Sandwych.QuickGraph.Core" version="1.0.0" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Encoding.CodePages" version="5.0.0" exclude="Build,Analyzers" />
+        <dependency id="Thot" version="3.3.5" exclude="Build,Analyzers" />
+	</group>
     </dependencies>
 	<contentFiles>
 		<files include="any/any/books.csv" buildAction="None" copyToOutput="true" />
@@ -21,7 +26,8 @@
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.dll" target="lib\net6.0\ClearBible.Engine.dll" />
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.dll" target="lib\net6.0\ClearBible.Engine.SyntaxTree.dll" />
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.dll" target="lib\net6.0\SIL.Machine.dll" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.Translation.Thot.dll" target="lib\net6.0\SIL.Machine.Translation.Thot.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.xml" target="lib\net6.0\SIL.Machine.xml" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.Translation.Thot.dll" target="lib\net6.0\SIL.Machine.Translation.Thot.dll" />
 	<file src="src\ClearBible.Engine\books.csv" target="contentFiles\any\any\books.csv" />
 	<file src="src\ClearBible.Engine.SyntaxTree\bin\Debug\net6.0\Corpora\syntaxtrees\*.*" target="contentFiles\any\any\Corpora\syntaxtrees" />
   </files>
