@@ -137,7 +137,7 @@ namespace ClearBible.Engine.Tests.Corpora
             output_.WriteLine($"Target surfaceTexts spaced    : {string.Join(" ", surfaceTexts)}");
 
             //Surface text, detokenized
-            output_.WriteLine($"Target detokenized surfaceText: {targetDetokenizer.Detokenize(typeof(T) == typeof(Token) ? engineParallelTextRow.TargetTokens!.Cast<U>() : surfaceTexts.Cast<U>())}");
+            output_.WriteLine($"Target detokenized surfaceText: {targetDetokenizer.Detokenize(typeof(U) == typeof(Token) ? engineParallelTextRow.TargetTokens!.Cast<U>() : surfaceTexts.Cast<U>())}");
             output_.WriteLine("");
         }
     }
