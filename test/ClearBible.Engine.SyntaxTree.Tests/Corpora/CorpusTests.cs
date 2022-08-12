@@ -2,8 +2,9 @@
 using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.SyntaxTree.Corpora;
-using ClearBible.Engine.SyntaxTree.Tokenization;
 using ClearBible.Engine.Tests.Corpora;
+using ClearBible.Engine.Tokenization;
+using SIL.Machine.Tokenization;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
@@ -30,7 +31,7 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
                 // now get the first 5 verses
                 foreach (var tokensTextRow in sourceCorpus["GEN"].GetRows().Cast<TokensTextRow>().Take(5))
                 {
-                    TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new SyntaxTreeWordDetokenizer());
+                    TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new EngineStringDetokenizer(new WhitespaceDetokenizer()));
                 }
                 Assert.NotEmpty(sourceCorpus);
             }
@@ -53,7 +54,7 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
                 // now get the first 5 verses
                 foreach (var tokensTextRow in sourceCorpus["MAT"].GetRows().Cast<TokensTextRow>().Take(5))
                 {
-                    TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new SyntaxTreeWordDetokenizer());
+                    TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new EngineStringDetokenizer(new WhitespaceDetokenizer()));
                 }
                 Assert.NotEmpty(sourceCorpus);
             }

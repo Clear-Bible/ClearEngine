@@ -8,7 +8,6 @@ using ClearBible.Engine.Exceptions;
 using ClearBible.Engine.SyntaxTree.Aligner.Persistence;
 using ClearBible.Engine.SyntaxTree.Aligner.Translation;
 using ClearBible.Engine.SyntaxTree.Corpora;
-using ClearBible.Engine.SyntaxTree.Tokenization;
 using ClearBible.Engine.Tests.Corpora;
 using ClearBible.Engine.Tokenization;
 using ClearBible.Engine.Translation;
@@ -99,7 +98,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Cast<EngineParallelTextRow>())
                     {
-                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new SyntaxTreeWordDetokenizer(), new LatinWordDetokenizer());
+                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new EngineStringDetokenizer(new WhitespaceDetokenizer()), new EngineStringDetokenizer(new LatinWordDetokenizer()));
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
@@ -334,7 +333,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         {
                             var engineParallelTextRow = pair.engineParallelTextRow;
 
-                            TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new SyntaxTreeWordDetokenizer(), new LatinWordDetokenizer());
+                            TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new EngineStringDetokenizer(new WhitespaceDetokenizer()), new EngineStringDetokenizer(new LatinWordDetokenizer()));
 
                             //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                             var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
@@ -422,7 +421,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Cast<EngineParallelTextRow>())
                     {
-                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new SyntaxTreeWordDetokenizer(), new LatinWordDetokenizer());
+                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new EngineStringDetokenizer(new WhitespaceDetokenizer()), new EngineStringDetokenizer(new LatinWordDetokenizer()));
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
@@ -492,7 +491,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Cast<EngineParallelTextRow>())
                     {
-                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new LatinWordDetokenizer(), new LatinWordDetokenizer());
+                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new EngineStringDetokenizer(new LatinWordDetokenizer()), new EngineStringDetokenizer(new LatinWordDetokenizer()));
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
@@ -547,7 +546,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     // now best alignments for first 5 verses.
                     foreach (var engineParallelTextRow in parallelTextCorpus.Cast<EngineParallelTextRow>())
                     {
-                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new SyntaxTreeWordDetokenizer(), new LatinWordDetokenizer());
+                        TestHelpers.WriteTokensEngineParallelTextRow(output_, engineParallelTextRow, new EngineStringDetokenizer(new WhitespaceDetokenizer()), new EngineStringDetokenizer(new LatinWordDetokenizer()));
 
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);

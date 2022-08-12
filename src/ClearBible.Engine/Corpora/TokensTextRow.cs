@@ -54,9 +54,7 @@ namespace ClearBible.Engine.Corpora
         public List<Token> Tokens {
             get
             {
-                return tokens_?
-                    .OrderBy(t => t.TokenId)
-                    .ToList()
+                return tokens_
                     ?? new List<Token>();
             }
             set

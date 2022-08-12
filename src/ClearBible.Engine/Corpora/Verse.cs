@@ -1,4 +1,6 @@
-﻿using SIL.Scripture;
+﻿using ClearBible.Engine.Exceptions;
+using SIL.Scripture;
+using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -7,7 +9,11 @@ namespace ClearBible.Engine.Corpora
 		public Verse(string book, int ChapterNumber, int VerseNumber,IEnumerable<TokenId>? tokenIds = null)
 		{
 			Book = book;
-			ChapterNum = ChapterNumber;
+            BookNum = int.Parse(BookIds
+                  .Where(b => b.silCannonBookAbbrev.Equals(book))
+                  .Select(b => b.silCannonBookNum)
+                  .FirstOrDefault() ?? throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookAbbrev", value: book));
+            ChapterNum = ChapterNumber;
 			VerseNum = VerseNumber;
             TokenIds = tokenIds ?? Enumerable.Empty<TokenId>();
         }
@@ -15,13 +21,15 @@ namespace ClearBible.Engine.Corpora
 		public Verse(VerseRef verseRef)
 		{
 			Book = verseRef.Book;
+            BookNum = verseRef.BookNum;
 			ChapterNum = verseRef.ChapterNum;
 			VerseNum = verseRef.VerseNum;
 			TokenIds = Enumerable.Empty<TokenId>();
 		}
 
 		public string Book { get; }
-		public int ChapterNum { get; }
+        public int BookNum { get; }
+        public int ChapterNum { get; }
 		public int VerseNum { get; }
         public IEnumerable<TokenId> TokenIds { get; set; }
 
@@ -48,7 +56,7 @@ namespace ClearBible.Engine.Corpora
             // If other is not a valid object reference, this instance is smaller.
             if (other == null) return -1;
 
-            int result = Book.CompareTo(other.Book);
+            int result = BookNum.CompareTo(other.BookNum);
             if (result == 0)
             {
                 result = ChapterNum.CompareTo(other.ChapterNum);

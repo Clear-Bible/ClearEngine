@@ -56,7 +56,7 @@ namespace ClearBible.Engine.Tests.Corpora
                 // now get the first 5 verses
                 foreach (var tokensTextRow in corpus.Cast<TokensTextRow>().Take(5))
                 {
-                    TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new LatinWordDetokenizer());
+                    TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new EngineStringDetokenizer(new LatinWordDetokenizer()));
                 }
                 Assert.NotEmpty(corpus);
             }
@@ -85,7 +85,7 @@ namespace ClearBible.Engine.Tests.Corpora
             output_.WriteLine("Texts without composite:");
             foreach (var tokensTextRow in corpus.Cast<TokensTextRow>())
             {
-                TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new LatinWordDetokenizer());
+                TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new EngineStringDetokenizer(new LatinWordDetokenizer()));
             }
 
             //build new tokens list for first verse that includes a composite token
@@ -113,7 +113,7 @@ namespace ClearBible.Engine.Tests.Corpora
             output_.WriteLine("Texts with composite:");
             foreach (var tokensTextRow in corpus.Cast<TokensTextRow>())
             {
-                TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new LatinWordDetokenizer());
+                TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new EngineStringDetokenizer(new LatinWordDetokenizer()));
             }
         }
     }

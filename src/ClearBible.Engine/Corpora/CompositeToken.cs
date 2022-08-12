@@ -59,5 +59,17 @@ namespace ClearBible.Engine.Corpora
                 throw new EngineException("Cannot set training text directly on type CompositeToken. CompositeToken's Training text can be set by setting this.Tokens.");
             }
         }
+
+        public override ulong Position
+        {
+            get
+            {
+                throw new EngineException("CompositeToken is not a positional token.");
+            }
+            set
+            {
+                throw new EngineException("CompositeToken is not a positional token.");
+            }
+        }
     }
 }

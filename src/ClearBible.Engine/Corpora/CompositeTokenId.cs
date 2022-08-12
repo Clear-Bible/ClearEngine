@@ -77,5 +77,9 @@ namespace ClearBible.Engine.Corpora
             }
         }
 
+        public override bool IsNextSubword(TokenId tokenId)
+        {
+            throw new EngineException("Cannot check before for a compositetokenid.");
+        }
     }
-}
+}   

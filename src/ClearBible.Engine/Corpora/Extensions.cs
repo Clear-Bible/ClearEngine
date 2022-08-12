@@ -131,21 +131,20 @@ namespace ClearBible.Engine.Corpora
 		public static IEnumerable<string> GetSurfaceTexts(this IEnumerable<Token>? tokens)
         {
 			return tokens?
-				.GetBaseTokens()
+				.GetPositionalSortedBaseTokens()
 				.Select(t => t.SurfaceText)
 				?? new List<string>();
 		}
 
-		public static IEnumerable<Token> GetBaseTokens(this IEnumerable<Token>? tokens)
+		public static IEnumerable<Token> GetPositionalSortedBaseTokens(this IEnumerable<Token> tokens)
 		{
-			return tokens?
-				.OrderBy(t => t.TokenId)
+			return tokens
 				.SelectMany(t =>
 					(t is CompositeToken) ?
 						((CompositeToken)t).Tokens
 					:
 						new List<Token>() { t })
-				?? new List<Token>();
-		}
+				.OrderBy(t => t.Position);
+        }
 	}
 }

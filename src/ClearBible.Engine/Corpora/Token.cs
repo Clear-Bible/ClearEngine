@@ -1,5 +1,7 @@
 ﻿
 
+using System.Text;
+
 namespace ClearBible.Engine.Corpora
 {
     public class Token : IEquatable<Token>
@@ -14,14 +16,28 @@ namespace ClearBible.Engine.Corpora
             TokenId = tokenId;
             SurfaceText = surfaceText;
             TrainingText = trainingText;
-            //Use = true;
+
+            Position = ulong.Parse(TokenId.ToString());
         }
 
         public virtual TokenId TokenId { get; }
-        public virtual string SurfaceText { get; set; } = "";
+
+        public virtual ulong Position { get; set; } = 0;
 
         public virtual string TrainingText { get; set; } = "";
-        public int? Group { get; set; }
+
+        public virtual string SurfaceText { get; set; } = "";
+
+        /// <summary>
+        /// Cannot include SurfaceText within this string
+        /// </summary>
+        public virtual string SurfaceTextPrefix { get; set; } = "";
+
+        /// <summary>
+        /// Cannot include SurfaceText within this string
+        /// </summary>
+        public virtual string SurfaceTextSuffix { get; set; } = "";
+
 
         public override bool Equals(object? obj)
         {
@@ -39,6 +55,9 @@ namespace ClearBible.Engine.Corpora
             return Equals((object?)other);
         }
 
-        //public bool Use { get; set; } //FIXME: not sure why I added this?!
+        public override string ToString()
+        {
+            return $"{SurfaceTextPrefix}{SurfaceText}{SurfaceTextSuffix}";
+        }
     }
 }

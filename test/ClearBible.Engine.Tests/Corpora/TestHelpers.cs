@@ -3,6 +3,7 @@ using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Scripture;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Xunit.Abstractions;
@@ -27,7 +28,10 @@ namespace ClearBible.Engine.Tests.Corpora
             };
         }
 
-        public static void WriteTokensTextRow<T>(ITestOutputHelper output_, TokensTextRow tokensTextRow, IDetokenizer<string, T> detokenizer)
+        public static void WriteTokensTextRow(
+            ITestOutputHelper output_, 
+            TokensTextRow tokensTextRow, 
+            IDetokenizer<IEnumerable<(Token token, string paddingBefore, string paddingAfter)>, Token> detokenizer)
         {
             output_.WriteLine(tokensTextRow.Ref.ToString());
 
@@ -48,24 +52,27 @@ namespace ClearBible.Engine.Tests.Corpora
             //DISPLAY:
             //Token ids for surface text (display):
             var tokenIdsForSurfaceText = tokensTextRow.Tokens
-                .GetBaseTokens() //pull out the tokens from composite tokens
-                .OrderBy(t => t.TokenId)
+                .GetPositionalSortedBaseTokens() //pull out the tokens from composite tokens
                 .Select(t => t.TokenId);
             output_.WriteLine($"Tokens tokenIds        : {string.Join(" ", tokenIdsForSurfaceText)}");
 
             //Surface text, still tokenized
             var surfaceTexts = tokensTextRow.Tokens
-                .GetBaseTokens()
-                .OrderBy(t => t.TokenId)
+                .GetPositionalSortedBaseTokens()
                 .Select(t => t.SurfaceText);
             output_.WriteLine($"SurfaceTexts spaced    : {string.Join(" ", surfaceTexts)}");
 
             //Surface text, detokenized
-            output_.WriteLine($"Detokenized surfaceText: {detokenizer.Detokenize(typeof(T) == typeof(Token) ? tokensTextRow.Tokens.Cast<T>() : surfaceTexts.Cast<T>())}");
+            var tokensWithPadding = detokenizer.Detokenize(tokensTextRow.Tokens);
+            output_.WriteLine($"Detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}")}");
             output_.WriteLine("");
         }
 
-        public static void WriteTokensEngineParallelTextRow<T, U>(ITestOutputHelper output_, EngineParallelTextRow engineParallelTextRow, IDetokenizer<string, T> sourceDetokenizer, IDetokenizer<string, U> targetDetokenizer)
+        public static void WriteTokensEngineParallelTextRow(
+            ITestOutputHelper output_, 
+            EngineParallelTextRow engineParallelTextRow, 
+            IDetokenizer<IEnumerable<(Token token, string paddingBefore, string paddingAfter)>, Token> sourceDetokenizer, 
+            IDetokenizer<IEnumerable<(Token token, string paddingBefore, string paddingAfter)>, Token> targetDetokenizer)
         {
             output_.WriteLine(engineParallelTextRow.Ref.ToString());
 
@@ -88,20 +95,19 @@ namespace ClearBible.Engine.Tests.Corpora
             //DISPLAY:
             //Token ids for surface text (display):
             var tokenIdsForSurfaceText = engineParallelTextRow.SourceTokens!
-                .GetBaseTokens() //pull out the tokens from composite tokens
-                .OrderBy(t => t.TokenId)
+                .GetPositionalSortedBaseTokens() //pull out the tokens from composite tokens
                 .Select(t => t.TokenId);
             output_.WriteLine($"Source tokens tokenIds        : {string.Join(" ", tokenIdsForSurfaceText)}");
 
             //Surface text, still tokenized
             var surfaceTexts = engineParallelTextRow.SourceTokens!
-                .GetBaseTokens()
-                .OrderBy(t => t.TokenId)
+                .GetPositionalSortedBaseTokens()
                 .Select(t => t.SurfaceText);
             output_.WriteLine($"Source surfaceTexts spaced    : {string.Join(" ", surfaceTexts)}");
 
             //Surface text, detokenized
-            output_.WriteLine($"Source etokenized surfaceText: {sourceDetokenizer.Detokenize(typeof(T) == typeof(Token) ? engineParallelTextRow.SourceTokens!.Cast<T>() : surfaceTexts.Cast<T>())}");
+            var tokensWithPadding = sourceDetokenizer.Detokenize(engineParallelTextRow.SourceTokens);
+            output_.WriteLine($"Source detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}")}");
             output_.WriteLine("");
 
 
@@ -124,20 +130,19 @@ namespace ClearBible.Engine.Tests.Corpora
             //DISPLAY:
             //Token ids for surface text (display):
             tokenIdsForSurfaceText = engineParallelTextRow.TargetTokens!
-                .GetBaseTokens() //pull out the tokens from composite tokens
-                .OrderBy(t => t.TokenId)
+                .GetPositionalSortedBaseTokens() //pull out the tokens from composite tokens
                 .Select(t => t.TokenId);
             output_.WriteLine($"Target tokens tokenIds        : {string.Join(" ", tokenIdsForSurfaceText)}");
 
             //Surface text, still tokenized
             surfaceTexts = engineParallelTextRow.TargetTokens!
-                .GetBaseTokens()
-                .OrderBy(t => t.TokenId)
+                .GetPositionalSortedBaseTokens()
                 .Select(t => t.SurfaceText);
             output_.WriteLine($"Target surfaceTexts spaced    : {string.Join(" ", surfaceTexts)}");
 
             //Surface text, detokenized
-            output_.WriteLine($"Target detokenized surfaceText: {targetDetokenizer.Detokenize(typeof(U) == typeof(Token) ? engineParallelTextRow.TargetTokens!.Cast<U>() : surfaceTexts.Cast<U>())}");
+            tokensWithPadding = sourceDetokenizer.Detokenize(engineParallelTextRow.TargetTokens);
+            output_.WriteLine($"Target detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}")}");
             output_.WriteLine("");
         }
     }

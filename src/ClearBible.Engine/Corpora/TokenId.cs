@@ -33,17 +33,17 @@ namespace ClearBible.Engine.Corpora
 
         /// <summary>
         /// </summary>
-        /// <param name="bookAbbreviation">SIL book abbreviation.</param>
+        /// <param name="book">SIL book abbreviation.</param>
         /// <param name="chapterNumber"></param>
         /// <param name="verseNumber"></param>
         /// <param name="wordNumber"></param>
         /// <param name="subWordNumber"></param>
         /// <exception cref="InvalidBookMappingEngineException"></exception>
-        public TokenId(string bookAbbreviation, int chapterNumber, int verseNumber, int wordNumber, int subWordNumber)
+        public TokenId(string book, int chapterNumber, int verseNumber, int wordNumber, int subWordNumber)
             : this(int.Parse(BookIds
-                  .Where(b => b.silCannonBookAbbrev.Equals(bookAbbreviation))
+                  .Where(b => b.silCannonBookAbbrev.Equals(book))
                   .Select(b => b.silCannonBookNum)
-                  .FirstOrDefault() ?? throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookAbbrev", value: bookAbbreviation)),
+                  .FirstOrDefault() ?? throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookAbbrev", value: book)),
                   chapterNumber,
                   verseNumber,
                   wordNumber,
@@ -116,14 +116,47 @@ namespace ClearBible.Engine.Corpora
 
         public int CompareTo(TokenId? other)
         {
-            // If other is not a valid object reference, this instance is smaller.
+
             if (other == null) return -1;
 
-            return ToString().CompareTo(other.ToString());
+            int result = BookNumber.CompareTo(other.BookNumber);
+            if (result == 0)
+            {
+                result = ChapterNumber.CompareTo(other.ChapterNumber);
+                if (result == 0)
+                {
+                    result = VerseNumber.CompareTo(other.VerseNumber);
+                    if (result == 0)
+                    {
+                        result = WordNumber.CompareTo(other.WordNumber);
+                        if (result == 0)
+                        {
+                            result = SubWordNumber.CompareTo(other.SubWordNumber);
+                        }
+                    }
+                }
+            }
+            return result;
         } 
         public override string ToString()
         {
             return $"{BookNumber.ToString("000")}{ChapterNumber.ToString("000")}{VerseNumber.ToString("000")}{WordNumber.ToString("000")}{SubWordNumber.ToString("000")}";
+        }
+
+        public virtual bool IsNextSubword(TokenId tokenId)
+        { 
+            if (BookNumber == tokenId.BookNumber && 
+                ChapterNumber == tokenId.ChapterNumber && 
+                VerseNumber == tokenId.VerseNumber &&
+                WordNumber == tokenId.WordNumber &&
+                SubWordNumber + 1 == tokenId.SubWordNumber)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
