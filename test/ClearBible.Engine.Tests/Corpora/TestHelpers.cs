@@ -141,7 +141,7 @@ namespace ClearBible.Engine.Tests.Corpora
             output_.WriteLine($"Target surfaceTexts spaced    : {string.Join(" ", surfaceTexts)}");
 
             //Surface text, detokenized
-            tokensWithPadding = sourceDetokenizer.Detokenize(engineParallelTextRow.TargetTokens);
+            tokensWithPadding = targetDetokenizer.Detokenize(engineParallelTextRow.TargetTokens);
             output_.WriteLine($"Target detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}")}");
             output_.WriteLine("");
         }
