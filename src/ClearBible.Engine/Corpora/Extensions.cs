@@ -12,18 +12,22 @@ namespace ClearBible.Engine.Corpora
             {
 				if (
 					verseMapping.SourceVerses //not all of the sourceverses for a given verseMapping are for the same book
+					.Select(v => v.Book)
 					.Distinct()
 					.Skip(1)
 					.Any()
 						||
 					verseMapping.TargetVerses //not all of the targetVerses for a given verseMapping are for the same book
-					.Distinct()
+                    .Select(v => v.Book)
+                    .Distinct()
 					.Skip(1)
 					.Any()
 						||
 					! verseMapping.SourceVerses // the sourceVerses book and targetVerses book are not the same
-					.Distinct()
+                    .Select(v => v.Book)
+                    .Distinct()
 					.First().Equals(verseMapping.TargetVerses
+					.Select(v => v.Book)
 					.Distinct()
 					.First())
 					)

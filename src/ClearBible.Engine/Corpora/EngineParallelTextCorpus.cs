@@ -1,6 +1,7 @@
 ﻿using ClearBible.Engine.Exceptions;
 using SIL.Machine.Corpora;
 using SIL.Scripture;
+using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -15,6 +16,8 @@ namespace ClearBible.Engine.Corpora
 	public class EngineParallelTextCorpus : ParallelTextCorpus
 	{
 		private readonly IComparer<object>? _segmentRefComparer;
+
+		private string? _limitToBookAbbreviation = null;
 
 		/// <summary>
 		/// 
@@ -44,12 +47,12 @@ namespace ClearBible.Engine.Corpora
 			// If engineVersificationMappingList is null, use Machine/sil/scripture versification to create it.
 
 			if (verseMappingList != null && verseMappingList.Count == 0)
-            {
+			{
 				_segmentRefComparer = rowRefComparer;
 
 				//Versifications as used in machine doesn't support combining verses.
 
-                _ = base.GetRows()
+				_ = base.GetRows()
 					.Select(parallelTextRow =>
 						{
 							var verseMapping = new VerseMapping
@@ -73,10 +76,42 @@ namespace ClearBible.Engine.Corpora
 				//for rebuilding map from file: use to VerseRef.VerseRef(int bookNum, int chapterNum, int verseNum, ScrVers versification) constructor.
 				VerseMappingList = verseMappingList;
 			}
+			if (sourceCorpus is ScriptureTextCorpus sourceScriptureTextCorpus)
+			{
+				SourceCorpusVersification = sourceScriptureTextCorpus.Versification;
+			}
 		}
 		public List<VerseMapping>? VerseMappingList { get; set; } = null;
 
-		public override IEnumerator<ParallelTextRow> GetEnumerator()
+		public ScrVers? SourceCorpusVersification { get; }
+
+		public IEnumerable<ParallelTextRow> SetLimitToBook(string? bookAbbreviation)
+		{
+            _limitToBookAbbreviation = bookAbbreviation;
+            return this;
+        }
+        public IEnumerable<ParallelTextRow> SetLimitToBook(int? bookNumber = null)
+        {
+            if (bookNumber == null)
+            {
+                _limitToBookAbbreviation = null;
+            }
+            else
+            {
+                _limitToBookAbbreviation = BookIds
+                    .Where(b => int.Parse(b.silCannonBookNum) == bookNumber)
+                    .FirstOrDefault()?
+                    .silCannonBookAbbrev
+                    ?? throw new InvalidBookMappingEngineException(message: "Doesn't exist", name: "silCannonBookNum", value: bookNumber?.ToString() ?? "null");
+            }
+			return this;
+        }
+        public string? GetLimitToBook()
+        {
+			return _limitToBookAbbreviation;
+        }
+
+        public override IEnumerator<ParallelTextRow> GetEnumerator()
 		{
 			IEnumerable<string> sourceTextIds = SourceCorpus.Texts.Select(t => t.Id);
 			IEnumerable<string> targetTextIds = TargetCorpus.Texts.Select(t => t.Id);
@@ -85,7 +120,13 @@ namespace ClearBible.Engine.Corpora
 			if (AllSourceRows && AllTargetRows)
 				textIds = sourceTextIds.Union(targetTextIds);
 			else if (!AllSourceRows && !AllTargetRows)
+			{
 				textIds = sourceTextIds.Intersect(targetTextIds);
+				if (_limitToBookAbbreviation != null)
+				{
+					textIds = new List<string>() { _limitToBookAbbreviation }.Intersect(textIds);
+				}
+			}
 			else if (AllSourceRows)
 				textIds = sourceTextIds;
 			else
