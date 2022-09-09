@@ -20,7 +20,7 @@ namespace ClearBible.Engine.Tests.Corpora
 			output_ = output;
 		}
 
-		[Fact]
+        [Fact]
 		public void ParallelCorpus__GetGetRows_SameVerseRefOneToMany()
 		{
 			Versification.Table.Implementation.RemoveAllUnknownVersifications();
@@ -91,28 +91,28 @@ namespace ClearBible.Engine.Tests.Corpora
             var sourceCorpus = new DictionaryTextCorpus(
                 new MemoryText("MAT", new[]
                 {
-                    TextRow(new VerseRef("MAT 1:1", versificationSource), "source MAT chapter one, verse one ."),
-                    TextRow(new VerseRef("MAT 1:2", versificationSource), "source MAT chapter one, verse two ."),
-                    TextRow(new VerseRef("MAT 1:3", versificationSource), "source MAT chapter one, verse three .")
+                    TextRow(new VerseRef("MAT 1:1", versificationSource), "source MAT chapter one, verse one."),
+                    TextRow(new VerseRef("MAT 1:2", versificationSource), "source MAT chapter one, verse two."),
+                    TextRow(new VerseRef("MAT 1:3", versificationSource), "source MAT chapter one, verse three.")
                 }),
                 new MemoryText("MRK", new[]
                 {
-                    TextRow(new VerseRef("MRK 1:1", versificationSource), "source MRK chapter one, verse one ."),
-                    TextRow(new VerseRef("MRK 1:2", versificationSource), "source MRK chapter one, verse two ."),
-                    TextRow(new VerseRef("MRK 1:3", versificationSource), "source MRK chapter one, verse three .")
+                    TextRow(new VerseRef("MRK 1:1", versificationSource), "source MRK chapter one, verse one."),
+                    TextRow(new VerseRef("MRK 1:2", versificationSource), "source MRK chapter one, verse two."),
+                    TextRow(new VerseRef("MRK 1:3", versificationSource), "source MRK chapter one, verse three.")
                 }));
             var targetCorpus = new DictionaryTextCorpus(
                 new MemoryText("MAT", new[]
                 {
-                    TextRow(new VerseRef("MAT 1:1", versificationTarget), "target MAT chapter one, verse one ."),
-                    TextRow(new VerseRef("MAT 1:2", versificationTarget), "target MAT chapter one, verse two ."),
-                    TextRow(new VerseRef("MAT 1:3", versificationTarget), "target MAT chapter one, verse three .")
+                    TextRow(new VerseRef("MAT 1:1", versificationTarget), "target MAT chapter one, verse one."),
+                    TextRow(new VerseRef("MAT 1:2", versificationTarget), "target MAT chapter one, verse two."),
+                    TextRow(new VerseRef("MAT 1:3", versificationTarget), "target MAT chapter one, verse three.")
                 }),
                 new MemoryText("MRK", new[]
                 {
-                    TextRow(new VerseRef("MRK 1:1", versificationTarget), "target MRK chapter one, verse one ."),
-                    TextRow(new VerseRef("MRK 1:2", versificationTarget), "target MRK chapter one, verse two ."),
-                    TextRow(new VerseRef("MRK 1:3", versificationTarget), "target MRK chapter one, verse three .")
+                    TextRow(new VerseRef("MRK 1:1", versificationTarget), "target MRK chapter one, verse one."),
+                    TextRow(new VerseRef("MRK 1:2", versificationTarget), "target MRK chapter one, verse two."),
+                    TextRow(new VerseRef("MRK 1:3", versificationTarget), "target MRK chapter one, verse three.")
                 }));
             var engineParallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
 
@@ -182,6 +182,161 @@ namespace ClearBible.Engine.Tests.Corpora
 
         }
 
+        [Fact]
+        public void ParallelCorpus__LimitByBook_FindRangeByVerse()
+        {
+            /*
+			 *  Should result in the following mapping for MAT 1:
+			 *  
+			 *  Original       Source         Target
+			 *     1             2              3
+			 *     2             3              2
+			 *     3             1              1
+			 * 
+			 */
+            Versification.Table.Implementation.RemoveAllUnknownVersifications();
+            string source = "&MAT 1:2 = MAT 1:1\nMAT 1:3 = MAT 1:2\nMAT 1:1 = MAT 1:3\n";
+            ScrVers versificationSource;
+            using (var reader = new StringReader(source))
+            {
+                versificationSource = Versification.Table.Implementation.Load(reader, "vers.txt", ScrVers.English, "custom");
+            }
+
+            Versification.Table.Implementation.RemoveAllUnknownVersifications();
+            string target = "&MAT 1:3 = MAT 1:1\nMAT 1:1 = MAT 1:3\nMAT 1:2 = MAT 1:2\n";
+            ScrVers versificationTarget;
+            using (var reader = new StringReader(target))
+            {
+                versificationTarget = Versification.Table.Implementation.Load(reader, "vers.txt", ScrVers.English, "custom");
+            }
+
+
+            var sourceCorpus = new DictionaryTextCorpus(
+                new MemoryText("MAT", new[]
+                {
+                    TextRow(new VerseRef("MAT 1:1", versificationSource), "source MAT chapter one, verse one."),
+                    TextRow(new VerseRef("MAT 1:2", versificationSource), "source MAT chapter one, verse two."),
+                    TextRow(new VerseRef("MAT 1:3", versificationSource), "source MAT chapter one, verse three."),
+                    TextRow(new VerseRef("MAT 1:4", versificationSource), "source MAT chapter one, verse four."),
+                    TextRow(new VerseRef("MAT 1:5", versificationSource), "source MAT chapter one, verse five."),
+                    TextRow(new VerseRef("MAT 1:6", versificationSource), "source MAT chapter one, verse six.")
+                }),
+                new MemoryText("MRK", new[]
+                {
+                    TextRow(new VerseRef("MRK 1:1", versificationSource), "source MRK chapter one, verse one."),
+                    TextRow(new VerseRef("MRK 1:2", versificationSource), "source MRK chapter one, verse two."),
+                    TextRow(new VerseRef("MRK 1:3", versificationSource), "source MRK chapter one, verse three."),
+                    TextRow(new VerseRef("MRK 1:4", versificationSource), "source MRK chapter one, verse four."),
+                    TextRow(new VerseRef("MRK 1:5", versificationSource), "source MRK chapter one, verse five."),
+                    TextRow(new VerseRef("MRK 1:6", versificationSource), "source MRK chapter one, verse six.")
+                }));
+            var targetCorpus = new DictionaryTextCorpus(
+                new MemoryText("MAT", new[]
+                {
+                    TextRow(new VerseRef("MAT 1:1", versificationTarget), "target MAT chapter one, verse one."),
+                    TextRow(new VerseRef("MAT 1:2", versificationTarget), "target MAT chapter one, verse two."),
+                    TextRow(new VerseRef("MAT 1:3", versificationTarget), "target MAT chapter one, verse three."),
+                    TextRow(new VerseRef("MAT 1:4", versificationTarget), "target MAT chapter one, verse four."),
+                    TextRow(new VerseRef("MAT 1:5", versificationTarget), "target MAT chapter one, verse five."),
+                    TextRow(new VerseRef("MAT 1:6", versificationTarget), "target MAT chapter one, verse six.")
+                }),
+                new MemoryText("MRK", new[]
+                {
+                    TextRow(new VerseRef("MRK 1:1", versificationTarget), "target MRK chapter one, verse one."),
+                    TextRow(new VerseRef("MRK 1:2", versificationTarget), "target MRK chapter one, verse two."),
+                    TextRow(new VerseRef("MRK 1:3", versificationTarget), "target MRK chapter one, verse three."),
+                    TextRow(new VerseRef("MRK 1:4", versificationTarget), "target MRK chapter one, verse four."),
+                    TextRow(new VerseRef("MRK 1:5", versificationTarget), "target MRK chapter one, verse five."),
+                    TextRow(new VerseRef("MRK 1:6", versificationTarget), "target MRK chapter one, verse six.")
+                }));
+            var engineParallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+
+            var parallelTextRowsMAT13_1_1 = engineParallelTextCorpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 1, 1, versificationSource);
+            Assert.Equal(3, parallelTextRowsMAT13_1_1.parallelTextRows.Count());
+            Assert.Equal(1, parallelTextRowsMAT13_1_1.indexOfVerse);
+
+            var list = parallelTextRowsMAT13_1_1.parallelTextRows.ToList();
+
+            Assert.True(list[0].SourceRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:3", versificationSource)))
+                .Count() > 0);
+            Assert.True(list[0].TargetRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:2", versificationTarget)))
+                .Count() > 0);
+            Assert.True(list[1].SourceRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:1", versificationSource)))
+                .Count() > 0);
+            Assert.True(list[1].TargetRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:1", versificationTarget)))
+                .Count() > 0);
+            Assert.True(list[2].SourceRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:4", versificationSource)))
+                .Count() > 0);
+            Assert.True(list[2].TargetRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:4", versificationTarget)))
+                .Count() > 0);
+
+            var parallelTextRowsMAT13_1_3 = engineParallelTextCorpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 1, 3, versificationSource);
+            Assert.Equal(5, parallelTextRowsMAT13_1_3.parallelTextRows.Count());
+            Assert.Equal(1, parallelTextRowsMAT13_1_3.indexOfVerse);
+
+            var parallelTextRowsMAT13_4_4 = engineParallelTextCorpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 4, 4, versificationSource);
+            Assert.Equal(6, parallelTextRowsMAT13_4_4.parallelTextRows.Count());
+            Assert.Equal(2, parallelTextRowsMAT13_4_4.indexOfVerse);
+
+            var parallelTextRowsMAT13_14_14 = engineParallelTextCorpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 3, 14, versificationSource);
+            Assert.Equal(6, parallelTextRowsMAT13_14_14.parallelTextRows.Count());
+            Assert.Equal(2, parallelTextRowsMAT13_14_14.indexOfVerse);
+
+            list = parallelTextRowsMAT13_14_14.parallelTextRows.ToList();
+
+            Assert.True(list[0].SourceRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:2", versificationSource)))
+                .Count() > 0);
+            Assert.True(list[0].TargetRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:3", versificationTarget)))
+                .Count() > 0);
+            Assert.True(list[1].SourceRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:3", versificationSource)))
+                .Count() > 0);
+            Assert.True(list[1].TargetRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:2", versificationTarget)))
+                .Count() > 0);
+            Assert.True(list[2].SourceRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:1", versificationSource)))
+                .Count() > 0);
+            Assert.True(list[2].TargetRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:1", versificationTarget)))
+                .Count() > 0);
+            Assert.True(list[3].SourceRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:4", versificationSource)))
+                .Count() > 0);
+            Assert.True(list[3].TargetRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:4", versificationTarget)))
+                .Count() > 0);
+            Assert.True(list[4].SourceRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:5", versificationSource)))
+                .Count() > 0);
+            Assert.True(list[4].TargetRefs
+                .Cast<VerseRef>()
+                .Where(vr => vr.Equals(new VerseRef("MAT 1:5", versificationTarget)))
+                .Count() > 0);
+        }
         private static TextRow TextRow(int key, string text = "", bool isSentenceStart = true,
 			bool isInRange = false, bool isRangeStart = false)
 		{

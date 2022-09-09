@@ -1,10 +1,12 @@
 ﻿
 using SIL.Machine.Corpora;
 using SIL.Machine.Translation;
+using SIL.Scripture;
+using System;
 
 namespace ClearBible.Engine.Corpora
 {
-    public class EngineParallelTextRow : ParallelTextRow
+    public class EngineParallelTextRow : ParallelTextRow, IEquatable<EngineParallelTextRow>
     {
         private static IReadOnlyList<object> GetSourceSegmentRefs(IEnumerable<TextRow> sourceTextRows, IEnumerable<TextRow> targetTextRows, IEnumerable<AlignmentRow> alignmentRows)
         {
@@ -103,5 +105,40 @@ namespace ClearBible.Engine.Corpora
         public IReadOnlyList<Token>? SourceTokens { get; }
 
         public IReadOnlyList<Token>? TargetTokens { get; }
+
+        public override bool Equals(object? obj)
+        {
+            bool equals = obj is EngineParallelTextRow engineParallelTextRow
+                && engineParallelTextRow.SourceRefs.Count() > 0
+                && engineParallelTextRow.SourceRefs.Count() == SourceRefs.Count();
+
+            if (!equals)
+                return false;
+
+            foreach (var sourceVerseRef in SourceRefs.Cast<VerseRef>())
+            {
+                if (!((EngineParallelTextRow) obj!).SourceRefs
+                        .Cast<VerseRef>()
+                        .Contains(sourceVerseRef))
+                {
+                    equals = false;
+                    break;
+                }
+            }
+            return equals;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 0;
+            foreach (var sourceVerseRef in SourceRefs.Cast<VerseRef>())
+                hashCode += sourceVerseRef.GetHashCode();
+            return hashCode;
+        }
+
+        public bool Equals(EngineParallelTextRow? other)
+        {
+            return Equals((object?)other);
+        }
     }
 }

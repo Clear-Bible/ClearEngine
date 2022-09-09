@@ -1,5 +1,6 @@
 ﻿using ClearBible.Engine.Exceptions;
 using SIL.Machine.Corpora;
+using SIL.Scripture;
 using System.Collections;
 
 namespace ClearBible.Engine.Corpora
@@ -150,5 +151,60 @@ namespace ClearBible.Engine.Corpora
 						new List<Token>() { t })
 				.OrderBy(t => t.Position);
         }
-	}
+
+
+
+
+		public static (IEnumerable<ParallelTextRow> parallelTextRows, int indexOfVerse) GetByVerseRange(this EngineParallelTextCorpus engineParallelTextCorpus, 
+			VerseRef verseRef, 
+			ushort numberOfVersesInChapterBefore, 
+			ushort numberOfVersesInChapterAfter, 
+			ScrVers? sourceCorpusVersification = null)
+		{
+            sourceCorpusVersification = sourceCorpusVersification 
+				?? engineParallelTextCorpus.SourceCorpusVersification 
+				?? ScrVers.English;
+
+            var priorLimitToBook = engineParallelTextCorpus.GetLimitToBook();
+
+			var parallelTextRows = new List<ParallelTextRow>();
+
+			engineParallelTextCorpus.SetLimitToBook(verseRef.Book);
+
+			var firstVerseNumber = verseRef.VerseNum - numberOfVersesInChapterBefore;
+			var count = numberOfVersesInChapterAfter + numberOfVersesInChapterBefore + 1;
+			//var indexOfVerse = (numberOfVersesInChapterBefore + numberOfVersesInChapterAfter) / 2;
+			if (firstVerseNumber <= 0) 
+			{
+				count = count + firstVerseNumber - 1;
+				//indexOfVerse = indexOfVerse + firstVerse - 1;
+				firstVerseNumber = 1;
+			}
+
+			foreach (var verseNumber in Enumerable.Range(firstVerseNumber, count))
+			{
+                var currentVerseRef = verseRef; 
+				currentVerseRef.VerseNum = verseNumber;
+				currentVerseRef.ChangeVersification(sourceCorpusVersification);
+
+				var engineParallelTextRowForVerse = engineParallelTextCorpus
+					.Where(parallelTextRow => parallelTextRow.SourceRefs.Contains(currentVerseRef))
+					.FirstOrDefault();
+
+				if (engineParallelTextRowForVerse == null)
+				{
+					break;
+				}
+				else
+				{ 
+					if (!parallelTextRows.Contains(engineParallelTextRowForVerse))
+						parallelTextRows.Add(engineParallelTextRowForVerse);
+				}
+            }
+
+			engineParallelTextCorpus.SetLimitToBook(priorLimitToBook);
+			verseRef.ChangeVersification(sourceCorpusVersification);
+			return (parallelTextRows, parallelTextRows.FindIndex(pr => pr.SourceRefs.Contains(verseRef)));
+		}
+    }
 }
