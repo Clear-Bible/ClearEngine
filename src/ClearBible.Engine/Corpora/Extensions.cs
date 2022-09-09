@@ -153,9 +153,57 @@ namespace ClearBible.Engine.Corpora
         }
 
 
+		public static (IEnumerable<TextRow> textRows, int indexOfVerse) GetByVerseRange(this ScriptureTextCorpus scriptureTextCorpus,
+            VerseRef verseRef,
+            ushort numberOfVersesInChapterBefore,
+            ushort numberOfVersesInChapterAfter,
+            ScrVers? versification = null)
+		{
+			versification = versification
+                ?? scriptureTextCorpus.Versification 
+				?? throw new InvalidStateEngineException(name: "versificaiton", value: "null", message: "both parameter null and textRows isn't a ScriptureTextCorpus");
 
 
-		public static (IEnumerable<ParallelTextRow> parallelTextRows, int indexOfVerse) GetByVerseRange(this EngineParallelTextCorpus engineParallelTextCorpus, 
+            var textRows = new List<TextRow>();
+
+            var bookTextRows = scriptureTextCorpus[verseRef.Book].GetRows();
+
+            var firstVerseNumber = verseRef.VerseNum - numberOfVersesInChapterBefore;
+            var count = numberOfVersesInChapterAfter + numberOfVersesInChapterBefore + 1;
+            //var indexOfVerse = (numberOfVersesInChapterBefore + numberOfVersesInChapterAfter) / 2;
+            if (firstVerseNumber <= 0)
+            {
+                count = count + firstVerseNumber - 1;
+                //indexOfVerse = indexOfVerse + firstVerse - 1;
+                firstVerseNumber = 1;
+            }
+
+            foreach (var verseNumber in Enumerable.Range(firstVerseNumber, count))
+            {
+                var currentVerseRef = verseRef;
+                currentVerseRef.VerseNum = verseNumber;
+                currentVerseRef.ChangeVersification(versification);
+
+                var textRowForVerse = bookTextRows
+                    .Where(textRow => textRow.Ref.Equals(currentVerseRef))
+                    .FirstOrDefault();
+
+                if (textRowForVerse == null)
+                {
+                    break;
+                }
+                else
+                {
+                    textRows.Add(textRowForVerse);
+                }
+            }
+
+            verseRef.ChangeVersification(versification);
+            return (textRows, textRows.FindIndex(tr => tr.Ref.Equals(verseRef)));
+        }
+
+
+        public static (IEnumerable<ParallelTextRow> parallelTextRows, int indexOfVerse) GetByVerseRange(this EngineParallelTextCorpus engineParallelTextCorpus, 
 			VerseRef verseRef, 
 			ushort numberOfVersesInChapterBefore, 
 			ushort numberOfVersesInChapterAfter, 
@@ -163,7 +211,7 @@ namespace ClearBible.Engine.Corpora
 		{
             sourceCorpusVersification = sourceCorpusVersification 
 				?? engineParallelTextCorpus.SourceCorpusVersification 
-				?? ScrVers.English;
+				?? throw new InvalidStateEngineException(name: "sourceCorpusVersification", value: "null", message: "both parameter null and engineParallelTextCorpus.SourceCorpusVersification is null");
 
             var priorLimitToBook = engineParallelTextCorpus.GetLimitToBook();
 

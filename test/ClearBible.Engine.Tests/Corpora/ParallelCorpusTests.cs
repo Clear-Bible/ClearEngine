@@ -8,6 +8,8 @@ using SIL.Machine.Corpora;
 using SIL.Scripture;
 using Xunit.Abstractions;
 using ClearBible.Engine.Corpora;
+using ClearBible.Engine.Tokenization;
+using SIL.Machine.Tokenization;
 
 namespace ClearBible.Engine.Tests.Corpora
 {
@@ -229,7 +231,10 @@ namespace ClearBible.Engine.Tests.Corpora
                     TextRow(new VerseRef("MRK 1:4", versificationSource), "source MRK chapter one, verse four."),
                     TextRow(new VerseRef("MRK 1:5", versificationSource), "source MRK chapter one, verse five."),
                     TextRow(new VerseRef("MRK 1:6", versificationSource), "source MRK chapter one, verse six.")
-                }));
+                }))
+                .Tokenize<LatinWordTokenizer>()
+                .Transform<IntoTokensTextRowProcessor>();
+
             var targetCorpus = new DictionaryTextCorpus(
                 new MemoryText("MAT", new[]
                 {
@@ -248,7 +253,10 @@ namespace ClearBible.Engine.Tests.Corpora
                     TextRow(new VerseRef("MRK 1:4", versificationTarget), "target MRK chapter one, verse four."),
                     TextRow(new VerseRef("MRK 1:5", versificationTarget), "target MRK chapter one, verse five."),
                     TextRow(new VerseRef("MRK 1:6", versificationTarget), "target MRK chapter one, verse six.")
-                }));
+                }))
+                .Tokenize<LatinWordTokenizer>()
+                .Transform<IntoTokensTextRowProcessor>();
+
             var engineParallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
 
             var parallelTextRowsMAT13_1_1 = engineParallelTextCorpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 1, 1, versificationSource);

@@ -4,7 +4,9 @@ using ClearBible.Engine.Tokenization;
 using SIL.Machine.Corpora;
 using SIL.Machine.Tokenization;
 using SIL.Scripture;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Xunit;
@@ -115,6 +117,106 @@ namespace ClearBible.Engine.Tests.Corpora
             {
                 TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new EngineStringDetokenizer(new LatinWordDetokenizer()));
             }
+        }
+
+        [Fact]
+        [Trait("Category", "Example")]
+        public void Corpus__LimitByBook_FindRangeByVerse()
+        {
+            /*
+             *  Should result in the following mapping for MAT 1:
+             *  
+             *  Original       corpus
+             *     1             2   
+             *     2             3   
+             *     3             1   
+             * 
+             */
+            Versification.Table.Implementation.RemoveAllUnknownVersifications();
+            string customVersificationAddition = "&MAT 1:2 = MAT 1:1\nMAT 1:3 = MAT 1:2\nMAT 1:1 = MAT 1:3\n";
+            ScrVers versification;
+            using (var reader = new StringReader(customVersificationAddition))
+            {
+                versification = Versification.Table.Implementation.Load(reader, "vers.txt", ScrVers.English, "custom");
+            }
+
+            var texts = new List<IText>() 
+            {
+                new MemoryText("MAT", new[]
+                {
+                    TextRow(new VerseRef("MAT 1:1", versification), "source MAT chapter one, verse one."),
+                    TextRow(new VerseRef("MAT 1:2", versification), "source MAT chapter one, verse two."),
+                    TextRow(new VerseRef("MAT 1:3", versification), "source MAT chapter one, verse three."),
+                    TextRow(new VerseRef("MAT 1:4", versification), "source MAT chapter one, verse four."),
+                    TextRow(new VerseRef("MAT 1:5", versification), "source MAT chapter one, verse five."),
+                    TextRow(new VerseRef("MAT 1:6", versification), "source MAT chapter one, verse six.")
+                }),
+                new MemoryText("MRK", new[]
+                {
+                    TextRow(new VerseRef("MRK 1:1", versification), "source MRK chapter one, verse one."),
+                    TextRow(new VerseRef("MRK 1:2", versification), "source MRK chapter one, verse two."),
+                    TextRow(new VerseRef("MRK 1:3", versification), "source MRK chapter one, verse three."),
+                    TextRow(new VerseRef("MRK 1:4", versification), "source MRK chapter one, verse four."),
+                    TextRow(new VerseRef("MRK 1:5", versification), "source MRK chapter one, verse five."),
+                    TextRow(new VerseRef("MRK 1:6", versification), "source MRK chapter one, verse six.")
+                })
+            };
+
+            var corpus = new TestScriptureTextCorpus(texts, versification);
+
+            var textRowsAndIndex3_1_1 = corpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 1, 1, versification);
+            Assert.Equal(3, textRowsAndIndex3_1_1.textRows.Count());
+            Assert.Equal(1, textRowsAndIndex3_1_1.indexOfVerse);
+
+            var list = textRowsAndIndex3_1_1.textRows.ToList();
+            Assert.True(list[0].Ref.Equals(new VerseRef("MAT 1:3", versification)));
+            Assert.True(list[1].Ref.Equals(new VerseRef("MAT 1:1", versification)));
+            Assert.True(list[2].Ref.Equals(new VerseRef("MAT 1:4", versification)));
+
+            var textRowsAndIndex3_1_3 = corpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 1, 3, versification);
+            Assert.Equal(5, textRowsAndIndex3_1_3.textRows.Count());
+            Assert.Equal(1, textRowsAndIndex3_1_3.indexOfVerse);
+
+            var textRowsAndIndex3_4_4 = corpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 4, 4, versification);
+            Assert.Equal(6, textRowsAndIndex3_4_4.textRows.Count());
+            Assert.Equal(2, textRowsAndIndex3_4_4.indexOfVerse);
+
+            var textRowsAndIndex3_3_14 = corpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 3, 14, versification);
+            Assert.Equal(6, textRowsAndIndex3_3_14.textRows.Count());
+            Assert.Equal(2, textRowsAndIndex3_3_14.indexOfVerse);
+
+            list = textRowsAndIndex3_3_14.textRows.ToList();
+            Assert.True(list[0].Ref.Equals(new VerseRef("MAT 1:2", versification)));
+            Assert.True(list[1].Ref.Equals(new VerseRef("MAT 1:3", versification)));
+            Assert.True(list[2].Ref.Equals(new VerseRef("MAT 1:1", versification)));
+            Assert.True(list[3].Ref.Equals(new VerseRef("MAT 1:4", versification)));
+            Assert.True(list[4].Ref.Equals(new VerseRef("MAT 1:5", versification)));
+        }
+
+        class TestScriptureTextCorpus : ScriptureTextCorpus
+        {
+            public TestScriptureTextCorpus(IEnumerable<IText> texts, ScrVers versification)
+            {
+                foreach(var text in texts)
+                {
+                    AddText(text);
+                }
+                Versification = versification;
+            }
+
+            public override ScrVers Versification { get; }
+        }
+        private static TextRow TextRow(VerseRef vref, string text = "", bool isSentenceStart = true,
+             bool isInRange = false, bool isRangeStart = false)
+        {
+            return new TextRow(vref)
+            {
+                Segment = text.Length == 0 ? Array.Empty<string>() : text.Split(),
+                IsSentenceStart = isSentenceStart,
+                IsInRange = isInRange,
+                IsRangeStart = isRangeStart,
+                IsEmpty = text.Length == 0
+            };
         }
     }
 }
