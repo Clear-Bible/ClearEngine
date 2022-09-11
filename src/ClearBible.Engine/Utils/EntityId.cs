@@ -1,6 +1,10 @@
 ﻿
 namespace ClearBible.Engine.Utils
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T">The type of the derived id.</typeparam>
     public class EntityId<T> : IId where T : EntityId<T>
     {
         public Guid Id { get; set; } = Guid.NewGuid();
