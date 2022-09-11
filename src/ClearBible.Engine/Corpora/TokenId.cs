@@ -1,9 +1,10 @@
 ﻿using ClearBible.Engine.Exceptions;
+using ClearBible.Engine.Utils;
 using static ClearBible.Engine.Persistence.FileGetBookIds;
 
 namespace ClearBible.Engine.Corpora
 {
-    public class TokenId : IEquatable<TokenId>, IComparable<TokenId>
+    public class TokenId : EntityId<TokenId>, IEquatable<TokenId>, IComparable<TokenId>
     {
         /// <summary>
         /// SIL book number
