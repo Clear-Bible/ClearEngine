@@ -2,7 +2,7 @@
 
 namespace ClearBible.Engine.Utils
 {
-    public interface IId : IIdEquitable
+    public interface IId : IIdEquatable
     {
         /// <summary>
         /// used for universal identification and compared using

@@ -38,7 +38,7 @@ namespace ClearBible.Engine.Tests.Corpora
         }
 
         [Fact]
-        public void EntityId__CombiningWithIdEquitablesCollections()
+        public void EntityId__CombiningWithIdEquatablesCollections()
         {
             var testId = new TestId("11");
             var (fullyQualifiedNameTestId, guidTestId) = testId.GetNameAndId();
@@ -75,36 +75,36 @@ namespace ClearBible.Engine.Tests.Corpora
             };
 
             var testIdsNotes = testIds.Combine(notes).ToList();
-            Assert.True(((Note)testIdsNotes[0].idEquitablesCollections[0]).Text.Equals("howdy from note 1"));
-            Assert.Single(testIdsNotes[0].idEquitablesCollections);
-            Assert.True(((Note)testIdsNotes[1].idEquitablesCollections[0]).Text.Equals("howdy from note 3"));
-            Assert.Single(testIdsNotes[0].idEquitablesCollections);
+            Assert.True(((Note)testIdsNotes[0].idEquatablesCollections[0]).Text.Equals("howdy from note 1"));
+            Assert.Single(testIdsNotes[0].idEquatablesCollections);
+            Assert.True(((Note)testIdsNotes[1].idEquatablesCollections[0]).Text.Equals("howdy from note 3"));
+            Assert.Single(testIdsNotes[0].idEquatablesCollections);
 
             var test2IdsNotes = test2Ids.Combine(notes).ToList();
-            Assert.True(((Note)test2IdsNotes[0].idEquitablesCollections[0]).Text.Equals("howdy from note 1"));
-            Assert.True(((Note)test2IdsNotes[0].idEquitablesCollections[1]).Text.Equals("howdy from note 2"));
-            Assert.Equal(2, test2IdsNotes[0].idEquitablesCollections.Count);
-            Assert.True(((Note)test2IdsNotes[1].idEquitablesCollections[0]).Text.Equals("howdy from note 1"));
-            Assert.True(((Note)test2IdsNotes[1].idEquitablesCollections[1]).Text.Equals("howdy from note 2"));
-            Assert.True(((Note)test2IdsNotes[1].idEquitablesCollections[2]).Text.Equals("howdy from note 3"));
-            Assert.Equal(3, test2IdsNotes[1].idEquitablesCollections.Count);
+            Assert.True(((Note)test2IdsNotes[0].idEquatablesCollections[0]).Text.Equals("howdy from note 1"));
+            Assert.True(((Note)test2IdsNotes[0].idEquatablesCollections[1]).Text.Equals("howdy from note 2"));
+            Assert.Equal(2, test2IdsNotes[0].idEquatablesCollections.Count);
+            Assert.True(((Note)test2IdsNotes[1].idEquatablesCollections[0]).Text.Equals("howdy from note 1"));
+            Assert.True(((Note)test2IdsNotes[1].idEquatablesCollections[1]).Text.Equals("howdy from note 2"));
+            Assert.True(((Note)test2IdsNotes[1].idEquatablesCollections[2]).Text.Equals("howdy from note 3"));
+            Assert.Equal(3, test2IdsNotes[1].idEquatablesCollections.Count);
 
             var idsNotes = ids.Combine(notes).ToList();
-            Assert.True(((Note)idsNotes[0].idEquitablesCollections[0]).Text.Equals("howdy from note 1"));
-            Assert.Single(idsNotes[0].idEquitablesCollections);
-            Assert.True(((Note)idsNotes[1].idEquitablesCollections[0]).Text.Equals("howdy from note 3"));
-            Assert.Single(idsNotes[1].idEquitablesCollections);
-            Assert.True(((Note)idsNotes[2].idEquitablesCollections[0]).Text.Equals("howdy from note 1"));
-            Assert.True(((Note)idsNotes[2].idEquitablesCollections[1]).Text.Equals("howdy from note 2"));
-            Assert.Equal(2, idsNotes[2].idEquitablesCollections.Count);
-            Assert.True(((Note)idsNotes[3].idEquitablesCollections[0]).Text.Equals("howdy from note 1"));
-            Assert.True(((Note)idsNotes[3].idEquitablesCollections[1]).Text.Equals("howdy from note 2"));
-            Assert.True(((Note)idsNotes[3].idEquitablesCollections[2]).Text.Equals("howdy from note 3"));
-            Assert.Equal(3, idsNotes[3].idEquitablesCollections.Count);
+            Assert.True(((Note)idsNotes[0].idEquatablesCollections[0]).Text.Equals("howdy from note 1"));
+            Assert.Single(idsNotes[0].idEquatablesCollections);
+            Assert.True(((Note)idsNotes[1].idEquatablesCollections[0]).Text.Equals("howdy from note 3"));
+            Assert.Single(idsNotes[1].idEquatablesCollections);
+            Assert.True(((Note)idsNotes[2].idEquatablesCollections[0]).Text.Equals("howdy from note 1"));
+            Assert.True(((Note)idsNotes[2].idEquatablesCollections[1]).Text.Equals("howdy from note 2"));
+            Assert.Equal(2, idsNotes[2].idEquatablesCollections.Count);
+            Assert.True(((Note)idsNotes[3].idEquatablesCollections[0]).Text.Equals("howdy from note 1"));
+            Assert.True(((Note)idsNotes[3].idEquatablesCollections[1]).Text.Equals("howdy from note 2"));
+            Assert.True(((Note)idsNotes[3].idEquatablesCollections[2]).Text.Equals("howdy from note 3"));
+            Assert.Equal(3, idsNotes[3].idEquatablesCollections.Count);
         }
 
         [Fact]
-        public void EntityId__CombiningTokenIdAndCompositeTokenIdsWithIdEquitablesCollections()
+        public void EntityId__CombiningTokenIdAndCompositeTokenIdsWithIdEquatablesCollections()
         {
             //create tokens
             var corpus = new DictionaryTextCorpus(
@@ -153,13 +153,13 @@ namespace ClearBible.Engine.Tests.Corpora
 
             //combine notes with verse tokens that include both a CompositeToken and a Token so UI can associate notes with tokens.
             var tokensWithCompositeIdNotes = tokensWithCompositeIds.Combine(notes).ToList();
-            Assert.True(((Note)tokensWithCompositeIdNotes[0].idEquitablesCollections[0]).Text.Equals("howdy from note 1"));
-            Assert.True(((Note)tokensWithCompositeIdNotes[0].idEquitablesCollections[1]).Text.Equals("howdy from note 2"));
-            Assert.Equal(2, tokensWithCompositeIdNotes[0].idEquitablesCollections.Count);
+            Assert.True(((Note)tokensWithCompositeIdNotes[0].idEquatablesCollections[0]).Text.Equals("howdy from note 1"));
+            Assert.True(((Note)tokensWithCompositeIdNotes[0].idEquatablesCollections[1]).Text.Equals("howdy from note 2"));
+            Assert.Equal(2, tokensWithCompositeIdNotes[0].idEquatablesCollections.Count);
 
-            Assert.True(((Note)tokensWithCompositeIdNotes[1].idEquitablesCollections[0]).Text.Equals("howdy from note 1"));
-            Assert.True(((Note)tokensWithCompositeIdNotes[1].idEquitablesCollections[1]).Text.Equals("howdy from note 3"));
-            Assert.Equal(2, tokensWithCompositeIdNotes[1].idEquitablesCollections.Count);
+            Assert.True(((Note)tokensWithCompositeIdNotes[1].idEquatablesCollections[0]).Text.Equals("howdy from note 1"));
+            Assert.True(((Note)tokensWithCompositeIdNotes[1].idEquatablesCollections[1]).Text.Equals("howdy from note 3"));
+            Assert.Equal(2, tokensWithCompositeIdNotes[1].idEquatablesCollections.Count);
         }
     }
 
@@ -181,9 +181,9 @@ namespace ClearBible.Engine.Tests.Corpora
         public string Bar { get; }
     }
 
-    public class Note : IdEquitablesCollection
+    public class Note : IdEquatableCollection
     {
-        public Note(string text, IEnumerable<IIdEquitable> idEquitables) : base(idEquitables)
+        public Note(string text, IEnumerable<IIdEquatable> idEquatables) : base(idEquatables)
         {
             Text = text;
         }

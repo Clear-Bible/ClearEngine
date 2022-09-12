@@ -5,19 +5,19 @@ namespace ClearBible.Engine.Utils
 {
     public static class EntityIdExtensions
     {
-        private class IdEquitableComparer : IEqualityComparer<IIdEquitable>
+        private class IdEquatableComparer : IEqualityComparer<IIdEquatable>
         {
-            public bool Equals(IIdEquitable? x, IIdEquitable? y) => x != null && y != null && x.IdEquals(y);
+            public bool Equals(IIdEquatable? x, IIdEquatable? y) => x != null && y != null && x.IdEquals(y);
 
-            public int GetHashCode(IIdEquitable idEquitable) => idEquitable.GetIdHashcode();
+            public int GetHashCode(IIdEquatable idEquatable) => idEquatable.GetIdHashcode();
         }
-        public static IEnumerable<(IIdEquitable iIdEquitable, List<IEnumerable<IIdEquitable>> idEquitablesCollections)> Combine(
-            this IEnumerable<IIdEquitable> iIdEquitables,
-            IEnumerable<IEnumerable<IIdEquitable>> idEquitablesCollections)
+        public static IEnumerable<(IIdEquatable iIdEquatable, List<IEnumerable<IIdEquatable>> idEquatablesCollections)> Combine(
+            this IEnumerable<IIdEquatable> iIdEquatables,
+            IEnumerable<IEnumerable<IIdEquatable>> idEquatablesCollections)
         {
-            var comparer = new IdEquitableComparer();
-            return iIdEquitables
-                .Select(ie => (ie, idEquitablesCollections
+            var comparer = new IdEquatableComparer();
+            return iIdEquatables
+                .Select(ie => (ie, idEquatablesCollections
                     .Where(iec => iec.Contains(ie, comparer))
                     .ToList()));
         }
