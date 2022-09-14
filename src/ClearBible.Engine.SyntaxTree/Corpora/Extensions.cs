@@ -84,6 +84,12 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                             {"attribute", "Cat" }
                         });
 
+        public static string English(this XElement leaf) =>
+            leaf.Attribute("English")?.Value ?? throw new InvalidTreeEngineException($"leaf missing attribute.", new Dictionary<string, string>
+                {
+                            {"nodeId", leaf.NodeId() ?? "<nodeId attribute also missing>"},
+                            {"attribute", "English" }
+                });
         /// <summary>
         /// SIL Book Abbreviation
         /// </summary>

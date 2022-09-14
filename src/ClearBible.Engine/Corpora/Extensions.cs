@@ -161,7 +161,7 @@ namespace ClearBible.Engine.Corpora
 		{
 			versification = versification
                 ?? scriptureTextCorpus.Versification 
-				?? throw new InvalidStateEngineException(name: "versificaiton", value: "null", message: "both parameter null and textRows isn't a ScriptureTextCorpus");
+				?? throw new InvalidStateEngineException(name: "versification", value: "null", message: "both parameter null and textRows isn't a ScriptureTextCorpus");
 
 
             var textRows = new List<TextRow>();

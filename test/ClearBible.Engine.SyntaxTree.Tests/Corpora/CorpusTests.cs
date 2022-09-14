@@ -5,7 +5,10 @@ using ClearBible.Engine.SyntaxTree.Corpora;
 using ClearBible.Engine.Tests.Corpora;
 using ClearBible.Engine.Tokenization;
 using SIL.Machine.Tokenization;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
+using System.Text.Json;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -17,6 +20,102 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
         public CorpusTests(ITestOutputHelper output)
         {
             output_ = output;
+        }
+
+
+        private IEnumerable<string> GetWordStrings(IEnumerable<List<Token>> tokenGroups)
+        {
+            return tokenGroups
+                .Select(tg => tg
+                    .Aggregate(string.Empty, (constructedString, token) => $"{constructedString}{token.SurfaceTextPrefix}{token.SurfaceText}{token.SurfaceTextSuffix}"));
+        }
+        private IEnumerable<List<Token>> GetTokensGroupedByWords(IEnumerable<Token> tokens)
+        {
+            List<Token> tokenWordGroup = new();
+
+            foreach (var token in tokens
+                .OrderBy(t => t.Position))
+            {
+                if (tokenWordGroup.LastOrDefault()?.TokenId.IsNextSubword(token.TokenId) ?? false)
+                {
+                    tokenWordGroup.Add(token);
+                }
+                else
+                {
+                    if (tokenWordGroup.Count() > 0)
+                    {
+                        yield return tokenWordGroup;
+                    }
+                    tokenWordGroup = new() { token };
+                }
+            }
+
+            if (tokenWordGroup.Count() > 0)
+            {
+                yield return tokenWordGroup;
+            }
+        }
+
+
+        [Fact]
+        public void Corpus_SyntaxTrees_SyntaxTreeTokenPropertiesJson()
+        {
+            var syntaxTree = new SyntaxTrees();
+            var corpus = new SyntaxTreeFileTextCorpus(syntaxTree);
+            var sourceCorpusFirstVerse = corpus.First();
+            var firstToken = ((TokensTextRow)sourceCorpusFirstVerse).Tokens.First();
+            var firstTokenPropertiesJson = firstToken.PropertiesJson;
+            Assert.NotNull(firstTokenPropertiesJson);
+            Assert.IsType<SyntaxTreeToken>(firstToken);
+
+            firstToken.PropertiesJson = "blah";
+            //can't set because its a SyntaxTreeToken
+            Assert.Equal(firstTokenPropertiesJson, firstToken.PropertiesJson);
+
+            //Since it is a syntaxtree token it has English in it.
+            JsonNode forecastNode = JsonNode.Parse(firstToken.PropertiesJson)!;
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            output_.WriteLine(forecastNode!.ToJsonString(options));
+
+            JsonNode englishNode = forecastNode!["English"]!;
+            output_.WriteLine($"JSON={englishNode.ToJsonString()}");
+            output_.WriteLine($"Type={englishNode.GetType()}");
+        }
+        [Fact]
+        public void Corpus_SyntaxTrees_DetokenizeAndCompareAll()
+        {
+            var syntaxTree = new SyntaxTrees();
+            var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
+
+            var stringDetokenizer = new WhitespaceDetokenizer();
+            var engineDetokenizer = new EngineStringDetokenizer(stringDetokenizer);
+
+            foreach (var verseTokensTextRow in sourceCorpus.GetRows().Cast<TokensTextRow>())
+            {
+                var verseTokens = verseTokensTextRow.Tokens
+                    .SelectMany(t =>
+                    (t is CompositeToken) ?
+                        ((CompositeToken)t).Tokens
+                    :
+                        new List<Token>() { t })
+                    .OrderBy(t => t.Position);
+
+                //group  verse's tokens by words
+                var tokensGroupedByWords = GetTokensGroupedByWords(verseTokens);
+                //put the words together
+                var wordStrings = GetWordStrings(tokensGroupedByWords);
+                //detokenize them into a string
+                var versePutTogetherByWordStrings = stringDetokenizer.Detokenize(wordStrings) ?? wordStrings.Aggregate(string.Empty, (constructedString, str) => $"{constructedString}{str}");
+
+                //Now use engine detokenizer to get the tokens with padding
+                var verseTokensWithPadding = engineDetokenizer.Detokenize(verseTokens);
+                //put the tokens together with padding
+                var versePutTogetherByVerseTokensWithPadding = verseTokensWithPadding
+                    .OrderBy(t => t.token.Position)
+                    .Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}");
+
+                Assert.Equal(versePutTogetherByWordStrings, versePutTogetherByVerseTokensWithPadding);
+            }
         }
 
         [Fact]

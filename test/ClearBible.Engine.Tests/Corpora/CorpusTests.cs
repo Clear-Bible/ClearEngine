@@ -45,6 +45,22 @@ namespace ClearBible.Engine.Tests.Corpora
         }
 
         [Fact]
+        public void Corpus_TokenPropertiesJson()
+        {
+            var corpus = new UsfmFileTextCorpus("usfm.sty", Encoding.UTF8, TestHelpers.UsfmTestProjectPath)
+                .Tokenize<LatinWordTokenizer>()
+                .Transform<IntoTokensTextRowProcessor>();
+            var sourceCorpusFirstVerse = corpus.First();
+            var firstToken = ((TokensTextRow)sourceCorpusFirstVerse).Tokens.First();
+            Assert.Null(firstToken.PropertiesJson);
+            Assert.IsType<Token>(firstToken);
+
+            firstToken.PropertiesJson = "blah";
+            //can set because its a Token
+            Assert.Equal("blah", firstToken.PropertiesJson);
+        }
+
+        [Fact]
         [Trait("Category", "Example")]
         public void Corpus_ImportFromUsfm__Read()
         {

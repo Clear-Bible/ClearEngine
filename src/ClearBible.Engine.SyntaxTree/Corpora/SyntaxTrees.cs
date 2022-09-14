@@ -87,7 +87,8 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                                     leaf.Surface(),
                                     leaf.Strong(),
                                     leaf.Category(),
-                                    leaf.Lemma()
+                                    leaf.Lemma(),
+                                    leaf.English()
                                     )),
                             isSentenceStart: true
                         ))
@@ -137,7 +138,7 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                 .SelectMany(chapterElement => chapterElement
                     .Descendants("Node")
                     .Where(node => node.FirstNode is XText)
-                    .Select(leaf => new SyntaxTreeToken(leaf.TokenId(), leaf.Surface(), leaf.Strong(), leaf.Category(), /*leaf.Analysis(),*/ leaf.Lemma())));
+                    .Select(leaf => new SyntaxTreeToken(leaf.TokenId(), leaf.Surface(), leaf.Strong(), leaf.Category(), /*leaf.Analysis(),*/ leaf.Lemma(), leaf.English())));
         }
 
         #endregion
