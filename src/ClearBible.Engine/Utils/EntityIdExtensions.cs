@@ -31,28 +31,30 @@ namespace ClearBible.Engine.Utils
             return (IId)o;
         }
 
-        public static (string name, Guid id) GetNameAndId<T>(this T t) where T : EntityId<T>
+        public static (string name, Guid id) GetNameAndId(this IId iId)
         {
             Type? entityIdType = null;
 
-            Type? baseType = t.GetType().BaseType;
+            Type? baseType = iId.GetType().BaseType;
             while (baseType != null)
             {
                 if (baseType.IsGenericType)
                 {
-                    entityIdType = baseType.GetGenericTypeDefinition().MakeGenericType(baseType.GenericTypeArguments); //t.GetType()
-                    break;
+                    var genericTypeDefinition = baseType.GetGenericTypeDefinition();
+                    if (genericTypeDefinition == typeof(EntityId<>))
+                    {
+                        entityIdType = genericTypeDefinition.MakeGenericType(baseType.GenericTypeArguments); //t.GetType()
+                        break;
+                    }
+
                 }
-                else
-                {
-                    baseType = baseType.BaseType;
-                }
+                baseType = baseType.BaseType;
             }
 
             if (entityIdType == null)
-                throw new InvalidParameterEngineException(name: "t", value: t.GetType().FullName ?? "no GetType().FullName is null", message: "not a derivative of EntityId");
+                throw new InvalidParameterEngineException(name: "iId", value: iId.GetType().FullName ?? "GetType().FullName is null", message: "not a derivative of generic EntityId<>");
 
-            return (entityIdType.AssemblyQualifiedName ?? throw new InvalidStateEngineException(name: "AssemblyQualifiedName", value: typeof(EntityId<T>).FullName ?? "", message: "is null"), t.Id);
+            return (entityIdType.AssemblyQualifiedName ?? throw new InvalidStateEngineException(name: "AssemblyQualifiedName", value: iId.GetType().FullName ?? "", message: "is null"), iId.Id);
         }
     }
 }

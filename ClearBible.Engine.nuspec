@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>ClearBible.Engine</id>
-    <version>1.0.15</version>
+    <version>1.0.18</version>
     <authors>Clear Bible</authors>
     <projectUrl>https://github.com/Clear-Bible/ClearEngine</projectUrl>
     <description>ClearBible's Engine with SIL's Machine</description>
@@ -28,6 +28,11 @@
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.dll" target="lib\net6.0\SIL.Machine.dll" />
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.xml" target="lib\net6.0\SIL.Machine.xml" />
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.Translation.Thot.dll" target="lib\net6.0\SIL.Machine.Translation.Thot.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.Aligner.pdb" target="lib\net6.0\ClearBible.Engine.SyntaxTree.Aligner.pdb" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.pdb" target="lib\net6.0\ClearBible.Engine.pdb" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.pdb" target="lib\net6.0\ClearBible.Engine.SyntaxTree.pdb" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.pdb" target="lib\net6.0\SIL.Machine.pdb" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.Translation.Thot.pdb" target="lib\net6.0\SIL.Machine.Translation.Thot.pdb" />
 	<file src="src\ClearBible.Engine\books.csv" target="contentFiles\any\any\books.csv" />
 	<file src="src\ClearBible.Engine.SyntaxTree\bin\Debug\net6.0\Corpora\syntaxtrees\*.*" target="contentFiles\any\any\Corpora\syntaxtrees" />
   </files>
