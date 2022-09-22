@@ -61,7 +61,7 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                                 .GetLeafs()
                                 .First()
                                 ?.Chapter()
-                                ?? throw new InvalidTreeEngineException($"Doesn't have a first leaf", new Dictionary<string, string> 
+                                ?? throw new InvalidTreeEngineException($"Doesn't have a first leaf", new Dictionary<string, string>
                                 {
                                     {"bookAbbreviation", bookAbbreviation },
                                     {"chapter", c.ToString()}
@@ -87,12 +87,12 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                                     leaf.Surface(),
                                     leaf.Strong(),
                                     leaf.Category(),
-                                    leaf.Lemma(),
+                                    leaf.Lemma().Replace(" ", "+"), // Thot uses spaces to determine the parts of a segment but the number of segments to allocate a native matrix causing a native intext out of bounds resulting in an AccessViolationExceptioni.
                                     leaf.English()
                                     )),
                             isSentenceStart: true
                         ))
-                    );
+                    ) ;
             /*
             return Directory.EnumerateFiles(_syntaxTreesPath, $"{bookAbbreviation}*.xml")
                 .SelectMany(fileName =>

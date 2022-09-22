@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using ClearBible.Engine.Exceptions;
+using System.Text.Json.Serialization;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -12,6 +13,10 @@ namespace ClearBible.Engine.Corpora
 
         public Token(TokenId tokenId, string surfaceText, string trainingText)
         {
+            if (trainingText.Contains(" "))
+            {
+                throw new InvalidParameterEngineException(name: "trainingText", value: trainingText, message: "can't contain spaces because native Thot uses spaces to segment");
+            }
             TokenId = tokenId;
             SurfaceText = surfaceText;
             TrainingText = trainingText;
