@@ -1,5 +1,6 @@
 ﻿using ClearBible.Engine.Exceptions;
 using System.Text.Json.Serialization;
+using System.Transactions;
 
 namespace ClearBible.Engine.Corpora
 {
@@ -15,7 +16,23 @@ namespace ClearBible.Engine.Corpora
         {
             if (trainingText.Contains(" "))
             {
-                throw new InvalidParameterEngineException(name: "trainingText", value: trainingText, message: "can't contain spaces because native Thot uses spaces to segment");
+                bool foundFirstNonSpace = false;
+                bool foundFirstSpaceAfterNonSpace = false;
+                foreach (var c in trainingText)
+                {
+                    if (!c.Equals(' '))
+                    {
+                        if (!foundFirstNonSpace)
+                            foundFirstNonSpace = true;
+                        else if (foundFirstNonSpace && foundFirstSpaceAfterNonSpace)
+                            throw new InvalidParameterEngineException(name: "trainingText", value: trainingText, message: "can't contain spaces between non-space characters because native Thot uses spaces to segment tokens");
+                    }
+                    else //space
+                    {
+                        if (foundFirstNonSpace)
+                            foundFirstSpaceAfterNonSpace = true;
+                    }
+                }
             }
             TokenId = tokenId;
             SurfaceText = surfaceText;
