@@ -35,7 +35,7 @@ namespace ClearBible.Engine.Tokenization
 
         protected virtual string GetTrainingText(string surfaceText)
         {
-            return surfaceText.ToLower();
+            return surfaceText;
         }
     }
 }
