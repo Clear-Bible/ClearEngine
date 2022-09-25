@@ -7,7 +7,7 @@ namespace ClearBible.Engine.Tokenization
     /// <summary>
     /// Base implementation sets Training to Surface.ToUpper(). 
     /// </summary>
-    public class SetTrainingBySurfaceTokensTextRowProcessor : IRowProcessor<TextRow>
+    public class SetTrainingTokensTextRowProcessor : IRowProcessor<TextRow>
     {
         public TextRow Process(TextRow textRow)
         {
@@ -25,7 +25,7 @@ namespace ClearBible.Engine.Tokenization
                         new List<Token>() { t })
                 .Select(t =>
                 {
-                    t.TrainingText = GetTrainingText(t.SurfaceText);
+                    t.TrainingText = GetTrainingText(t.SurfaceText, t.TrainingText);
                     return t;
                 })
                 .ToList();
@@ -33,7 +33,7 @@ namespace ClearBible.Engine.Tokenization
             return textRow;
         }
 
-        protected virtual string GetTrainingText(string surfaceText)
+        protected virtual string GetTrainingText(string surfaceText, string trainingText)
         {
             return surfaceText;
         }

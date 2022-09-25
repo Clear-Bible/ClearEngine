@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace ClearBible.Engine.Tokenization
 {
-    public class SetTrainingBySurfaceLowercase : SetTrainingTokensTextRowProcessor
+    public class SetTrainingByTrainingLowercase : SetTrainingTokensTextRowProcessor
     {
         protected override string GetTrainingText(string surfaceText, string targetText)
         {
-            return surfaceText.ToLowerInvariant();
+            return targetText.ToLowerInvariant();
         }
     }
 }
