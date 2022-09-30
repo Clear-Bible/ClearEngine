@@ -120,15 +120,15 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
 
         [Fact]
         [Trait("Category", "Example")]
-        public void Corpus_SytaxTrees_Read_OT()
+        public void Corpus_SytaxTrees_Read_LEV()
         {
             try
             {
                 var syntaxTree = new SyntaxTrees();
-                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree, Persistence.FileGetBookIds.LanguageCodeEnum.H);
 
                 // now get the first 5 verses
-                foreach (var tokensTextRow in sourceCorpus["GEN"].GetRows().Cast<TokensTextRow>().Take(5))
+                foreach (var tokensTextRow in sourceCorpus["LEV"].GetRows().Cast<TokensTextRow>().Take(5))
                 {
                     TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new EngineStringDetokenizer(new WhitespaceDetokenizer()));
                 }
@@ -143,15 +143,15 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
 
         [Fact]
         [Trait("Category", "Example")]
-        public void Corpus_SytaxTrees_Read_NT()
+        public void Corpus_SytaxTrees_Read_ACT()
         {
             try
             {
                 var syntaxTree = new SyntaxTrees();
-                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree, Persistence.FileGetBookIds.LanguageCodeEnum.G);
 
                 // now get the first 5 verses
-                foreach (var tokensTextRow in sourceCorpus["MAT"].GetRows().Cast<TokensTextRow>().Take(5))
+                foreach (var tokensTextRow in sourceCorpus["ACT"].GetRows().Cast<TokensTextRow>().Take(5))
                 {
                     TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new EngineStringDetokenizer(new WhitespaceDetokenizer()));
                 }
@@ -164,6 +164,54 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
             }
         }
 
+        [Fact]
+        [Trait("Category", "Example")]
+        public void Corpus_SytaxTrees_Read_BookCounts()
+        {
+            var syntaxTree = new SyntaxTrees();
+            var sourceCorpusAll = new SyntaxTreeFileTextCorpus(syntaxTree);
+
+            var sourceCorpusGreek = new SyntaxTreeFileTextCorpus(syntaxTree, Persistence.FileGetBookIds.LanguageCodeEnum.G);
+
+            var sourceCorpusHebrew = new SyntaxTreeFileTextCorpus(syntaxTree, Persistence.FileGetBookIds.LanguageCodeEnum.H);
+
+            Assert.Equal(sourceCorpusAll.Texts.Count(), sourceCorpusGreek.Texts.Count() + sourceCorpusHebrew.Texts.Count());
+            Assert.True(sourceCorpusGreek.Texts.Count() > 0);
+            Assert.True(sourceCorpusHebrew.Texts.Count() > 0);
+        }
+
+        [Fact]
+        public void Corpus_SytaxTrees_ByLanguage()
+        {
+            var syntaxTree = new SyntaxTrees();
+            var sourceCorpusHebrew = new SyntaxTreeFileTextCorpus(syntaxTree, Persistence.FileGetBookIds.LanguageCodeEnum.H);
+
+            Assert.NotEmpty(sourceCorpusHebrew);
+            Assert.NotEmpty(sourceCorpusHebrew["GEN"].GetRows());
+            try
+            {
+                sourceCorpusHebrew["MAT"].GetRows();
+                Assert.True(false);
+            }
+            catch (KeyNotFoundException)
+            {
+                Assert.True(true);
+            }
+
+            var sourceCorpusGreek = new SyntaxTreeFileTextCorpus(syntaxTree, Persistence.FileGetBookIds.LanguageCodeEnum.G);
+
+            Assert.NotEmpty(sourceCorpusGreek);
+            try
+            {
+                sourceCorpusGreek["GEN"].GetRows();
+                Assert.True(false);
+            }
+            catch (KeyNotFoundException)
+            {
+                Assert.True(true);
+            }
+            Assert.NotEmpty(sourceCorpusGreek["MAT"].GetRows());
+        }
 
         [Fact]
         public void Corpus__SyntaxTrees_TokensSurfaceTrainingTextDifferent()
