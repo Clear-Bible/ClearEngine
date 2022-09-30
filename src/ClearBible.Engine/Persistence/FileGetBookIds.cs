@@ -27,7 +27,14 @@ namespace ClearBible.Engine.Persistence
                         var pieces = line?.Split(',') ?? new string[0];
                         if (pieces.Length >= 4)
                         {
-                            _bookIds.Add(new BookId(pieces[0], pieces[1], pieces[2], pieces[3]));
+                            try
+                            {
+                                _bookIds.Add(new BookId(pieces[0], pieces[1], pieces[2], pieces[3], Enum.Parse<LanguageCodeEnum>(pieces[4])));
+                            }
+                            catch (Exception)
+                            {
+                                throw new InvalidDataEngineException(name: "langaugeCode", value: pieces[4], message: $"Language code entry in {_fileName} for bookid {pieces[0]} is invalid");
+                            }
                         }
                     }
 
@@ -36,8 +43,24 @@ namespace ClearBible.Engine.Persistence
             }
         }
 
-        public record BookId(string silCannonBookAbbrev, string silCannonBookNum, string clearTreeBookAbbrev,
-            string clearTreeBookNum);
+        public record BookId(
+            string silCannonBookAbbrev, 
+            string silCannonBookNum, 
+            string clearTreeBookAbbrev,
+            string clearTreeBookNum,
+            LanguageCodeEnum languageCode);
+
+        public enum LanguageCodeEnum
+        {
+            /// <summary>
+            /// Greek
+            /// </summary>
+            G,
+            /// <summary>
+            /// Hebrew
+            /// </summary>
+            H
+        }
 
         private static string _fileName = "books.csv";
         private static List<BookId> _bookIds = new();

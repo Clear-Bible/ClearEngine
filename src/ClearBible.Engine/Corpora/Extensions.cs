@@ -88,6 +88,7 @@ namespace ClearBible.Engine.Corpora
 			}
 		}
 
+		/*
 		public static ITextCorpus Filter(this ITextCorpus corpus, Func<TextRow, bool> predicate)
 		{
 			return new FilterTextCorpus(corpus, predicate);
@@ -132,6 +133,7 @@ namespace ClearBible.Engine.Corpora
 				return GetEnumerator();
 			}
 		}
+		*/
 
 		public static IEnumerable<string> GetSurfaceTexts(this IEnumerable<Token>? tokens)
         {

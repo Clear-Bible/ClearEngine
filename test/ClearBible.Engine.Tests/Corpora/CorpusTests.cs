@@ -32,7 +32,7 @@ namespace ClearBible.Engine.Tests.Corpora
             var corpus = new UsfmFileTextCorpus("usfm.sty", Encoding.UTF8, TestHelpers.UsfmTestProjectPath)
                 .Tokenize<LatinWordTokenizer>()
                 .Transform<IntoTokensTextRowProcessor>()
-                .Transform<SetTrainingBySurfaceTokensTextRowProcessor>();
+                .Transform<SetTrainingBySurfaceLowercase>();
 
             Assert.NotEmpty(corpus);
             Assert.All(corpus, c => Assert.IsType<TokensTextRow>(c));
@@ -69,7 +69,7 @@ namespace ClearBible.Engine.Tests.Corpora
                 var corpus = new UsfmFileTextCorpus("usfm.sty", Encoding.UTF8, TestHelpers.UsfmTestProjectPath)
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>()
-                    .Transform<SetTrainingBySurfaceTokensTextRowProcessor>();
+                    .Transform<SetTrainingBySurfaceLowercase>();
 
                 // now get the first 5 verses
                 foreach (var tokensTextRow in corpus.Cast<TokensTextRow>().Take(5))
@@ -97,7 +97,7 @@ namespace ClearBible.Engine.Tests.Corpora
                 }))
                 .Tokenize<LatinWordTokenizer>()
                 .Transform<IntoTokensTextRowProcessor>()
-                .Transform<SetTrainingBySurfaceTokensTextRowProcessor>()
+                .Transform<SetTrainingBySurfaceLowercase>()
                 .ToList(); //so it only tokenizes and transforms once.
 
             output_.WriteLine("Texts without composite:");

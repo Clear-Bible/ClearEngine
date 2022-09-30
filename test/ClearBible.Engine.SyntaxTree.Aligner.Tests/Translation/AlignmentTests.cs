@@ -58,7 +58,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                 parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-                    .Filter<FunctionWordTextRowProcessor>();
+                    .Transform<FunctionWordTextRowProcessor>();
 
                 {
                     using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -149,7 +149,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                     parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-                        .Filter<FunctionWordTextRowProcessor>();
+                        .Transform<FunctionWordTextRowProcessor>();
 
                     {
                         using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -213,7 +213,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                     parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-                        .Filter<FunctionWordTextRowProcessor>();
+                        .Transform<FunctionWordTextRowProcessor>();
 
                     {
                         using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -278,7 +278,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                 parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-                    .Filter<FunctionWordTextRowProcessor>();
+                    .Transform<FunctionWordTextRowProcessor>();
 
                 {
                     using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -381,7 +381,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                 parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-                    .Filter<FunctionWordTextRowProcessor>();
+                    .Transform<FunctionWordTextRowProcessor>();
 
                 {
                     using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -459,20 +459,20 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 var sourceCorpus = new ParatextTextCorpus(SourceCorpusProjectPath)
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>()
-                    .Transform<SetTrainingBySurfaceTokensTextRowProcessor>();
+                    .Transform<SetTrainingBySurfaceLowercase>();
 
 
                 var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>()
-                    .Transform<SetTrainingBySurfaceTokensTextRowProcessor>();
+                    .Transform<SetTrainingBySurfaceLowercase>();
 
                 var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                 parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-                    .Filter<FunctionWordTextRowProcessor>();
+                    .Transform<FunctionWordTextRowProcessor>();
 
                 {
                     using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -509,6 +509,46 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 throw eex;
             }
         }
+
+        [Fact]
+        [Trait("Category", "Example")]
+        public async Task Alignment__SetTrainingBySurfaceLowercase()
+        {
+            var sourceCorpus = new ParatextTextCorpus(SourceCorpusProjectPath)
+                .Tokenize<LatinWordTokenizer>()
+                .Transform<IntoTokensTextRowProcessor>()
+                .Transform<SetTrainingBySurfaceLowercase>();
+
+
+            var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
+                .Tokenize<LatinWordTokenizer>()
+                .Transform<IntoTokensTextRowProcessor>()
+                .Transform<SetTrainingBySurfaceLowercase>();
+
+            var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+
+            {
+                using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
+                using var trgSrcModel = new ThotFastAlignWordAlignmentModel();
+
+                using var smtWordAlignmentModel = new SymmetrizedWordAlignmentModel(srcTrgModel, trgSrcModel)
+                {
+                    Heuristic = SymmetrizationHeuristic.GrowDiagFinalAnd
+                };
+
+                using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpus.Lowercase());
+                trainer.Train(new DelegateProgress(status =>
+                        output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")));
+                await trainer.SaveAsync();
+
+                var translationModel = smtWordAlignmentModel.GetTranslationTable();
+                Assert.Single(translationModel
+                    .Where(te => te.Key.Equals("esta")));
+                Assert.Empty(translationModel
+                    .Where(te => te.Key.Equals("Esta")));
+            }
+        }
+
         [Fact]
         [Trait("Category", "Example")]
         public async Task Alignment__SmtAlignmentManuscript()
@@ -527,7 +567,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                 parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
-                    .Filter<FunctionWordTextRowProcessor>();
+                    .Transform<FunctionWordTextRowProcessor>();
 
                 {
                     using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -564,5 +604,54 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 throw eex;
             }
         }
+
+        [Fact]
+        [Trait("Category", "Example")]
+        public async Task Alignment__SmtAlignmentManuscriptWithZZSur()
+        {
+            try
+            {
+                var syntaxTree = new SyntaxTrees();
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree)
+                    .Transform<SetTrainingByTrainingLowercase>();
+
+                var targetCorpus = new ParatextTextCorpus("C:\\My Paratext 9 Projects\\zz_SUR")
+                    .Tokenize<LatinWordTokenizer>()
+                    .Transform<IntoTokensTextRowProcessor>()
+                    .Transform<SetTrainingBySurfaceLowercase>();
+
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+
+                {
+                    using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
+                    using var trgSrcModel = new ThotFastAlignWordAlignmentModel();
+
+                    using var smtWordAlignmentModel = new SymmetrizedWordAlignmentModel(srcTrgModel, trgSrcModel)
+                    {
+                        Heuristic = SymmetrizationHeuristic.GrowDiagFinalAnd
+                    };
+
+                    using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpus.Lowercase());
+                    trainer.Train(new DelegateProgress(status =>
+                            output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")));
+                    await trainer.SaveAsync();
+
+                    var allAlignedTokenPairs = new List<AlignedTokenPairs>();
+                    foreach (EngineParallelTextRow row in parallelTextCorpus)
+                    {
+                        allAlignedTokenPairs.AddRange(row.GetAlignedTokenPairs(smtWordAlignmentModel.GetBestAlignment(row.SourceSegment, row.TargetSegment)));
+                    }
+                    //parallelTextCorpus
+                    //    .SelectMany(row => ((EngineParallelTextRow) row).GetAlignedTokenPairs(smtWordAlignmentModel.GetBestAlignment(row.SourceSegment, row.TargetSegment)))
+                    //    .ToList();
+                }
+            }
+            catch (EngineException eex)
+            {
+                output_.WriteLine(eex.ToString());
+                throw eex;
+            }
+        }
+
     }
 }

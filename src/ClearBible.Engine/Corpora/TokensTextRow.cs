@@ -22,10 +22,21 @@ namespace ClearBible.Engine.Corpora
                 ((VerseRef)segmentRef).VerseNum);
         }
 
+        /// <summary>
+        /// Used by EngineParallelTextCorpus when joining TextRows together from versification. 
+        /// </summary>
+        /// <param name="rowRef"></param>
+        /// <param name="tokens"></param>
         public TokensTextRow(object rowRef, IReadOnlyList<Token>? tokens = null) : base(rowRef)
         {
             Tokens = tokens?.ToList() ?? new List<Token>();
+            //Implementation should not copy OriginalText because there is no such thing when joining verses together.
         }
+
+        /// <summary>
+        /// Used by IntoTokensTextRowProcessor.
+        /// </summary>
+        /// <param name="textRow"></param>
         public TokensTextRow(TextRow textRow)
             : base(textRow.Ref)
         {
@@ -39,8 +50,14 @@ namespace ClearBible.Engine.Corpora
             Tokens = textRow.Segment
                 .Select((stringToken, index) => new Token(new TokenId(bookAbbreviation, chapterNumber, verseNumber, index + 1, 1), stringToken, stringToken))
                 .ToList();
+            OriginalText = textRow.OriginalText;
         }
 
+        /// <summary>
+        /// Used by SyntaxTree. Does not need to 
+        /// </summary>
+        /// <param name="textRow"></param>
+        /// <param name="tokens"></param>
         public TokensTextRow(TextRow textRow, IReadOnlyList<Token> tokens)
             : base(textRow.Ref)
         {
@@ -49,6 +66,7 @@ namespace ClearBible.Engine.Corpora
             IsRangeStart = textRow.IsRangeStart;
             IsEmpty = false;
             Tokens = tokens.ToList();
+            //No OriginalText for SyntaxTrees: they are pre-tokenized and not versioned
         }
 
         public List<Token> Tokens {
