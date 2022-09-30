@@ -12,9 +12,9 @@ namespace ClearBible.Engine.Tests.Corpora
 {
     public static class TestHelpers
     {
-        internal static readonly string TestDataPath = Path.Combine(AppContext.BaseDirectory,
+        public static readonly string TestDataPath = Path.Combine(AppContext.BaseDirectory,
             "..", "..", "..", "Corpora", "TestData");
-        internal static readonly string UsfmTestProjectPath = Path.Combine(TestDataPath, "usfm", "Tes");
+        public static readonly string UsfmTestProjectPath = Path.Combine(TestDataPath, "usfm", "Tes");
 
         public static TextRow CreateTextRow(VerseRef verseRef, string text = "", bool isSentenceStart = true, bool isInRange = false, bool isRangeStart = false)
         {
