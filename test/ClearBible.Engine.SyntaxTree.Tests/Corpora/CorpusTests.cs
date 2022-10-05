@@ -143,6 +143,29 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
 
         [Fact]
         [Trait("Category", "Example")]
+        public void Corpus_SytaxTrees_Read_GEN1_1()
+        {
+            try
+            {
+                var syntaxTree = new SyntaxTrees();
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree, Persistence.FileGetBookIds.LanguageCodeEnum.H);
+
+                // now get the first 5 verses
+                foreach (var tokensTextRow in sourceCorpus["GEN"].GetRows().Cast<TokensTextRow>().Take(1))
+                {
+                    TestHelpers.WriteTokensTextRow(output_, tokensTextRow, new EngineStringDetokenizer(new WhitespaceDetokenizer()));
+                }
+                Assert.NotEmpty(sourceCorpus);
+            }
+            catch (EngineException eex)
+            {
+                output_.WriteLine(eex.ToString());
+                throw eex;
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Example")]
         public void Corpus_SytaxTrees_Read_ACT()
         {
             try
