@@ -1,0 +1,8 @@
+SET CHOP false
+SET EXPORTER indent=no,omit-xml-declaration=no
+CREATE DB ClearEngine syntaxtrees
+
+RUN ./strip-LTR-from-attributes.xq
+RUN ./replace-michigan-code-with-unicode.xq
+EXPORT ./out/
+
