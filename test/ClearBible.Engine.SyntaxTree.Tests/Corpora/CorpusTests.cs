@@ -11,6 +11,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json;
 using Xunit;
 using Xunit.Abstractions;
+using ClearBible.Macula.PropertiesSources.Tokenization;
 
 namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
 {
@@ -58,28 +59,13 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
 
 
         [Fact]
-        public void Corpus_SyntaxTrees_SyntaxTreeTokenPropertiesJson()
+        public void Corpus_SyntaxTrees_SyntaxTreeTokenExtendedProperties()
         {
             var syntaxTree = new SyntaxTrees();
-            var corpus = new SyntaxTreeFileTextCorpus(syntaxTree);
-            var sourceCorpusFirstVerse = corpus.First();
-            var firstToken = ((TokensTextRow)sourceCorpusFirstVerse).Tokens.First();
-            var firstTokenPropertiesJson = firstToken.PropertiesJson;
-            Assert.NotNull(firstTokenPropertiesJson);
-            Assert.IsType<SyntaxTreeToken>(firstToken);
+            var corpus = new SyntaxTreeFileTextCorpus(syntaxTree)
+                .Transform<AddPronominalReferencesToTokens>();
 
-            firstToken.PropertiesJson = "blah";
-            //can't set because its a SyntaxTreeToken
-            Assert.Equal(firstTokenPropertiesJson, firstToken.PropertiesJson);
-
-            //Since it is a syntaxtree token it has English in it.
-            JsonNode forecastNode = JsonNode.Parse(firstToken.PropertiesJson)!;
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            output_.WriteLine(forecastNode!.ToJsonString(options));
-
-            JsonNode englishNode = forecastNode!["English"]!;
-            output_.WriteLine($"JSON={englishNode.ToJsonString()}");
-            output_.WriteLine($"Type={englishNode.GetType()}");
+            var tokensTextRow = corpus.GetRows(new List<string> { "GEN" }).Cast<TokensTextRow>().Take(10).ToList();
         }
         [Fact]
         public void Corpus_SyntaxTrees_DetokenizeAndCompareAll()

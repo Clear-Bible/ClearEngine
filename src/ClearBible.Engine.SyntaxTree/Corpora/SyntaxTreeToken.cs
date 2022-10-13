@@ -1,7 +1,9 @@
 ﻿
 using ClearBible.Engine.Corpora;
+using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 namespace ClearBible.Engine.SyntaxTree.Corpora
 {
@@ -13,13 +15,22 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
             PartsOfSpeech = partsOfSpeech;
             English = english;
             //Analysis = analysis;
-        }
-        public string Strong { get; }
-        public string PartsOfSpeech { get; }
-        public string English { get; }
-        //public string Analysis { get; }
 
-        [JsonIgnore]
-        public override string? PropertiesJson => JsonSerializer.Serialize(this);
+            XmlSerializer thisXmlSerializer = new XmlSerializer(GetType());
+            using (var writer = new StringWriter())
+            {
+                thisXmlSerializer.Serialize(writer, this);
+                AddToExtendedProperties(writer.ToString());
+            }
+        }
+
+        public SyntaxTreeToken() : base(new TokenId("000000000000000"))
+        {
+        }
+
+        public string? Strong { get; set; }
+        public string? PartsOfSpeech { get; set; }
+        public string? English { get; set; }
+        //public string Analysis { get; }
     }
 }

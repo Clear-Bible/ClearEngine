@@ -52,12 +52,12 @@ namespace ClearBible.Engine.Tests.Corpora
                 .Transform<IntoTokensTextRowProcessor>();
             var sourceCorpusFirstVerse = corpus.First();
             var firstToken = ((TokensTextRow)sourceCorpusFirstVerse).Tokens.First();
-            Assert.Null(firstToken.PropertiesJson);
+            Assert.Null(firstToken.ExtendedProperties);
             Assert.IsType<Token>(firstToken);
 
-            firstToken.PropertiesJson = "blah";
+            //firstToken.PropertiesJson = "blah";
             //can set because its a Token
-            Assert.Equal("blah", firstToken.PropertiesJson);
+            //Assert.Equal("blah", firstToken.PropertiesJson);
         }
 
         [Fact]

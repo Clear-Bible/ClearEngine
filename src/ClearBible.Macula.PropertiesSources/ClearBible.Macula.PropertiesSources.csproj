@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClearBible.Engine\ClearBible.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Corpora\pronominalreferences\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Corpora\pronominalreferences\PronominalReferences.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

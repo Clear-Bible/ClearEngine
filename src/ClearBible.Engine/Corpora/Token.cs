@@ -1,16 +1,17 @@
 ﻿using ClearBible.Engine.Exceptions;
-using System.Text.Json.Serialization;
-using System.Transactions;
+using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace ClearBible.Engine.Corpora
 {
     public class Token : IEquatable<Token>
     {
-        private string? _propertiesJson = null;
+        private string? _extendedProperties = null;
         protected Token(TokenId tokenId)
         {
             TokenId = tokenId;
         }
+
 
         public Token(TokenId tokenId, string surfaceText, string trainingText)
         {
@@ -41,31 +42,31 @@ namespace ClearBible.Engine.Corpora
             Position = ulong.Parse(TokenId.ToString());
         }
 
-        [JsonIgnore]
+        [XmlIgnore]
         public virtual TokenId TokenId { get; }
 
-        [JsonIgnore]
+        [XmlIgnore]
         public virtual ulong Position { get; set; } = 0;
 
-        [JsonIgnore]
+        [XmlIgnore]
         public virtual string TrainingText { get; set; } = "";
 
-        [JsonIgnore]
+        [XmlIgnore]
         public virtual string SurfaceText { get; set; } = "";
 
-        [JsonIgnore]
+        [XmlIgnore]
         /// <summary>
         /// Cannot include SurfaceText within this string
         /// </summary>
         public virtual string SurfaceTextPrefix { get; set; } = "";
 
-        [JsonIgnore]
+        [XmlIgnore]
         /// <summary>
         /// Cannot include SurfaceText within this string
         /// </summary>
         public virtual string SurfaceTextSuffix { get; set; } = "";
 
-        [JsonIgnore]
+        [XmlIgnore]
         public string TokenType
         {
             get
@@ -73,26 +74,36 @@ namespace ClearBible.Engine.Corpora
                 return GetType().AssemblyQualifiedName!;
             }
         }
-        [JsonIgnore]
-        public virtual string? PropertiesJson
+
+        public void AddToExtendedProperties(string xmlString)
+        {
+            XElement rootElement;
+            if (_extendedProperties == null)
+                rootElement = new XElement("ExtendedProperties");
+            else
+            {
+                using var extendedPropertiesReader = new StringReader(_extendedProperties);
+                rootElement = XElement.Load(extendedPropertiesReader);
+            }
+
+            var rootElementXmlString = XDocument.Parse(xmlString).Root;
+            rootElement.Add(rootElementXmlString);
+
+            using var writer = new StringWriter();
+            rootElement.Save(writer);
+            _extendedProperties = writer.ToString();
+        }
+
+        [XmlIgnore]
+        public virtual string? ExtendedProperties
         {
             set
             {
-                if (GetType() == typeof(Token))
-                {
-                    _propertiesJson = value;
-                }
+                _extendedProperties = value;
             }
             get
             {
-                if (GetType() == typeof(Token) && _propertiesJson != null)
-                {
-                    return _propertiesJson;
-                }
-                else
-                {
-                    return null;
-                }
+                return _extendedProperties;
             }
         }
         public override bool Equals(object? obj)
