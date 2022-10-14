@@ -13,8 +13,6 @@ namespace ClearBible.MaculaPropertiesSources.ETL.PronominalReferences
             string morphId, 
             List<string>? pronominalReferencesAsStrings = null, 
             List<string>? verbSubjectReferencesAsStrings = null,
-            List<PronominalReferences>? dereferencedPronominalReferences = null,
-            List<PronominalReferences>? dereferencedVerbSubjectReferences = null,
             string? surfaceText = null, 
             string? english = null,
             string? notes = null)
@@ -23,13 +21,15 @@ namespace ClearBible.MaculaPropertiesSources.ETL.PronominalReferences
             MorphId = morphId;
             PronominalReferencesAsStrings = pronominalReferencesAsStrings;
             VerbSubjectReferencesAsStrings = verbSubjectReferencesAsStrings;
-            DereferencedPronominalReferences = dereferencedPronominalReferences;
-            DereferencedVerbSubjectReferences = dereferencedVerbSubjectReferences;
             SurfaceText = surfaceText;
             English = english;
             Notes = notes;
         }
 
+        internal PronominalReferenceDetails DeepCopyIntoPronominalReferenceDetails()
+        {
+            return new PronominalReferenceDetails(TokenIdString, SurfaceText, English, Notes);
+        }
         [XmlIgnore]
         internal TokenId? TokenId { get; set; }
 
@@ -56,10 +56,10 @@ namespace ClearBible.MaculaPropertiesSources.ETL.PronominalReferences
         internal List<string>? VerbSubjectReferencesAsStrings { get; set; }
        
         [XmlElement(ElementName = "PronominalReferences")]
-        public List<PronominalReferences>? DereferencedPronominalReferences { get; set; }
+        public List<PronominalReferenceDetails?>? PronominalReferenceDetails { get; set; }
         
         [XmlElement(ElementName = "VerbSubjectReferences")]
-        public List<PronominalReferences>? DereferencedVerbSubjectReferences { get; set; }
+        public List<PronominalReferenceDetails?>? VerbSubjectReferenceDetails { get; set; }
         public string? SurfaceText { get; set; }
         public string? English { get; set; }
         public string? Notes { get; set; }
@@ -78,6 +78,40 @@ namespace ClearBible.MaculaPropertiesSources.ETL.PronominalReferences
         public override string ToString()
         {
             return $"TokenId: {TokenIdString}, English: {English}, SurfaceText: {SurfaceText}";
+        }
+    }
+
+    public class PronominalReferenceDetails
+    {
+        public PronominalReferenceDetails()
+        { }
+        internal PronominalReferenceDetails(
+            string? tokenIdString,
+            string? surfaceText = null,
+            string? english = null,
+            string? notes = null)
+        {
+            TokenIdString = tokenIdString;
+            SurfaceText = surfaceText;
+            English = english;
+            Notes = notes;
+        }
+
+        [XmlElement(ElementName = "TokenId")]
+        public string? TokenIdString { get; set; }
+        public string? SurfaceText { get; set; }
+        public string? English { get; set; }
+        public string? Notes { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is PronominalReferenceDetails details &&
+                   TokenIdString == details.TokenIdString;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(TokenIdString);
         }
     }
 }

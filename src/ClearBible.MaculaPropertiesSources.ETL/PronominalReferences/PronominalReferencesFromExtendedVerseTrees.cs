@@ -63,8 +63,6 @@ namespace ClearBible.MaculaPropertiesSources.ETL.PronominalReferences
                         leaf.MorphId(),
                         leaf.PronominalReferencesAsStrings()?.ToList(),
                         leaf.VerbSubjectReferencesAsStrings()?.ToList(),
-                        null,
-                        null,
                         leaf.Surface(),
                         leaf.English(),
                         leaf.Notes()
@@ -81,25 +79,25 @@ namespace ClearBible.MaculaPropertiesSources.ETL.PronominalReferences
                 .Where(kvp => kvp.Value.PronominalReferencesAsStrings != null || kvp.Value.VerbSubjectReferencesAsStrings != null)
                 .Select(kvp =>
                 {
-                    kvp.Value.DereferencedPronominalReferences = kvp.Value.PronominalReferencesAsStrings != null ?
+                    kvp.Value.PronominalReferenceDetails = kvp.Value.PronominalReferencesAsStrings != null ?
                         kvp.Value.PronominalReferencesAsStrings
                             .Select(pr =>
                             {
                                 var value = allObjsDict.GetValueOrDefault(pr);
                                 if (value == null)
-                                    Console.WriteLine($"Could not find PronominalReferencesAsStrings {pr} for morphId {kvp.Value.MorphId}. Setting DereferencedPronominalReferences to null. ");
-                                return allObjsDict.GetValueOrDefault(pr)!;
+                                    Console.WriteLine($"Could not find PronominalReferencesAsStrings {pr} for morphId {kvp.Value.MorphId}. Setting DereferencedPronominalReference to null. ");
+                                return value?.DeepCopyIntoPronominalReferenceDetails();
                             })
                             .ToList()
                         : null;
-                    kvp.Value.DereferencedVerbSubjectReferences = kvp.Value.VerbSubjectReferencesAsStrings != null ?
+                    kvp.Value.VerbSubjectReferenceDetails = kvp.Value.VerbSubjectReferencesAsStrings != null ?
                         kvp.Value.VerbSubjectReferencesAsStrings
                             .Select(pr =>
                             {
                                 var value = allObjsDict.GetValueOrDefault(pr);
                                 if (value == null)
-                                    Console.WriteLine($"Could not find VerbSubjectReferences {pr} for morphId {kvp.Value.MorphId}. Setting DereferencedVerbSubjectReferences to null. ");
-                                return allObjsDict.GetValueOrDefault(pr)!;
+                                    Console.WriteLine($"Could not find VerbSubjectReferences {pr} for morphId {kvp.Value.MorphId}. Setting DereferencedVerbSubjectReference to null. ");
+                                return value?.DeepCopyIntoPronominalReferenceDetails();
                             })
                             .ToList()
                         : null;
