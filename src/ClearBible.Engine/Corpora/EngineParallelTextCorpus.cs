@@ -236,7 +236,9 @@ namespace ClearBible.Engine.Corpora
 
 						yield return new EngineParallelTextRow(
 							parallelSourceTextRows,
-							parallelTargetTextRows,
+                            verseMappingForBook.SourceVersesCompositeTokens ?? new List<CompositeToken>(),
+                            parallelTargetTextRows,
+							verseMappingForBook.TargetVersesCompositeTokens ?? new List<CompositeToken>(),
 							AlignmentCorpus
 						);
 					}

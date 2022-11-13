@@ -109,7 +109,7 @@ namespace ClearBible.Engine.Corpora
         public override bool Equals(object? obj)
         {
             return obj is Token token &&
-                   TokenId == token.TokenId;
+                   TokenId.Equals(token.TokenId);
         }
 
         public override int GetHashCode()

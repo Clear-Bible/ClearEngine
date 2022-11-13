@@ -63,7 +63,7 @@ namespace ClearBible.Engine.Tests.Corpora
             output_.WriteLine($"SurfaceTexts spaced    : {string.Join(" ", surfaceTexts)}");
 
             //Surface text, detokenized
-            var tokensWithPadding = detokenizer.Detokenize(tokensTextRow.Tokens);
+            var tokensWithPadding = detokenizer.Detokenize(tokensTextRow.Tokens.GetPositionalSortedBaseTokens());
             output_.WriteLine($"Detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}")}");
             output_.WriteLine("");
         }
@@ -106,7 +106,7 @@ namespace ClearBible.Engine.Tests.Corpora
             output_.WriteLine($"Source surfaceTexts spaced    : {string.Join(" ", surfaceTexts)}");
 
             //Surface text, detokenized
-            var tokensWithPadding = sourceDetokenizer.Detokenize(engineParallelTextRow.SourceTokens);
+            var tokensWithPadding = sourceDetokenizer.Detokenize(engineParallelTextRow.SourceTokens!.GetPositionalSortedBaseTokens());
             output_.WriteLine($"Source detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}")}");
             output_.WriteLine("");
 
@@ -141,7 +141,7 @@ namespace ClearBible.Engine.Tests.Corpora
             output_.WriteLine($"Target surfaceTexts spaced    : {string.Join(" ", surfaceTexts)}");
 
             //Surface text, detokenized
-            tokensWithPadding = targetDetokenizer.Detokenize(engineParallelTextRow.TargetTokens);
+            tokensWithPadding = targetDetokenizer.Detokenize(engineParallelTextRow.TargetTokens!.GetPositionalSortedBaseTokens());
             output_.WriteLine($"Target detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}")}");
             output_.WriteLine("");
         }

@@ -7,11 +7,12 @@ using ClearBible.Engine.Tokenization;
 using SIL.Machine.Tokenization;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Nodes;
-using System.Text.Json;
+
 using Xunit;
 using Xunit.Abstractions;
 using ClearBible.Macula.PropertiesSources.Tokenization;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
 {
@@ -66,7 +67,17 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
                 .Transform<AddPronominalReferencesToTokens>();
 
             var tokensTextRow = corpus.GetRows(new List<string> { "GEN" }).Cast<TokensTextRow>().Take(10).ToList();
+            var token = tokensTextRow[4].Tokens[9];
+            var extendedProperties = token.ExtendedProperties;
+
+            if (extendedProperties != null)
+            {
+                var rootElement = XDocument.Parse(extendedProperties).Root;
+                Assert.Equal("he called", rootElement?.XPathSelectElement("/ExtendedProperties/SyntaxTreeToken/English")?.Value ?? "");   //token's english
+                Assert.Equal("God", rootElement?.XPathSelectElement("/ExtendedProperties/PronominalReferences/VerbSubjectReferences/English")?.Value ?? ""); //token's verb's subject 
+            }
         }
+
         [Fact]
         public void Corpus_SyntaxTrees_DetokenizeAndCompareAll()
         {
