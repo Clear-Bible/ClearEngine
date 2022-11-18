@@ -30,7 +30,7 @@ namespace ClearBible.Engine.Tokenization
 
             foreach (var token in tokens)
             {
-                if (tokenWordGroup.LastOrDefault()?.TokenId.IsNextSubword(token.TokenId) ?? false)
+                if (tokenWordGroup.LastOrDefault()?.TokenId.IsSiblingSubword(token.TokenId) ?? false)
                 {
                     tokenWordGroup.Add(token);
                 }

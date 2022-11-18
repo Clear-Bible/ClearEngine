@@ -144,13 +144,20 @@ namespace ClearBible.Engine.Corpora
             return $"{BookNumber.ToString("000")}{ChapterNumber.ToString("000")}{VerseNumber.ToString("000")}{WordNumber.ToString("000")}{SubWordNumber.ToString("000")}";
         }
 
-        public virtual bool IsNextSubword(TokenId tokenId)
+        /// <summary>
+        /// Doesn't check whether parameter is 'next' subword.
+        /// </summary>
+        /// <param name="tokenId"></param>
+        /// <returns></returns>
+        public virtual bool IsSiblingSubword(TokenId tokenId)
         { 
             if (BookNumber == tokenId.BookNumber && 
                 ChapterNumber == tokenId.ChapterNumber && 
                 VerseNumber == tokenId.VerseNumber &&
-                WordNumber == tokenId.WordNumber &&
-                SubWordNumber + 1 == tokenId.SubWordNumber)
+                WordNumber == tokenId.WordNumber 
+                //&&
+                //SubWordNumber + 1 == tokenId.SubWordNumber
+                )
             {
                 return true;
             }
