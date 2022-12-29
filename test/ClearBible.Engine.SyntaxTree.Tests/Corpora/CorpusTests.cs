@@ -13,6 +13,7 @@ using Xunit.Abstractions;
 using ClearBible.Macula.PropertiesSources.Tokenization;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using SIL.Scripture;
 
 namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
 {
@@ -38,7 +39,7 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
             foreach (var token in tokens
                 .OrderBy(t => t.Position))
             {
-                if (tokenWordGroup.LastOrDefault()?.TokenId.IsNextSubword(token.TokenId) ?? false)
+                if (tokenWordGroup.LastOrDefault()?.TokenId.IsSiblingSubword(token.TokenId) ?? false)
                 {
                     tokenWordGroup.Add(token);
                 }
@@ -249,6 +250,49 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
             Assert.NotEmpty(corpusList[0].Segment[9]);
             Assert.NotEqual(((TokensTextRow)corpusList[0]).Tokens[9].TrainingText, ((TokensTextRow)corpusList[0]).Tokens[9].SurfaceText);
             Assert.Equal(((TokensTextRow)corpusList[0]).Tokens[9].TrainingText, corpusList[0].Segment[9]);
+        }
+
+        [Fact]
+        public void Corpus_SyntaxTrees_HebrewDetokenization()
+        {
+            var syntaxTree = new SyntaxTrees();
+            var corpus = new SyntaxTreeFileTextCorpus(syntaxTree)
+                .Transform<AddPronominalReferencesToTokens>();
+
+            var textRow = corpus.GetRows(new List<string> { "GEN" }).Cast<TokensTextRow>().Where(ttr => ((VerseRef)ttr.Ref).ChapterNum == 1 && ((VerseRef)ttr.Ref).VerseNum == 1);
+
+//            var textRow = corpus.GetRows(new List<string> { "1SA" }).Cast<TokensTextRow>().Where(ttr => ((VerseRef)ttr.Ref).ChapterNum == 3 && ((VerseRef)ttr.Ref).VerseNum == 2);
+
+            Assert.Single(textRow);
+
+            var positionedTokens = textRow.First().Tokens
+                .GetPositionalSortedBaseTokens();
+
+            var detokenizer = new EngineStringDetokenizer(new WhitespaceDetokenizer());
+
+            var tokenIdsForSurfaceText = positionedTokens
+                .Select(t => t.TokenId)
+                //.Reverse()
+                .ToArray();
+            //output_.WriteLine($"Tokens tokenIds        : {string.Join(" ", tokenIdsForSurfaceText)}");
+
+            var surfaceTexts = positionedTokens
+                .Select((s,i) =>
+                {
+                    output_.WriteLine($"TokenId: {tokenIdsForSurfaceText[i]}  SurfaceText: {s}");
+                    return s.SurfaceText;
+                })
+                .ToList();
+
+            //output_.WriteLine($"SurfaceTexts spaced    : {surfaceTexts.Aggregate(string.Empty, (constructedString, surfaceText) => $"{constructedString}{new string(' ', 27 - (new System.Globalization.StringInfo(surfaceText)).LengthInTextElements)}{surfaceText}")}");
+
+            var tokensWithPadding = detokenizer.Detokenize(positionedTokens);
+            //output_.WriteLine($"Detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}")}");
+            //output_.WriteLine("");
+
+            //substitute _ for padding spaces, * for padding non-spaces to see in text.
+            output_.WriteLine($"Detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{new string(tokenWithPadding.paddingBefore.Select(c => c == '\u0020' ? '_' : '*').ToArray())}{tokenWithPadding.token}{new string(tokenWithPadding.paddingAfter.Select(c => c == '\u0020' ? '_' : '*').ToArray())}")}");
+            output_.WriteLine("");
         }
     }
 }
