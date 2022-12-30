@@ -16,7 +16,7 @@
 
 # Building and ddeploying Machine Nuget package
 
-1. Change the version number in the Sil.Machine.csproj
+1. Change the version number in the SIL.Machine.csproj
 1. Build the project
-2. Open a terminal session in Sil.Machine/bin/debug
-2. Execute ` nuget push .\Clear.SIL.Machine.<YOUR VERSION>.nupkg -ApiKey <YOUR KY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
+2. Open a terminal session in SIL.Machine/bin/debug
+2. Execute `nuget push .\Clear.SIL.Machine.<YOUR VERSION>.nupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
