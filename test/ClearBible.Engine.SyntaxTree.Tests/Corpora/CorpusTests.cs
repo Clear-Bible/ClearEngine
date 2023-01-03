@@ -259,9 +259,9 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
             var corpus = new SyntaxTreeFileTextCorpus(syntaxTree)
                 .Transform<AddPronominalReferencesToTokens>();
 
-            var textRow = corpus.GetRows(new List<string> { "GEN" }).Cast<TokensTextRow>().Where(ttr => ((VerseRef)ttr.Ref).ChapterNum == 1 && ((VerseRef)ttr.Ref).VerseNum == 1);
+//            var textRow = corpus.GetRows(new List<string> { "GEN" }).Cast<TokensTextRow>().Where(ttr => ((VerseRef)ttr.Ref).ChapterNum == 1 && ((VerseRef)ttr.Ref).VerseNum == 1);
 
-//            var textRow = corpus.GetRows(new List<string> { "1SA" }).Cast<TokensTextRow>().Where(ttr => ((VerseRef)ttr.Ref).ChapterNum == 3 && ((VerseRef)ttr.Ref).VerseNum == 2);
+            var textRow = corpus.GetRows(new List<string> { "1SA" }).Cast<TokensTextRow>().Where(ttr => ((VerseRef)ttr.Ref).ChapterNum == 3 && ((VerseRef)ttr.Ref).VerseNum == 2);
 
             Assert.Single(textRow);
 
@@ -270,23 +270,27 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
 
             var detokenizer = new EngineStringDetokenizer(new WhitespaceDetokenizer());
 
-            var tokenIdsForSurfaceText = positionedTokens
+            var tokenIdsForSurfaceTextArray = positionedTokens
                 .Select(t => t.TokenId)
                 //.Reverse()
                 .ToArray();
             //output_.WriteLine($"Tokens tokenIds        : {string.Join(" ", tokenIdsForSurfaceText)}");
 
+            var tokensWithPadding = detokenizer.Detokenize(positionedTokens);
+
+            var tokensWithPaddingArray = tokensWithPadding.ToArray();
+
             var surfaceTexts = positionedTokens
-                .Select((s,i) =>
+                .Select((t,i) =>
                 {
-                    output_.WriteLine($"TokenId: {tokenIdsForSurfaceText[i]}  SurfaceText: {s}");
-                    return s.SurfaceText;
+                    output_.WriteLine($"TokenId: {tokenIdsForSurfaceTextArray[i]}  Before: {new string(tokensWithPaddingArray[i].paddingBefore.Select(c => c == '\u0020' ? '_' : '*').ToArray())} SurfaceText: {t.SurfaceText} After: {new string(tokensWithPaddingArray[i].paddingAfter.Select(c => c == '\u0020' ? '_' : '*').ToArray())}");
+                    return t.SurfaceText;
                 })
                 .ToList();
 
             //output_.WriteLine($"SurfaceTexts spaced    : {surfaceTexts.Aggregate(string.Empty, (constructedString, surfaceText) => $"{constructedString}{new string(' ', 27 - (new System.Globalization.StringInfo(surfaceText)).LengthInTextElements)}{surfaceText}")}");
 
-            var tokensWithPadding = detokenizer.Detokenize(positionedTokens);
+
             //output_.WriteLine($"Detokenized surfaceText: {tokensWithPadding.Aggregate(string.Empty, (constructedString, tokenWithPadding) => $"{constructedString}{tokenWithPadding.paddingBefore}{tokenWithPadding.token}{tokenWithPadding.paddingAfter}")}");
             //output_.WriteLine("");
 

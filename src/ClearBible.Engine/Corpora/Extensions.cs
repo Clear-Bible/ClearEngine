@@ -1,4 +1,5 @@
 ﻿using ClearBible.Engine.Exceptions;
+using Newtonsoft.Json.Linq;
 using SIL.Machine.Corpora;
 using SIL.Scripture;
 using System.Collections;
@@ -52,6 +53,76 @@ namespace ClearBible.Engine.Corpora
 				AllTargetRows = allTargetRows
 			};
 		}
+        public static bool CanPackWith(this CompositeToken compositeToken, CompositeToken other)
+        {
+            return other.TokenId == compositeToken.TokenId
+                && (other.ExtendedProperties?.Equals(compositeToken.ExtendedProperties) ?? compositeToken.ExtendedProperties == null ? true : false)
+                && other.Tokens.Concat(other.OtherTokens)
+                    .All(compositeToken.Tokens.Concat(compositeToken.OtherTokens).Contains)
+                && compositeToken.Tokens.Concat(compositeToken.OtherTokens)
+                    .All(other.Tokens.Concat(other.OtherTokens).Contains);
+        }
+        public static IEnumerable<Token> PackComposites(this IEnumerable<Token> tokens)
+		{
+			var compositeTokensGroupedByTokenIds = tokens
+				.Where(token => token is CompositeToken)
+				.GroupBy(compositeToken => compositeToken.TokenId)
+				.Select(g => g
+					.Select(t => t as CompositeToken));
+
+			var packedCompositeTokens = new List<Token>();
+			foreach (var compositeTokensGroupedByTokenId in compositeTokensGroupedByTokenIds)
+			{
+				if (compositeTokensGroupedByTokenId.Count() == 0)
+					continue;
+
+				CompositeToken? packedCompositeToken = null;
+				foreach (var compositeToken in compositeTokensGroupedByTokenId)
+				{
+					if (compositeToken == null) 
+						continue;
+
+					if (packedCompositeToken == null)
+					{
+						packedCompositeToken = compositeToken;
+						continue;
+					}
+
+					//Validate
+					if (!compositeToken.CanPackWith(packedCompositeToken))
+						throw new InvalidDataEngineException(message: $"Composite token {compositeToken.TokenId} cannot pack with {packedCompositeToken.TokenId}: ExtendedPropeties and/or combination of tokens and othertokens don't match.");
+						
+					packedCompositeToken.Tokens = packedCompositeToken.Tokens
+						.Concat(compositeToken.Tokens);
+
+                    if (packedCompositeToken.Tokens.GroupBy(t => t.TokenId).Any(g => g.Count() > 1))
+                        throw new InvalidDataEngineException(message: $"Packed composite token {compositeToken.TokenId} Tokens contains one or more Tokens with the same TokenId.");
+
+                    packedCompositeToken.OtherTokens = packedCompositeToken.OtherTokens
+						.Concat(compositeToken.OtherTokens)
+						.Except(packedCompositeToken.Tokens)
+						.Distinct();
+                }
+				if (packedCompositeToken != null)
+					packedCompositeTokens.Add(packedCompositeToken);
+			}
+
+			var packedTokens = tokens
+                .Where(token => token is not CompositeToken)
+                .Concat(packedCompositeTokens);
+
+            if (packedTokens
+                .SelectMany(t => (t is CompositeToken) ? ((CompositeToken)t).Tokens.Concat(((CompositeToken)t).OtherTokens) : new List<Token>() { t })
+				.GroupBy(t => t.TokenId)
+				.Any(g => g.Count() > 1))
+            {
+                throw new InvalidDataEngineException(name: "Tokens", message: "set of all Tokens and CompositeToken children Tokens cannot have duplicate Token.TokenIds");
+            }
+
+            return packedTokens;
+
+        }
+
 		public static ITextCorpus Transform<T>(this ITextCorpus corpus)
 			where T : IRowProcessor<TextRow>, new()
 		{

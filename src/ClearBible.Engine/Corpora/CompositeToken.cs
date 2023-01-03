@@ -7,7 +7,7 @@ namespace ClearBible.Engine.Corpora
     {
         public readonly string CompositeTokensTrainingTextDelimiter = "_";
 
-        private IEnumerable<Token> tokens_ = new List<Token>(); //will always be set by constructur. This is to suppress incorrect nullable warning for constructor.
+        private IEnumerable<Token> tokens_ = new List<Token>(); //will always be set by constructor. This is to suppress incorrect nullable warning for constructor.
         public IEnumerable<Token> Tokens 
         {
             get
@@ -16,20 +16,40 @@ namespace ClearBible.Engine.Corpora
             }
             set 
             {
+                if (value.OfType<CompositeToken>().Any())
+                {
+                    throw new InvalidParameterEngineException(name: "Tokens", value: "OfType<CompositeToken>().Any() == true", message: "Cannot contain any Tokens of type CompositeToken");
+                }
+
                 tokens_ = value;
                 base.TrainingText = string.Join(CompositeTokensTrainingTextDelimiter, tokens_.Select(t => t.TrainingText));
 
             }
         }
 
-        public CompositeToken(IEnumerable<Token> tokens) : base(new CompositeTokenId(tokens))
-        {
-            if (tokens.OfType<CompositeToken>().Any())
-            {
-                throw new InvalidParameterEngineException(name: "tokens", value: "OfType<CompositeToken>().Any() == true", message: "Cannot contain any tokens of type CompositeToken");
-            }
 
+        private IEnumerable<Token> otherTokens_ = new List<Token>(); 
+        public IEnumerable<Token> OtherTokens
+        {
+            get
+            {
+                return otherTokens_;
+            }
+            set
+            {
+                if (value.OfType<CompositeToken>().Any())
+                {
+                    throw new InvalidParameterEngineException(name: "OtherTokens", value: "OfType<CompositeToken>().Any() == true", message: "Cannot contain any OtherTokens of type CompositeToken");
+                }
+
+                otherTokens_ = value;
+            }
+        }
+
+        public CompositeToken(IEnumerable<Token> tokens, IEnumerable<Token>? otherTokens = null) : base(new CompositeTokenId(otherTokens == null ? tokens : tokens.Concat(otherTokens)))
+        {
             Tokens = tokens;
+            OtherTokens = otherTokens ?? new List<Token>();
         }
 
         public IEnumerator<Token> GetEnumerator()

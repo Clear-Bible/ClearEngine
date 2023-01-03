@@ -148,7 +148,7 @@ namespace ClearBible.Engine.Corpora
 							//Only set SourceTokens if all the members of sourceSegments can be cast to a TokensTextSegment
 							sourceTokens = sourceTextRows
 								.Cast<TokensTextRow>()  //throws an invalidCastException if any of the members can't be cast to type
-								.Where(tr => r.SourceRefs.Cast<VerseRef>().Contains((VerseRef)tr.Ref)) //sourceTextRows that pertain to paralleltextrow's sourcerefs
+								.Where(tokensTextRow => r.SourceRefs.Cast<VerseRef>().Contains((VerseRef)tokensTextRow.Ref)) //sourceTextRows that pertain to paralleltextrow's sourcerefs
 								.SelectMany(tokensTextRow => tokensTextRow.Tokens).ToList();
 						}
 						catch (InvalidCastException)
@@ -160,8 +160,8 @@ namespace ClearBible.Engine.Corpora
 						{
 							targetTokens = targetTextRows
 								.Cast<TokensTextRow>() //throws an invalidCastException if any of the members can't be cast to type
-								.Where(tr => r.SourceRefs.Cast<VerseRef>().Contains((VerseRef)tr.Ref)) //targetTextRows that pertain to paralleltextrow's targetrefs
-								.SelectMany(tokensTextRow => ((TokensTextRow)tokensTextRow).Tokens).ToList();
+								.Where(tokensTextRow => r.SourceRefs.Cast<VerseRef>().Contains((VerseRef)tokensTextRow.Ref)) //targetTextRows that pertain to paralleltextrow's targetrefs
+								.SelectMany(tokensTextRow => tokensTextRow.Tokens).ToList();
 						}
 						catch (InvalidCastException)
 						{
@@ -236,9 +236,7 @@ namespace ClearBible.Engine.Corpora
 
 						yield return new EngineParallelTextRow(
 							parallelSourceTextRows,
-                            verseMappingForBook.SourceVersesCompositeTokens ?? new List<CompositeToken>(),
                             parallelTargetTextRows,
-							verseMappingForBook.TargetVersesCompositeTokens ?? new List<CompositeToken>(),
 							AlignmentCorpus
 						);
 					}

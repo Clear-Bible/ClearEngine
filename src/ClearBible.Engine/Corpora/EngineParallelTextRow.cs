@@ -49,9 +49,7 @@ namespace ClearBible.Engine.Corpora
         public EngineParallelTextRow(
             //string textId,
             IEnumerable<TextRow> sourceTextRows,
-            IEnumerable<CompositeToken> sourceVersesCompositeTokens,
             IEnumerable<TextRow> targetTextRows,
-            IEnumerable<CompositeToken> targetVersesCompositeTokens,
             IAlignmentCorpus alignmentRows
             )
             : base(
@@ -64,26 +62,12 @@ namespace ClearBible.Engine.Corpora
 
             try
             {
-                //validate
-                if (sourceVersesCompositeTokens
-                    .Where(ct => ct.Tokens.Count() == 0 || ct.Tokens.Any(t => !SourceRefs.Cast<VerseRef>().Contains(new VerseRef(t.TokenId.BookNumber, t.TokenId.ChapterNumber, t.TokenId.VerseNumber))))
-                    .Count() > 0)
-                    throw new InvalidParameterEngineException(name: "sourceVersesCompositeTokens", value: "", message: "One or more have no Tokens, or Tokens that are not in SourceRefs, or both");
-
-
                 //Only set SourceTokens if all the members of sourceSegments can be cast to a TokensTextSegment
-                var tokens = sourceTextRows
+                SourceTokens = sourceTextRows
                     .Cast<TokensTextRow>() //throws an invalidCastException if any of the members can't be cast to type
-                    .SelectMany(tokensTextRow => tokensTextRow.Tokens
-                        .Where(token => ! sourceVersesCompositeTokens
-                            .SelectMany(ct => ct.Tokens)
-                            .Select(t => t.TokenId)
-                            .Contains(token.TokenId)))
+                    .SelectMany(tokensTextRow => tokensTextRow.Tokens)
+                    .PackComposites()
                     .ToList();
-                tokens.AddRange(sourceVersesCompositeTokens
-                    .Where(ct => ct.Tokens.Any()));
-
-                SourceTokens = tokens;
             }
             catch (InvalidCastException)
             {
@@ -91,25 +75,12 @@ namespace ClearBible.Engine.Corpora
 
             try
             {
-                //validate
-                if (targetVersesCompositeTokens
-                    .Where(ct => ct.Tokens.Count() == 0 || ct.Tokens.Any(t => !TargetRefs.Cast<VerseRef>().Contains(new VerseRef(t.TokenId.BookNumber, t.TokenId.ChapterNumber, t.TokenId.VerseNumber))))
-                    .Count() > 0)
-                    throw new InvalidParameterEngineException(name: "targetVersesCompositeTokens", value: "", message: "One or more have no Tokens, or Tokens that are not in TargetRefs, or both");
-
                 //Only set TargetTokens if all the members of targetSegments can be cast to a TokensTextSegment
-                var tokens = targetTextRows
+                TargetTokens = targetTextRows
                     .Cast<TokensTextRow>() //throws an invalidCastException if any of the members can't be cast to type
-                    .SelectMany(tokensTextRow => tokensTextRow.Tokens
-                        .Where(token => !targetVersesCompositeTokens
-                            .SelectMany(ct => ct.Tokens)
-                            .Select(t => t.TokenId)
-                            .Contains(token.TokenId)))
+                    .SelectMany(tokensTextRow => tokensTextRow.Tokens)
+                    .PackComposites()
                     .ToList();
-                tokens.AddRange(targetVersesCompositeTokens
-                    .Where(ct => ct.Tokens.Any()));
-
-                TargetTokens = tokens;
             }
             catch (InvalidCastException)
             {

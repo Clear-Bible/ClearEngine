@@ -23,7 +23,7 @@ namespace ClearBible.Engine.Corpora
         }
 
         /// <summary>
-        /// Used by EngineParallelTextCorpus when joining TextRows together from versification. 
+        /// ONLY USED INTERNAL TO ENGINE: Used by EngineParallelTextCorpus when joining TextRows together from versification. 
         /// </summary>
         /// <param name="rowRef"></param>
         /// <param name="tokens"></param>
@@ -34,7 +34,7 @@ namespace ClearBible.Engine.Corpora
         }
 
         /// <summary>
-        /// Used by IntoTokensTextRowProcessor.
+        /// ONLY USED INTERNAL TO ENGINE: Used by IntoTokensTextRowProcessor.
         /// </summary>
         /// <param name="textRow"></param>
         public TokensTextRow(TextRow textRow)
@@ -54,7 +54,7 @@ namespace ClearBible.Engine.Corpora
         }
 
         /// <summary>
-        /// Used by SyntaxTree. Does not need to 
+        /// Use to convert from TextRow to TokensTextRow. Used internally in engine by SyntaxTree.
         /// </summary>
         /// <param name="textRow"></param>
         /// <param name="tokens"></param>
@@ -78,15 +78,11 @@ namespace ClearBible.Engine.Corpora
             set
             {
                 // if there are Tokens with duplicate tokenIds
-                if (value
-                    .SelectMany(t => (t is CompositeToken) ? ((CompositeToken)t).Tokens : new List<Token>() { t })
-                    .GroupBy(t => t.TokenId)
-                    .Any(g => g.Count() > 1))
-                {
-                    throw new InvalidDataEngineException(name: "Tokens", message: "set of all Tokens and CompositeToken children Tokens cannot have duplicate Token.TokenIds");
-                }
-                tokens_ = value;
+                tokens_ = value
+                    .PackComposites()
+                    .ToList();
                 Segment = tokens_
+                    .Where(t => (t is CompositeToken) ? ((CompositeToken)t).OtherTokens.Count() == 0 : true)
                     .Select(t => t.TrainingText)
                     .ToList();
             }

@@ -24,7 +24,9 @@ namespace ClearBible.Engine.Corpora
         public override bool Equals(object? obj)
         {
             return obj is CompositeTokenId compositeTokenId &&
-                   TokenIds.SequenceEqual(compositeTokenId.TokenIds);
+                TokenIds
+                    .OrderBy(tid => tid)
+                    .SequenceEqual(compositeTokenId.TokenIds);
         }
         public override int GetHashCode()
         {
