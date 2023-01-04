@@ -88,17 +88,20 @@ namespace ClearBible.Engine.Corpora
 						continue;
 					}
 
-					//Validate
+#if DEBUG
+					//validate that composites have the same value
 					if (!compositeToken.CanPackWith(packedCompositeToken))
 						throw new InvalidDataEngineException(message: $"Composite token {compositeToken.TokenId} cannot pack with {packedCompositeToken.TokenId}: ExtendedPropeties and/or combination of tokens and othertokens don't match.");
-						
+#endif
 					packedCompositeToken.Tokens = packedCompositeToken.Tokens
 						.Concat(compositeToken.Tokens);
 
-                    if (packedCompositeToken.Tokens.GroupBy(t => t.TokenId).Any(g => g.Count() > 1))
+#if DEBUG
+					//validate compositetoken didn't have any token that was already in packedCompositeToken
+					if (packedCompositeToken.Tokens.GroupBy(t => t.TokenId).Any(g => g.Count() > 1))
                         throw new InvalidDataEngineException(message: $"Packed composite token {compositeToken.TokenId} Tokens contains one or more Tokens with the same TokenId.");
-
-                    packedCompositeToken.OtherTokens = packedCompositeToken.OtherTokens
+#endif
+					packedCompositeToken.OtherTokens = packedCompositeToken.OtherTokens
 						.Concat(compositeToken.OtherTokens)
 						.Except(packedCompositeToken.Tokens)
 						.Distinct();
@@ -111,15 +114,17 @@ namespace ClearBible.Engine.Corpora
                 .Where(token => token is not CompositeToken)
                 .Concat(packedCompositeTokens);
 
-            if (packedTokens
+#if DEBUG
+			//validate that there are no duplicate tokens
+			if (packedTokens
                 .SelectMany(t => (t is CompositeToken) ? ((CompositeToken)t).Tokens.Concat(((CompositeToken)t).OtherTokens) : new List<Token>() { t })
 				.GroupBy(t => t.TokenId)
 				.Any(g => g.Count() > 1))
             {
-                throw new InvalidDataEngineException(name: "Tokens", message: "set of all Tokens and CompositeToken children Tokens cannot have duplicate Token.TokenIds");
+                throw new InvalidDataEngineException(name: "Tokens", message: "set of all Tokens and CompositeToken children Tokens and OtherTokens has one ore more duplicate Token.TokenIds");
             }
-
-            return packedTokens;
+#endif
+			return packedTokens;
 
         }
 
