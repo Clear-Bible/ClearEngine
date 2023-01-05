@@ -11,7 +11,9 @@ namespace ClearBible.Engine.Corpora
 
         public CompositeTokenId(IEnumerable<Token> tokens) : base(0,0,0,0,0) //values are never accessed.
         {
-            TokenIds = tokens.Select(t => t.TokenId);
+            TokenIds = tokens
+                .Select(t => t.TokenId)
+                .OrderBy(tid => tid);
         }
         public IEnumerator<TokenId> GetEnumerator()
         {
