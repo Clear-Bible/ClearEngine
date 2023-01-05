@@ -55,7 +55,7 @@ namespace ClearBible.Engine.Corpora
 		}
         public static bool CanPackWith(this CompositeToken compositeToken, CompositeToken other)
         {
-            return other.TokenId == compositeToken.TokenId
+            return other.TokenId.Equals(compositeToken.TokenId)
                 && (other.ExtendedProperties?.Equals(compositeToken.ExtendedProperties) ?? compositeToken.ExtendedProperties == null ? true : false)
                 && other.Tokens.Concat(other.OtherTokens)
                     .All(compositeToken.Tokens.Concat(compositeToken.OtherTokens).Contains)
