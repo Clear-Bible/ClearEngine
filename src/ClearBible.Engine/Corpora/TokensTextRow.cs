@@ -83,7 +83,7 @@ namespace ClearBible.Engine.Corpora
                     .Select(t => t as CompositeToken)
                     .Where(
                         ct => ct != null &&  
-                        (ct.Tokens.Count() == 0 || ct.Tokens.Any(t => ! ((VerseRef) Ref).Equals(new VerseRef(t.TokenId.BookNumber, t.TokenId.ChapterNumber, t.TokenId.VerseNumber)))))
+                        (ct.Tokens.Count() == 0 || ct.Tokens.Any(t => ! ((VerseRef) Ref).Equals(new VerseRef(t.TokenId.BookNumber, t.TokenId.ChapterNumber, t.TokenId.VerseNumber, ((VerseRef) Ref).Versification)))))
                     .Count() > 0)
                     throw new InvalidParameterEngineException(name: "Tokens", value: "", message: "One or more Tokens are CompositeToken either containing no Tokens, or one or more Token that are not in Ref, or both");
 #endif
