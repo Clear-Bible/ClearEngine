@@ -77,11 +77,21 @@ namespace ClearBible.Engine.Corpora
                 else
                 {
 #if DEBUG
-                    //validate sourceVersesCompositeTokens
-                    if (sourceVersesCompositeTokens
-                        .Where(ct => ct.Tokens.Count() == 0 || ct.Tokens.Any(t => !SourceRefs.Cast<VerseRef>().Contains(new VerseRef(t.TokenId.BookNumber, t.TokenId.ChapterNumber, t.TokenId.VerseNumber))))
-                        .Count() > 0)
-                        throw new InvalidParameterEngineException(name: "sourceVersesCompositeTokens", value: "", message: "One or more have no Tokens, or Tokens that are not in SourceRefs, or both");
+                    try
+                    {
+                        //validate sourceVersesCompositeTokens
+                        if (sourceVersesCompositeTokens
+                            .Where(ct => ct.Tokens.Count() == 0 || ct.Tokens.Any(t => !SourceRefs.Cast<VerseRef>().Contains(
+                                SourceRefs.Count() > 0 ?
+                                    new VerseRef(t.TokenId.BookNumber, t.TokenId.ChapterNumber, t.TokenId.VerseNumber, ((VerseRef)SourceRefs[0]).Versification) :
+                                    throw new InvalidDataEngineException(name: "SourceRefs", value: "Empty"))))
+                            .Count() > 0)
+                            throw new InvalidParameterEngineException(name: "sourceVersesCompositeTokens", value: "", message: "One or more have no Tokens, or Tokens that are not in SourceRefs, or both");
+                    }
+                    catch (InvalidDataEngineException)
+                    {
+                        // absorb and abort test since this it is not clear that having an empty SourceRefs is invalid in Machine.
+                    }
 
                     if (sourcePackedTextRowsTokens
                             .Where(t => t is CompositeToken)
@@ -133,11 +143,21 @@ namespace ClearBible.Engine.Corpora
                 else
                 {
 #if DEBUG
-                    //validate
-                    if (targetVersesCompositeTokens
-                        .Where(ct => ct.Tokens.Count() == 0 || ct.Tokens.Any(t => !TargetRefs.Cast<VerseRef>().Contains(new VerseRef(t.TokenId.BookNumber, t.TokenId.ChapterNumber, t.TokenId.VerseNumber))))
-                        .Count() > 0)
-                        throw new InvalidParameterEngineException(name: "targetVersesCompositeTokens", value: "", message: "One or more have no Tokens, or Tokens that are not in TargetRefs, or both");
+                    try
+                    {
+                        //validate
+                        if (targetVersesCompositeTokens
+                            .Where(ct => ct.Tokens.Count() == 0 || ct.Tokens.Any(t => !TargetRefs.Cast<VerseRef>().Contains(
+                                TargetRefs.Count() > 0 ?
+                                    new VerseRef(t.TokenId.BookNumber, t.TokenId.ChapterNumber, t.TokenId.VerseNumber, ((VerseRef)TargetRefs[0]).Versification) :
+                                    throw new InvalidDataEngineException(name: "TargetRefs", value: "Empty"))))
+                            .Count() > 0)
+                            throw new InvalidParameterEngineException(name: "targetVersesCompositeTokens", value: "", message: "One or more have no Tokens, or Tokens that are not in TargetRefs, or both");
+                    }
+                    catch (InvalidDataEngineException)
+                    {
+                        // absorb and abort test since this it is not clear that having an empty TargetRefs is invalid in Machine.
+                    }
 
                     if (targetPackedTextRowsTokens
                             .Where(t => t is CompositeToken)
