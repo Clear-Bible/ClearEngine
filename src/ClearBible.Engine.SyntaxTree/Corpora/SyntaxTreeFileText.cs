@@ -33,7 +33,7 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                 .SelectMany(tokenTextRowInfo => CreateRows(
                         tokenTextRowInfo.chapter,
                         tokenTextRowInfo.verse,
-                        string.Join(" ", tokenTextRowInfo.syntaxTreeTokens.ToString()),
+                        string.Join(" ", tokenTextRowInfo.syntaxTreeTokens),
                         tokenTextRowInfo.isSentenceStart)
                     .Select(textRow => new TokensTextRow(textRow, tokenTextRowInfo.syntaxTreeTokens.ToList())));
         }   
