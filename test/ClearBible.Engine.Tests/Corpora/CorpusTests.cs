@@ -209,6 +209,31 @@ namespace ClearBible.Engine.Tests.Corpora
             Assert.True(list[4].Ref.Equals(new VerseRef("MAT 1:5", versification)));
         }
 
+        [Fact]
+        public void ExtractScripture()
+        {
+            var corpus = new UsfmFileTextCorpus("usfm.sty", Encoding.UTF8, TestHelpers.UsfmTestProjectPath);
+
+            var lines = corpus.ExtractScripture().ToList();
+            Assert.Equal(41899, lines.Count);
+
+            (string text, VerseRef origRef, VerseRef? corpusRef) = lines[0];
+            Assert.Equal("", text);
+            Assert.Equal(new VerseRef("GEN 1:1", ScrVers.Original), origRef);
+            Assert.False(corpusRef.HasValue);
+
+            (text, origRef, corpusRef) = lines[23213];
+            Assert.Equal("Chapter one, verse one.", text);
+            Assert.Equal(new VerseRef("MAT 1:1", ScrVers.Original), origRef);
+            Assert.True(corpusRef.HasValue);
+            Assert.Equal(new VerseRef("MAT 1:1", corpus.Versification), corpusRef);
+
+            (text, origRef, corpusRef) = lines[23240];
+            Assert.Equal("<range>", text);
+            Assert.Equal(new VerseRef("MAT 2:3", ScrVers.Original), origRef);
+            Assert.True(corpusRef.HasValue);
+            Assert.Equal(new VerseRef("MAT 2:3", corpus.Versification), corpusRef);
+        }
         class TestScriptureTextCorpus : ScriptureTextCorpus
         {
             public TestScriptureTextCorpus(IEnumerable<IText> texts, ScrVers versification)
@@ -219,8 +244,6 @@ namespace ClearBible.Engine.Tests.Corpora
                 }
                 Versification = versification;
             }
-
-            public override ScrVers Versification { get; }
         }
         private static TextRow TextRow(VerseRef vref, string text = "", bool isSentenceStart = true,
              bool isInRange = false, bool isRangeStart = false)

@@ -33,9 +33,9 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                 .SelectMany(tokenTextRowInfo => CreateRows(
                         tokenTextRowInfo.chapter,
                         tokenTextRowInfo.verse,
-                        "", // text parameter is set by TokensTextRow from the tokens
+                        string.Join(" ", tokenTextRowInfo.syntaxTreeTokens),
                         tokenTextRowInfo.isSentenceStart)
                     .Select(textRow => new TokensTextRow(textRow, tokenTextRowInfo.syntaxTreeTokens.ToList())));
-        }
+        }   
     }
 }

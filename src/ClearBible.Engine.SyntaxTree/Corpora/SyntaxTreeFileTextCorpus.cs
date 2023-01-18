@@ -9,6 +9,8 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
     {
         public SyntaxTreeFileTextCorpus(ISyntaxTreeText syntaxTreeText, LanguageCodeEnum? languageCodeEnum = null)
         {
+            Versification = ScrVers.Original;
+
             syntaxTreeText.GetBooks()
                 .Where(b => languageCodeEnum != null ? BookIds  //if not null
                     .Where(bookId => bookId.silCannonBookAbbrev.Equals(b)) // where only books that match that language code.
@@ -23,6 +25,5 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
                     return b;
                 }).ToList();
         }
-        public override ScrVers Versification => ScrVers.Original;
     }
 }
