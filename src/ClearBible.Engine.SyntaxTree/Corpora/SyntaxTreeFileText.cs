@@ -31,8 +31,7 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
         {
             return _syntaxTreeText.GetTokensTextRowInfos(Id)
                 .SelectMany(tokenTextRowInfo => CreateRows(
-                        tokenTextRowInfo.chapter,
-                        tokenTextRowInfo.verse,
+                        CreateVerseRef(tokenTextRowInfo.chapter, tokenTextRowInfo.verse),
                         string.Join(" ", tokenTextRowInfo.syntaxTreeTokens),
                         tokenTextRowInfo.isSentenceStart)
                     .Select(textRow => new TokensTextRow(textRow, tokenTextRowInfo.syntaxTreeTokens.ToList())));

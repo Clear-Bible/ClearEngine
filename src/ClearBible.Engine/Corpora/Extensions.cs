@@ -10,41 +10,11 @@ namespace ClearBible.Engine.Corpora
     {
 		public static List<VerseMapping> Validate(this List<VerseMapping> verseMappingList, IEnumerable<TextRow> sourceCorpus, IEnumerable<TextRow> targetCorpus)
 		{
-			foreach (var verseMapping in verseMappingList)
-            {
-				if (
-					verseMapping.SourceVerses //not all of the sourceverses for a given verseMapping are for the same book
-					.Select(v => v.Book)
-					.Distinct()
-					.Skip(1)
-					.Any()
-						||
-					verseMapping.TargetVerses //not all of the targetVerses for a given verseMapping are for the same book
-                    .Select(v => v.Book)
-                    .Distinct()
-					.Skip(1)
-					.Any()
-						||
-					! verseMapping.SourceVerses // the sourceVerses book and targetVerses book are not the same
-                    .Select(v => v.Book)
-                    .Distinct()
-					.First().Equals(verseMapping.TargetVerses
-					.Select(v => v.Book)
-					.Distinct()
-					.First())
-					)
-                {
-					throw new InvalidDataEngineException(
-						name: "List<VerseMapping>", 
-						value: "VerseMapping.SourceVerses andVerseMapping.TargetVerses not all for same book", 
-						message: "all sourceVerses and targetverses for a given versemapping must be for the same book");
-				}
-
-			}
+			//enhanced EngineParallelCorpus to not need restrictions on versemappinglist other than should not include a verse in more than one versemapping.
 			return verseMappingList;
 		}
 		public static EngineParallelTextCorpus EngineAlignRows(this ITextCorpus sourceCorpus, ITextCorpus targetCorpus,
-			List<VerseMapping>? sourceTargetParallelVersesList = null, IAlignmentCorpus? alignmentCorpus = null, bool allSourceRows = false, bool allTargetRows = false,
+            SourceTextIdToVerseMappings? sourceTargetParallelVersesList = null, IAlignmentCorpus? alignmentCorpus = null, bool allSourceRows = false, bool allTargetRows = false,
 			IComparer<object>? rowRefComparer = null)
 		{
 			return new EngineParallelTextCorpus(sourceCorpus, targetCorpus, sourceTargetParallelVersesList, alignmentCorpus, rowRefComparer)
@@ -163,54 +133,6 @@ namespace ClearBible.Engine.Corpora
 				return GetEnumerator();
 			}
 		}
-
-		/*
-		public static ITextCorpus Filter(this ITextCorpus corpus, Func<TextRow, bool> predicate)
-		{
-			return new FilterTextCorpus(corpus, predicate);
-		}
-
-		public static ITextCorpus Filter(this ITextCorpus corpus, IRowFilter<TextRow> filter)
-		{
-			return corpus.Filter(filter.Process);
-		}
-
-		public static ITextCorpus Filter<T>(this ITextCorpus corpus)
-			where T : IRowFilter<TextRow>, new()
-		{
-			var textRowFilter = new T();
-			return new FilterTextCorpus(corpus, textRowFilter.Process);
-		}
-		private class FilterTextCorpus : ITextCorpus
-		{
-			private readonly ITextCorpus _corpus;
-			private readonly Func<TextRow, bool> _predicate;
-
-			public FilterTextCorpus(ITextCorpus corpus, Func<TextRow, bool> predicate)
-			{
-				_corpus = corpus;
-				_predicate = predicate;
-			}
-
-			public IEnumerable<IText> Texts => _corpus.Texts;
-
-			public IEnumerator<TextRow> GetEnumerator()
-			{
-				return GetRows().GetEnumerator();
-			}
-
-			public IEnumerable<TextRow> GetRows(IEnumerable<string>? textIds = null)
-			{
-				return _corpus.GetRows(textIds).Where(_predicate);
-			}
-
-            IEnumerator IEnumerable.GetEnumerator()
-			{
-				return GetEnumerator();
-			}
-		}
-		*/
-
 		public static IEnumerable<string> GetSurfaceTexts(this IEnumerable<Token>? tokens)
         {
 			return tokens?
@@ -231,44 +153,86 @@ namespace ClearBible.Engine.Corpora
         }
 
 
-		public static (IEnumerable<TextRow> textRows, int indexOfVerse) GetByVerseRange(this ScriptureTextCorpus scriptureTextCorpus,
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="textCorpus"></param>
+        /// <param name="verseRef"></param>
+        /// <param name="numberOfVersesInChapterBefore"></param>
+        /// <param name="numberOfVersesInChapterAfter"></param>
+        /// <param name="versification">if null, treat verseRef as in textCorpusVersification if set, or scriptureTextCorpus.Versification,
+        /// else treat verseRef in versification and change to textCorpusVersification if set, or scriptureTextCorpus.Versification, before finding textrows in textCorpus</param>
+		/// <param name="textCorpusVersification">if set use this value, otherwise assume textCorpus is a ScriptureTextCorpus and obtain versification from it.</param>
+        /// <returns></returns>
+        public static (IEnumerable<TextRow> textRows, int indexOfVerse) GetByVerseRange(this ITextCorpus textCorpus,
             VerseRef verseRef,
             ushort numberOfVersesInChapterBefore,
             ushort numberOfVersesInChapterAfter,
-            ScrVers? versification = null)
+            ScrVers? versification = null,
+			ScrVers? textCorpusVersification = null)
 		{
-			versification = versification
-                ?? scriptureTextCorpus.Versification 
-				?? throw new InvalidStateEngineException(name: "versification", value: "null", message: "both parameter null and textRows isn't a ScriptureTextCorpus");
+            if (textCorpus is not ScriptureTextCorpus && textCorpusVersification == null)
+            {
+                throw new InvalidStateEngineException(
+                    name: "sourceCorpusVersification",
+                    value: "null",
+                    message: $"textCorpus is a {textCorpus.GetType().Name} which is not a ScriptureTextCorpus so textCorpusVersification must be set but isn't.");
+            }
 
+			ScrVers txtCorpusVersification;
+			if (textCorpusVersification != null)
+				txtCorpusVersification = textCorpusVersification;
+			else
+				txtCorpusVersification = ((ScriptureTextCorpus)textCorpus).Versification;
 
-            var textRows = new List<TextRow>();
-
-            var bookTextRows = scriptureTextCorpus[verseRef.Book].GetRows();
+            if (versification != null)
+				verseRef.Versification = versification;
+			else
+				verseRef.Versification = txtCorpusVersification;
 
             var firstVerseNumber = verseRef.VerseNum - numberOfVersesInChapterBefore;
             var count = numberOfVersesInChapterAfter + numberOfVersesInChapterBefore + 1;
-            //var indexOfVerse = (numberOfVersesInChapterBefore + numberOfVersesInChapterAfter) / 2;
             if (firstVerseNumber <= 0)
             {
                 count = count + firstVerseNumber - 1;
-                //indexOfVerse = indexOfVerse + firstVerse - 1;
                 firstVerseNumber = 1;
             }
 
-            foreach (var verseNumber in Enumerable.Range(firstVerseNumber, count))
-            {
-                var currentVerseRef = verseRef;
-                currentVerseRef.VerseNum = verseNumber;
-                currentVerseRef.ChangeVersification(versification);
+            var verseRefs = Enumerable.Range(firstVerseNumber, count)
+				.SelectMany(vn =>
+				{
+					var vref = new VerseRef(verseRef)
+					{
+						VerseNum = vn
+					};
 
+					if (versification != null) 
+					{
+						vref.ChangeVersification(txtCorpusVersification);
+                        return vref.AllVerses();
+                    }
+					return new List<VerseRef>() { vref };
+				})
+				.ToList();
+
+			var books = verseRefs
+				.Select(vr => vr.Book)
+				.Distinct()
+				.ToList();
+
+            var bookTextRows = textCorpus.GetRows(books);
+            
+			var textRows = new List<TextRow>();
+
+            foreach (var vRef in verseRefs)
+            {
                 var textRowForVerse = bookTextRows
-                    .Where(textRow => textRow.Ref.Equals(currentVerseRef))
+                    .Where(textRow => textRow.Ref.Equals(vRef))
                     .FirstOrDefault();
 
                 if (textRowForVerse == null)
                 {
-                    break;
+                    continue;
                 }
                 else
                 {
@@ -276,61 +240,98 @@ namespace ClearBible.Engine.Corpora
                 }
             }
 
-            verseRef.ChangeVersification(versification);
+            verseRef.ChangeVersification(txtCorpusVersification);
+
             return (textRows, textRows.FindIndex(tr => tr.Ref.Equals(verseRef)));
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="engineParallelTextCorpus">Requires that engineParallelTextCorpus.SourceCorpusVersification is not null. If engineParallelTextCorpus is not
+		/// a ScriptureTextCorpus this property must be manually set.</param>
+        /// <param name="verseRef"></param>
+        /// <param name="numberOfVersesInChapterBefore"></param>
+        /// <param name="numberOfVersesInChapterAfter"></param>
+        /// <param name="versification">if null, treat verseRef as in engineParallelCorpus.SourceCorpusVersification,
+        /// else treat verseRef in versification and change to engineParallelCorpus.SourceCorpusVersification before finding 
+		/// paralleltextrows in engineParallelCorpus</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidStateEngineException"></exception>
         public static (IEnumerable<ParallelTextRow> parallelTextRows, int indexOfVerse) GetByVerseRange(this EngineParallelTextCorpus engineParallelTextCorpus, 
 			VerseRef verseRef, 
 			ushort numberOfVersesInChapterBefore, 
-			ushort numberOfVersesInChapterAfter, 
-			ScrVers? sourceCorpusVersification = null)
+			ushort numberOfVersesInChapterAfter,
+            ScrVers? versification = null)
 		{
-            sourceCorpusVersification = sourceCorpusVersification 
-				?? engineParallelTextCorpus.SourceCorpusVersification 
-				?? throw new InvalidStateEngineException(name: "sourceCorpusVersification", value: "null", message: "both parameter null and engineParallelTextCorpus.SourceCorpusVersification is null");
+            if (engineParallelTextCorpus.SourceCorpusVersification == null)
+            {
+                throw new InvalidStateEngineException(
+                    name: "sourceCorpusVersification",
+                    value: "null",
+                    message: $"engineParallelTextCorpus.SourceCorpusVersification property is not set because SourceCorpus is {engineParallelTextCorpus.SourceCorpus.GetType().Name} which is not type ScriptureTextCorpus. Please set engineParallelTextCorpus.SourceCorpusVersification property manually before calling this method.");
+            }
 
-            var priorLimitToBook = engineParallelTextCorpus.GetLimitToBook();
-
-			var parallelTextRows = new List<ParallelTextRow>();
-
-			engineParallelTextCorpus.SetLimitToBook(verseRef.Book);
+            if (versification != null)
+                verseRef.Versification = versification;
+            else
+                verseRef.Versification = engineParallelTextCorpus.SourceCorpusVersification;
 
 			var firstVerseNumber = verseRef.VerseNum - numberOfVersesInChapterBefore;
 			var count = numberOfVersesInChapterAfter + numberOfVersesInChapterBefore + 1;
-			//var indexOfVerse = (numberOfVersesInChapterBefore + numberOfVersesInChapterAfter) / 2;
 			if (firstVerseNumber <= 0) 
 			{
 				count = count + firstVerseNumber - 1;
-				//indexOfVerse = indexOfVerse + firstVerse - 1;
 				firstVerseNumber = 1;
 			}
 
-			foreach (var verseNumber in Enumerable.Range(firstVerseNumber, count))
-			{
-                var currentVerseRef = verseRef; 
-				currentVerseRef.VerseNum = verseNumber;
-				currentVerseRef.ChangeVersification(sourceCorpusVersification);
+            var verseRefs = Enumerable.Range(firstVerseNumber, count)
+				.SelectMany(vn =>
+				{
+					var vref = new VerseRef(verseRef)
+					{
+						VerseNum = vn
+					};
 
+					if (versification != null)
+					{
+						vref.ChangeVersification(engineParallelTextCorpus.SourceCorpusVersification);
+						return vref.AllVerses();
+					}
+					return new List<VerseRef>() { vref };
+				})
+				.ToList();
+
+			engineParallelTextCorpus.LimitToSourceBooks = verseRefs
+				.Select(vr => vr.Book)
+				.Distinct()
+				.ToList();
+
+            var parallelTextRows = new List<ParallelTextRow>();
+
+            foreach (var sVerseRef in verseRefs)
+			{
 				var engineParallelTextRowForVerse = engineParallelTextCorpus
-					.Where(parallelTextRow => parallelTextRow.SourceRefs.Contains(currentVerseRef))
+					.Where(parallelTextRow => parallelTextRow.SourceRefs.Contains(sVerseRef))
 					.FirstOrDefault();
 
 				if (engineParallelTextRowForVerse == null)
 				{
-					break;
+					continue;
 				}
 				else
 				{ 
-					if (!parallelTextRows.Contains(engineParallelTextRowForVerse))
-						parallelTextRows.Add(engineParallelTextRowForVerse);
+					parallelTextRows.Add(engineParallelTextRowForVerse);
 				}
             }
 
-			engineParallelTextCorpus.SetLimitToBook(priorLimitToBook);
-			verseRef.ChangeVersification(sourceCorpusVersification);
-			return (parallelTextRows, parallelTextRows.FindIndex(pr => pr.SourceRefs.Contains(verseRef)));
+			engineParallelTextCorpus.LimitToSourceBooks = null;
+
+            verseRef.ChangeVersification(engineParallelTextCorpus.SourceCorpusVersification);
+
+            return (parallelTextRows, parallelTextRows
+				.FindIndex(pr => pr.SourceRefs
+					.Contains(verseRef)));
 		}
     }
 }

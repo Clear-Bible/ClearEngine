@@ -53,7 +53,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -144,7 +144,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         .Tokenize<LatinWordTokenizer>()
                         .Transform<IntoTokensTextRowProcessor>();
 
-                    var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+                    var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
 
                     FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -208,7 +208,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         .Tokenize<LatinWordTokenizer>()
                         .Transform<IntoTokensTextRowProcessor>();
 
-                    var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+                    var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
 
                     FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -273,7 +273,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -376,7 +376,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -467,7 +467,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     .Transform<IntoTokensTextRowProcessor>()
                     .Transform<SetTrainingBySurfaceLowercase>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -525,7 +525,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 .Transform<IntoTokensTextRowProcessor>()
                 .Transform<SetTrainingBySurfaceLowercase>();
 
-            var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+            var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
 
             {
                 using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -562,7 +562,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -620,7 +620,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     .Transform<IntoTokensTextRowProcessor>()
                     .Transform<SetTrainingBySurfaceLowercase>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
 
                 {
                     using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
