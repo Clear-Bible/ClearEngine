@@ -31,14 +31,14 @@ namespace ClearBible.Engine.Corpora
                                 .Where(verse => verse.TokenIds.Count() == 0) // either for verses that have no token ids
                                 .Select(v => v.Book)
                                 .Distinct()
-                                .Any(b => b.Equals(sourceTextId)
+                                .Any(b => b.Equals(sourceTextId))
                             ||
                             verseMapping.SourceVerses
                                 .Where(verse => verse.TokenIds.Count() > 0) //or verses that do have token ids.
                                 .SelectMany(v => v.TokenIds)
                                 .Select(t => t.Book)
                                 .Distinct()
-                                .Any(b => b.Equals(sourceTextId))));
+                                .Any(b => b.Equals(sourceTextId)));
                 }
                 return textIdToVerseMappings[sourceTextId];
             }
