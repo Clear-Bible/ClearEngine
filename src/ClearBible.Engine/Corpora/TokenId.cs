@@ -10,6 +10,18 @@ namespace ClearBible.Engine.Corpora
         /// SIL book number
         /// </summary>
         public virtual int BookNumber { get; }
+
+        public virtual string Book
+        {
+            get => BookIds
+                    .Where(b => b.silCannonBookNum.Equals(BookNumber))
+                    .Select(b => b.silCannonBookAbbrev)
+                    .FirstOrDefault() 
+                        ?? throw new InvalidBookMappingEngineException(
+                            message: "Doesn't exist", 
+                            name: "silCannonBookNum", 
+                            value: BookNumber.ToString());
+        }
         public virtual int ChapterNumber { get; }
         public virtual int VerseNumber { get; }
         public virtual int WordNumber { get; }
