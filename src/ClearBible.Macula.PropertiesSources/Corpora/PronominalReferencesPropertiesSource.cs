@@ -29,6 +29,12 @@ namespace ClearBible.Macula.PronominalReferencePropertiesSource.Corpora
             {
                 var tokenIdString = pronominalReference.Element("TokenId")?.Value
                     ?? throw new InvalidDataEngineException(name: "TokenId", value: "no such element");
+
+                if (tokenIdString.Contains("00n"))
+                {
+                    continue;
+                }
+
                 var tokenId = new TokenId(tokenIdString);
 
                 using var writer = new StringWriter();

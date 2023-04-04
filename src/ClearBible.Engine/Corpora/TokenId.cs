@@ -54,6 +54,11 @@ namespace ClearBible.Engine.Corpora
 
         public static int SubstringToInt(string tokenString, int start, int count)
         {
+            if (start == 12 && tokenString.Length<=12)
+            {
+                return 001;
+            }
+
             string substring;
             try
             {
