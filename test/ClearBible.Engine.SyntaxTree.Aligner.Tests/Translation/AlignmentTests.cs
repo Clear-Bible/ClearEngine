@@ -49,11 +49,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 var syntaxTree = new SyntaxTrees();
                 var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
-                var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
+                var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath);
+                var transformedTargetCorpus = targetCorpus
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(
+                    transformedTargetCorpus,
+                   new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification)));
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -140,16 +143,21 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     var syntaxTree = new SyntaxTrees();
                     var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
-                    var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
+                    var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath);
+                    var transformedTargetCorpus = targetCorpus
                         .Tokenize<LatinWordTokenizer>()
                         .Transform<IntoTokensTextRowProcessor>();
 
-                    var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+                    var parallelTextCorpus = sourceCorpus.EngineAlignRows(
+                        transformedTargetCorpus,
+                       new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification)));
 
                     FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                     parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
                         .Transform<FunctionWordTextRowProcessor>();
+
+                    var parallelTextCorpusList = parallelTextCorpus.ToList();
 
                     {
                         using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -160,7 +168,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                             Heuristic = SymmetrizationHeuristic.GrowDiagFinalAnd
                         };
 
-                        using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpus.Lowercase());
+                        using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpusList.Lowercase());
                         trainer.Train();
                         await trainer.SaveAsync();
 
@@ -178,14 +186,14 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                         // initialize a manuscript word alignment model. At this point it has not yet been trained.
                         using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
-                        using var manuscriptTrainer = syntaxTreeWordAlignmentModel.CreateTrainer(parallelTextCorpus);
+                        using var manuscriptTrainer = syntaxTreeWordAlignmentModel.CreateTrainer(parallelTextCorpusList);
 
                         // Trains the manuscriptmodel using the pre-trained SMT model(s)
                         manuscriptTrainer.Train();
                         await manuscriptTrainer.SaveAsync();
 
                         List<Task<IEnumerable<(IReadOnlyCollection<AlignedWordPair> alignedWordPairs, EngineParallelTextRow engineParallelTextRow)>>> tasks = new();
-                        parallelTextCorpus
+                        _ = parallelTextCorpusList
                             .GroupBy(row => ((VerseRef)row.Ref).BookNum)
                             .SelectMany(g =>
                             {
@@ -204,16 +212,21 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     var syntaxTree = new SyntaxTrees();
                     var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
-                    var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
+                    var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath);
+                    var transformedTargetCorpus = targetCorpus
                         .Tokenize<LatinWordTokenizer>()
                         .Transform<IntoTokensTextRowProcessor>();
 
-                    var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+                    var parallelTextCorpus = sourceCorpus.EngineAlignRows(
+                        transformedTargetCorpus,
+                       new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification)));
 
                     FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
                     parallelTextCorpus.SourceCorpus = parallelTextCorpus.SourceCorpus
                         .Transform<FunctionWordTextRowProcessor>();
+
+                    var parallelTextCorpusList = parallelTextCorpus.ToList();
 
                     {
                         using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -224,7 +237,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                             Heuristic = SymmetrizationHeuristic.GrowDiagFinalAnd
                         };
 
-                        using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpus.Lowercase());
+                        using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpusList.Lowercase());
                         trainer.Train();
                         await trainer.SaveAsync();
 
@@ -242,13 +255,13 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                         // initialize a manuscript word alignment model. At this point it has not yet been trained.
                         using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
-                        using var manuscriptTrainer = syntaxTreeWordAlignmentModel.CreateTrainer(parallelTextCorpus);
+                        using var manuscriptTrainer = syntaxTreeWordAlignmentModel.CreateTrainer(parallelTextCorpusList);
 
                         // Trains the manuscriptmodel using the pre-trained SMT model(s)
                         manuscriptTrainer.Train();
                         await manuscriptTrainer.SaveAsync();
 
-                        foreach (var engineParallelTextRow in parallelTextCorpus.Cast<EngineParallelTextRow>())
+                        foreach (var engineParallelTextRow in parallelTextCorpusList.Cast<EngineParallelTextRow>())
                         {
                             _ = syntaxTreeWordAlignmentModel.GetBestAlignmentAlignedWordPairs(engineParallelTextRow);
                         }
@@ -273,7 +286,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus);
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -372,11 +385,16 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                 var syntaxTree = new SyntaxTrees();
                 var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
 
-                var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
+                var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath);
+                var targetCorpusTransformed = targetCorpus
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(
+                    targetCorpusTransformed
+                    ,new SourceTextIdToVerseMappingsFromVerseMappings(
+                        EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification))
+                    );
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -456,18 +474,22 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
         {
             try
             {
-                var sourceCorpus = new ParatextTextCorpus(SourceCorpusProjectPath)
+                var sourceCorpus = new ParatextTextCorpus(SourceCorpusProjectPath);
+                var transformedSourceCorpus = sourceCorpus
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>()
                     .Transform<SetTrainingBySurfaceLowercase>();
 
-
-                var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
+                var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath);
+                var transformedTargetCorpus = targetCorpus
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>()
                     .Transform<SetTrainingBySurfaceLowercase>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+                var parallelTextCorpus = transformedSourceCorpus.EngineAlignRows(
+                    transformedTargetCorpus
+                    //, new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification))
+                    );
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -514,18 +536,21 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
         [Trait("Category", "Example")]
         public async Task Alignment__SetTrainingBySurfaceLowercase()
         {
-            var sourceCorpus = new ParatextTextCorpus(SourceCorpusProjectPath)
+            var sourceCorpus = new ParatextTextCorpus(SourceCorpusProjectPath);
+            var transformedSourceCorpus = sourceCorpus
                 .Tokenize<LatinWordTokenizer>()
                 .Transform<IntoTokensTextRowProcessor>()
                 .Transform<SetTrainingBySurfaceLowercase>();
 
-
-            var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath)
+            var targetCorpus = new ParatextTextCorpus(TargetCorpusProjectPath);
+            var transformedTargetCorpus = targetCorpus
                 .Tokenize<LatinWordTokenizer>()
                 .Transform<IntoTokensTextRowProcessor>()
                 .Transform<SetTrainingBySurfaceLowercase>();
 
-            var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+            var parallelTextCorpus = transformedSourceCorpus.EngineAlignRows(
+                transformedTargetCorpus,
+               new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification)));
 
             {
                 using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -562,7 +587,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus);
 
                 FunctionWordTextRowProcessor.Train(parallelTextCorpus);
 
@@ -612,15 +637,20 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
             try
             {
                 var syntaxTree = new SyntaxTrees();
-                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree)
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
+                var transformedSourceCorpus = sourceCorpus
                     .Transform<SetTrainingByTrainingLowercase>();
 
-                var targetCorpus = new ParatextTextCorpus("C:\\My Paratext 9 Projects\\zz_SUR")
+                var targetCorpus = new ParatextTextCorpus("C:\\My Paratext 9 Projects\\zz_SUR");
+                var transformedTargetCorpus = targetCorpus
                     .Tokenize<LatinWordTokenizer>()
                     .Transform<IntoTokensTextRowProcessor>()
                     .Transform<SetTrainingBySurfaceLowercase>();
 
-                var parallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+                var parallelTextCorpus = transformedSourceCorpus.EngineAlignRows(
+                    transformedTargetCorpus,
+                    new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification)))
+                    .ToList();
 
                 {
                     using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
@@ -636,14 +666,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                             output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")));
                     await trainer.SaveAsync();
 
-                    var allAlignedTokenPairs = new List<AlignedTokenPairs>();
-                    foreach (EngineParallelTextRow row in parallelTextCorpus)
-                    {
-                        allAlignedTokenPairs.AddRange(row.GetAlignedTokenPairs(smtWordAlignmentModel.GetBestAlignment(row.SourceSegment, row.TargetSegment)));
-                    }
-                    //parallelTextCorpus
-                    //    .SelectMany(row => ((EngineParallelTextRow) row).GetAlignedTokenPairs(smtWordAlignmentModel.GetBestAlignment(row.SourceSegment, row.TargetSegment)))
-                    //    .ToList();
+                    var allAlignedTokenPairs = parallelTextCorpus
+                        .SelectMany(row => ((EngineParallelTextRow)row).GetAlignedTokenPairs(smtWordAlignmentModel.GetBestAlignment(row.SourceSegment, row.TargetSegment)))
+                        .ToList();
                 }
             }
             catch (EngineException eex)
