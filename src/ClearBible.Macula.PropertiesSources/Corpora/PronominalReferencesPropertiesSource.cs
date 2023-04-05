@@ -1,6 +1,7 @@
 ﻿using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
 using System.Reflection;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace ClearBible.Macula.PronominalReferencePropertiesSource.Corpora
@@ -44,6 +45,17 @@ namespace ClearBible.Macula.PronominalReferencePropertiesSource.Corpora
 
                 if (!tokenIdToXmlMap.ContainsKey(tokenId)){
                     tokenIdToXmlMap.Add(tokenId, xml);
+                }
+                else
+                {
+                    var pronominalReferenceDescendentXml = pronominalReference.DescendantNodes();
+
+                    var oldXmlString = tokenIdToXmlMap[tokenId];
+                    var oldXmlElement = XElement.Parse(oldXmlString);
+
+                    oldXmlElement.Add(pronominalReferenceDescendentXml);
+
+                    tokenIdToXmlMap[tokenId] = oldXmlElement.ToString();
                 }
             }
         }
