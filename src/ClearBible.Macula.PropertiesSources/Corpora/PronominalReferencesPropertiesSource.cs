@@ -30,7 +30,7 @@ namespace ClearBible.Macula.PronominalReferencePropertiesSource.Corpora
                 var tokenIdString = pronominalReference.Element("TokenId")?.Value
                     ?? throw new InvalidDataEngineException(name: "TokenId", value: "no such element");
 
-                //because some pronominal references have an invaild token id
+                //because some pronominal references have an invalid token id
                 if (tokenIdString.Contains("00n"))
                 {
                     continue;
@@ -41,7 +41,10 @@ namespace ClearBible.Macula.PronominalReferencePropertiesSource.Corpora
                 using var writer = new StringWriter();
                 pronominalReference.Save(writer);
                 var xml = writer.ToString();
-                tokenIdToXmlMap.Add(tokenId, xml);
+
+                if (!tokenIdToXmlMap.ContainsKey(tokenId)){
+                    tokenIdToXmlMap.Add(tokenId, xml);
+                }
             }
         }
         public string? GetExtendedPropertiesObjectForToken(TokenId tokenId)
