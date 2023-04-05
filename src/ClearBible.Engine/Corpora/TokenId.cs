@@ -54,7 +54,9 @@ namespace ClearBible.Engine.Corpora
 
         public static int SubstringToInt(string tokenString, int start, int count)
         {
-            if (start == 12 && tokenString.Length<=12)
+            //because greek tokenIds do not specify word part (whereas Hebrew do)
+            var hebrewTokenLength = 12;
+            if (start == hebrewTokenLength && tokenString.Length <= hebrewTokenLength)
             {
                 return 001;
             }
