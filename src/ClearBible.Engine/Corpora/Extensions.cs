@@ -8,14 +8,15 @@ namespace ClearBible.Engine.Corpora
 {
     public static class Extensions
     {
-		public static List<VerseMapping> Validate(this List<VerseMapping> verseMappingList, IEnumerable<TextRow> sourceCorpus, IEnumerable<TextRow> targetCorpus)
-		{
-			//enhanced EngineParallelCorpus to not need restrictions on versemappinglist other than should not include a verse in more than one versemapping.
-			return verseMappingList;
-		}
-		public static EngineParallelTextCorpus EngineAlignRows(this ITextCorpus sourceCorpus, ITextCorpus targetCorpus,
-            SourceTextIdToVerseMappings? sourceTargetParallelVersesList = null, IAlignmentCorpus? alignmentCorpus = null, bool allSourceRows = false, bool allTargetRows = false,
-			IComparer<object>? rowRefComparer = null)
+		public static EngineParallelTextCorpus EngineAlignRows(
+			this ITextCorpus sourceCorpus, 
+			ITextCorpus targetCorpus,
+            SourceTextIdToVerseMappings? sourceTargetParallelVersesList = null, 
+			IAlignmentCorpus? alignmentCorpus = null, 
+			bool allSourceRows = false, 
+			bool allTargetRows = false,
+			IComparer<object>? rowRefComparer = null
+		)
 		{
 			return new EngineParallelTextCorpus(sourceCorpus, targetCorpus, sourceTargetParallelVersesList, alignmentCorpus, rowRefComparer)
 			{

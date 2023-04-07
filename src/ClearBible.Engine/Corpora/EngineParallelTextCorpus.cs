@@ -4,20 +4,6 @@ using SIL.Scripture;
 
 namespace ClearBible.Engine.Corpora
 {
-    public class SourceTextIdToVerseMappingsFromMachine : SourceTextIdToVerseMappingsFromVerseMappings
-    {
-        /// <summary>
-        /// used to tell EngineParallelTextCorpus to initialize versemappings from Machine's versification, then use Engine's versemappings.
-        /// </summary>
-        public SourceTextIdToVerseMappingsFromMachine() : base()
-        {
-        }
-        public IEnumerable<VerseMapping> VerseMappings
-        {
-            set => verseMappings_ = value;
-        }
-    }
-
     /// <summary>
     /// Used to create parallel segments of sourceCorpus with targetCorpus from method GetRows(), which returns enhanced ParallelTextRows, which
     /// is included with either source and/or target corpus when corpus TextRows have been transformed into TokensTextRows.
@@ -40,10 +26,7 @@ namespace ClearBible.Engine.Corpora
         /// Engine's versification mapping. 
         /// 
         /// - If null, use Machine's versification
-        /// 
-        /// - If is a SourceTextIdToVerseMappingsFromMachine, use Machine's versification to build Engine's versemappings, then use Engine's versemappings.
-        /// 
-        /// - If is not a SourceTextIdToVerseMappingsFromMachine, use Engine's versemappings.
+        /// - Else use Engine's versemappings.
         /// </param>
         /// <param name="textAlignmentCorpus">Prior alignment mapping to use as an override. Defaults to null.</param>
         /// <param name="rowRefComparer">The comparer used to find parallel source and target segments. Defaults to null,
@@ -56,40 +39,11 @@ namespace ClearBible.Engine.Corpora
 			IComparer<object>? rowRefComparer = null)
 			: base(sourceCorpus, targetCorpus, alignmentCorpus, rowRefComparer = null)
 		{
-			if (sourceTextIdToVerseMappings != null && sourceTextIdToVerseMappings is SourceTextIdToVerseMappingsFromMachine)
-			{
-				_segmentRefComparer = rowRefComparer;
-
-				List<VerseMapping> verseMappings = new List<VerseMapping>();
-				//Versifications as used in machine doesn't support combining verses.
-
-				_ = base.GetRows()
-					.Select(parallelTextRow =>
-						{
-							var verseMapping = new VerseMapping
-							(
-								// assume SegmentRef is VerseRef since corpora are ScriptureTextCorpus.
-								parallelTextRow.SourceRefs
-									.Select(sourceSegmentRef => new Verse((VerseRef)sourceSegmentRef)),
-								parallelTextRow.TargetRefs
-									.Select(targetSegmentRef => new Verse((VerseRef)targetSegmentRef))
-
-							);
-							verseMappings.Add(verseMapping);
-							return verseMapping;
-						}
-					).ToList(); //cause the enumerable to evaluate
-
-				((SourceTextIdToVerseMappingsFromMachine) sourceTextIdToVerseMappings).VerseMappings 
-					= verseMappings.Validate(sourceCorpus, targetCorpus);
-				SourceTextIdToVerseMappings = sourceTextIdToVerseMappings;
-			}
-			else if (sourceTextIdToVerseMappings != null) // sourceTextIdToVerseMappings is NOT SourceTextIdToVerseMappingsFromMachine
+			if (sourceTextIdToVerseMappings != null)
             {
-				//for rebuilding map from file: use to VerseRef.VerseRef(int bookNum, int chapterNum, int verseNum, ScrVers versification) constructor.
 				SourceTextIdToVerseMappings = sourceTextIdToVerseMappings;
 			}
-            else //sourceTextIdToVerseMappings == null
+            else
             {
 				SourceTextIdToVerseMappings = null;
 			}
@@ -101,9 +55,8 @@ namespace ClearBible.Engine.Corpora
 		}
 		public SourceTextIdToVerseMappings? SourceTextIdToVerseMappings { get; set; } = null;
 
-		public ScrVers? SourceCorpusVersification { get; set; }
-
-		public IEnumerable<string>? LimitToSourceBooks { get; set; } = null;
+		public ScrVers? SourceCorpusVersification { get; set; } = null;
+        public IEnumerable<string>? LimitToSourceBooks { get; set; } = null;
 
         public override IEnumerator<ParallelTextRow> GetEnumerator()
 		{
@@ -157,7 +110,7 @@ namespace ClearBible.Engine.Corpora
 						{
 							targetTokens = targetTextRows
 								.Cast<TokensTextRow>() //throws an invalidCastException if any of the members can't be cast to type
-								.Where(tokensTextRow => r.SourceRefs
+								.Where(tokensTextRow => r.TargetRefs
 									.Cast<VerseRef>()
 									.Contains((VerseRef)tokensTextRow.Ref)) //targetTextRows that pertain to paralleltextrow's targetrefs
 								.SelectMany(tokensTextRow => tokensTextRow.Tokens)
@@ -205,14 +158,18 @@ namespace ClearBible.Engine.Corpora
 						.Select(sourceVerse => sourceVerse.Book))
 					.Distinct();
 
-			var allSourceBooksNeededAndAvailable = allSourceBooksNeeded.Intersect(sourceBooksAvailable);
+			var allSourceBooksNeededAndAvailable = allSourceBooksNeeded
+				.Intersect(sourceBooksAvailable)
+				.ToList();
 
             var allTargetBooksNeeded = allVerseMappings
                     .SelectMany(verseMapping => verseMapping.TargetVerses
 						.Select(targetVerse => targetVerse.Book))
 					.Distinct();
 
-            var allTargetBooksNeededAndAvailable = allTargetBooksNeeded.Intersect(targetBooksAvailable);
+            var allTargetBooksNeededAndAvailable = allTargetBooksNeeded
+				.Intersect(targetBooksAvailable)
+				.ToList();
 
             // get verse mappings that are supported by the sourceTextIds and targetTextIds
             var verseMappingsNeededAndAvailable = allVerseMappings
@@ -228,9 +185,9 @@ namespace ClearBible.Engine.Corpora
 						.SelectMany(v => v.TokenIds)
 						.Select(t => t.Book)
                         .Distinct()
-	                    .All(b => allSourceBooksNeededAndAvailable.Contains(b)))
-                .Where(verseMapping => // further filter for only verse mappings where all the target verses are associated with books in targetTextIds
-                    verseMapping.TargetVerses
+	                    .All(b => allSourceBooksNeededAndAvailable.Contains(b))
+                    &&
+					verseMapping.TargetVerses
                         .Where(verse => verse.TokenIds.Count() == 0) // either for verses that have no token ids
                         .Select(v => v.Book)
                         .Distinct()
@@ -243,7 +200,7 @@ namespace ClearBible.Engine.Corpora
                         .Distinct()
                         .All(b => allTargetBooksNeededAndAvailable.Contains(b)));
 
-			//now figure out the actual set of srcTextIds for which rows will be needed and get them.
+            //now figure out the actual set of srcTextIds for which rows will be needed and get them.
             var sourceBooksNeededAndAvailable = verseMappingsNeededAndAvailable
                 .SelectMany(vm => vm.SourceVerses
                     .Select(v => v.Book))
@@ -275,22 +232,25 @@ namespace ClearBible.Engine.Corpora
 
 				if (notTokenMode)
 				{
-                    var parallelSourceTextRows = verseMapping.SourceVerses
+                    var sTextRows = verseMapping.SourceVerses
 						.SelectMany(verse => sourceTextRows
-							.Where(textRow => (new Verse((VerseRef)textRow.Ref).Equals(verse))));
+							.Where(textRow => verse.Equals((VerseRef)textRow.Ref)))
+						.ToList();
 
-					var parallelTargetTextRows = verseMapping.TargetVerses
+					var tTextRows = verseMapping.TargetVerses
 						//.Where(verse => verse.TokenIds.Count() == 0)
 						.SelectMany(verse => targetTextRows
-							.Where(textRow => (new Verse((VerseRef)textRow.Ref).Equals(verse))));
+							.Where(textRow => verse.Equals((VerseRef)textRow.Ref)))
+						.ToList();
 
-					yield return new EngineParallelTextRow(
-						parallelSourceTextRows,
-                        verseMapping.SourceVersesCompositeTokens,
-                        parallelTargetTextRows,
-                        verseMapping.TargetVersesCompositeTokens,
-                        AlignmentCorpus
-					);
+					if (sTextRows.Count() != 0 || tTextRows.Count() != 0) // see ParallelTextRow.ctor()
+						yield return new EngineParallelTextRow(
+							sTextRows,
+							verseMapping.SourceVersesCompositeTokens,
+							tTextRows,
+							verseMapping.TargetVersesCompositeTokens,
+							AlignmentCorpus
+						);
 				}
 				else //token mode
                 {
@@ -332,5 +292,22 @@ namespace ClearBible.Engine.Corpora
 				}
 			}
 		}
-	}
+
+		public static IEnumerable<VerseMapping> VerseMappingsForAllVerses(ScrVers sourceVersification, ScrVers targetVersification)
+		{
+			var sourceCorpus = ScriptureTextCorpus.CreateVersificationRefCorpus(sourceVersification);
+            var targetCorpus = ScriptureTextCorpus.CreateVersificationRefCorpus(targetVersification);
+
+			return sourceCorpus.AlignRows(targetCorpus)
+				.Select(parallelTextRow => new VerseMapping(
+						// assume SegmentRef is VerseRef since corpora are ScriptureText.
+						parallelTextRow.SourceRefs
+							.Select(sourceSegmentRef => new Verse((VerseRef)sourceSegmentRef))
+							.ToList(),
+						parallelTextRow.TargetRefs
+							.Select(targetSegmentRef => new Verse((VerseRef)targetSegmentRef))
+							.ToList()
+				));
+        }
+    }
 }

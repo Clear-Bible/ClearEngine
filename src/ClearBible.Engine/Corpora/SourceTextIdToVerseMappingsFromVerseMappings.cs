@@ -4,8 +4,8 @@ namespace ClearBible.Engine.Corpora
 {
     public class SourceTextIdToVerseMappingsFromVerseMappings : SourceTextIdToVerseMappings
     {
-        private Dictionary<string, IEnumerable<VerseMapping>> textIdToVerseMappings = new();
-        protected IEnumerable<VerseMapping> verseMappings_;
+        private Dictionary<string, List<VerseMapping>> textIdToVerseMappings = new();
+        protected List<VerseMapping> verseMappings_;
 
         protected SourceTextIdToVerseMappingsFromVerseMappings()
         {
@@ -13,7 +13,8 @@ namespace ClearBible.Engine.Corpora
         }
         public SourceTextIdToVerseMappingsFromVerseMappings(IEnumerable<VerseMapping> verseMappings)
         {
-            verseMappings_ = verseMappings;
+            verseMappings_ = verseMappings
+                .ToList();
         }
         public override IEnumerable<VerseMapping> GetVerseMappings()
         {
@@ -38,7 +39,8 @@ namespace ClearBible.Engine.Corpora
                                 .SelectMany(v => v.TokenIds)
                                 .Select(t => t.Book)
                                 .Distinct()
-                                .Any(b => b.Equals(sourceTextId)));
+                                .Any(b => b.Equals(sourceTextId)))
+                        .ToList();
                 }
                 return textIdToVerseMappings[sourceTextId];
             }

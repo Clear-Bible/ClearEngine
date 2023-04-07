@@ -70,7 +70,7 @@ namespace ClearBible.Engine.Tests.Corpora
 
 
         [Fact]
-        public void ParallelCorpus__LimitByBook_FindByVerse()
+        public void ParallelCorpus__LimitByBook_MachineVersificationOnly_FindByVerse()
         {
 			/*
 			 *  Should result in the following mapping for MAT 1:
@@ -124,7 +124,11 @@ namespace ClearBible.Engine.Tests.Corpora
                     TextRow(new VerseRef("MRK 1:2", versificationTarget), "target MRK chapter one, verse two."),
                     TextRow(new VerseRef("MRK 1:3", versificationTarget), "target MRK chapter one, verse three.")
                 }));
-            var engineParallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+            var engineParallelTextCorpus = sourceCorpus.EngineAlignRows(
+                targetCorpus,
+                //use versemappings
+                new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(versificationSource, versificationTarget))
+            );
 
             Assert.Equal(6, engineParallelTextCorpus.Count());
             Assert.Equal(3, engineParallelTextCorpus.SetLimitToBook("MRK").Count());
@@ -276,7 +280,13 @@ namespace ClearBible.Engine.Tests.Corpora
                 .Tokenize<LatinWordTokenizer>()
                 .Transform<IntoTokensTextRowProcessor>();
 
-            var engineParallelTextCorpus = sourceCorpus.EngineAlignRows(targetCorpus, new SourceTextIdToVerseMappingsFromMachine());
+            var engineParallelTextCorpus = sourceCorpus.EngineAlignRows(
+                targetCorpus, 
+                //use versemappings
+                new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(versificationSource, versificationTarget))
+            );
+
+            // need to set because .Tokenize() and .Transform() return a TransformTextCorpus       
             engineParallelTextCorpus.SourceCorpusVersification = versificationSource;
 
             var parallelTextRowsMAT13_1_1 = engineParallelTextCorpus.GetByVerseRange(new VerseRef("MAT 1:3"), 1, 1, ScrVers.Original);
@@ -365,7 +375,134 @@ namespace ClearBible.Engine.Tests.Corpora
                 .Where(vr => vr.Equals(new VerseRef("MAT 1:5", versificationTarget)))
                 .Count() > 0);
         }
+        
+        [Fact]
+        public void VerseMapping__Compare_AllUsingMachine_CorporaUsingMachine()
+        {
+            
+			 //  Should result in the following mapping for MAT 1:
+			 //  
+			 //  Original       Source         Target
+			 //     1             2              3
+			 //     2             3              2
+			 //     3             1              1
+			 // 
+			 
+            Versification.Table.Implementation.RemoveAllUnknownVersifications();
+            string source = "&GEN 1:2 = GEN 1:1\nGEN 1:3 = GEN 1:2\nGEN 1:1 = GEN 1:3\n";
+            ScrVers versificationSource;
+            using (var reader = new StringReader(source))
+            {
+                versificationSource = Versification.Table.Implementation.Load(reader, "vers.txt", ScrVers.English, "custom");
+            }
 
+            Versification.Table.Implementation.RemoveAllUnknownVersifications();
+            string target = "&GEN 1:3 = GEN 1:1\nGEN 1:1 = GEN 1:3\nGEN 1:2 = GEN 1:2\n";
+            ScrVers versificationTarget;
+            using (var reader = new StringReader(target))
+            {
+                versificationTarget = Versification.Table.Implementation.Load(reader, "vers.txt", ScrVers.English, "custom");
+            }
+
+            var sourceCorpus = new TestScriptureTextCorpus(
+                new List<IText>()
+                {
+                    new MemoryText("GEN", new[]
+                    {
+                        TextRow(new VerseRef("GEN 1:1", versificationSource), "source GEN chapter one, verse one."),
+                        TextRow(new VerseRef("GEN 1:2", versificationSource), "source GEN chapter one, verse two."),
+                        TextRow(new VerseRef("GEN 1:3", versificationSource), "source GEN chapter one, verse three.")
+                    }),
+                    new MemoryText("EXO", new[]
+                    {
+                        TextRow(new VerseRef("EXO 1:1", versificationSource), "source EXO chapter one, verse one."),
+                        TextRow(new VerseRef("EXO 1:2", versificationSource), "source EXO chapter one, verse two."),
+                        TextRow(new VerseRef("EXO 1:3", versificationSource), "source EXO chapter one, verse three.")
+                    })
+                },
+                versificationSource
+            );
+            var targetCorpus = new TestScriptureTextCorpus(
+                new List<IText>()
+                {
+                    new MemoryText("GEN", new[]
+                    {
+                        TextRow(new VerseRef("GEN 1:1", versificationTarget), "target GEN chapter one, verse one."),
+                        TextRow(new VerseRef("GEN 1:2", versificationTarget), "target GEN chapter one, verse two."),
+                        TextRow(new VerseRef("GEN 1:3", versificationTarget), "target GEN chapter one, verse three.")
+                    }),
+                    new MemoryText("EXO", new[]
+                    {
+                        TextRow(new VerseRef("EXO 1:1", versificationTarget), "target EXO chapter one, verse one."),
+                        TextRow(new VerseRef("EXO 1:2", versificationTarget), "target EXO chapter one, verse two."),
+                        TextRow(new VerseRef("EXO 1:3", versificationTarget), "target EXO chapter one, verse three.")
+                    })
+                },
+                versificationTarget
+            );
+            var engineParallelTextCorpus = sourceCorpus.EngineAlignRows(
+                targetCorpus,
+                new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(versificationSource, versificationTarget))
+            );
+
+            var verseMappingsForAllVerses = engineParallelTextCorpus!.SourceTextIdToVerseMappings!.GetVerseMappings();
+
+            var verseMappingsForCorpora = sourceCorpus.AlignRows(targetCorpus)
+                .Select(parallelTextRow =>
+                {
+                    var verseMapping = new VerseMapping
+                    (
+                        // assume SegmentRef is VerseRef since corpora are ScriptureTextCorpus.
+                        parallelTextRow.SourceRefs
+                            .Select(sourceSegmentRef => new Verse((VerseRef)sourceSegmentRef))
+                            .ToList(),
+                        parallelTextRow.TargetRefs
+                            .Select(targetSegmentRef => new Verse((VerseRef)targetSegmentRef))
+                            .ToList()
+
+                    );
+                    return verseMapping;
+                })
+                .ToList();
+
+            Assert.Empty(verseMappingsForCorpora
+                .Except(verseMappingsForAllVerses, new VerseMappingEqualityComparer()));
+
+            var totalCount = verseMappingsForAllVerses.Count();
+            output_.WriteLine($"Versifying {versificationSource} and {versificationTarget} result in {totalCount.ToString()} verse mappings");
+
+            Assert.True(totalCount > verseMappingsForCorpora.Count());
+        }
+        class VerseMappingEqualityComparer : IEqualityComparer<VerseMapping>
+        {
+            public bool Equals(VerseMapping? vm1, VerseMapping? vm2)
+            {
+                if (vm2 == null && vm1 == null)
+                    return true;
+                else if (vm1 == null || vm2 == null)
+                    return false;
+                else if (
+                    vm1.SourceVerses.SequenceEqual(vm2.SourceVerses) &&
+                    vm1.TargetVerses.SequenceEqual(vm2.TargetVerses)
+                )
+                    return true;
+                else
+                    return false;
+            }
+            public int GetHashCode(VerseMapping vm)
+            {
+                int hash = 0;
+                foreach (var verse in vm.SourceVerses)
+                {
+                    hash = unchecked(hash + verse.GetHashCode());
+                }
+                foreach (var verse in vm.TargetVerses)
+                {
+                    hash = unchecked(hash + verse.GetHashCode());
+                }
+                return hash;
+            }
+        }
         class TestScriptureTextCorpus : ScriptureTextCorpus
         {
             public TestScriptureTextCorpus(IEnumerable<IText> texts, ScrVers versification)

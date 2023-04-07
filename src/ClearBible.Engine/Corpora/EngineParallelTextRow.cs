@@ -9,7 +9,7 @@ namespace ClearBible.Engine.Corpora
 {
     public class EngineParallelTextRow : ParallelTextRow, IEquatable<EngineParallelTextRow>
     {
-        private static IReadOnlyList<object> GetSourceSegmentRefs(IEnumerable<TextRow> sourceTextRows, IEnumerable<TextRow> targetTextRows, IEnumerable<AlignmentRow> alignmentRows)
+        private static IReadOnlyList<object> GetSourceSegmentRefs(List<TextRow> sourceTextRows, List<TextRow> targetTextRows, IEnumerable<AlignmentRow> alignmentRows)
         {
             var sourceSegment = sourceTextRows
                 .SelectMany(textRow => textRow.Segment).ToList();
@@ -48,10 +48,10 @@ namespace ClearBible.Engine.Corpora
 
         public EngineParallelTextRow(
             //string textId,
-            IEnumerable<TextRow> sourceTextRows,
-            IEnumerable<CompositeToken>? sourceVersesCompositeTokens,
-            IEnumerable<TextRow> targetTextRows,
-            IEnumerable<CompositeToken>? targetVersesCompositeTokens,
+            List<TextRow> sourceTextRows,
+            List<CompositeToken>? sourceVersesCompositeTokens,
+            List<TextRow> targetTextRows,
+            List<CompositeToken>? targetVersesCompositeTokens,
             IAlignmentCorpus alignmentRows
             )
             : base(
@@ -252,6 +252,11 @@ namespace ClearBible.Engine.Corpora
         public bool Equals(EngineParallelTextRow? other)
         {
             return Equals((object?)other);
+        }
+
+        public override string ToString()
+        {
+            return Ref.ToString() ?? "Ref not set";
         }
     }
 }
