@@ -56,7 +56,7 @@ namespace ClearBible.Engine.Corpora
 		public SourceTextIdToVerseMappings? SourceTextIdToVerseMappings { get; set; } = null;
 
 		public ScrVers? SourceCorpusVersification { get; set; } = null;
-        public IEnumerable<string>? LimitToSourceBooks { get; set; } = null;
+        public virtual IEnumerable<string>? LimitToSourceBooks { get; set; } = null;
 
         public override IEnumerator<ParallelTextRow> GetEnumerator()
 		{
