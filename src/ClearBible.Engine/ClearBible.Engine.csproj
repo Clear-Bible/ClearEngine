@@ -5,6 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
+		<DebugType>embedded</DebugType>
+		<EmbedAllSources>true</EmbedAllSources>
 	</PropertyGroup>
 
 	<ItemGroup>
