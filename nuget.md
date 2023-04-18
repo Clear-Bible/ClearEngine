@@ -13,7 +13,7 @@
 3. Execute `nuget pack .\ClearBible.Engine.nuspec` to just create the *.nupkg
 4. Execute `nuget pack .\ClearBible.Engine.nuspec -Symbols -SymbolPackageFormat snupkg` to create both the *.nupkg and a *.snupkg
 5. Execute `nuget push .\ClearBible.Engine.X.X.X.nupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
-6. To publish the symbole package, execute `nuget push .\ClearBible.Engine.X.X.X.snupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
+6. To publish the symbol package, execute `nuget push .\ClearBible.Engine.X.X.X.snupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
 
 # Building and deploying Machine Nuget package
 
