@@ -228,8 +228,8 @@ namespace ClearBible.Engine.Corpora
             foreach (var vRef in verseRefs)
             {
                 var textRowForVerse = bookTextRows
-                    .Where(textRow => textRow.Ref.Equals(vRef))
-                    .FirstOrDefault();
+                    //.Where(textRow => textRow.Ref.Equals(vRef))
+                    .FirstOrDefault(textRow => textRow.Ref.Equals(vRef));
 
                 if (textRowForVerse == null)
                 {
@@ -313,8 +313,8 @@ namespace ClearBible.Engine.Corpora
             foreach (var sVerseRef in verseRefs)
 			{
 				var engineParallelTextRowForVerse = engineParallelTextCorpus
-					.Where(parallelTextRow => parallelTextRow.SourceRefs.Contains(sVerseRef))
-					.FirstOrDefault();
+					//.Where(parallelTextRow => parallelTextRow.SourceRefs.Contains(sVerseRef))
+					.FirstOrDefault(parallelTextRow => parallelTextRow.SourceRefs.Contains(sVerseRef));
 
 				if (engineParallelTextRowForVerse == null)
 				{
