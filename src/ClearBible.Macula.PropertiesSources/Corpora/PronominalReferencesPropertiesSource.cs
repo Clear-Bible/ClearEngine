@@ -28,14 +28,14 @@ namespace ClearBible.Macula.PronominalReferencePropertiesSource.Corpora
 
             foreach (var pronominalReference in pronominalReferences)
             {
-                var tokenIdString = pronominalReference.Element("TokenId")?.Value
-                    ?? throw new InvalidDataEngineException(name: "TokenId", value: "no such element");
+                var tokenIdString = pronominalReference.Element("TokenId")?.Value 
+                                    ?? throw new InvalidDataEngineException(name: "TokenId", value: "no such element");
 
-                //because some pronominal references have an invalid token id
-                if (tokenIdString.Contains("00n"))
-                {
-                    continue;
-                }
+                ////because some pronominal references have an invalid token id
+                //if (tokenIdString.Contains("00n"))
+                //{
+                //    continue;
+                //}
 
                 var tokenId = new TokenId(tokenIdString);
 
@@ -43,20 +43,22 @@ namespace ClearBible.Macula.PronominalReferencePropertiesSource.Corpora
                 pronominalReference.Save(writer);
                 var xml = writer.ToString();
 
-                if (!tokenIdToXmlMap.ContainsKey(tokenId)){
-                    tokenIdToXmlMap.Add(tokenId, xml);
-                }
-                else
-                {
-                    var pronominalReferenceDescendentXml = pronominalReference.DescendantNodes();
+                //addressing when a token id has both pronominal references and verb subject references
+                //if (!tokenIdToXmlMap.ContainsKey(tokenId))
+                //{
+                tokenIdToXmlMap.Add(tokenId, xml);
+                //}
+                //else
+                //{
+                //    var pronominalReferenceDescendentXml = pronominalReference.DescendantNodes();
 
-                    var oldXmlString = tokenIdToXmlMap[tokenId];
-                    var oldXmlElement = XElement.Parse(oldXmlString);
+                //    var oldXmlString = tokenIdToXmlMap[tokenId];
+                //    var oldXmlElement = XElement.Parse(oldXmlString);
 
-                    oldXmlElement.Add(pronominalReferenceDescendentXml);
+                //    oldXmlElement.Add(pronominalReferenceDescendentXml);
 
-                    tokenIdToXmlMap[tokenId] = oldXmlElement.ToString();
-                }
+                //    tokenIdToXmlMap[tokenId] = oldXmlElement.ToString();
+                //}
             }
         }
         public string? GetExtendedPropertiesObjectForToken(TokenId tokenId)
