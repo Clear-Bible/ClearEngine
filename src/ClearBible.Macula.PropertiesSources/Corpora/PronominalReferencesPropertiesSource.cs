@@ -1,7 +1,6 @@
 ﻿using ClearBible.Engine.Corpora;
 using ClearBible.Engine.Exceptions;
 using System.Reflection;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace ClearBible.Macula.PronominalReferencePropertiesSource.Corpora
