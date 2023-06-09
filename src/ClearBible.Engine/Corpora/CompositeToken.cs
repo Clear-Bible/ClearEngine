@@ -5,7 +5,7 @@ namespace ClearBible.Engine.Corpora
 {
     public class CompositeToken : Token, IEnumerable<Token>
     {
-        public readonly string CompositeTokensTrainingTextDelimiter = "_";
+        public readonly string CompositeTokensTextDelimiter = "_";
 
         private IEnumerable<Token> tokens_ = new List<Token>(); //will always be set by constructor. This is to suppress incorrect nullable warning for constructor.
         public IEnumerable<Token> Tokens 
@@ -21,9 +21,11 @@ namespace ClearBible.Engine.Corpora
                     throw new InvalidParameterEngineException(name: "Tokens", value: "OfType<CompositeToken>().Any() == true", message: "Cannot contain any Tokens of type CompositeToken");
                 }
 
-                tokens_ = value;
-                base.TrainingText = string.Join(CompositeTokensTrainingTextDelimiter, tokens_.Select(t => t.TrainingText));
-
+                tokens_ = value
+                    .OrderBy(t => t.Position)
+                    .ToList();
+                base.TrainingText = string.Join(CompositeTokensTextDelimiter, tokens_.Select(t => t.TrainingText));
+                base.SurfaceText = string.Join(CompositeTokensTextDelimiter, tokens_.Select(t => t.SurfaceText));
             }
         }
 
@@ -62,10 +64,6 @@ namespace ClearBible.Engine.Corpora
         }
         public override string SurfaceText
         {
-            get
-            {
-                throw new EngineException("Cannot get surface text from type CompositeToken. Retrieve surface text directly from composed tokens available by enumerating this.");
-            }
             set
             {
                 throw new EngineException("Cannot set surface text for type CompositeToken.");
