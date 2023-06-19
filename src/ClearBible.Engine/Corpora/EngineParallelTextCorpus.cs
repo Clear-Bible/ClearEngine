@@ -39,14 +39,7 @@ namespace ClearBible.Engine.Corpora
 			IComparer<object>? rowRefComparer = null)
 			: base(sourceCorpus, targetCorpus, alignmentCorpus, rowRefComparer = null)
 		{
-			if (sourceTextIdToVerseMappings != null)
-            {
-				SourceTextIdToVerseMappings = sourceTextIdToVerseMappings;
-			}
-            else
-            {
-				SourceTextIdToVerseMappings = null;
-			}
+			SourceTextIdToVerseMappings = sourceTextIdToVerseMappings;
 
 			if (sourceCorpus is ScriptureTextCorpus sourceScriptureTextCorpus)
 			{

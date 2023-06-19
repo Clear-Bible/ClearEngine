@@ -32,7 +32,8 @@ namespace ClearBible.Engine.SyntaxTree.Corpora
         {
             return element
                 .Descendants()
-                .Where(e => e.FirstNode is XText);
+                //.Where(e => e.FirstNode is XText);
+                .Where(e => e.Elements().Count(xElem => xElem.GetType() != typeof(XText)) == 0);
         }
         public static string MorphId(this XElement leaf)
         {

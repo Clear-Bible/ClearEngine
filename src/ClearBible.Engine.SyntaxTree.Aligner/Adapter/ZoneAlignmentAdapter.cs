@@ -14,11 +14,17 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Adapter
     internal class ZoneAlignmentAdapter
     {
 
-        private static BookChapterVerseXElements? LastChapterVerseXElements_ = null;
+        private BookChapterVerseXElements? _lastBookChapterXElements = null;
+        private readonly object _lastBookChapterXElementsLockObject = new object();
 
-        internal static IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> AlignZone(
-            ParallelTextRow parallelTextRow, 
-            ISyntaxTree syntaxTree, 
+        private readonly ISyntaxTree _syntaxTree;
+
+        internal ZoneAlignmentAdapter(ISyntaxTree syntaxTree)
+        {
+            _syntaxTree = syntaxTree;
+        }
+        internal IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> AlignZone(
+            ParallelTextRow parallelTextRow,
             SyntaxTreeWordAlignerHyperparameters hyperParameters)
         {
             try
@@ -51,17 +57,19 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Adapter
                 .Distinct() // this results in an unordered enumerable. sort so getversesXelement doesn't have chance to combine tree in non-deterministic way.
                 .OrderBy(i => i);
 
-
-            if ( LastChapterVerseXElements_ == null 
-                || 
-                (!LastChapterVerseXElements_.Book.Equals(books.First()) || ( LastChapterVerseXElements_?.ChapterNumber != chapterNumbers.First() )) )
+            XElement? versesXElementCombined = null;
+            lock (_lastBookChapterXElementsLockObject)
             {
-                LastChapterVerseXElements_ = syntaxTree.GetVerseXElementsForBookChapter(books.First(), chapterNumbers.First());
+                if (
+                    _lastBookChapterXElements == null ||
+                    !_lastBookChapterXElements.Book.Equals(books.First()) ||
+                    (_lastBookChapterXElements?.ChapterNumber != chapterNumbers.First()))
+                {
+                    _lastBookChapterXElements = _syntaxTree.GetVerseXElementsForBookChapter(books.First(), chapterNumbers.First());
+                }
 
+                versesXElementCombined = _syntaxTree.GetVersesXElementsCombined(_lastBookChapterXElements, verseNumbers);
             }
-
-            XElement? versesXElementCombined = syntaxTree.GetVersesXElementsCombined(LastChapterVerseXElements_, verseNumbers);
-
             if (versesXElementCombined == null)
             {
                 throw new InvalidTreeEngineException($"versesXElementCombined is null", new Dictionary<string, string>
