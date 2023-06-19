@@ -7,6 +7,7 @@ using ClearBible.Engine.SyntaxTree.Corpora;
 using SIL.Machine.Corpora;
 using SIL.Machine.Translation;
 using SIL.Machine.Utils;
+using System.Diagnostics;
 
 namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 {
@@ -15,7 +16,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         public SyntaxTreeWordAlignerHyperparameters HyperParameters { get; set; } 
 
         private string? _prefFileName;
-        private readonly ISyntaxTree _syntaxTree;
+		private readonly ZoneAlignmentAdapter _zoneAlignmentAdapter;
 
 		public List<SmtModel> SmtModels { get; }
 		public double Epsilon { get; set; } = 0.1;
@@ -43,7 +44,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 				throw new InvalidDataException("indexPrimarySmtModel param isn't between zero and count of smtModels minus one.");
             }
             IndexPrimarySmtModel = indexPrimarySmtModel;
-            _syntaxTree = syntaxTree;
+			_zoneAlignmentAdapter = new ZoneAlignmentAdapter(syntaxTree);
             Load(prefFileName);
 			HyperParameters = hyperParameters;
 		}
@@ -57,30 +58,20 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         {
 			return SmtModels[IndexPrimarySmtModel].SmtWordAlignmentModel.GetAlignmentScore(sourceLen, prevSourceIndex, sourceIndex, targetLen, prevTargetIndex, targetIndex);
 		}
-
-		public IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(EngineParallelTextRow engineParallelTextRow)
+        public IReadOnlyCollection<AlignedWordPair> GetBestAlignmentAlignedWordPairs(EngineParallelTextRow engineParallelTextRow)
         {
-			int smtTcIndex = 0;
-			if (SmtModels.Count > 2 || SmtModels.Count == 0)
-				throw new InvalidConfigurationEngineException(message: "must have one or two smts to use the syntax tree word aligner.");
-			if (SmtModels.Count == 2)
-				smtTcIndex = IndexPrimarySmtModel == 0 ? 1 : 0;
-			if (SmtModels.Count == 1)
+			if (
+				engineParallelTextRow.SourceRefs.Count() == 0 || 
+				engineParallelTextRow.TargetRefs.Count() == 0 ||
+				engineParallelTextRow.SourceSegment.Count() == 0 ||
+				engineParallelTextRow.TargetSegment.Count() == 0) 
 			{
-				smtTcIndex = 0;
+				Debug.WriteLine($"MISSING VERSE: ref: {engineParallelTextRow.Ref}, sourceRefCount: {engineParallelTextRow.SourceRefs.Count}, targetRefCount: {engineParallelTextRow.TargetRefs.Count()}");
+				return new List<AlignedWordPair>();
 			}
 			
-			HyperParameters.TranslationModel = SmtModels[IndexPrimarySmtModel].TranslationModel 
-				?? throw new NotTrainedEngineException(name: "SmtModels[IndexPrimarySmtModel].TranslationModel", value: "null");
-			HyperParameters.TranslationModelTC = SmtModels[smtTcIndex].TranslationModel 
-				?? throw new NotTrainedEngineException(name: "SmtModels[smtTcIndex].TranslationModel", value: "null");
-			HyperParameters.AlignmentProbabilities = SmtModels[smtTcIndex].AlignmentModel 
-				?? throw new NotTrainedEngineException(name: "SmtModels[smtTcIndex].AlignmentModel", value: "null");
-			HyperParameters.AlignmentProbabilitiesPre = SmtModels[IndexPrimarySmtModel].AlignmentModel 
-				?? throw new NotTrainedEngineException(name: "SmtModels[IndexPrimarySmtModel].AlignmentModel", value: "null");
-			
 			IEnumerable<(TokenId sourceTokenId, TokenId targetTokenId, double score)> alignments 
-				= ZoneAlignmentAdapter.AlignZone(engineParallelTextRow, _syntaxTree, HyperParameters);
+				= _zoneAlignmentAdapter.AlignZone(engineParallelTextRow, HyperParameters);
 
 			return alignments
 				.Select(a => new TokensAlignedWordPair(a.sourceTokenId, a.targetTokenId, engineParallelTextRow) { AlignmentScore = Math.Exp(a.score) }).ToList(); 
@@ -128,7 +119,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 			}
 			phases.Add(new Phase($"Clearing smt alignment models"));
 			phases.Add(new Phase($"Calculating smt alignment models"));
-			var reporter = new PhasedProgressReporter(progress, phases.ToArray());
+            phases.Add(new Phase($"Adding smt translation and alignment models to hyperparameters"));
+            var reporter = new PhasedProgressReporter(progress, phases.ToArray());
 
 			count = 0;
 			foreach (var smtModel in SmtModels)
@@ -166,7 +158,29 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 				}
 				checkCanceled?.Invoke();
 			}
-		}
+
+			using (PhaseProgress phaseProgress = reporter.StartNextPhase())
+			{
+                int smtTcIndex = 0;
+                if (SmtModels.Count > 2 || SmtModels.Count == 0)
+                    throw new InvalidConfigurationEngineException(message: "must have one or two smts to use the syntax tree word aligner.");
+                if (SmtModels.Count == 2)
+                    smtTcIndex = IndexPrimarySmtModel == 0 ? 1 : 0;
+                if (SmtModels.Count == 1)
+                {
+                    smtTcIndex = 0;
+                }
+
+                HyperParameters.TranslationModel = SmtModels[IndexPrimarySmtModel].TranslationModel
+                    ?? throw new NotTrainedEngineException(name: "SmtModels[IndexPrimarySmtModel].TranslationModel", value: "null");
+                HyperParameters.TranslationModelTC = SmtModels[smtTcIndex].TranslationModel
+                    ?? throw new NotTrainedEngineException(name: "SmtModels[smtTcIndex].TranslationModel", value: "null");
+                HyperParameters.AlignmentProbabilities = SmtModels[smtTcIndex].AlignmentModel
+                    ?? throw new NotTrainedEngineException(name: "SmtModels[smtTcIndex].AlignmentModel", value: "null");
+                HyperParameters.AlignmentProbabilitiesPre = SmtModels[IndexPrimarySmtModel].AlignmentModel
+                    ?? throw new NotTrainedEngineException(name: "SmtModels[IndexPrimarySmtModel].AlignmentModel", value: "null");
+            }
+        }
 		public Task SaveAsync()
         {
 			Save();

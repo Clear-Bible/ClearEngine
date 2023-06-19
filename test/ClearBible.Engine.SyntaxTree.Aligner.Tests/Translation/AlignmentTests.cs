@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -106,9 +107,9 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         //predict primary smt aligner alignments only then display - ONLY FOR COMPARISON
                         var smtOrdinalAlignments = smtWordAlignmentModel.GetBestAlignment(engineParallelTextRow.SourceSegment, engineParallelTextRow.TargetSegment);
                         IEnumerable<AlignedTokenPairs> smtSourceTargetTokenIdPairs = engineParallelTextRow.GetAlignedTokenPairs(smtOrdinalAlignments);
-                            // (Legacy): Alignments as ordinal positions in versesmap
+                        // (Legacy): Alignments as ordinal positions in versesmap
                         output_.WriteLine($"SMT Alignment        : {smtOrdinalAlignments}");
-                            // Alignments as source token to target token pairs
+                        // Alignments as source token to target token pairs
                         output_.WriteLine($"SMT Alignment        : {string.Join(" ", smtSourceTargetTokenIdPairs.Select(t => $"{t.SourceToken.TokenId}->{t.TargetToken.TokenId}"))}");
 
                         //predict syntax tree aligner alignments then display
@@ -134,7 +135,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
         public async Task Alignment__SyntaxTreeAlignmentSequentialAndParallelComparison()
         {
             int count = 5;
-            while(count > 0)
+            while (count > 0)
             {
                 DateTime beginDateTime = DateTime.Now;
 
@@ -204,7 +205,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         Task.WaitAll(tasks.ToArray());
                     }
 
-                    output_.WriteLine($"Parallel iteration {count} took {(DateTime.Now - beginDateTime).TotalSeconds }");
+                    output_.WriteLine($"Parallel iteration {count} took {(DateTime.Now - beginDateTime).TotalSeconds}");
                 }
 
                 //sequential
@@ -267,7 +268,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                         }
                     }
 
-                    output_.WriteLine($"Sequential iteration {count} took {(DateTime.Now - beginDateTime).TotalSeconds }");
+                    output_.WriteLine($"Sequential iteration {count} took {(DateTime.Now - beginDateTime).TotalSeconds}");
                 }
                 count--;
             }
@@ -331,11 +332,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
                     List<Task<IEnumerable<(IReadOnlyCollection<AlignedWordPair> alignedWordPairs, EngineParallelTextRow engineParallelTextRow)>>> tasks = new();
                     parallelTextCorpus
                         .GroupBy(row => ((VerseRef)row.Ref).BookNum)
-                        .SelectMany(g => 
+                        .SelectMany(g =>
                         {
                             tasks.Add(g.Cast<EngineParallelTextRow>().GetBestAlignedWordPairs(smtWordAlignmentModel, syntaxTreeWordAlignmentModel, output_.WriteLine));
                             return g;
-                         })
+                        })
                         .ToList();
                     Task.WaitAll(tasks.ToArray());
 
@@ -392,7 +393,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
                 var parallelTextCorpus = sourceCorpus.EngineAlignRows(
                     targetCorpusTransformed
-                    ,new SourceTextIdToVerseMappingsFromVerseMappings(
+                    , new SourceTextIdToVerseMappingsFromVerseMappings(
                         EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification))
                     );
 
@@ -632,12 +633,12 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
 
         [Fact]
         [Trait("Category", "Example")]
-        public async Task Alignment__SmtAlignmentManuscriptWithZZSur()
+        public async Task Alignment__SUR__SyntaxTrees_to_SUR_SymmetrizedFastAlign_h()
         {
             try
             {
                 var syntaxTree = new SyntaxTrees();
-                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree);
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree, Engine.Persistence.FileGetBookIds.LanguageCodeEnum.H);
                 var transformedSourceCorpus = sourceCorpus
                     .Transform<SetTrainingByTrainingLowercase>();
 
@@ -678,5 +679,318 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Tests.Translation
             }
         }
 
+        [Fact]
+        [Trait("Category", "Example")]
+        public async Task Alignment__SUR__SyntaxTree_to_SUR_FastAlign_SyntaxTreeWorkAlignment_g()
+        {
+            try
+            {
+                var syntaxTree = new SyntaxTrees();
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree, Engine.Persistence.FileGetBookIds.LanguageCodeEnum.G);
+                var transformedSourceCorpus = sourceCorpus
+                    .Transform<SetTrainingByTrainingLowercase>();
+
+                var targetCorpus = new ParatextTextCorpus("C:\\My Paratext 9 Projects\\zz_SUR");
+                var transformedTargetCorpus = targetCorpus
+                    .Tokenize<LatinWordTokenizer>()
+                    .Transform<IntoTokensTextRowProcessor>()
+                    .Transform<SetTrainingBySurfaceLowercase>();
+
+                var parallelTextCorpus = transformedSourceCorpus.EngineAlignRows(
+                    transformedTargetCorpus,
+                    new SourceTextIdToVerseMappingsFromVerseMappings(
+                        EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification))
+                    ).ToList();
+
+                {
+                    using var smtWordAlignmentModel = new ThotFastAlignWordAlignmentModel();
+
+                    using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpus.Lowercase());
+                    trainer.Train(new DelegateProgress(status =>
+                            output_.WriteLine($"Training Fastalign model: {status.PercentCompleted:P}")));
+                    await trainer.SaveAsync();
+
+                    // set the manuscript tree aligner hyperparameters
+                    var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
+
+                    var syntaxTrees = new SyntaxTrees();
+
+                    // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
+                    ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
+                        new List<IWordAlignmentModel>() { smtWordAlignmentModel },
+                        0,
+                        hyperparameters,
+                        syntaxTrees);
+
+                    // initialize a manuscript word alignment model. At this point it has not yet been trained.
+                    using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
+                    using var manuscriptTrainer = syntaxTreeWordAlignmentModel.CreateTrainer(parallelTextCorpus);
+
+                    // Trains the manuscriptmodel using the pre-trained SMT model(s)
+                    manuscriptTrainer.Train(new DelegateProgress(status =>
+                            output_.WriteLine($"Training syntax tree alignment model: {status.PercentCompleted:P}")));
+                    await manuscriptTrainer.SaveAsync();
+
+                    var allAlignedTokenPairs = parallelTextCorpus
+                        .SelectMany(row => ((EngineParallelTextRow)row).GetAlignedTokenPairs(syntaxTreeWordAlignmentModel.GetBestAlignmentAlignedWordPairs((EngineParallelTextRow)row)))
+                        .ToList();
+                }
+            }
+            catch (EngineException eex)
+            {
+                output_.WriteLine(eex.ToString());
+                throw eex;
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Example")]
+        public async Task Alignment__SUR__SyntaxTree_to_SUR_SymmetrizedFastAlign_SyntaxTreeWorkAlignment_h()
+        {
+            try
+            {
+                var syntaxTree = new SyntaxTrees();
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree, Engine.Persistence.FileGetBookIds.LanguageCodeEnum.H);
+                var transformedSourceCorpus = sourceCorpus
+                    .Transform<SetTrainingByTrainingLowercase>();
+
+                var targetCorpus = new ParatextTextCorpus("C:\\My Paratext 9 Projects\\zz_SUR");
+                var transformedTargetCorpus = targetCorpus
+                    .Tokenize<LatinWordTokenizer>()
+                    .Transform<IntoTokensTextRowProcessor>()
+                    .Transform<SetTrainingBySurfaceLowercase>();
+
+                var parallelTextCorpus = transformedSourceCorpus.EngineAlignRows(
+                    transformedTargetCorpus,
+                    new SourceTextIdToVerseMappingsFromVerseMappings(
+                        EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification))
+                    ).ToList();
+
+                {
+                    //using var smtWordAlignmentModel = new ThotFastAlignWordAlignmentModel();
+                    using var srcTrgModel = new ThotFastAlignWordAlignmentModel();
+                    using var trgSrcModel = new ThotFastAlignWordAlignmentModel();
+
+                    using var smtWordAlignmentModel = new SymmetrizedWordAlignmentModel(srcTrgModel, trgSrcModel)
+                    {
+                        Heuristic = SymmetrizationHeuristic.GrowDiagFinalAnd
+                    };
+
+                    using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpus.Lowercase());
+                    trainer.Train(new DelegateProgress(status =>
+                            output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")));
+                    await trainer.SaveAsync();
+
+                    // set the manuscript tree aligner hyperparameters
+                    var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
+
+                    var syntaxTrees = new SyntaxTrees();
+
+                    // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
+                    ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
+                        new List<IWordAlignmentModel>() { smtWordAlignmentModel },
+                        0,
+                        hyperparameters,
+                        syntaxTrees);
+
+                    // initialize a manuscript word alignment model. At this point it has not yet been trained.
+                    using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
+                    using var manuscriptTrainer = syntaxTreeWordAlignmentModel.CreateTrainer(parallelTextCorpus);
+
+                    // Trains the manuscriptmodel using the pre-trained SMT model(s)
+                    manuscriptTrainer.Train(new DelegateProgress(status =>
+                            output_.WriteLine($"Training syntax tree alignment model: {status.PercentCompleted:P}")));
+                    await manuscriptTrainer.SaveAsync();
+
+                    var allAlignedTokenPairs = parallelTextCorpus
+                        .SelectMany(row => ((EngineParallelTextRow)row).GetAlignedTokenPairs(syntaxTreeWordAlignmentModel.GetBestAlignmentAlignedWordPairs((EngineParallelTextRow)row)))
+                        .ToList();
+                }
+            }
+            catch (EngineException eex)
+            {
+                output_.WriteLine(eex.ToString());
+                throw eex;
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Example")]
+        public async Task Alignment__SUR__SUR_to_SyntaxTreeHebrewOnly_FastAlign_mo_counts_h()
+        {
+            try
+            {
+                var sourceCorpus = new ParatextTextCorpus("C:\\My Paratext 9 Projects\\zz_SUR");
+                var transformedSourceCorpus = sourceCorpus
+                    .Tokenize<LatinWordTokenizer>()
+                    .Transform<IntoTokensTextRowProcessor>()
+                    .Transform<SetTrainingBySurfaceLowercase>();
+
+
+                var syntaxTree = new SyntaxTrees();
+                var targetCorpus = new SyntaxTreeFileTextCorpus(syntaxTree, Engine.Persistence.FileGetBookIds.LanguageCodeEnum.H);
+                var transformedTargetCorpus = targetCorpus
+                    .Transform<SetTrainingByTrainingLowercase>();
+
+
+                var parallelTextCorpus = transformedSourceCorpus.EngineAlignRows(
+                    transformedTargetCorpus,
+                    new SourceTextIdToVerseMappingsFromVerseMappings(EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification)))
+                    ;//.ToList();
+
+                Stopwatch stopWatch = new Stopwatch();
+                {
+                    stopWatch.Start();
+                    using var smtWordAlignmentModel = new ThotFastAlignWordAlignmentModel();
+
+                    using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpus.Lowercase());
+                    trainer.Train(new DelegateProgress(status =>
+                            output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P}")));
+                    await trainer.SaveAsync();
+
+                    var topAlignedTokenPairs = parallelTextCorpus
+                        .SelectMany(row => ((EngineParallelTextRow)row).GetAlignedTokenPairs(smtWordAlignmentModel.GetBestAlignment((EngineParallelTextRow)row)))
+                        .Where(atp => atp.SourceToken.TrainingText.Equals("mo"))
+                        .GroupBy(atp => atp.TargetToken.TrainingText)
+                        .OrderByDescending(g => g
+                            .Select(atp => atp.TargetToken.TrainingText)
+                            .Count())
+                        .Take(30)
+                        .ToList();
+
+                    stopWatch.Stop();
+                    output_.WriteLine("");
+                    output_.WriteLine("");
+                    output_.WriteLine("SMT Only; for source token training text 'mo', top 30 aligned target token training text");
+                    output_.WriteLine($"    Elapsed time (seconds): {stopWatch.Elapsed.Seconds}");
+                    output_.WriteLine("");
+                    foreach (var atp in topAlignedTokenPairs)
+                    {
+                        output_.WriteLine($"    Target.TrainingText: '{atp.Key}'; Count: {atp.Select(atp => atp).Count()}");
+                    }
+                }
+            }
+            catch (EngineException eex)
+            {
+                output_.WriteLine(eex.ToString());
+                throw eex;
+            }
+        }
+
+        [Fact]
+        [Trait("Category", "Example")]
+        public async Task Alignment__SUR__SyntaxTree_SUR_FastAlign_and_syntaxtree_comparison_h()
+        {
+            string timeSpanString(TimeSpan ts) =>
+                String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+
+            try
+            {
+                var syntaxTree = new SyntaxTrees();
+                var sourceCorpus = new SyntaxTreeFileTextCorpus(syntaxTree, Engine.Persistence.FileGetBookIds.LanguageCodeEnum.H);
+                var transformedSourceCorpus = sourceCorpus
+                    .Transform<SetTrainingByTrainingLowercase>();
+
+                var targetCorpus = new ParatextTextCorpus("C:\\My Paratext 9 Projects\\zz_SUR");
+                var transformedTargetCorpus = targetCorpus
+                    .Tokenize<LatinWordTokenizer>()
+                    .Transform<IntoTokensTextRowProcessor>()
+                    .Transform<SetTrainingBySurfaceLowercase>();
+
+                var parallelTextCorpus = transformedSourceCorpus.EngineAlignRows(
+                    transformedTargetCorpus,
+                    new SourceTextIdToVerseMappingsFromVerseMappings(
+                        EngineParallelTextCorpus.VerseMappingsForAllVerses(sourceCorpus.Versification, targetCorpus.Versification)
+                    )
+                 );
+
+                Stopwatch stopWatch = new Stopwatch();
+                {
+                    stopWatch.Start();
+                    using var smtWordAlignmentModel = new ThotFastAlignWordAlignmentModel();
+
+                    using var trainer = smtWordAlignmentModel.CreateTrainer(parallelTextCorpus.Lowercase());
+                    trainer.Train(new DelegateProgress(status =>
+                            output_.WriteLine($"Training symmetrized Fastalign model: {status.PercentCompleted:P} {status.Message}")));
+                    await trainer.SaveAsync();
+
+                    var allFastAlignedTokenPairs = parallelTextCorpus
+                        .SelectMany(row => ((EngineParallelTextRow)row).GetAlignedTokenPairs(smtWordAlignmentModel.GetBestAlignment((EngineParallelTextRow)row)))
+                        .ToList();
+
+                    var topFastAlignedTokenPairs = allFastAlignedTokenPairs
+                        .Where(atp => atp.SourceToken.TrainingText.Equals("\u05d4\u05d9\u05d4"))
+                        .GroupBy(atp => atp.TargetToken.TrainingText)
+                        .OrderByDescending(g => g
+                            .Select(atp => atp.TargetToken.TrainingText)
+                            .Count())
+                        .Take(30)
+                        .ToList();
+
+                    stopWatch.Stop();
+                    output_.WriteLine("");
+                    output_.WriteLine("");
+                    output_.WriteLine("SMT Only; for source token training text \u05d4\u05d9\u05d4, top 30 aligned target token training text");
+                    output_.WriteLine($"    Elapsed time: {timeSpanString(stopWatch.Elapsed)}");
+                    foreach (var atp in topFastAlignedTokenPairs)
+                    {
+                        output_.WriteLine($"    Target.TrainingText: '{atp.Key}'; Count: {atp.Select(atp => atp).Count()}");
+                    }
+
+                    stopWatch.Restart();
+
+                    // set the manuscript tree aligner hyperparameters
+                    var hyperparameters = await FileGetSyntaxTreeWordAlignerHyperparams.Get().SetLocation(HyperparametersFiles).GetAsync();
+
+                    var syntaxTrees = new SyntaxTrees();
+
+                    // create the manuscript word aligner. Engine's main implementation is specifically a tree-based aligner.
+                    ISyntaxTreeTrainableWordAligner syntaxTreeTrainableWordAligner = new SyntaxTreeWordAligner(
+                        new List<IWordAlignmentModel>() { smtWordAlignmentModel },
+                        0,
+                        hyperparameters,
+                        syntaxTrees);
+
+                    // initialize a manuscript word alignment model. At this point it has not yet been trained.
+                    using var syntaxTreeWordAlignmentModel = new SyntaxTreeWordAlignmentModel(syntaxTreeTrainableWordAligner);
+                    using var manuscriptTrainer = syntaxTreeWordAlignmentModel.CreateTrainer(parallelTextCorpus);
+
+                    // Trains the manuscriptmodel using the pre-trained SMT model(s)
+                    manuscriptTrainer.Train(new DelegateProgress(status =>
+                            output_.WriteLine($"Training syntax tree alignment model: {status.PercentCompleted:P} {status.Message}")));
+                    await manuscriptTrainer.SaveAsync();
+
+                    var allSyntaxTreeAlignedTokenPairs = parallelTextCorpus
+                        .SelectMany(row => ((EngineParallelTextRow)row).GetAlignedTokenPairs(syntaxTreeWordAlignmentModel.GetBestAlignmentAlignedWordPairs((EngineParallelTextRow)row)))
+                        .ToList();
+
+                    var topSyntaxTreeAlignedTokenPairs = allSyntaxTreeAlignedTokenPairs
+                        .Where(atp => atp.SourceToken.TrainingText.Equals("\u05d4\u05d9\u05d4"))
+                        .GroupBy(atp => atp.TargetToken.TrainingText)
+                        .OrderByDescending(g => g
+                            .Select(atp => atp.TargetToken.TrainingText)
+                            .Count())
+                        .Take(30)
+                        .ToList();
+
+                    stopWatch.Stop();
+                    output_.WriteLine("");
+                    output_.WriteLine("");
+                    output_.WriteLine("SyntaxTreeWordAlignmentModel; for source token training text \u05d4\u05d9\u05d4, top 30 aligned target token training text");
+                    output_.WriteLine($"    Elapsed time: {timeSpanString(stopWatch.Elapsed)}");
+                    foreach (var atp in topSyntaxTreeAlignedTokenPairs)
+                    {
+                        output_.WriteLine($"    Target.TrainingText: '{atp.Key}'; Count: {atp.Select(atp => atp).Count()}");
+                    }
+                }
+            }
+            catch (EngineException eex)
+            {
+                output_.WriteLine(eex.ToString());
+                throw eex;
+            }
+        }
     }
 }

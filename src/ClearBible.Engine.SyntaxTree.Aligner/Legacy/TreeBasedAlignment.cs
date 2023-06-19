@@ -105,7 +105,8 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Legacy
             string nodeStackID = treeNode.NodeStackID();
 
             // If this is a terminal node:
-            if (treeNode.FirstNode is XText)
+            //if (treeNode.FirstNode is XText)
+            if (treeNode.Elements().Count(xElem => xElem.GetType() != typeof(XText)) == 0)
             {
                 SourceID sourceID = treeNode.SourceID();
                 alignments.Add(nodeStackID, terminalCandidates[sourceID]);
