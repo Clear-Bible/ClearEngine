@@ -1,5 +1,8 @@
 # ClearEngine
 
+ClearEngine 2022 which is used by ClearDashboard version 1.0
+
+
 A set of classes extending SIL's Machine that includes:
 
 - Custom versification,

@@ -33,6 +33,13 @@ namespace ClearBible.Engine.Corpora
 		public int VerseNum { get; }
         public IEnumerable<TokenId> TokenIds { get; set; }
 
+        public bool Equals(VerseRef verseRef)
+        {
+            return
+                Book == verseRef.Book &&
+                ChapterNum == verseRef.ChapterNum &&
+                VerseNum == verseRef.VerseNum;
+        }
         public override bool Equals(object? obj)
         {
             return obj is Verse verse &&
@@ -66,6 +73,10 @@ namespace ClearBible.Engine.Corpora
                 }
             }
             return result;
+        }
+        public override string ToString()
+        {
+            return $"{Book} {ChapterNum}:{VerseNum}";
         }
     }
 }

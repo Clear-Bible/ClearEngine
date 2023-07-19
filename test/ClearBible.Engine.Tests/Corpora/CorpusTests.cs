@@ -137,15 +137,17 @@ namespace ClearBible.Engine.Tests.Corpora
 
         [Fact]
         [Trait("Category", "Example")]
-        public void Corpus__LimitByBook_FindRangeByVerse()
+        public void Corpus__GetByVerseRange()
         {
             /*
              *  Should result in the following mapping for MAT 1:
+             *  (note in verse mappings a mapping is always corpusverse=originalverse, 
+             *  and that SIL.Scripture.Versification changes from corpusversification -> originalversification -> newversification)
              *  
-             *  Original       corpus
-             *     1             2   
-             *     2             3   
-             *     3             1   
+             *  Corpus       Original  
+             *     2            1       
+             *     3            2       
+             *     1            3       
              * 
              */
             Versification.Table.Implementation.RemoveAllUnknownVersifications();
@@ -178,9 +180,10 @@ namespace ClearBible.Engine.Tests.Corpora
                 })
             };
 
-            var corpus = new TestScriptureTextCorpus(texts, versification);
+            var corpus = new TestScriptureTextCorpus(texts, versification); //versification is custom
 
-            var textRowsAndIndex3_1_1 = corpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 1, 1, versification);
+            //now change from custom versification to original. First parameter is interpreted as in corpus versification
+            var textRowsAndIndex3_1_1 = corpus.GetByVerseRange(new VerseRef("MAT 1:3"), 1, 1, ScrVers.Original);
             Assert.Equal(3, textRowsAndIndex3_1_1.textRows.Count());
             Assert.Equal(1, textRowsAndIndex3_1_1.indexOfVerse);
 
@@ -189,15 +192,15 @@ namespace ClearBible.Engine.Tests.Corpora
             Assert.True(list[1].Ref.Equals(new VerseRef("MAT 1:1", versification)));
             Assert.True(list[2].Ref.Equals(new VerseRef("MAT 1:4", versification)));
 
-            var textRowsAndIndex3_1_3 = corpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 1, 3, versification);
+            var textRowsAndIndex3_1_3 = corpus.GetByVerseRange(new VerseRef("MAT 1:3"), 1, 3, ScrVers.Original);
             Assert.Equal(5, textRowsAndIndex3_1_3.textRows.Count());
             Assert.Equal(1, textRowsAndIndex3_1_3.indexOfVerse);
 
-            var textRowsAndIndex3_4_4 = corpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 4, 4, versification);
+            var textRowsAndIndex3_4_4 = corpus.GetByVerseRange(new VerseRef("MAT 1:3"), 4, 4, ScrVers.Original);
             Assert.Equal(6, textRowsAndIndex3_4_4.textRows.Count());
             Assert.Equal(2, textRowsAndIndex3_4_4.indexOfVerse);
 
-            var textRowsAndIndex3_3_14 = corpus.GetByVerseRange(new VerseRef("MAT 1:3", ScrVers.Original), 3, 14, versification);
+            var textRowsAndIndex3_3_14 = corpus.GetByVerseRange(new VerseRef("MAT 1:3"), 3, 14, ScrVers.Original);
             Assert.Equal(6, textRowsAndIndex3_3_14.textRows.Count());
             Assert.Equal(2, textRowsAndIndex3_3_14.indexOfVerse);
 

@@ -68,7 +68,7 @@ namespace ClearBible.Engine.SyntaxTree.Tests.Corpora
                 .Transform<AddPronominalReferencesToTokens>();
 
             var tokensTextRow = corpus.GetRows(new List<string> { "GEN" }).Cast<TokensTextRow>().Take(10).ToList();
-            var token = tokensTextRow[4].Tokens[9];
+            var token = tokensTextRow[4].Tokens[11];
             var extendedProperties = token.ExtendedProperties;
 
             if (extendedProperties != null)

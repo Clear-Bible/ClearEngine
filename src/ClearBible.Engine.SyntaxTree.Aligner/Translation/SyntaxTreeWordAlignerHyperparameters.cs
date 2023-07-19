@@ -121,20 +121,86 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
 
 
 
+        private Dictionary<string, Dictionary<string, double>> _translationModelOverride = new();
         //NOTE: complete
         /// <summary>
         /// Overrides the translation model. 
         /// 
         /// (formerly ManTransModel)
         /// </summary>
-        internal Dictionary<string, Dictionary<string, double>> TranslationModelOverride { private get; set; } = new();
+        internal Dictionary<string, Dictionary<string, double>> TranslationModelOverride 
+        { 
+            private get
+            {
+                return _translationModelOverride;
+            }
+            set
+            {
+                _translationModelOverride = value;
+                _legacyTranslationModelOverride = null;
+            } 
+        }
 
         //public TranslationModel ManTransModel { private get; set; } = new TranslationModel(new Dictionary<SourceLemma, Dictionary<TargetLemma, Score>>());
 
-        internal Dictionary<string, Dictionary<string, double>> TranslationModel { private get; set; } = new();
-        internal Dictionary<string, Dictionary<string, double>> TranslationModelTC { private get; set; } = new();
-        internal List<IReadOnlyCollection<TokensAlignedWordPair>> AlignmentProbabilities { private get; set; } = new();
-        internal List<IReadOnlyCollection<TokensAlignedWordPair>> AlignmentProbabilitiesPre { private get; set; } = new();
+        private Dictionary<string, Dictionary<string, double>> _translationModel = new();
+        internal Dictionary<string, Dictionary<string, double>> TranslationModel
+        {
+            private get
+            {
+                return _translationModel;
+            }
+            set
+            {
+                _translationModel = value;
+                _legacyTranslationModel = null;
+            }
+        }
+
+
+        private Dictionary<string, Dictionary<string, double>> _translationModelTC = new();
+        internal Dictionary<string, Dictionary<string, double>> TranslationModelTC
+        {
+            private get
+            {
+                return _translationModelTC;
+            }
+            set
+            {
+                _translationModelTC = value;
+                _legacyTranslationModelTC = null;
+            }
+        }
+
+
+        private List<IReadOnlyCollection<TokensAlignedWordPair>> _alignmentProbabilities = new();
+        internal List<IReadOnlyCollection<TokensAlignedWordPair>> AlignmentProbabilities
+        {
+            private get
+            {
+                return _alignmentProbabilities;
+            }
+            set
+            {
+                _alignmentProbabilities = value;
+                _legacyAlignmentProbabilities = null;
+            }
+        }
+
+
+        private List<IReadOnlyCollection<TokensAlignedWordPair>> _alignmentProbabilitiesPre = new();
+        internal List<IReadOnlyCollection<TokensAlignedWordPair>> AlignmentProbabilitiesPre
+        {
+            private get
+            {
+                return _alignmentProbabilitiesPre;
+            }
+            set
+            {
+                _alignmentProbabilitiesPre = value;
+                _legacyAlignmentProbabilitiesPreMap = null;
+            }
+        }
 
 
         /// <summary>
@@ -216,6 +282,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
             }
         }
 
+        private TranslationModel? _legacyTranslationModel = null;
         /// <summary>
         /// Get the score from the estimated translation model for a
         /// specified lemma and target text, or 0 if the target text
@@ -225,7 +292,11 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// 
         internal double GetTranslationModelScore(string sourceLemma, string targetLemma)
         {
-            var _legacyTranslationModel = ToLegacyTranslationModel(TranslationModel);
+            if (_legacyTranslationModel == null)
+            {
+                _legacyTranslationModel = ToLegacyTranslationModel(TranslationModel);
+            }
+
             if (_legacyTranslationModel.Dictionary.TryGetValue(new SourceLemma(sourceLemma),
                 out Dictionary<TargetLemma, Score>? translations))
             {
@@ -239,6 +310,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
             return 0;
         }
 
+        private AlignmentModel? _legacyAlignmentProbabilities = null;
         /// <summary>
         /// Look up the score in the estimated alignment model for a
         /// link between specified source and target instances.
@@ -254,9 +326,13 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// 
         internal bool TryGetAlignment(string sourceID, string targetID,  out double score)
         {
+            if (_legacyAlignmentProbabilities == null)
+            {
+                _legacyAlignmentProbabilities = ToLegacyAlignmentModel(AlignmentProbabilities);
+            }
             var key = new BareLink(new SourceID(sourceID), new TargetID(targetID));
 
-            if (ToLegacyAlignmentModel(AlignmentProbabilities).Dictionary.TryGetValue(key, out Score? score2))
+            if (_legacyAlignmentProbabilities.Dictionary.TryGetValue(key, out Score? score2))
             {
                 score = score2.Double;
                 return true;
@@ -268,6 +344,7 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
             }
         }
 
+        private Dictionary<string, string>? _legacyAlignmentProbabilitiesPreMap = null;
         /// <summary>
         /// Given a source instance, attempt to find some target instance
         /// to which it is linked in the estimated alignment model.
@@ -281,16 +358,22 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// True if some target link was found, and false otherwise.
         /// </returns>
         /// 
-        internal bool TryGetPreAlignment(string sourceID, out string? targetID) =>
-            ToLegacyAlignmentModel(AlignmentProbabilitiesPre).Dictionary.Keys
+        internal bool TryGetPreAlignment(string sourceID, out string? targetID)
+        {
+            if (_legacyAlignmentProbabilitiesPreMap == null)
+            {
+                _legacyAlignmentProbabilitiesPreMap = ToLegacyAlignmentModel(AlignmentProbabilitiesPre).Dictionary.Keys
                 .GroupBy(bareLink => bareLink.SourceID)
                 .Where(group => group.Any())
                 .ToDictionary(
                     group => group.Key.AsCanonicalString,
-                    group => group.First().TargetID.AsCanonicalString)
+                    group => group.First().TargetID.AsCanonicalString);
+            }
+            return _legacyAlignmentProbabilitiesPreMap
                 .TryGetValue(sourceID, out targetID);
+        }
 
-
+        private TranslationModel? _legacyTranslationModelTC = null;
         // 2021.05.27 CL: Changed to use the translationModelTC to let us use different models to get translations
         // when getting terminal candidates (TC) and when getting alignments for the rest.
         /// <summary>
@@ -307,12 +390,25 @@ namespace ClearBible.Engine.SyntaxTree.Aligner.Translation
         /// is not null.
         /// </returns>
         /// 
-        internal bool TryGetTranslations(string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
-            TryGetFromTransModel(ToLegacyTranslationModel(TranslationModelTC), lemma, out tryGetScoreForTargetText);
+        internal bool TryGetTranslations(string lemma, out TryGet<string, double> tryGetScoreForTargetText)
+        {
+            if (_legacyTranslationModelTC == null)
+            {
+                _legacyTranslationModelTC = ToLegacyTranslationModel(TranslationModelTC);
+            }
+            return TryGetFromTransModel(_legacyTranslationModelTC, lemma, out tryGetScoreForTargetText);
+        }
 
+        private TranslationModel? _legacyTranslationModelOverride = null;
         //NOTE: complete
-        internal bool TryGetTranslationModelOverride( string lemma, out TryGet<string, double> tryGetScoreForTargetText) =>
-            TryGetFromTransModel(ToLegacyTranslationModel(TranslationModelOverride), lemma, out tryGetScoreForTargetText);
+        internal bool TryGetTranslationModelOverride(string lemma, out TryGet<string, double> tryGetScoreForTargetText)
+        {
+            if (_legacyTranslationModelOverride == null)
+            {
+                _legacyTranslationModelOverride = ToLegacyTranslationModel(TranslationModelOverride);
+            }
+            return TryGetFromTransModel(_legacyTranslationModelOverride, lemma, out tryGetScoreForTargetText);
+        }
 
 
         private bool TryGetFromTransModel(
