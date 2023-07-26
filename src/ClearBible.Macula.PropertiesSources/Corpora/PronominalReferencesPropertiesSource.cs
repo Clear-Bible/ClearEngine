@@ -28,12 +28,14 @@ namespace ClearBible.Macula.PronominalReferencePropertiesSource.Corpora
             foreach (var pronominalReference in pronominalReferences)
             {
                 var tokenIdString = pronominalReference.Element("TokenId")?.Value
-                    ?? throw new InvalidDataEngineException(name: "TokenId", value: "no such element");
+                                    ?? throw new InvalidDataEngineException(name: "TokenId", value: "no such element");
+
                 var tokenId = new TokenId(tokenIdString);
 
                 using var writer = new StringWriter();
                 pronominalReference.Save(writer);
                 var xml = writer.ToString();
+
                 tokenIdToXmlMap.Add(tokenId, xml);
             }
         }
