@@ -21,6 +21,12 @@
 		<None Update="books.csv">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Tokenization\Data\ChineseBibleWordTokenizer\words.txt">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>

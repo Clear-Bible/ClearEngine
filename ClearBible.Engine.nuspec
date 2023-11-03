@@ -28,12 +28,15 @@
 		<files include="any/any/books.csv" buildAction="None" copyToOutput="true" />
 		<files include="any/any/Corpora/syntaxtrees/*" buildAction="None" copyToOutput="true" />
 		<files include="any/any/Corpora/pronominalreferences/*" buildAction="None" copyToOutput="true" />
+		<files include="any/any/Tokenization/Data/ChineseBibleWordTokenizer/*" buildAction="None" copyToOutput="true" />
 	</contentFiles>
   </metadata>
   <files>
     <file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net6.0\ClearBible.Macula.PropertiesSources.dll" target="lib\net6.0\ClearBible.Macula.PropertiesSources.dll" />
 	
-	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net6.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />	  
+	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net6.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />
+	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net6.0\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" />
+	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net6.0\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" />
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.Aligner.dll" target="lib\net6.0\ClearBible.Engine.SyntaxTree.Aligner.dll" />
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.dll" target="lib\net6.0\ClearBible.Engine.dll" />
 
@@ -56,7 +59,9 @@
 	
 	<!--net7.0 -->
 	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net7.0\ClearBible.Macula.PropertiesSources.dll" target="lib\net7.0\ClearBible.Macula.PropertiesSources.dll" />
-	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net7.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />	  
+	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net7.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />
+    <file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net7.0\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" />
+	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net7.0\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" />
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.SyntaxTree.Aligner.dll" target="lib\net7.0\ClearBible.Engine.SyntaxTree.Aligner.dll" />
 	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.dll" target="lib\net7.0\ClearBible.Engine.dll" />
     <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.SyntaxTree.dll" target="lib\net7.0\ClearBible.Engine.SyntaxTree.dll" />
