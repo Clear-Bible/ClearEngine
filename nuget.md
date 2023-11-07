@@ -11,7 +11,7 @@ https://dist.nuget.org/win-x86-commandline/v5.7.3/nuget.exe
 ## Steps
 
 1. Open Powershell terminal in Engine's base solution directory.		
-2. Switch to Release configuration
+2. Switch to DEBUG configuration
 3. Build the solution
 
 
