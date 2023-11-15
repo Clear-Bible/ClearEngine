@@ -118,7 +118,9 @@ namespace ClearBible.Engine.Tokenization
                     string ngram = GetNgram(chars, i, n);
                     if (ngram != string.Empty && (n == 1 || words.Contains(ngram)))
                     {
-                        segments += ngram + (ngram != " " ? " " : ""); // only delimit if the single character is not a space, otherwise just add space.
+                        segments += ngram + (ngram.Length != 1 || !char.IsWhiteSpace(ngram.ToCharArray()[0]) ? 
+                            " " : 
+                            ""); // only delimit if the single character is not a space, otherwise just add space.
                         i = i + n - 1; // need to subtract 1 because the iterator increments after the body.
                         break;
                     }

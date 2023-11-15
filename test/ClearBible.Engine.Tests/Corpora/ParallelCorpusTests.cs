@@ -64,8 +64,8 @@ namespace ClearBible.Engine.Tests.Corpora
 			Assert.Equal(3, rows.Length);
 			Assert.Equal(Refs(new VerseRef("MAT 1:2", ScrVers.Original)), rows[1].SourceRefs.Cast<VerseRef>());
 			Assert.Equal(Refs(new VerseRef("MAT 1:2", versification), new VerseRef("MAT 1:3", versification)), rows[1].TargetRefs.Cast<VerseRef>());
-			Assert.Equal("source chapter one, verse two .".Split(), rows[1].SourceSegment);
-			Assert.Equal("target chapter one, verse two . target chapter one, verse three .".Split(), rows[1].TargetSegment);
+			Assert.Equal(new List<string> { "source chapter one, verse two ." }, rows[1].SourceSegment);
+			Assert.Equal(new List<string>() { "target chapter one, verse two . target chapter one, verse three .", "" }, rows[1].TargetSegment);
 		}
 
 
@@ -514,25 +514,12 @@ namespace ClearBible.Engine.Tests.Corpora
                 Versification = versification;
             }
         }
-        private static TextRow TextRow(int key, string text = "", bool isSentenceStart = true,
-			bool isInRange = false, bool isRangeStart = false)
-		{
-			return new TextRow(new RowRef(key))
-			{
-				Segment = text.Length == 0 ? Array.Empty<string>() : text.Split(),
-				IsSentenceStart = isSentenceStart,
-				IsInRange = isInRange,
-				IsRangeStart = isRangeStart,
-				IsEmpty = text.Length == 0
-			};
-		}
-
 		private static TextRow TextRow(VerseRef vref, string text = "", bool isSentenceStart = true,
 			bool isInRange = false, bool isRangeStart = false)
 		{
 			return new TextRow(vref)
 			{
-				Segment = text.Length == 0 ? Array.Empty<string>() : text.Split(),
+				Segment = new[] { text },
 				IsSentenceStart = isSentenceStart,
 				IsInRange = isInRange,
 				IsRangeStart = isRangeStart,
