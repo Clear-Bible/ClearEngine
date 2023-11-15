@@ -20,7 +20,7 @@ namespace ClearBible.Engine.Tests.Corpora
         {
             return new TextRow(verseRef)
             {
-                Segment = text.Length == 0 ? Array.Empty<string>() : text.Split(),
+                Segment = new[] { text },
                 IsSentenceStart = isSentenceStart,
                 IsInRange = isInRange,
                 IsRangeStart = isRangeStart,
