@@ -17,7 +17,7 @@ https://dist.nuget.org/win-x86-commandline/v5.7.3/nuget.exe
 
 4. Change the version number in the SIL.Machine.csproj by editing AssemblyInfo.props under he Imports folder.
 5. Build the project
-6. Open a terminal session in SIL.Machine/bin/release which will contain the nuget package
+6. Open a terminal session in SIL.Machine/bin/debug which will contain the nuget package
 7. Execute `nuget push .\Clear.SIL.Machine.<YOUR VERSION>.nupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
 
 
@@ -25,7 +25,7 @@ https://dist.nuget.org/win-x86-commandline/v5.7.3/nuget.exe
 ## Steps
 
 1. Open Powershell terminal in Engine's base solution directory.		
-2. Switch to Release configuration
+2. Switch to Debug configuration
 3. Build the solution
 
 4. Edit `ClearBible.Engine.nuspec` and change `<version>` to next version number
