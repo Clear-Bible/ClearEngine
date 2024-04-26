@@ -75,6 +75,12 @@ namespace ClearBible.Engine.Corpora
             }
         }
 
+        [XmlIgnore]
+        public virtual string Tag { get; set; }
+
+        [XmlIgnore]
+        public bool HasTag => !string.IsNullOrEmpty(Tag);
+
         public void AddToExtendedProperties(string xmlString)
         {
             XElement rootElement;
