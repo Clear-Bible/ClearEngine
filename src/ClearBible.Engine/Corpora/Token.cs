@@ -76,7 +76,7 @@ namespace ClearBible.Engine.Corpora
         }
 
         [XmlIgnore]
-        public virtual string Tag { get; set; }
+        public virtual string? Tag { get; set; }
 
         [XmlIgnore]
         public bool HasTag => !string.IsNullOrEmpty(Tag);
