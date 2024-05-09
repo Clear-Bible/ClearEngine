@@ -37,7 +37,7 @@ namespace ClearBible.Engine.Utils
 
             Type? baseType = iId.GetType().BaseType;
 
-            if (baseType == typeof(System.Object))
+            if (baseType == null || baseType == typeof(System.Object))
             {
                 baseType= iId.GetType();
             }
