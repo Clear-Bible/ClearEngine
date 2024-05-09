@@ -35,7 +35,7 @@ namespace ClearBible.Engine.Utils
         {
             Type? entityIdType = null;
 
-            Type? baseType = iId.GetType().BaseType;
+            Type? baseType = iId.GetType();
             while (baseType != null)
             {
                 if (baseType.IsGenericType)
