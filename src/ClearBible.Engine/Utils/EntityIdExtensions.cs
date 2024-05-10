@@ -33,9 +33,27 @@ namespace ClearBible.Engine.Utils
 
         public static (string name, Guid id) GetNameAndId(this IId iId)
         {
-            Type? entityIdType = null;
+            var entityIdType = default(Type?);
 
-            Type? baseType = iId.GetType().BaseType;
+            var baseType = iId.GetType();
+
+            // In certain cases the base type of the IID passed not an EntityId<> (i.e. it's System.Object)
+            // so we need to see if it is a generic type and if it is, we need to check if it is a derivative of EntityId<>
+            if (baseType?.IsGenericType ?? false)
+            {
+                var genericTypeDefinition = baseType.GetGenericTypeDefinition();
+
+                if (genericTypeDefinition != typeof(EntityId<>))
+                {
+                    baseType = baseType?.BaseType;
+                }
+            }
+            else
+            {
+                // this is the normal case
+                baseType = baseType?.BaseType;
+            }
+
             while (baseType != null)
             {
                 if (baseType.IsGenericType)
@@ -52,7 +70,7 @@ namespace ClearBible.Engine.Utils
             }
 
             if (entityIdType == null)
-                throw new InvalidParameterEngineException(name: "iId", value: iId.GetType().FullName ?? "GetType().FullName is null", message: "not a derivative of generic EntityId<>");
+                throw new InvalidParameterEngineException(name: "iId", value: iId.GetType().FullName ?? "GetType().FullName is null", message: "not a generic EntityId<> or a derivative of it");
 
             return (entityIdType.AssemblyQualifiedName ?? throw new InvalidStateEngineException(name: "AssemblyQualifiedName", value: iId.GetType().FullName ?? "", message: "is null"), iId.Id);
         }
