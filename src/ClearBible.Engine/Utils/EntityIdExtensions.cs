@@ -38,7 +38,8 @@ namespace ClearBible.Engine.Utils
             var baseType = iId.GetType();
 
             // In certain cases the base type of the IID passed not an EntityId<> (i.e. it's System.Object)
-            // so we need to see if it is a generic type and if it is, we need to check if it is a derivative of EntityId<>
+            // so we need to see if the type is a generic type and if it is, we need to check if it is a
+            // derivative of EntityId<>.  If it is not a derivative then we to use its base type as is otherwise the type as is.
             if (baseType?.IsGenericType ?? false)
             {
                 var genericTypeDefinition = baseType.GetGenericTypeDefinition();
@@ -54,6 +55,8 @@ namespace ClearBible.Engine.Utils
                 baseType = baseType?.BaseType;
             }
 
+
+            // this is the original code as written by Russell...
             while (baseType != null)
             {
                 if (baseType.IsGenericType)
