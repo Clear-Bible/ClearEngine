@@ -35,11 +35,20 @@ namespace ClearBible.Engine.Utils
         {
             Type? entityIdType = null;
 
-            Type? baseType = iId.GetType().BaseType;
+            Type? baseType = iId.GetType();
 
-            if (baseType == null || baseType == typeof(System.Object))
+            if (baseType?.IsGenericType ?? false)
             {
-                baseType= iId.GetType();
+                var genericTypeDefinition = baseType.GetGenericTypeDefinition();
+
+                if (genericTypeDefinition != typeof(EntityId<>))
+                {
+                    baseType = baseType?.BaseType;
+                }
+            }
+            else
+            {
+                baseType = baseType?.BaseType;
             }
 
             while (baseType != null)
@@ -58,7 +67,7 @@ namespace ClearBible.Engine.Utils
             }
 
             if (entityIdType == null)
-                throw new InvalidParameterEngineException(name: "iId", value: iId.GetType().FullName ?? "GetType().FullName is null", message: "not a derivative of generic EntityId<>");
+                throw new InvalidParameterEngineException(name: "iId", value: iId.GetType().FullName ?? "GetType().FullName is null", message: "not a generic EntityId<> or a derivative of it");
 
             return (entityIdType.AssemblyQualifiedName ?? throw new InvalidStateEngineException(name: "AssemblyQualifiedName", value: iId.GetType().FullName ?? "", message: "is null"), iId.Id);
         }
