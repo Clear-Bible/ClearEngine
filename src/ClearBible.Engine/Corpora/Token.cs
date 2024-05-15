@@ -75,11 +75,44 @@ namespace ClearBible.Engine.Corpora
             }
         }
 
-        [XmlIgnore]
-        public virtual string? Tag { get; set; }
 
         [XmlIgnore]
-        public bool HasTag => !string.IsNullOrEmpty(Tag);
+        public virtual Dictionary<string, object> Metadata { get; set; } = new();
+
+        public bool HasMetadatum(string key)
+        {
+            return Metadata.ContainsKey(key);
+        }
+
+        public T GetMetadatum<T>(string key)
+        {
+            if (!Metadata.TryGetValue(key, out var item))
+            {
+                throw new KeyNotFoundException($"Key '{key}' not found in Metadata");
+            }
+
+            if (item is T metadatum)
+            {
+                return metadatum;
+            }
+
+            try
+            {
+                var obj = Convert.ChangeType(item, typeof(T));
+                if (obj is T metadatum2)
+                {
+                    return metadatum2;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidCastException($"Cannot cast '{item}' to {typeof(T).Name}", ex);
+            }
+
+
+            throw new InvalidCastException($"Value for key '{key}' is not of type '{typeof(T).Name}'");
+        }
+
 
         public void AddToExtendedProperties(string xmlString)
         {
