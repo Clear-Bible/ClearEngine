@@ -76,8 +76,14 @@ namespace ClearBible.Engine.Corpora
         }
 
 
+        /// <summary>
+        /// A dictionary of metadata for the token.
+        /// </summary>
+        /// <remarks>
+        /// Note: this data is transient and not persisted to the database.
+        /// </remarks>
         [XmlIgnore]
-        public virtual Dictionary<string, object> Metadata { get; set; } = new();
+        public virtual Dictionary<string, object?> Metadata { get; set; } = new();
 
         public bool HasMetadatum(string key)
         {

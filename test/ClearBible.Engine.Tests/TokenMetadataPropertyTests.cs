@@ -14,6 +14,8 @@ namespace ClearBible.Engine.Tests
         }
 
         private Token token_;
+
+        private DateTime date_ = DateTime.Now;
         public TokenMetadataPropertyTests()
         {
            token_ = new Token(new TokenId(1, 1, 1, 1, 1), "surface", "training")
@@ -24,7 +26,8 @@ namespace ClearBible.Engine.Tests
                     ["string"] = "string",
                     ["double"] = 1.1,
                     ["bool"] = true,
-                    ["complex"] = new ComplexType { Name = "name", Age = 1 }
+                    ["complex"] = new ComplexType { Name = "name", Age = 1 },
+                    ["date"] = date_
                 }
             };
         }
@@ -43,6 +46,14 @@ namespace ClearBible.Engine.Tests
             Assert.True(token_.HasMetadatum("string"));
             var @string = token_.GetMetadatum<string>("string");
             Assert.Equal("string", @string);
+        }
+
+        [Fact]
+        public void CanGetDateFromMetadata()
+        {
+            Assert.True(token_.HasMetadatum("date"));
+            var @date = token_.GetMetadatum<DateTime>("date");
+            Assert.Equal(date_, @date);
         }
 
         [Fact]
