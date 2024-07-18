@@ -21,8 +21,9 @@ https://dist.nuget.org/win-x86-commandline/v5.7.3/nuget.exe
 7. Execute `nuget push .\Clear.SIL.Machine.<YOUR VERSION>.nupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
 
 
+# Building and deploying Engine Nuget package
 
-## Steps
+## Steps - Release build (This is the prefered way to build and deploy)
 
 1. Open Powershell terminal in Engine's base solution directory.		
 2. Switch to Release configuration
@@ -30,8 +31,20 @@ https://dist.nuget.org/win-x86-commandline/v5.7.3/nuget.exe
 
 4. Edit `ClearBible.Engine.nuspec` and change `<version>` to next version number
 
-5. Execute `nuget pack .\ClearBible.Engine.nuspec` to just create the *.nupkg
+5. Execute `nuget pack .\ClearBible.Engine.nuspec -Build -Prop Configuration=Release` to just create the *.nupkg
 6. Execute `nuget pack .\ClearBible.Engine.nuspec -Symbols -SymbolPackageFormat snupkg` to create both the *.nupkg and a *.snupkg
 7. Execute `nuget push .\ClearBible.Engine.X.X.X.nupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
 8. To publish the symbol package, execute `nuget push .\ClearBible.Engine.X.X.X.snupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
 
+## Steps - Debug build
+
+1. Open Powershell terminal in Engine's base solution directory.		
+2. Switch to Debug configuration
+3. Build the solution
+
+4. Edit `ClearBible.Engine.nuspec` and change `<version>` to next version number
+
+5. Execute `nuget pack .\ClearBible.Engine.nuspec -Build -Prop Configuration=Debug -Suffix debug` to just create the *.nupkg
+6. Execute `nuget pack .\ClearBible.Engine.nuspec -Symbols -SymbolPackageFormat snupkg` to create both the *.nupkg and a *.snupkg
+7. Execute `nuget push .\ClearBible.Engine.X.X.X.Debug.nupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`
+8. To publish the symbol package, execute `nuget push .\ClearBible.Engine.X.X.X.Debug.snupkg -ApiKey <YOUR KEY> -Source https://nuget.pkg.github.com/clear-bible/index.json`

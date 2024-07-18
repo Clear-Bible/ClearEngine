@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
   <metadata>
     <id>ClearBible.Engine</id>
-    <version>3.0.6</version>
+    <version>3.0.9</version>
     <authors>Clear Bible</authors>
     <projectUrl>https://github.com/Clear-Bible/ClearEngine</projectUrl>
     <description>ClearBible's Engine with SIL's Machine</description>
@@ -39,73 +39,56 @@
 	</contentFiles>
   </metadata>
   <files>
-    <file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net6.0\ClearBible.Macula.PropertiesSources.dll" target="lib\net6.0\ClearBible.Macula.PropertiesSources.dll" />
+    <file src="src\ClearBible.Macula.PropertiesSources\bin\$configuration$\net6.0\ClearBible.Macula.PropertiesSources.dll" target="lib\net6.0\ClearBible.Macula.PropertiesSources.dll" />
 	
-	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net6.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />
-    <file src="src\ClearBible.Engine\bin\Debug\net6.0\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" />
-    <file src="src\ClearBible.Engine\bin\Debug\net6.0\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" />	 
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.Aligner.dll" target="lib\net6.0\ClearBible.Engine.SyntaxTree.Aligner.dll" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.dll" target="lib\net6.0\ClearBible.Engine.dll" />
+	<file src="src\ClearBible.Macula.PropertiesSources\bin\$configuration$\net6.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />
+    <file src="src\ClearBible.Engine\bin\$configuration$\net6.0\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" />
+    <file src="src\ClearBible.Engine\bin\$configuration$\net6.0\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" />	 
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net6.0\ClearBible.Engine.SyntaxTree.Aligner.dll" target="lib\net6.0\ClearBible.Engine.SyntaxTree.Aligner.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net6.0\ClearBible.Engine.dll" target="lib\net6.0\ClearBible.Engine.dll" />
 
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.dll" target="lib\net6.0\ClearBible.Engine.SyntaxTree.dll" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\Clear.SIL.Machine.dll" target="lib\net6.0\Clear.SIL.Machine.dll" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\Clear.SIL.Machine.xml" target="lib\net6.0\Clear.SIL.Machine.xml" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.Translation.Thot.dll" target="lib\net6.0\SIL.Machine.Translation.Thot.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net6.0\ClearBible.Engine.SyntaxTree.dll" target="lib\net6.0\ClearBible.Engine.SyntaxTree.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net6.0\Clear.SIL.Machine.dll" target="lib\net6.0\Clear.SIL.Machine.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net6.0\Clear.SIL.Machine.xml" target="lib\net6.0\Clear.SIL.Machine.xml" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net6.0\SIL.Machine.Translation.Thot.dll" target="lib\net6.0\SIL.Machine.Translation.Thot.dll" />
 	
     <file src="src\ClearBible.Engine\books.csv" target="contentFiles\any\any\books.csv" />
-    <file src="src\ClearBible.Engine.SyntaxTree\bin\Debug\net6.0\Corpora\syntaxtrees\*.*" target="contentFiles\any\any\Corpora\syntaxtrees" />
+    <file src="src\ClearBible.Engine.SyntaxTree\bin\$configuration$\net6.0\Corpora\syntaxtrees\*.*" target="contentFiles\any\any\Corpora\syntaxtrees" />
 
-	<!--
-    <file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net6.0\ClearBible.Macula.PropertiesSources.pdb" target="lib\net6.0\ClearBible.Macula.PropertiesSources.pdb" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.pdb" target="lib\net6.0\ClearBible.Engine.pdb" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.Aligner.pdb" target="lib\net6.0\ClearBible.Engine.SyntaxTree.Aligner.pdb" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\ClearBible.Engine.SyntaxTree.pdb" target="lib\net6.0\ClearBible.Engine.SyntaxTree.pdb" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\Clear.SIL.Machine.pdb" target="lib\net6.0\Clear.SIL.Machine.pdb" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net6.0\SIL.Machine.Translation.Thot.pdb" target="lib\net6.0\SIL.Machine.Translation.Thot.pdb" />
-	-->
-	
+
 	<!--net7.0 -->
-	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net7.0\ClearBible.Macula.PropertiesSources.dll" target="lib\net7.0\ClearBible.Macula.PropertiesSources.dll" />
-	<file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net7.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />
-    <file src="src\ClearBible.Engine\bin\Debug\net7.0\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" />
-    <file src="src\ClearBible.Engine\bin\Debug\net7.0\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.SyntaxTree.Aligner.dll" target="lib\net7.0\ClearBible.Engine.SyntaxTree.Aligner.dll" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.dll" target="lib\net7.0\ClearBible.Engine.dll" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.SyntaxTree.dll" target="lib\net7.0\ClearBible.Engine.SyntaxTree.dll" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\Clear.SIL.Machine.dll" target="lib\net7.0\Clear.SIL.Machine.dll" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\Clear.SIL.Machine.xml" target="lib\net7.0\Clear.SIL.Machine.xml" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\SIL.Machine.Translation.Thot.dll" target="lib\net7.0\SIL.Machine.Translation.Thot.dll" />
+	<file src="src\ClearBible.Macula.PropertiesSources\bin\$configuration$\net7.0\ClearBible.Macula.PropertiesSources.dll" target="lib\net7.0\ClearBible.Macula.PropertiesSources.dll" />
+	<file src="src\ClearBible.Macula.PropertiesSources\bin\$configuration$\net7.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />
+    <file src="src\ClearBible.Engine\bin\$configuration$\net7.0\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" />
+    <file src="src\ClearBible.Engine\bin\$configuration$\net7.0\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net7.0\ClearBible.Engine.SyntaxTree.Aligner.dll" target="lib\net7.0\ClearBible.Engine.SyntaxTree.Aligner.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net7.0\ClearBible.Engine.dll" target="lib\net7.0\ClearBible.Engine.dll" />
+    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net7.0\ClearBible.Engine.SyntaxTree.dll" target="lib\net7.0\ClearBible.Engine.SyntaxTree.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net7.0\Clear.SIL.Machine.dll" target="lib\net7.0\Clear.SIL.Machine.dll" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net7.0\Clear.SIL.Machine.xml" target="lib\net7.0\Clear.SIL.Machine.xml" />
+	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net7.0\SIL.Machine.Translation.Thot.dll" target="lib\net7.0\SIL.Machine.Translation.Thot.dll" />
 
     <file src="src\ClearBible.Engine\books.csv" target="contentFiles\any\any\books.csv" />
-    <file src="src\ClearBible.Engine.SyntaxTree\bin\Debug\net7.0\Corpora\syntaxtrees\*.*" target="contentFiles\any\any\Corpora\syntaxtrees" />
+    <file src="src\ClearBible.Engine.SyntaxTree\bin\$configuration$\net7.0\Corpora\syntaxtrees\*.*" target="contentFiles\any\any\Corpora\syntaxtrees" />
 
 
 
 
 	  <!--net8.0 -->
-    <file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net8.0\ClearBible.Macula.PropertiesSources.dll" target="lib\net8.0\ClearBible.Macula.PropertiesSources.dll" />
-    <file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net8.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />
-    <file src="src\ClearBible.Engine\bin\Debug\net8.0\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" />
-    <file src="src\ClearBible.Engine\bin\Debug\net8.0\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net8.0\ClearBible.Engine.SyntaxTree.Aligner.dll" target="lib\net8.0\ClearBible.Engine.SyntaxTree.Aligner.dll" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net8.0\ClearBible.Engine.dll" target="lib\net8.0\ClearBible.Engine.dll" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net8.0\ClearBible.Engine.SyntaxTree.dll" target="lib\net8.0\ClearBible.Engine.SyntaxTree.dll" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net8.0\Clear.SIL.Machine.dll" target="lib\net8.0\Clear.SIL.Machine.dll" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net8.0\Clear.SIL.Machine.xml" target="lib\net8.0\Clear.SIL.Machine.xml" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net8.0\SIL.Machine.Translation.Thot.dll" target="lib\net8.0\SIL.Machine.Translation.Thot.dll" />
+    <file src="src\ClearBible.Macula.PropertiesSources\bin\$configuration$\net8.0\ClearBible.Macula.PropertiesSources.dll" target="lib\net8.0\ClearBible.Macula.PropertiesSources.dll" />
+    <file src="src\ClearBible.Macula.PropertiesSources\bin\$configuration$\net8.0\Corpora\pronominalreferences\PronominalReferences.xml" target="contentFiles\any\any\Corpora\pronominalreferences\PronominalReferences.xml" />
+    <file src="src\ClearBible.Engine\bin\$configuration$\net8.0\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\combination_corrections.txt" />
+    <file src="src\ClearBible.Engine\bin\$configuration$\net8.0\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" target="contentFiles\any\any\Tokenization\Data\ChineseBibleWordTokenizer\words.txt" />
+    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net8.0\ClearBible.Engine.SyntaxTree.Aligner.dll" target="lib\net8.0\ClearBible.Engine.SyntaxTree.Aligner.dll" />
+    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net8.0\ClearBible.Engine.dll" target="lib\net8.0\ClearBible.Engine.dll" />
+    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net8.0\ClearBible.Engine.SyntaxTree.dll" target="lib\net8.0\ClearBible.Engine.SyntaxTree.dll" />
+    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net8.0\Clear.SIL.Machine.dll" target="lib\net8.0\Clear.SIL.Machine.dll" />
+    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net8.0\Clear.SIL.Machine.xml" target="lib\net8.0\Clear.SIL.Machine.xml" />
+    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\$configuration$\net8.0\SIL.Machine.Translation.Thot.dll" target="lib\net8.0\SIL.Machine.Translation.Thot.dll" />
 
     <file src="src\ClearBible.Engine\books.csv" target="contentFiles\any\any\books.csv" />
-    <file src="src\ClearBible.Engine.SyntaxTree\bin\Debug\net8.0\Corpora\syntaxtrees\*.*" target="contentFiles\any\any\Corpora\syntaxtrees" />
+    <file src="src\ClearBible.Engine.SyntaxTree\bin\$configuration$\net8.0\Corpora\syntaxtrees\*.*" target="contentFiles\any\any\Corpora\syntaxtrees" />
 
-	<!--
-    <file src="src\ClearBible.Macula.PropertiesSources\bin\Debug\net7.0\ClearBible.Macula.PropertiesSources.pdb" target="lib\net7.0\ClearBible.Macula.PropertiesSources.pdb" />
-    <file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.pdb" target="lib\net7.0\ClearBible.Engine.pdb" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.SyntaxTree.Aligner.pdb" target="lib\net7.0\ClearBible.Engine.SyntaxTree.Aligner.pdb" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.pdb" target="lib\net7.0\ClearBible.Engine.pdb" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\ClearBible.Engine.SyntaxTree.pdb" target="lib\net7.0\ClearBible.Engine.SyntaxTree.pdb" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\Clear.SIL.Machine.pdb" target="lib\net7.0\Clear.SIL.Machine.pdb" />
-	<file src="src\ClearBible.Engine.SyntaxTree.Aligner\bin\Debug\net7.0\SIL.Machine.Translation.Thot.pdb" target="lib\net7.0\SIL.Machine.Translation.Thot.pdb" />
-	-->
 
   </files>
 </package>
