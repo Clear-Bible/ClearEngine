@@ -92,7 +92,7 @@ namespace ClearBible.Engine.Corpora
 				.GroupBy(t => t.TokenId)
 				.Any(g => g.Count() > 1))
             {
-                throw new InvalidDataEngineException(name: "Tokens", message: "set of all Tokens and CompositeToken children Tokens and OtherTokens has one ore more duplicate Token.TokenIds");
+                throw new InvalidDataEngineException(name: "Tokens", message: "set of all Tokens and CompositeToken children Tokens and OtherTokens has one or more duplicate Token.TokenIds");
             }
 #endif
 			return packedTokens;
