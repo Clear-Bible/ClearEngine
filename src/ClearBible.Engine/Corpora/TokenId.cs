@@ -14,7 +14,7 @@ namespace ClearBible.Engine.Corpora
         public virtual string Book
         {
             get => BookIds
-                    .Where(b => b.silCannonBookNum.Equals(BookNumber))
+                    .Where(b => b.silCannonBookNum.Equals(BookNumber.ToString()))
                     .Select(b => b.silCannonBookAbbrev)
                     .FirstOrDefault() 
                         ?? throw new InvalidBookMappingEngineException(
